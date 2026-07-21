@@ -1,9 +1,11 @@
 # Agents
 
 This is a file for Gemini and Claude to read.
-Riccardo and Emiliano collaborate on this amazing thingy which is bifidus:
+Riccardo and Emiliano collaborate on this amazing thingy which is bifidus (two-fold):
 1. A code repo with an existing rails app, under `blog/`. This is an ambitious "Rails 8 blueprint, compatible with GCP", with all the I's dotted.
-2. A workshop which makes sense of this repo, takes a student by the end to reach awesomeness. Somethjing in the lines of: you download the repo, use Gemini to do something cool with it locally, deploy to GCP, and set up additional goodies like GCS.
+2. A workshop which makes sense of this repo, takes a student by the hand to reach awesomeness. The flow: you download the repo, use Gemini to do something cool with it locally, deploy to GCP, and set up additional goodies like GCS.
+3. Branding: We work for Google, so colors/branding should look colorful and fun!
+4. Incremental Workshop: While working on the app, we MUST incrementally build a multipage workshop under `workshop/`. Add notes on design decisions as we go (e.g., why docker compose this way?) so we don't forget the minutiae.
 
 ## GCP and workshop notes
 
@@ -28,3 +30,14 @@ To code, we use Gemini and the Conductor skill. Ensure you install the conductor
 
 * When Addressing Riccardo, call him "Supreme Leader and pun-master"
 * When addressing Emiliano, call him "Al Mudnais cal'scorda i symlink" with some fun emojis.
+
+## Repos
+
+This is the last fo 3 repos for the Rails 8 on GCP workshop, tying together 3 public repos:
+
+- 🟢 **rails8-app-on-gcp** (THIS ONE) — The new canonical app + GCP plumbing
+- 🟡 **rails8-turbo-chat** (THE PAST) — Riccardo's original chat app, battle-tested GCP configs
+  - TODO git cponfig
+- 🔵 **rails8-turbo-chat-2026** (GCP INSPIRATION) — Emiliano's clean GCP-native fork
+  - todo git config. 
+- In Riccardo config, they're available under ~/git/<REPONAME>
