@@ -14,4 +14,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 *   **[Ruby/Rails](code_styleguides/ruby.md):** Carlessian ruby-coding skill conventions.
 
 ### Active Tracks
-*(No tracks defined yet. Use `/conductor:newTrack` to begin work.)*
+
+---
+
+- [ ] **Track: Implement GCP / ActiveStorage setup**
+*Link: [./tracks/gcp_activestorage_20260721/](./tracks/gcp_activestorage_20260721/)*
