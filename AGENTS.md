@@ -21,6 +21,8 @@ Riccardo and Emiliano collaborate on this amazing thingy which is bifidus:
 ## AI Dev
 
 To code, we use Gemini and the Conductor skill. Ensure you install the conductor skill here: https://github.com/gemini-cli-extensions/conductor
+* Ensure proper versioning is happening in `CHANGELOG.md`. This needs to align to app version. this is super important for workshops, so we can say "since/until v1.2.3 this /wasis...", great for errata.
+* You decide where version is, but it needs to be surfaced in footer, alongside a link to GH code!
 
 ## Personas
 
