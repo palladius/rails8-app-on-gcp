@@ -11,6 +11,8 @@
 
 ## Task Workflow
 
+**Workflow Strategy:** Iterative - One phase/task at a time with user review.
+
 All tasks follow a strict lifecycle:
 
 ### Standard Task Workflow
