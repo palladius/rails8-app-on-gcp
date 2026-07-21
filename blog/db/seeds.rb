@@ -18,3 +18,7 @@ Post.find_or_create_by!(title: "Welcome to our amazing Workshop") do |post|
   post.body = "Riccardo and Emiliano welcome you to this amazing Workshop!"
   post.updated_at = Time.zone.parse("2026-07-21 10:35:00")
 end
+
+welcome_post = Post.find_by(title: "Welcome to our amazing Workshop")
+welcome_post.comments.find_or_create_by!(content: "Riccardo: This is going to be an epic workshop! 🚀")
+welcome_post.comments.find_or_create_by!(content: "Emiliano: Can't wait to show everyone the Cloud Run setup! ☁️")
