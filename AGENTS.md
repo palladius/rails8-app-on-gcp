@@ -12,6 +12,7 @@ Riccardo and Emiliano collaborate on this amazing thingy which is bifidus (two-f
 1. `Activestorage`+`GCS` has always been a pain for Riccardo to setup. This needs to be properly tested with non-public objects.
 2. We want to demonstrate `docker-compose` in Cloud Run. Rubyists nowadays are skeptical about the Cloud, they use Kamal and SQlite love Cloud re-patriation. To win their heart we need to meet them where they are: in localhost and baremetal - or make GCP look like it as much as possible :)
 3. I think we can skip kafka/PubSub and use DB queues. This was Emiliano suggestion and I think this is what the chat 2026 uses. Please doouble check it, and I'm happy to take a critical look at other options leveraging `docker-compose`.
+4. Use Fabric FAST for GCP Terraform.
 
 ## Folder structure
 

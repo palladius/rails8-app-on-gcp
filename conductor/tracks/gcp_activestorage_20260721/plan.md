@@ -1,7 +1,7 @@
 # Implementation Plan: GCP ActiveStorage & Arch Setup
 
 ## Phase 1: Infrastructure as Code (GCP Resources)
-- [ ] Task: Initialize Terraform in `iac/` and define Google Cloud Foundation Fabric modules for GCS buckets (dev, test, prod).
+- [~] Task: Initialize Terraform in `iac/` and define Google Cloud Foundation Fabric modules for GCS buckets (dev, test, prod).
 - [ ] Task: Define the Cloud Run Service Account and IAM permissions (Storage Object Admin on buckets) in Terraform.
 - [ ] Task: Define GCP Secret Manager resource for `RAILS_MASTER_KEY` and grant access to the Cloud Run Service Account in Terraform.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure as Code' (Protocol in workflow.md)
