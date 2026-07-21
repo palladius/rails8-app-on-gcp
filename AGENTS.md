@@ -6,7 +6,9 @@ riccardo and Emiliano collaborate on this amazing thingy.
 
 ## Folder structure
 
-* App will be under `rails-app/`
+* App is under `blog/`
+* Workshop is (temporarily) under `workshop/`
+* GCP setup is going under `iac/`
 * Do not use EXTERNAL symlinks, copy the whole app in here, maybe without `.env`. ;)
 
 ## Personas
