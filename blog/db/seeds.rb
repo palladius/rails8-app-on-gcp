@@ -7,4 +7,14 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-User.create!(email_address: "<YUOR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
+
+#User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
+
+User.find_or_create_by!(email_address: "riccardo@example.com") do |user|
+  user.password = "Ch4ng3m3!!1"
+end
+
+Post.find_or_create_by!(title: "Welcome to our amazing Workshop") do |post|
+  post.body = "Riccardo and Emiliano welcome you to this amazing Workshop!"
+  post.updated_at = Time.zone.parse("2026-07-21 10:35:00")
+end

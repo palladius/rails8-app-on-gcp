@@ -1,0 +1,10 @@
+default:
+    @just --list
+
+install:
+    bundle install
+    bin/rails db:prepare
+    bin/rails db:seed
+
+dev:
+    bin/dev -p 9090
