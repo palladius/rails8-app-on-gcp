@@ -23,12 +23,21 @@ welcome_post.update!(
 )
 
 # Attach test image for end-to-end ActiveStorage GCS verification
+# Attach test image for end-to-end ActiveStorage GCS verification
 image_name = "gcs_#{Rails.env}_image.jpg"
 image_path = Rails.root.join("app", "assets", "images", image_name)
 
 if File.exist?(image_path) && !welcome_post.cover_image.attached?
-  puts "* Attaching #{image_name} to the welcome post"
-  welcome_post.cover_image.attach(io: File.open(image_path), filename: image_name, content_type: "image/jpeg")
+  puts "* Attaching #{image_name} to the welcome post from pre-uploaded GCS object"
+  
+  blob = ActiveStorage::Blob.find_or_create_by!(key: "seeds/#{image_name}") do |b|
+    b.filename = image_name
+    b.content_type = "image/jpeg"
+    b.byte_size = File.size(image_path)
+    b.checksum = Digest::MD5.file(image_path).base64digest
+  end
+  
+  welcome_post.cover_image.attach(blob)
 end
 
 puts "* Adding 2 comments to the post"

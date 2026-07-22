@@ -42,6 +42,25 @@ module "gcs_prod" {
   location   = var.region
 }
 
+# Seed Images for ActiveStorage End-to-End Testing
+resource "google_storage_bucket_object" "dev_seed_image" {
+  name   = "seeds/gcs_dev_image.jpg"
+  bucket = module.gcs_dev.name
+  source = "../blog/app/assets/images/gcs_dev_image.jpg"
+}
+
+resource "google_storage_bucket_object" "test_seed_image" {
+  name   = "seeds/gcs_test_image.jpg"
+  bucket = module.gcs_test.name
+  source = "../blog/app/assets/images/gcs_test_image.jpg"
+}
+
+resource "google_storage_bucket_object" "prod_seed_image" {
+  name   = "seeds/gcs_prod_image.jpg"
+  bucket = module.gcs_prod.name
+  source = "../blog/app/assets/images/gcs_prod_image.jpg"
+}
+
 # Cloud Run Service Account
 module "service_account_cloud_run" {
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v34.0.0"
