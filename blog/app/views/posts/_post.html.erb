@@ -9,6 +9,12 @@
     <%= post.body %>
   </div>
 
+  <% if post.cover_image.attached? %>
+    <div style="margin-top: 1em; max-width: 600px;">
+      <%= image_tag post.cover_image, style: "max-width: 100%; height: auto;" %>
+    </div>
+  <% end %>
+
   <p>
     <strong>Updated at:</strong>
     <%= time_tag post.updated_at, "data-local": "time", "data-format": "%B %e, %Y %l:%M%P" %>

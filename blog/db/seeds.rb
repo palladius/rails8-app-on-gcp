@@ -16,12 +16,21 @@ User.find_or_create_by!(email_address: "riccardo@example.com") do |user|
 end
 
 puts "* Adding a post"
-Post.find_or_create_by!(title: "Welcome to our amazing Workshop") do |post|
-  post.body = "Riccardo and Emiliano welcome you to this amazing Workshop!"
-  post.updated_at = Time.zone.parse("2026-07-21 10:35:00")
+welcome_post = Post.find_or_create_by!(title: "Welcome to our amazing Workshop")
+welcome_post.update!(
+  body: "Riccardo and Emiliano welcome you to this amazing Workshop!",
+  updated_at: Time.zone.parse("2026-07-21 10:35:00")
+)
+
+# Attach test image for end-to-end ActiveStorage GCS verification
+image_name = "gcs_#{Rails.env}_image.jpg"
+image_path = Rails.root.join("app", "assets", "images", image_name)
+
+if File.exist?(image_path) && !welcome_post.cover_image.attached?
+  puts "* Attaching #{image_name} to the welcome post"
+  welcome_post.cover_image.attach(io: File.open(image_path), filename: image_name, content_type: "image/jpeg")
 end
 
-welcome_post = Post.find_by(title: "Welcome to our amazing Workshop")
 puts "* Adding 2 comments to the post"
 welcome_post.comments.find_or_create_by!(content: "Riccardo: This is going to be an epic workshop! 🚀")
 welcome_post.comments.find_or_create_by!(content: "Emiliano: Can't wait to show everyone the Cloud Run setup! ☁️")
