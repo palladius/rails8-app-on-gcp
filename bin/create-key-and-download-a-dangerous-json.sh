@@ -8,8 +8,8 @@ echo "Creating and downloading Service Account JSON keys poses a significant sec
 echo "Use ADC (Application Default Credentials) whenever possible."
 echo "----------------------------------------------------------------------------------"
 
-KEY_PATH="private/gcp-key.json"
-PROJECT_ID="palladius-genai"
+PROJECT_ID=$(grep '^GOOGLE_CLOUD_PROJECT=' ../.env | cut -d '"' -f 2)
+KEY_PATH="private/${PROJECT_ID}-key.json"
 SA_NAME="workshop-tf-runner"
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 

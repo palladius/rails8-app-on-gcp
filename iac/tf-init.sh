@@ -1,3 +1,10 @@
+
+# Auto-load project-specific JSON key if it exists
+if [ -f "../private/${GOOGLE_CLOUD_PROJECT}-key.json" ]; then
+  export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/../private/${GOOGLE_CLOUD_PROJECT}-key.json"
+  echo "🔑 Using project-specific JSON key for authentication"
+fi
+
 #!/bin/bash
 # iac/tf-init.sh
 set -e

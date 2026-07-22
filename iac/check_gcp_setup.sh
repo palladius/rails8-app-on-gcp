@@ -4,10 +4,19 @@
 
 set -e
 
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
-if [ -z "$PROJECT_ID" ]; then
-  echo "❌ No default project set in gcloud. Run: gcloud config set project <PROJECT_ID>"
-  exit 1
+if [ -f "../.env" ]; then
+  source ../.env
+fi
+
+if [ -z "$GOOGLE_CLOUD_PROJECT" ]; then
+  PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
+else
+  PROJECT_ID=$GOOGLE_CLOUD_PROJECT
+fi
+
+if [ -f "../private/${PROJECT_ID}-key.json" ]; then
+  export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/../private/${PROJECT_ID}-key.json"
+  echo "🔑 Using project-specific JSON key for authentication"
 fi
 
 echo "🔍 Checking GCP setup for project: $PROJECT_ID"
