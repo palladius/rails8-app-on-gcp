@@ -13,7 +13,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: ActiveStorage Configuration' (Protocol in workflow.md)
 
 ## Phase 3: Validation & Stats Script
-- [ ] Task: Create `iac/check_gcp_setup.sh` (or ruby equivalent) script.
-- [ ] Task: Implement authentication (ADC), GCS bucket existence checks, and Secret Manager checks in the script.
-- [ ] Task: Implement media count fetching per `RAILS_ENV` (dev, test, prod) inside the script and format output.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Validation & Stats Script' (Protocol in workflow.md)
+- [x] Task: Create `iac/check_gcp_setup.sh` (or ruby equivalent) script.
+- [x] Task: Implement authentication (ADC), GCS bucket existence checks, and Secret Manager checks in the script.
+- [x] Task: Implement media count fetching per `RAILS_ENV` (dev, test, prod) inside the script and format output.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Validation & Stats Script' (Protocol in workflow.md)
+## Phase 4: Thorough Testing and UAT Acceptance Plan
+- [x] Task: Create TEST.md for 95% automated test plan and 5% manual steps.
+- [ ] Task: Review TEST.md with user and execute manual tests.
