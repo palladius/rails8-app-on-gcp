@@ -33,7 +33,6 @@
         </div>
         <div class="app-nav-links">
           <%= link_to "Posts", posts_path %>
-          <%= link_to "New Post", new_post_path %>
           <% if authenticated? %>
             <span class="user-badge">🧑‍💻 <%= Current.user.email_address.split('@').first %></span>
             <%= button_to "Sign out", session_path, method: :delete, class: "sign-out-btn" %>
