@@ -41,3 +41,11 @@ else
 fi
 
 echo "🎉 GCP Verification complete."
+
+echo "4️⃣ Checking Terraform State GCS Bucket..."
+TF_BUCKET="${PROJECT_ID}-tfstate"
+if gcloud storage ls "gs://${TF_BUCKET}" &>/dev/null; then
+  echo "✅ TF State Bucket gs://${TF_BUCKET} exists."
+else
+  echo "❌ TF State Bucket gs://${TF_BUCKET} DOES NOT exist!"
+fi
