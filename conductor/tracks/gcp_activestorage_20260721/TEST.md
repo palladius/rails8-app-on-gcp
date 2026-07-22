@@ -52,3 +52,9 @@ Run the Rails app locally (e.g., using `just s` or `bin/rails s` in the `blog/` 
 
 ### Sign-off
 If the media count increases and the app works, we are 100% complete!
+
+### Step 4: Verify GCS Terraform State on a Virgin Project
+1. Change the `GOOGLE_CLOUD_PROJECT` in `.env` to a completely new (virgin) GCP project id.
+2. Run `cd emiliano-new-app/iac && ./tf-init.sh` to initialize the GCS backend.
+3. Run `terraform apply -var="project_id=$GOOGLE_CLOUD_PROJECT"`.
+4. Ensure the state is properly captured in the newly created `${GOOGLE_CLOUD_PROJECT}-tfstate` GCS bucket without any collisions or local state conflicts.
