@@ -6,11 +6,11 @@
 - [x] Task: Define GCP Secret Manager resource for `RAILS_MASTER_KEY` and grant access to the Cloud Run Service Account in Terraform.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure as Code' (Protocol in workflow.md)
 
-## Phase 2: ActiveStorage Configuration
-- [ ] Task: Review `rails8-turbo-chat-2026` for ActiveStorage configuration inspiration.
-- [ ] Task: Update `blog/config/storage.yml` to define GCS bucket mappings for development, test, and production.
-- [ ] Task: Update environment configuration files (`config/environments/*.rb`) to use the new GCS service.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: ActiveStorage Configuration' (Protocol in workflow.md)
+## Phase 2: ActiveStorage Configuration [a25421a]
+- [x] Task: Review `rails8-turbo-chat-2026` for ActiveStorage configuration inspiration.
+- [x] Task: Update `blog/config/storage.yml` to define GCS bucket mappings for development, test, and production.
+- [x] Task: Update environment configuration files (`config/environments/*.rb`) to use the new GCS service.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: ActiveStorage Configuration' (Protocol in workflow.md)
 
 ## Phase 3: Validation & Stats Script
 - [ ] Task: Create `iac/check_gcp_setup.sh` (or ruby equivalent) script.
