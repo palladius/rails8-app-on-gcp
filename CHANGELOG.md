@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.0] - 2026-07-22
+## [0.1.1] - 2026-07-22
 ### Added
 - 💎 Gemini-inspired blue-to-purple gradient background with glassmorphism UI
 - 🔝 Sticky header nav bar with app logo, user badge (🧑‍💻 username), sign out
