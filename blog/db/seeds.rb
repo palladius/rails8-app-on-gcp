@@ -16,7 +16,7 @@ User.find_or_create_by!(email_address: "riccardo@example.com") do |user|
 end
 
 puts "* Adding a post"
-welcome_post = Post.find_or_create_by!(title: "Welcome to our amazing Workshop")
+welcome_post = Post.find_or_create_by!(title: "Welcome to our amazing Workshop (with pic)")
 welcome_post.update!(
   body: "This post was added by `rake db:seed` and proves this image is attached and configured correctly in GCS:",
   updated_at: Time.zone.parse("2026-07-21 10:35:00")
@@ -24,7 +24,8 @@ welcome_post.update!(
 
 # Attach test image for end-to-end ActiveStorage GCS verification
 # Attach test image for end-to-end ActiveStorage GCS verification
-image_name = "gcs_#{Rails.env}_image.jpg"
+env_short = { "development" => "dev", "test" => "test", "production" => "prod" }[Rails.env] || Rails.env
+image_name = "gcs_#{env_short}_image.jpg"
 image_path = Rails.root.join("app", "assets", "images", image_name)
 
 if File.exist?(image_path) && !welcome_post.cover_image.attached?
@@ -38,6 +39,8 @@ if File.exist?(image_path) && !welcome_post.cover_image.attached?
   end
   
   welcome_post.cover_image.attach(blob)
+
+  welcome_post.comments.find_or_create_by!(content: "Gemini: Do you like my cover image?!?")
 end
 
 puts "* Adding 2 comments to the post"
