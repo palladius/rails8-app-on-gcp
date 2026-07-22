@@ -20,13 +20,17 @@
   <tbody>
     <% @posts.each_with_index do |post, idx| %>
       <tr>
-        <td><%= link_to "👁️", post, title: "Show" %> <%= link_to "✏️", edit_post_path(post), title: "Edit" %> <%= button_to "❌", post, method: :delete, form: { data: { turbo_confirm: "Delete '#{post.title}'?" } }, style: "display:inline; background:none; border:none; cursor:pointer; padding:0; font-size:inherit;", title: "Delete" %> <%= idx + 1 %></td>
+        <td style="text-align: center; white-space: nowrap;">
+          <div><%= idx + 1 %></div>
+          <div class="actions-row"><%= link_to "👁️", post, title: "Show" %><%= link_to "✏️", edit_post_path(post), title: "Edit" %><%= button_to "❌", post, method: :delete, form: { data: { turbo_confirm: "Delete '#{post.title}'?" } }, title: "Delete" %></div>
+        </td>
         <td><%= link_to post.title, post %></td>
         <td><%= truncate(post.body.to_plain_text, length: 80) %></td>
         <% image_count = (post.cover_image.attached? ? 1 : 0) + post.body.body&.attachments&.count.to_i %>
         <td style="text-align: center;"><%= image_count %></td>
         <td style="text-align: center;"><%= post.comments.size %></td>
-        <td><%= post.updated_at.year == Date.today.year ? post.updated_at.strftime("%-d %b") : post.updated_at.strftime("%-d %b %Y") %></td>
+        <% days_ago = (Date.today - post.updated_at.to_date).to_i %>
+        <td><%= case days_ago when 0 then 'today' when 1 then 'yesterday' when 2..7 then "#{days_ago}d ago" else post.updated_at.year == Date.today.year ? post.updated_at.strftime('%-d %b') : post.updated_at.strftime('%-d %b %Y') end %></td>
       </tr>
     <% end %>
   </tbody>
