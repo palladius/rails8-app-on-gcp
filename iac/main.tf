@@ -73,3 +73,60 @@ module "service_account_cloud_run" {
     ]
   }
 }
+
+resource "local_file" "readme_md" {
+  filename = "${path.module}/out/README.md"
+  content  = <<-EOT
+    # 🚀 Rails 8 GCP Infrastructure
+
+    Welcome to your dynamically generated infrastructure output!
+
+    ## 🪣 ActiveStorage Buckets
+    * 🟡 **Dev**: [gs://${module.gcs_dev.name}](https://console.cloud.google.com/storage/browser/${module.gcs_dev.name}?project=${var.project_id})
+    * 🔵 **Test**: [gs://${module.gcs_test.name}](https://console.cloud.google.com/storage/browser/${module.gcs_test.name}?project=${var.project_id})
+    * 🟢 **Prod**: [gs://${module.gcs_prod.name}](https://console.cloud.google.com/storage/browser/${module.gcs_prod.name}?project=${var.project_id})
+
+    ## 🔐 Secret Manager
+    * **rails-master-key**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${var.project_id})
+
+    *(Cloud SQL and Cloud Run links will appear here once we add them to Terraform!)*
+  EOT
+}
+
+resource "local_file" "readme_html" {
+  filename = "${path.module}/out/OUTPUT.html"
+  content  = <<-EOT
+    <html>
+      <head>
+        <title>Rails 8 GCP Infrastructure</title>
+        <style>
+          body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+          h1 { color: #d32f2f; }
+          h2 { color: #1976d2; border-bottom: 2px solid #1976d2; padding-bottom: 5px; }
+          ul { list-style-type: none; padding-left: 0; }
+          li { margin-bottom: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+          a { color: #00796b; text-decoration: none; font-weight: bold; }
+          a:hover { text-decoration: underline; }
+        </style>
+      </head>
+      <body>
+        <h1>🚀 Rails 8 GCP Infrastructure</h1>
+        <p>Welcome to your dynamically generated infrastructure output!</p>
+
+        <h2>🪣 ActiveStorage Buckets</h2>
+        <ul>
+          <li>🟡 <strong>Dev</strong>: <a href="https://console.cloud.google.com/storage/browser/${module.gcs_dev.name}?project=${var.project_id}">gs://${module.gcs_dev.name}</a></li>
+          <li>🔵 <strong>Test</strong>: <a href="https://console.cloud.google.com/storage/browser/${module.gcs_test.name}?project=${var.project_id}">gs://${module.gcs_test.name}</a></li>
+          <li>🟢 <strong>Prod</strong>: <a href="https://console.cloud.google.com/storage/browser/${module.gcs_prod.name}?project=${var.project_id}">gs://${module.gcs_prod.name}</a></li>
+        </ul>
+
+        <h2>🔐 Secret Manager</h2>
+        <ul>
+          <li><strong>rails-master-key</strong>: <a href="https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${var.project_id}">View in Secret Manager</a></li>
+        </ul>
+
+        <p><em>(Cloud SQL and Cloud Run links will appear here once we add them to Terraform!)</em></p>
+      </body>
+    </html>
+  EOT
+}
