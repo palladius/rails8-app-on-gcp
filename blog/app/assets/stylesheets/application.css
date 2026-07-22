@@ -8,3 +8,251 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* === Gemini-inspired gradient background === */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7b2d8e 100%);
+  background-attachment: fixed;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* === App Header === */
+.app-header {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header nav {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-logo {
+  height: 36px;
+  width: auto;
+  border-radius: 6px;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.header-logo:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
+
+.app-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.app-nav-links a {
+  color: #b0bec5;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.app-nav-links a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.user-badge {
+  color: #ce93d8;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sign-out-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ef9a9a;
+  border: 1px solid rgba(239, 154, 154, 0.3);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.sign-out-btn:hover {
+  background: rgba(239, 154, 154, 0.15);
+}
+
+/* === Main content container === */
+main {
+  max-width: 960px;
+  margin: 1rem auto;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  background: linear-gradient(90deg, #4fc3f7, #ab47bc, #ec407a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+/* === Posts table === */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+table thead tr {
+  background: linear-gradient(90deg, rgba(79, 195, 247, 0.25), rgba(171, 71, 188, 0.25));
+}
+
+table th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #b0bec5;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
+}
+
+table tbody tr {
+  transition: background 0.2s ease;
+}
+
+table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* === Links === */
+a {
+  color: #80cbc4;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #b2dfdb;
+  text-decoration: underline;
+}
+
+
+
+a[href$="/posts/new"] {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #4fc3f7, #ab47bc);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+a[href$="/posts/new"]:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: #fff;
+}
+
+/* === Inline delete button fix === */
+form[style*="display:inline"] {
+  display: inline !important;
+}
+
+/* === Flash notice === */
+.flash-notice {
+  background: rgba(76, 175, 80, 0.15);
+  color: #81c784;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+/* === Footer === */
+.app-footer {
+  max-width: 960px;
+  margin: 0.5rem auto 1rem;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  color: #616161;
+  letter-spacing: 0.03em;
+}
+
+.footer-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.footer-bottom a {
+  color: #9e9e9e;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-bottom a:hover {
+  color: #ce93d8;
+  text-decoration: underline;
+}
+
+.ruby-icon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin: 0 2px;
+}
+
