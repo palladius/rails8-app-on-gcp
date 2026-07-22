@@ -31,14 +31,11 @@ image_path = Rails.root.join("app", "assets", "images", image_name)
 if File.exist?(image_path) && !welcome_post.cover_image.attached?
   puts "* Attaching #{image_name} to the welcome post from pre-uploaded GCS object"
   
-  blob = ActiveStorage::Blob.find_or_create_by!(key: "seeds/#{image_name}") do |b|
-    b.filename = image_name
-    b.content_type = "image/jpeg"
-    b.byte_size = File.size(image_path)
-    b.checksum = Digest::MD5.file(image_path).base64digest
-  end
-  
-  welcome_post.cover_image.attach(blob)
+  welcome_post.cover_image.attach(
+    io: File.open(image_path),
+    filename: image_name,
+    content_type: "image/jpeg"
+  )
 
   welcome_post.comments.find_or_create_by!(content: "Gemini: Do you like my cover image?!?")
 else
@@ -56,9 +53,9 @@ local_post.update!(
 local_image_name = "local_sad_image.png"
 local_image_path = Rails.root.join("app", "assets", "images", local_image_name)
 
-if File.exist?(local_image_path) && !local_post.cover_image.attached?
+if File.exist?(local_image_path) && !local_post.local_image.attached?
   puts "* Attaching #{local_image_name} to the local post via standard ActiveStorage"
-  local_post.cover_image.attach(
+  local_post.local_image.attach(
     io: File.open(local_image_path),
     filename: local_image_name,
     content_type: "image/png"
