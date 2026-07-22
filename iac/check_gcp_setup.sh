@@ -41,11 +41,18 @@ else
   echo "  ❌ Service Account $SA_EMAIL DOES NOT exist!"
 fi
 
-echo -e "\n=== 3️⃣ Checking Secret Manager for RAILS_MASTER_KEY ==="
+echo -e "\n=== 3️⃣ Checking RAILS_MASTER_KEY (GCP & Local) ==="
 if gcloud secrets describe "rails-master-key" &>/dev/null; then
-  echo "  ✅ Secret 'rails-master-key' exists."
+  echo "  ✅ GCP Secret 'rails-master-key' exists."
 else
-  echo "  ❌ Secret 'rails-master-key' DOES NOT exist!"
+  echo "  ❌ GCP Secret 'rails-master-key' DOES NOT exist!"
+fi
+
+if [ -f "blog/config/master.key" ] && [ -f "blog/config/credentials.yml.enc" ]; then
+  echo "  ✅ Local blog/config/master.key and credentials.yml.enc exist."
+else
+  echo "  ❌ Local blog/config/master.key or credentials.yml.enc is missing!"
+  echo "     (Run: cd blog && EDITOR=nano bin/rails credentials:edit)"
 fi
 
 echo "🎉 GCP Verification complete."
