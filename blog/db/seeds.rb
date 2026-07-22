@@ -18,7 +18,7 @@ end
 puts "* Adding a post"
 welcome_post = Post.find_or_create_by!(title: "Welcome to our amazing Workshop")
 welcome_post.update!(
-  body: "Riccardo and Emiliano welcome you to this amazing Workshop!",
+  body: "This post was added by `rake db:seed` and proves this image is attached and configured correctly in GCS:",
   updated_at: Time.zone.parse("2026-07-21 10:35:00")
 )
 
