@@ -10,44 +10,48 @@
 
 | Campo | Valore |
 |-------|--------|
-| **Titolo** | Costruisci la Tua Prima App AI con Rails 8 e Gemini |
-| **Formato** | Workshop (Laboratorio Pratico) — 90 minuti |
+| **Titolo** | Vibe-Coda la Tua Prima App Rails 8 con Gemini |
+| **Formato** | Workshop (Laboratorio Pratico) — 120 minuti |
 | **Lingua** | Italiano *(disponibile anche in inglese)* |
 | **Livello** | Principiante / Intermedio |
-| **Tag** | `Google Cloud`, `GenAI`, `Sviluppo Web`, `AI Agents`, `Open Source`, `Hands-On` |
+| **Tag** | `Google Cloud`, `Ruby on Rails`, `Sviluppo Web`, `AI-Assisted Development`, `Open Source`, `Hands-On` |
 
 ---
 
 ## 📝 Abstract
 
-Non serve conoscere Ruby per partecipare a questo workshop — basta portare il portatile e un po' di curiosità.
+Non serve conoscere Ruby. Non serve conoscere Rails. Ti bastano un portatile e 120 minuti — al resto pensiamo noi.
 
-In 90 minuti, partirai da zero e costruirai un'applicazione di chat con intelligenza artificiale che genera risposte in tempo reale e opere d'arte AI, il tutto in esecuzione sulla tua macchina. Niente slide, niente teoria a raffica — solo codice, esperimenti e quella sensazione magica di "wow, l'ho costruito io!".
+In questo workshop costruirai una vera applicazione web da zero usando **Rails 8** e **Gemini** come tuo AI pair programmer. Invece di memorizzare la sintassi o leggere documentazione, farai *vibe-coding*: descrivi quello che vuoi in linguaggio naturale, lasci che l'AI scriva il codice, capisci cosa ha fatto e iteri. È il modo più veloce per imparare un framework nuovo — e anche il più divertente.
 
-Useremo **Rails 8** (l'ultima versione, con job in background e aggiornamenti in tempo reale integrati) e **Google Gemini** per costruire un'app di chat che risponde in modo intelligente e crea immagini al volo. Poi la trasformeremo in un **server MCP** — il nuovo standard aperto che permette ad assistenti AI come Gemini CLI di interagire direttamente con i dati della tua app usando linguaggio naturale.
+Si parte da un'app Rails 8 pulita — post, commenti, upload di immagini, aggiornamenti in tempo reale — e da lì la estenderai con le tue idee. Vuoi aggiungere una feature? Chiedi a Gemini. Vuoi capire come si collegano i modelli? Chiedi a Gemini di disegnarti un diagramma architetturale. Vuoi deployarla nel cloud? C'è già un percorso pronto verso Google Cloud Run integrato nell'app.
 
 **Cosa imparerai:**
 
-- Un'app di chat AI funzionante sul tuo portatile con risposte in streaming in tempo reale
-- Esperienza pratica con **MCP (Model Context Protocol)** — lo standard di interoperabilità più in voga nel mondo AI
-- Il tuo primo tool MCP personalizzato: insegnare a un'AI a interrogare il tuo database in italiano!
-- Un percorso chiaro per deployare tutto su **Google Cloud Run** senza mal di testa DevOps
+- Un'app Rails 8 funzionante sul tuo portatile, costruita da te (con l'aiuto dell'AI!)
+- Esperienza pratica con **Gemini CLI** e lo **sviluppo assistito dall'AI** — la competenza che sta cambiando il modo in cui programmiamo
+- Come funziona un'app Rails 8 moderna: modelli, viste, aggiornamenti in tempo reale, upload di immagini
+- Un'app production-ready che puoi portare a casa, personalizzare e deployare su **Google Cloud** quando vuoi
 
 **Cosa ti serve:**
 
-- Un portatile con Docker installato
-- Una chiave API gratuita di Google AI Studio (ti aiutiamo noi a ottenerla!)
-- Zero esperienza Ruby richiesta — ti guidiamo passo dopo passo
+- Un portatile — **macOS o Linux** funzionano subito. **Windows?** Nessun problema! Vieni con WSL2 o una VM Linux installata e sei a posto — saremo lì per aiutarti con il setup anche prima che il workshop inizi
+- Una chiave API gratuita di Google AI Studio (ti guidiamo noi nell'ottenerla!)
+- **Zero esperienza Ruby richiesta** — è proprio questo il punto. Ti guidiamo passo dopo passo, e Gemini riempie i buchi
 
-Che tu sia uno sviluppatore Python curioso di altri ecosistemi, uno studente che scrive la sua prima web app, o uno sviluppatore navigato che vuole vedere cosa possono fare Rails 8 + AI insieme — questo workshop è per te.
+Che tu sia uno sviluppatore Python curioso di Ruby, uno studente che costruisce la sua prima web app, o uno sviluppatore navigato che vuole vedere com'è davvero lo sviluppo assistito dall'AI nella pratica — prendi una sedia. La barriera d'ingresso è il tuo portatile e la tua curiosità, nient'altro.
 
-Costruito con ❤️ da due Googler italiani che credono che il modo migliore per imparare l'AI sia spedire qualcosa di vero in produzione.
+Costruito con ❤️ da un Googler di stanza a Zurigo e un consulente Ruby nato e cresciuto a Modena — che credono che il modo migliore per imparare una tecnologia nuova sia spedire qualcosa di vero, con un pizzico di magia AI.
 
 ---
 
 ## 📌 Note per gli Organizzatori
 
-Questa è la **seconda edizione** del nostro workshop al DevFest Modena — la sessione dell'anno scorso ha avuto grande successo e l'abbiamo completamente ricostruita con il nuovo standard MCP e Rails 8.1. Entrambi i relatori sono Developer Advocate di Google (Riccardo per Cloud/SRE, Emiliano per Cloud Architecture) con ampia esperienza in conferenze in tutta Europa.
+Questa è la **seconda edizione** del nostro workshop al DevFest Modena. Nel 2025 abbiamo tenuto una sessione sulla costruzione di un'app di chat AI con Rails e Gemini — quest'anno abbiamo spostato il focus sullo **sviluppo assistito dall'AI**: insegnare ai partecipanti a vibe-codare un'app Rails 8 usando Gemini CLI, con un blueprint GCP production-ready come fondazione. Il progetto è open source su tre repository GitHub con documentazione completa in EN/IT.
+
+Riccardo è un Developer Advocate di Google (Cloud/SRE) di stanza a Zurigo ed Emiliano è un architetto software indipendente **nato e cresciuto a Modena** — una voce locale autentica al DevFest Modena. Insieme collegano l'ecosistema Google Cloud con la comunità Ruby attraverso modena.rb.
+
+**Lezioni dal 2025:** Gli utenti Windows hanno avuto grosse difficoltà col setup locale (Ruby, Docker, dipendenze). Quest'anno raccomandiamo esplicitamente macOS/Linux e forniamo istruzioni di setup WSL2 per utenti Windows. Offriamo anche una clinica di setup di 15 minuti pre-workshop.
 
 **Requisiti:**
 
@@ -55,9 +59,7 @@ Questa è la **seconda edizione** del nostro workshop al DevFest Modena — la s
 - Wi-Fi con accesso a Internet (i partecipanti dovranno clonare un repo GitHub e scaricare immagini Docker)
 - Dimensione ideale della sala: 20–40 persone
 
-**Setup partecipanti:** Forniamo una checklist pre-evento (Docker, Git, Ruby via rbenv) e uno script diagnostico `check_gcp_setup.sh`. L'app gira completamente in locale con SQLite — non serve un account cloud per il workshop base. Il deploy su GCP è un capitolo bonus opzionale.
-
-**Repository:** Tre repo GitHub open-source con documentazione completa in EN/IT. La guida del workshop è già tradotta in italiano.
+**Setup partecipanti:** Forniamo una checklist pre-evento (Docker, Git, Ruby via rbenv) e uno script diagnostico `check_gcp_setup.sh`. L'app gira completamente in locale con SQLite — non serve un account cloud per il workshop base.
 
 ---
 
@@ -65,7 +67,7 @@ Questa è la **seconda edizione** del nostro workshop al DevFest Modena — la s
 
 **Ruolo:** Developer Advocate, Google Cloud
 
-**Bio:** Riccardo è un Developer Advocate di Google Cloud, specializzato in SRE, AI e Ruby. Ex sysadmin convertito all'evangelismo cloud, scrive codice Ruby da prima che Rails avesse i numeri di versione. Quando non costruisce demo con AI o scrive moduli Terraform, lo trovi a pedalare sulle colline di Zurigo o ad aggiungere emoji ai messaggi di commit. Crede che la migliore documentazione sia quella che ti fa sorridere. GitHub: [@palladius](https://github.com/palladius)
+**Bio:** Riccardo è un Developer Advocate di Google Cloud, specializzato in SRE, AI e Ruby. Ex sysadmin convertito all'evangelismo cloud, scrive codice Ruby da prima che Rails avesse i numeri di versione. Quando non costruisce demo con AI o scrive moduli Terraform, lo trovi a pedalare sulle colline di Zurigo o ad aggiungere emoji ai messaggi di commit. Crede che la migliore documentazione sia quella che ti fa sorridere. Membro attivo di modena.rb. GitHub: [@palladius](https://github.com/palladius)
 
 | Piattaforma | URL |
 |-------------|-----|
@@ -76,11 +78,11 @@ Questa è la **seconda edizione** del nostro workshop al DevFest Modena — la s
 
 ## 👤 Relatore 2 — Emiliano Della Casa
 
-**Ruolo:** Cloud Architect / Developer Advocate, Google
+**Ruolo:** Architetto Software Indipendente & Consulente Ruby
 
 <!-- ⚠️ EMILIANO: per favore rivedi e riscrivi questa bio con la tua voce e i tuoi dettagli! -->
 
-**Bio:** Emiliano è un Cloud Architect e Developer Advocate di Google, con profonda esperienza in architetture cloud-native e deployment production-grade. È la mente dietro i pattern di deployment con sidecar su Cloud Run in questo workshop e ha il talento di far sembrare semplice un'infrastruttura complessa. Modenese doc, porta spirito locale e saggezza cloud pratica in ogni talk. Quando non progetta deployment multi-container, probabilmente sta debuggando file Docker Compose o gustando tortellini.
+**Bio:** Emiliano è un architetto software indipendente e consulente Ruby con base a Modena. Ha una profonda esperienza in architetture cloud-native e deployment production-grade, ed è l'architetto dietro il blueprint Rails ottimizzato per GCP al cuore di questo workshop. Modenese doc e membro attivo di modena.rb, fa da ponte tra design applicativo pulito e infrastruttura cloud reale. Quando non refactorizza file Docker Compose o ottimizza moduli Terraform, probabilmente sta gustando tortellini.
 
 | Piattaforma | URL |
 |-------------|-----|
@@ -93,8 +95,8 @@ Questa è la **seconda edizione** del nostro workshop al DevFest Modena — la s
 
 | Campo | Conteggio | Limite |
 |-------|-----------|--------|
-| **Titolo** | 54 caratteri | 75 max |
-| **Abstract** | ~260 parole / ~1.700 caratteri | 300 parole / 2.000 caratteri |
-| **Note** | ~150 parole / ~900 caratteri | 200 parole / 1.000 caratteri |
-| **Bio (Riccardo)** | ~70 parole | 200 parole |
-| **Bio (Emiliano)** | ~75 parole | 200 parole |
+| **Titolo** | 47 caratteri | 75 max |
+| **Abstract** | ~290 parole / ~1.950 caratteri | 300 parole / 2.000 caratteri |
+| **Note** | ~175 parole / ~1.050 caratteri | 200 parole / 1.000 caratteri |
+| **Bio (Riccardo)** | ~75 parole | 200 parole |
+| **Bio (Emiliano)** | ~70 parole | 200 parole |

@@ -26,6 +26,8 @@ Riccardo and Emiliano collaborate on this amazing thingy which is bifidus (two-f
 To code, we use Gemini and the Conductor skill. Ensure you install the conductor skill here: https://github.com/gemini-cli-extensions/conductor
 * Ensure proper versioning is happening in `CHANGELOG.md`. This needs to align to app version. this is super important for workshops, so we can say "since/until v1.2.3 this /wasis...", great for errata.
 * You decide where version is, but it needs to be surfaced in footer, alongside a link to GH code!
+* Use TDD -> Start with a broken test, prove it FAILS first, and change code until it works!
+* Ensure all tests pass., and not because you comment them out! do not commit unless `just test` which runs all rails tests + other stuff (eg some TF or other ext stuff) pass. If user is in a hurry, its ok to commit but confirm with user first. Lets try NOt to push broken commits.
 
 ## Personas
 

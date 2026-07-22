@@ -10,44 +10,48 @@
 
 | Field | Value |
 |-------|-------|
-| **Title** | Build Your First AI Chat App with Rails 8 & Gemini |
-| **Format** | Workshop (Hands-On Lab) — 90 minutes |
+| **Title** | Vibe-Code Your First Rails 8 App with Gemini |
+| **Format** | Workshop (Hands-On Lab) — 120 minutes |
 | **Language** | English *(deliverable in Italian if preferred)* |
 | **Level** | Beginner / Intermediate |
-| **Tags** | `Google Cloud`, `GenAI`, `Web Development`, `AI Agents`, `Open Source`, `Hands-On` |
+| **Tags** | `Google Cloud`, `Ruby on Rails`, `Web Development`, `AI-Assisted Development`, `Open Source`, `Hands-On` |
 
 ---
 
 ## 📝 Abstract
 
-You don't need to know Ruby to join this workshop — just bring your laptop and curiosity.
+You don't need to know Ruby. You don't need to know Rails. You just need a laptop and 120 minutes — we'll take care of the rest.
 
-In 90 minutes, you'll go from zero to a working AI-powered chat application that generates real-time responses and AI artwork, all running on your machine. No slides, no theory dumps — just code, experiments, and that "wow, I built this!" feeling.
+In this workshop, you'll build a real web application from scratch using **Rails 8** and **Gemini** as your AI pair programmer. Instead of memorizing syntax or reading documentation, you'll *vibe-code* your way through it: describe what you want in plain English, let the AI write the code, understand what it did, and iterate. It's the fastest way to learn a new framework — and the most fun.
 
-We'll use **Rails 8** (the latest version, with built-in background jobs and real-time updates out of the box) and **Google Gemini** to build a chat app that talks back intelligently and creates images on the fly. Then we'll turn it into an **MCP server** — the new open standard that lets AI assistants like Gemini CLI interact directly with your app's data using natural language.
+We start with a clean Rails 8 app — posts, comments, image uploads, real-time updates — and from there, you'll extend it with your own ideas. Want to add a feature? Ask Gemini. Want to understand how the models connect? Ask Gemini to draw you an architecture diagram. Want to deploy it to the cloud? There's a one-command path to Google Cloud Run already baked in.
 
 **What you'll walk away with:**
 
-- A working AI chat app on your laptop with real-time streaming responses
-- Hands-on experience with **MCP (Model Context Protocol)** — the hottest interoperability standard in AI tooling
-- Your first custom MCP tool: teach an AI to query your database in plain English
-- A clear path to deploy everything on **Google Cloud Run** with zero DevOps headaches
+- A working Rails 8 app running on your laptop that you built (with AI help!)
+- Hands-on experience with **Gemini CLI** and **AI-assisted development** — the skill that's changing how we code
+- An understanding of how a modern Rails 8 app works: models, views, real-time updates, image uploads
+- A production-ready app you can take home, customize, and deploy to **Google Cloud** whenever you're ready
 
 **What you need:**
 
-- A laptop with Docker installed
-- A free Google AI Studio API key (we'll help you get one!)
-- Zero Ruby experience required — we'll guide you step by step
+- A laptop — **macOS or Linux** work out of the box. **Windows?** No problem! Come with WSL2 or a Linux VM installed and you're all set — we'll be there to help you with setup before the workshop starts
+- A free Google AI Studio API key (we'll walk you through getting one!)
+- **Zero Ruby experience required** — that's the whole point. We'll guide you step by step, and Gemini fills in the gaps
 
-Whether you're a Python dev curious about other ecosystems, a student writing your first web app, or a seasoned developer who wants to see what Rails 8 + AI can do — this workshop is for you.
+Whether you're a Python developer curious about Ruby, a student building your first web app, or a seasoned dev who wants to see what AI-assisted development actually looks like in practice — pull up a chair. The barrier to entry is your laptop and your curiosity, nothing more.
 
-Built with ❤️ by two Italian Googlers who believe the best way to learn AI is to ship something real.
+Built with ❤️ by a Googler based in Zürich and a Ruby consultant born and raised in Modena — who believe the best way to learn a new technology is to ship something real, with a little AI magic.
 
 ---
 
 ## 📌 Notes to Organizers
 
-This is the **second edition** of our DevFest Modena workshop — last year's session was a hit, and we've completely rebuilt it with the new MCP standard and Rails 8.1. Both speakers are Google Developer Advocates (Riccardo for Cloud/SRE, Emiliano for Cloud Architecture) with extensive conference experience across Europe.
+This is the **second edition** of our DevFest Modena workshop. In 2025 we ran a session on building an AI chat app with Rails and Gemini — this year we've shifted the focus to **AI-assisted development**: teaching attendees to vibe-code a Rails 8 app using Gemini CLI, with a production-ready GCP blueprint as the foundation. The project is open source across three GitHub repos with full EN/IT documentation.
+
+Riccardo is a Google Developer Advocate (Cloud/SRE) based in Zürich and Emiliano is an independent software architect **born and raised in Modena** — a genuine local voice at DevFest Modena. Together they bridge the Google Cloud ecosystem with the Ruby community through modena.rb.
+
+**Lessons learned from 2025:** Windows users struggled with local setup (Ruby, Docker, dependencies). This year we explicitly recommend macOS/Linux and provide WSL2 setup instructions for Windows users. We also offer a 15-minute pre-workshop setup clinic.
 
 **Requirements:**
 
@@ -55,9 +59,7 @@ This is the **second edition** of our DevFest Modena workshop — last year's se
 - Wi-Fi with internet access (attendees will clone a GitHub repo and pull Docker images)
 - Ideal room size: 20–40 people
 
-**Attendee setup:** We provide a pre-event checklist (Docker, Git, Ruby via rbenv) and a `check_gcp_setup.sh` diagnostic script. The app runs fully locally with SQLite — no cloud account needed for the core workshop. GCP deployment is an optional bonus chapter.
-
-**Repos:** Three open-source GitHub repos with full documentation in EN/IT. Workshop guide already translated to Italian.
+**Attendee setup:** We provide a pre-event checklist (Docker, Git, Ruby via rbenv) and a `check_gcp_setup.sh` diagnostic script. The app runs fully locally with SQLite — no cloud account needed for the core workshop.
 
 ---
 
@@ -65,7 +67,7 @@ This is the **second edition** of our DevFest Modena workshop — last year's se
 
 **Job Title:** Developer Advocate, Google Cloud
 
-**Bio:** Riccardo is a Developer Advocate at Google Cloud, specializing in SRE, AI, and Ruby. A recovering sysadmin turned cloud evangelist, he's been shipping Ruby code since before Rails had version numbers. When he's not building AI-powered demos or writing Terraform modules, you'll find him cycling through the hills of Zürich or adding emoji to commit messages. He believes the best documentation is the one that makes you smile. GitHub: [@palladius](https://github.com/palladius)
+**Bio:** Riccardo is a Developer Advocate at Google Cloud, specializing in SRE, AI, and Ruby. A recovering sysadmin turned cloud evangelist, he's been shipping Ruby code since before Rails had version numbers. When he's not building AI-powered demos or writing Terraform modules, you'll find him cycling through the hills of Zürich or adding emoji to commit messages. He believes the best documentation is the one that makes you smile. Active member of modena.rb. GitHub: [@palladius](https://github.com/palladius)
 
 | Platform | URL |
 |----------|-----|
@@ -76,11 +78,11 @@ This is the **second edition** of our DevFest Modena workshop — last year's se
 
 ## 👤 Speaker 2 — Emiliano Della Casa
 
-**Job Title:** Cloud Architect / Developer Advocate, Google
+**Job Title:** Independent Software Architect & Ruby Consultant
 
 <!-- ⚠️ EMILIANO: please review and rewrite this bio with your own voice and details! -->
 
-**Bio:** Emiliano is a Cloud Architect and Developer Advocate at Google, with deep expertise in cloud-native architectures and production-grade deployments. He's the mind behind the sidecar-powered Cloud Run deployment patterns in this workshop and has a talent for making complex infrastructure feel simple. A proud Modenese, he brings local flair and practical cloud wisdom to every talk. When he's not architecting multi-container deployments, he's probably debugging Docker Compose files or enjoying tortellini.
+**Bio:** Emiliano is an independent software architect and Ruby consultant based in Modena. He has deep expertise in cloud-native architectures and production-grade deployments, and is the architect behind the GCP-optimized Rails blueprint at the heart of this workshop. A proud Modenese and active member of modena.rb, he bridges the gap between clean application design and real-world cloud infrastructure. When he's not refactoring Docker Compose files or optimizing Terraform modules, he's probably enjoying tortellini.
 
 | Platform | URL |
 |----------|-----|
@@ -93,8 +95,8 @@ This is the **second edition** of our DevFest Modena workshop — last year's se
 
 | Field | Count | Limit |
 |-------|-------|-------|
-| **Title** | 56 chars | 75 max |
-| **Abstract** | 247 words / ~1,550 chars | 300 words / 2,000 chars |
-| **Notes** | ~155 words / ~920 chars | 200 words / 1,000 chars |
-| **Bio (Riccardo)** | 69 words | 200 words |
-| **Bio (Emiliano)** | 73 words | 200 words |
+| **Title** | 46 chars | 75 max |
+| **Abstract** | ~295 words / ~1,900 chars | 300 words / 2,000 chars |
+| **Notes** | ~180 words / ~1,050 chars | 200 words / 1,000 chars |
+| **Bio (Riccardo)** | ~75 words | 200 words |
+| **Bio (Emiliano)** | ~70 words | 200 words |
