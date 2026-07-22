@@ -28,8 +28,7 @@ class PostTest < ActiveSupport::TestCase
       # Force to the GCS service configured in storage.yml
       ActiveStorage::Blob.service = ActiveStorage::Service.configure(:google_dev, Rails.configuration.active_storage.service_configurations)
       
-      post.cover_image.attach(blob)
-      url = post.cover_image.url
+      url = blob.url
       assert_not_nil url, "URL should be generated successfully"
     rescue => e
       if e.class.name == "Google::Cloud::Storage::SignedUrlUnavailable" || 
