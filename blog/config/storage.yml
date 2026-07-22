@@ -14,12 +14,20 @@ local:
 #   region: us-east-1
 #   bucket: your_own_bucket-<%= Rails.env %>
 
-# Remember not to checkin your GCS keyfile to a repository
-# google:
-#   service: GCS
-#   project: your_project
-#   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
-#   bucket: your_own_bucket-<%= Rails.env %>
+google_dev:
+  service: GCS
+  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
+  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-dev
+
+google_test:
+  service: GCS
+  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
+  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-test
+
+google_prod:
+  service: GCS
+  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
+  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-prod
 
 # mirror:
 #   service: Mirror
