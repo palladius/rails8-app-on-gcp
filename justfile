@@ -16,4 +16,4 @@ dev:
 # show project status
 project-status:
     cd iac && ./check_gcp_setup.sh
-    cd blog && echo "5️⃣ Checking DB Posts..." && bundle exec rails runner 'puts "   📊 Posts in DB: #{Post.count rescue "No DB/Posts yet"}"' || true
+    cd blog && echo "\n=== 5️⃣ Checking DB Posts ===" && bundle exec rails runner 'puts "  📊 Posts in DB: #{Post.count rescue "No DB/Posts yet"}"' || true
