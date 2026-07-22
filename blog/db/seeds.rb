@@ -41,6 +41,28 @@ if File.exist?(image_path) && !welcome_post.cover_image.attached?
   welcome_post.cover_image.attach(blob)
 
   welcome_post.comments.find_or_create_by!(content: "Gemini: Do you like my cover image?!?")
+else
+  puts "* Issues with image / GCS"
+  welcome_post.comments.find_or_create_by!(content: "Gemini: Woopsie - no GCS images I'm afraid")
+end
+
+puts "* Adding a local post"
+local_post = Post.find_or_create_by!(title: "Localhost only: The tragicomical tale")
+local_post.update!(
+  body: "This post proves that traditional local file attachment still works. This poor creature has no passport for the cloud and is very sad.",
+  updated_at: Time.zone.parse("2026-07-21 10:40:00")
+)
+
+local_image_name = "local_sad_image.png"
+local_image_path = Rails.root.join("app", "assets", "images", local_image_name)
+
+if File.exist?(local_image_path) && !local_post.cover_image.attached?
+  puts "* Attaching #{local_image_name} to the local post via standard ActiveStorage"
+  local_post.cover_image.attach(
+    io: File.open(local_image_path),
+    filename: local_image_name,
+    content_type: "image/png"
+  )
 end
 
 puts "* Adding 2 comments to the post"
