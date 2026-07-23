@@ -22,6 +22,16 @@
   </div>
 
   <div>
+    <%= form.label :cover_image, "Cover Image (GCS)", style: "display: block" %>
+    <%= form.file_field :cover_image %>
+  </div>
+
+  <div>
+    <%= form.label :local_image, "Local Image (Disk)", style: "display: block" %>
+    <%= form.file_field :local_image %>
+  </div>
+
+  <div>
     <%= form.submit %>
   </div>
 <% end %>
