@@ -1,14 +1,43 @@
 <%= turbo_stream_from @post %>
 
-<p style="color: green"><%= notice %></p>
+<% if notice.present? %>
+  <p class="flash-notice"><%= notice %></p>
+<% end %>
 
-<%= render @post %>
+<div id="<%= dom_id @post %>" class="post-show">
+  <h1 class="post-show__title"><%= @post.title %></h1>
 
-<div>
-  <%= link_to "Edit this post", edit_post_path(@post) %> |
-  <%= link_to "Back to posts", posts_path %>
+  <%# === Meta line: right under title, before body === %>
+  <p class="post-show__meta">
+    ✏️ Updated
+    <%= time_tag @post.updated_at, "data-local": "time", "data-format": "%B %e, %Y %l:%M%P" %>
+    &nbsp;·&nbsp;
+    💬 <%= pluralize(@post.comments.count, "Comment") %>
+  </p>
 
-  <%= button_to "Destroy this post", @post, method: :delete %>
+  <%# === Body + hero image together in one glass card === %>
+  <div class="post-show__body-glass">
+    <% if @post.cover_image.attached? || @post.local_image.attached? %>
+      <div class="post-show__hero-glass">
+        <% if @post.cover_image.attached? %>
+          <%= image_tag @post.cover_image, class: "post-show__hero-img" %>
+        <% elsif @post.local_image.attached? %>
+          <%= image_tag @post.local_image, class: "post-show__hero-img" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="post-show__body-content">
+      <%= @post.body %>
+    </div>
+  </div>
+</div>
+
+<div class="post-show__actions">
+  <%= link_to "✏️ Edit", edit_post_path(@post), class: "post-action-btn" %>
+  <%= link_to "⬅️ Back", posts_path, class: "post-action-btn post-action-btn--secondary" %>
+  <%= button_to "🗑️ Destroy", @post, method: :delete, class: "post-action-btn post-action-btn--danger",
+      data: { turbo_confirm: "Are you sure?" } %>
 </div>
 
 <%= render 'comments/comments', post: @post %>

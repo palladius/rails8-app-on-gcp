@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resource :session
+  resource :profile, controller: "users", only: [:show]
   resources :passwords, param: :token
   resources :posts do
     resources :comments

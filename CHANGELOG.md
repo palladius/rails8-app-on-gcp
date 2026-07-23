@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2026-07-23
+### Added
+- 🎨 Post show page: glassmorphism card with hero image, styled title, meta line (updated at · comment count)
+- 🔘 Post show actions: emoji buttons for Edit, Back, Destroy with confirmation dialog
+- 👤 `User#display_name` helper (returns `name || email_address`)
+- 🛣️ Added `/healthz` health-check route
+
+### Fixed
+- 🐛 Fix 500 error on `/posts/:id` — `simple_format` blew up on `ActionText::RichText` body; replaced with direct `<%= @post.body %>` rendering
+
+### Changed
+- 🧹 Flash notice on post show only renders when present (no empty `<p>` clutter)
+
 ## [0.1.1] - 2026-07-22
 ### Added
 - 💎 Gemini-inspired blue-to-purple gradient background with glassmorphism UI

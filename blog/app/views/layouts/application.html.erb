@@ -34,7 +34,7 @@
         <div class="app-nav-links">
           <%= link_to "Posts", posts_path %>
           <% if authenticated? %>
-            <span class="user-badge">🧑‍💻 <%= Current.user.email_address.split('@').first %></span>
+            <%= link_to profile_path, class: "user-badge-link" do %><img src="<%= Current.user.gravatar_url(size: 28) %>" alt="" class="header-avatar"><span class="user-badge"><%= Current.user.email_address.split('@').first %></span><% end %>
             <%= button_to "Sign out", session_path, method: :delete, class: "sign-out-btn" %>
           <% end %>
         </div>

@@ -80,6 +80,59 @@ body {
   color: #ce93d8;
   font-size: 0.9rem;
   font-weight: 500;
+  text-transform: capitalize;
+}
+
+.user-badge-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease;
+}
+
+.user-badge-link:hover {
+  opacity: 0.85;
+  text-decoration: none !important;
+}
+
+.header-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(206, 147, 216, 0.5);
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.user-badge-link:hover .header-avatar {
+  border-color: #ce93d8;
+  transform: scale(1.08);
+}
+
+/* --- Profile page avatar --- */
+.profile-avatar-glass {
+  float: right;
+  width: 120px;
+  margin: -0.8rem -1.5rem 0.8rem 1.2rem;
+  border-radius: 0 20px 0 50%;
+  overflow: hidden;
+  box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.45s ease;
+}
+
+.profile-avatar-glass:hover {
+  transform: perspective(800px) rotateY(-4deg) rotateX(2deg) translateY(-4px) scale(1.04);
+  box-shadow:
+    -6px 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(206, 147, 216, 0.15);
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .sign-out-btn {
@@ -286,3 +339,162 @@ a[href$="/posts/new"]:hover {
   margin: 0 2px;
 }
 
+/* ============================================================
+   Post Show — Glassmorphism redesign
+   ============================================================ */
+
+.post-show {
+  position: relative;
+}
+
+/* --- Title: big gradient H1 above body card --- */
+.post-show__title {
+  font-size: 2.4rem;
+  line-height: 1.2;
+  margin: 0 0 0.3rem;
+  /* inherits the gradient text from global h1 */
+}
+
+/* --- Body content: glass card with floated hero image --- */
+.post-show__body-glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
+  border-bottom: none;
+  border-radius: 20px;
+  padding: 0.8rem 1.5rem;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.25);
+  margin-bottom: 1rem;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden; /* contain the float */
+}
+
+.post-show__body-glass:hover {
+  box-shadow:
+    0 6px 30px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(171, 71, 188, 0.1);
+}
+
+/* Hero image: floated top-right, flush with body card edges */
+.post-show__hero-glass {
+  float: right;
+  width: 160px;
+  /* negative margins cancel the card padding so image is flush top-right */
+  margin: -0.8rem -1.5rem 0.5rem 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0 20px 0 14px; /* match card top-right corner */
+  overflow: hidden;
+  box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.45s ease;
+  cursor: default;
+}
+
+.post-show__hero-glass:hover {
+  transform: perspective(800px) rotateY(-4deg) rotateX(2deg) translateY(-4px) scale(1.04);
+  box-shadow:
+    -6px 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(79, 195, 247, 0.12);
+}
+
+.post-show__hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.post-show__body-content {
+  color: #cfd8dc;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.post-show__body-content p {
+  margin: 0 0 1em;
+}
+
+.post-show__body-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Meta line --- */
+.post-show__meta {
+  color: #78909c;
+  font-size: 0.85rem;
+  margin: 0.2rem 0 0.8rem;
+}
+
+/* --- Action buttons --- */
+.post-show__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.post-action-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #4fc3f7, #ab47bc);
+  color: #fff !important;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.post-action-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  color: #fff !important;
+}
+
+.post-action-btn--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.post-action-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.post-action-btn--danger {
+  background: linear-gradient(135deg, #ef5350, #d32f2f);
+}
+
+/* Make the button_to form inline */
+.post-show__actions form {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Responsive: stack on narrow screens --- */
+@media (max-width: 640px) {
+  .post-show__hero-glass {
+    float: none;
+    width: 60%;
+    max-width: 200px;
+    margin: 0 auto 1rem;
+  }
+
+  .post-show__title {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .post-show__body-glass {
+    padding: 1.2rem 1.5rem;
+  }
+}
