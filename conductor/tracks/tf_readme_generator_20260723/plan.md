@@ -1,11 +1,11 @@
 # Implementation Plan: Terraform Markdown Generator & Article Updater
 
 ## Phase 1: Terraform Markdown Template Generation
-- [ ] Task: Write Tests (Red Phase)
-    - [ ] Create a dummy Terraform output or locals block to verify `local_file` creation (mocking real resources for now if they don't exist).
-- [ ] Task: Implement to Pass Tests (Green Phase)
-    - [ ] Create `iac/README.md.tftpl` containing the markdown structure and placeholders for Terraform outputs (GCS buckets, Secret Manager, etc.) with correct Google Cloud Console URLs.
-    - [ ] Add a `local_file` resource in `iac/main.tf` (or equivalent file) to render `README.md.tftpl` to `iac/TF_README.md` passing the required output variables.
+- [x] Task: Write Tests (Red Phase) [466fb4d]
+    - [x] Create a dummy Terraform output or locals block to verify `local_file` creation (mocking real resources for now if they don't exist).
+- [x] Task: Implement to Pass Tests (Green Phase) [466fb4d]
+    - [x] Create `iac/README.md.tftpl` containing the markdown structure and placeholders for Terraform outputs (GCS buckets, Secret Manager, etc.) with correct Google Cloud Console URLs.
+    - [x] Add a `local_file` resource in `iac/main.tf` (or equivalent file) to render `README.md.tftpl` to `iac/TF_README.md` passing the required output variables.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Terraform Markdown Template Generation' (Protocol in workflow.md)
 
 ## Phase 2: CLI Uploader Updates (Sticky Post & Comments)
