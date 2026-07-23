@@ -86,8 +86,8 @@ Riccardo is a Google Developer Advocate (Cloud/SRE) based in Zürich and Emilian
 
 | Platform | URL |
 |----------|-----|
-| GitHub | *(Emiliano to provide)* |
-| LinkedIn | *(Emiliano to provide)* |
+| GitHub | https://github.com/emilianodellacasa |
+| LinkedIn | https://www.linkedin.com/in/emilianodellacasa |
 
 ---
 
