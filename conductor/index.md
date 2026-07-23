@@ -19,3 +19,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [~] **Track: Implement GCP / ActiveStorage setup**
 *Link: [./tracks/gcp_activestorage_20260721/](./tracks/gcp_activestorage_20260721/)*
+
+---
+
+- [ ] **Track: Create a rails runner script bin/new_article.rb to upload articles and images from the CLI.**
+*Link: [./tracks/cli_article_uploader_20260723/](./tracks/cli_article_uploader_20260723/)*
