@@ -168,31 +168,20 @@ resource "google_cloud_run_v2_service_iam_member" "public_access" {
 }
 
 resource "local_file" "readme_md" {
-  filename = "${path.module}/out/README.md"
-  content  = <<-EOT
-    # 🚀 Rails 8 GCP Infrastructure
-
-    Welcome to your dynamically generated infrastructure output!
-
-    ## 🪣 ActiveStorage Buckets
-    * 🟡 **Dev**: [gs://${module.gcs_dev.name}](https://console.cloud.google.com/storage/browser/${module.gcs_dev.name}?project=${var.project_id})
-    * 🔵 **Test**: [gs://${module.gcs_test.name}](https://console.cloud.google.com/storage/browser/${module.gcs_test.name}?project=${var.project_id})
-    * 🟢 **Prod**: [gs://${module.gcs_prod.name}](https://console.cloud.google.com/storage/browser/${module.gcs_prod.name}?project=${var.project_id})
-
-    ## 🐘 Cloud SQL (PostgreSQL)
-    * **Instance**: [${google_sql_database_instance.main.name}](https://console.cloud.google.com/sql/instances/${google_sql_database_instance.main.name}/overview?project=${var.project_id})
-    * **Database**: ${google_sql_database.database.name}
-    * **Connection Name**: `${google_sql_database_instance.main.connection_name}`
-    * **DB User**: `${google_sql_user.rails_user.name}`
-
-    ## 🏃 Cloud Run
-    * **Service**: [${google_cloud_run_v2_service.rails_app.name}](https://console.cloud.google.com/run/detail/${var.region}/${google_cloud_run_v2_service.rails_app.name}/metrics?project=${var.project_id})
-    * **URL**: [${google_cloud_run_v2_service.rails_app.uri}](${google_cloud_run_v2_service.rails_app.uri})
-
-    ## 🔐 Secret Manager
-    * **rails-master-key**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${var.project_id})
-    * **rails-db-password**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-db-password/versions?project=${var.project_id})
-  EOT
+  filename = "${path.module}/out/TF_README.md"
+  content  = templatefile("${path.module}/README.md.tftpl", {
+    project_id             = var.project_id
+    region                 = var.region
+    gcs_dev_name           = module.gcs_dev.name
+    gcs_test_name          = module.gcs_test.name
+    gcs_prod_name          = module.gcs_prod.name
+    sql_instance_name      = google_sql_database_instance.main.name
+    sql_database_name      = google_sql_database.database.name
+    sql_connection_name    = google_sql_database_instance.main.connection_name
+    sql_user_name          = google_sql_user.rails_user.name
+    cloud_run_service_name = google_cloud_run_v2_service.rails_app.name
+    cloud_run_service_uri  = google_cloud_run_v2_service.rails_app.uri
+  })
 }
 
 resource "local_file" "readme_html" {

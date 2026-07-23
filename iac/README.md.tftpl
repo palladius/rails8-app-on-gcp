@@ -1,0 +1,22 @@
+# 🚀 Rails 8 GCP Infrastructure
+
+Welcome to your dynamically generated infrastructure output!
+
+## 🪣 ActiveStorage Buckets
+* 🟡 **Dev**: [gs://${gcs_dev_name}](https://console.cloud.google.com/storage/browser/${gcs_dev_name}?project=${project_id})
+* 🔵 **Test**: [gs://${gcs_test_name}](https://console.cloud.google.com/storage/browser/${gcs_test_name}?project=${project_id})
+* 🟢 **Prod**: [gs://${gcs_prod_name}](https://console.cloud.google.com/storage/browser/${gcs_prod_name}?project=${project_id})
+
+## 🐘 Cloud SQL (PostgreSQL)
+* **Instance**: [${sql_instance_name}](https://console.cloud.google.com/sql/instances/${sql_instance_name}/overview?project=${project_id})
+* **Database**: ${sql_database_name}
+* **Connection Name**: `${sql_connection_name}`
+* **DB User**: `${sql_user_name}`
+
+## 🏃 Cloud Run
+* **Service**: [${cloud_run_service_name}](https://console.cloud.google.com/run/detail/${region}/${cloud_run_service_name}/metrics?project=${project_id})
+* **URL**: [${cloud_run_service_uri}](${cloud_run_service_uri})
+
+## 🔐 Secret Manager
+* **rails-master-key**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${project_id})
+* **rails-db-password**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-db-password/versions?project=${project_id})
