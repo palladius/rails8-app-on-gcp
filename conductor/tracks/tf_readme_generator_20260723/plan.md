@@ -16,4 +16,4 @@
     - [x] Modify `bin/new_article.rb` to search for `Post.find_by(title: parsed_title)`.
     - [x] If found, call `post.update!(body: parsed_body)` instead of `Post.create!`.
     - [x] If found and updated, execute `post.comments.create!(content: "Updated by CLI on #{Time.current}")` (or similar logging message).
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: CLI Uploader Updates (Sticky Post & Comments)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: CLI Uploader Updates (Sticky Post & Comments)' (Protocol in workflow.md)
