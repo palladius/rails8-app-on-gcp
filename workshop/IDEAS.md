@@ -25,9 +25,9 @@ In a Blog app context, the background worker (Solid Queue) is perfect for tasks 
    - **Job:** A deterministic worker calculates Exact Word Count, Estimated Reading Time (based on 200 WPM), and Fog Index (readability score). 
    - **Why it's great:** Good contrast to AI. Shows students that Solid Queue is also for heavy deterministic calculations or metric aggregations (like triggering MCP tools to check for broken links in the article).
 
-4. **The "Podcastifier" (Text-to-Speech)** 🎧
+4. **The "Podcastifier" (Multi-language Text-to-Speech)** 🎧
    - **Trigger:** An article is finalized.
-   - **Job:** The worker calls the Google Cloud Text-to-Speech API to generate a `.mp3` of the article being read out loud, attaching it to the post so users can listen on the go.
+   - **Job:** The worker first uses Cloud Translation (or Gemini) to translate the article into multiple languages (e.g., shipping v1 with English and Italian). Then it calls the Google Cloud Text-to-Speech API to generate a `.mp3` for each language (ensuring the Italian TTS engine reads the Italian translation so words like "dove" are pronounced correctly). It attaches these `.mp3` files to the post so users can listen on the go in their preferred language.
 
 ## App notes
 
