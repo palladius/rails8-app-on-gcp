@@ -3,6 +3,8 @@
 * [Emiliano] At the beginning, ask user to add user and password to seeds for login.
 * [Riccardo] At beginning ask Gemini to TAL at models and make an E/R diagram using mermaid and embed/render in README.md (or a new ARCHITECTURE.md)
 * [Riccardo] Explain ActiveStorage image handling across environments: have a v1 branch where images are saved locally, and a v2 branch where images are migrated/configured for remote GCS.
+* [Riccardo] Deployment Alternatives: As an exercise, launch the app using Kamal on a single GCE instance.
+* [Riccardo] Deployment Alternatives: Launch as a single tri-docker via `docker-compose` on a GCE VM with a container-optimized OS (COS).
 
 ## App notes
 
