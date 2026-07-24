@@ -1,0 +1,3 @@
+The final workshop will be held in `CODELAB.md` which will be converted to a Google Codelab using `claat` tool or similar.
+Every page of the codelab is a H2 and it needs a frontmatter with title, tags and other shenaningans which riccardo is going to provide soon.
+The final result is similar to this repo: https://codelabs.developers.google.com/codelabs/app-mod-workshop#0 (note every H2 renders into a differemt #1, 2, 3..)
