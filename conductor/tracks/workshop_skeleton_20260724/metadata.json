@@ -1,0 +1,12 @@
+{
+  "id": "workshop_skeleton_20260724",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-07-24T13:03:00Z",
+  "worktree": {
+    "branch": "feature/issue-workshop-skeleton",
+    "path": ".worktrees/issue-workshop-skeleton"
+  },
+  "github_issue": null,
+  "active_questions": []
+}
