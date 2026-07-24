@@ -63,5 +63,6 @@ if File.exist?(local_image_path) && !local_post.local_image.attached?
 end
 
 puts "* Adding 2 comments to the post"
+# Ricc: I'd rather have, `commentor_name: "Riccardo"`
 welcome_post.comments.find_or_create_by!(content: "Riccardo: This is going to be an epic workshop! 🚀")
 welcome_post.comments.find_or_create_by!(content: "Emiliano: Can't wait to show everyone the Cloud Run setup! ☁️")
