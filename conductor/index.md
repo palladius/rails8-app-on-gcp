@@ -22,7 +22,7 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 ---
 
-- [ ] **Track: Create a rails runner script bin/new_article.rb to upload articles and images from the CLI.**
+- [~] **Track: Create a rails runner script bin/new_article.rb to upload articles and images from the CLI.**
 *Link: [./tracks/cli_article_uploader_20260723/](./tracks/cli_article_uploader_20260723/)*
 
 ---
