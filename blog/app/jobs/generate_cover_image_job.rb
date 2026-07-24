@@ -11,8 +11,9 @@ class GenerateCoverImageJob < ApplicationJob
       Create a cover image for a blog post titled "#{post.title}".
       The article contains the following text: "#{post.content.to_s.truncate(500)}".
       
-      CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 1960s Pasolini movie, 
-      resembling an Italian aquarelle painting. Maintain a beautiful, cohesive Italian cinematic aesthetic.
+      CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a "Locandina di un film 1960" (a vintage 1960s Italian movie poster). 
+      Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. 
+      Also, you MUST feature a banana somewhere in the scene.
     PROMPT
 
     # Mocking the AI service call for now. In a real app, we'd use Gemini/Imagen here.
