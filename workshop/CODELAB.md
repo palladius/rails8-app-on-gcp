@@ -163,9 +163,9 @@ Instead of making the user wait while we call the Gemini API, we offload the wor
 
 ### The AI Magic
 When you publish a post without a cover image, our `GenerateCoverImageJob` is triggered. 
-1. It sends your article text to the Gemini/Imagen model.
-2. It explicitly adds a stylistic prompt: *"in the style of a 1960s Pasolini movie"*. This ensures our entire blog maintains a beautiful, cohesive Italian cinematic aesthetic.
-3. The job downloads the generated image and attaches it to the post via ActiveStorage.
+1. It sends your article text to the Gemini/Imagen model using this prompt:
+> *"Create a cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. Also, you MUST feature a banana somewhere in the scene."*
+2. The job downloads the generated image and attaches it to the post via ActiveStorage.
 
 Try it out! Create a new post, leave the image blank, and watch as an AI-generated, perfectly themed cover image appears a few seconds later.
 

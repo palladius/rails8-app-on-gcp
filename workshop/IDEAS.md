@@ -12,7 +12,7 @@ In a Blog app context, the background worker (Solid Queue) is perfect for tasks 
 
 1. **The "NanoBanana" Auto-Cover Generator (AI)** 🍌
    - **Trigger:** A user publishes a post without uploading a cover image.
-   - **Job:** A Solid Queue worker sends the article's text to an image generation model (Imagen/Gemini) to generate a custom, contextual cover image. We append a consistent styling prompt to all requests—like *"in the style of a 1960s Pasolini movie"*, *"Italian aquarelle painting"*, or *"Renaissance Italian painter"*—so the entire blog has a beautiful, cohesive look and feel. It then downloads the result and automatically attaches it to the post via ActiveStorage.
+   - **Job:** A Solid Queue worker sends the article's text to an image generation model (Imagen/Gemini) to generate a custom, contextual cover image. We append a consistent styling prompt to all requests—specifically *"in the style of a 'Locandina di un film 1960' (vintage 1960s Italian movie poster), and must feature a banana somewhere"*—so the entire blog has a beautiful, cohesive look and feel. It then downloads the result and automatically attaches it to the post via ActiveStorage.
    - **Why it's great:** Teaches ActiveStorage attachment from a URL/background process + AI Image generation with prompt engineering for brand consistency.
 
 2. **SEO & Metadata Assistant (AI)** 📝

@@ -17,7 +17,7 @@ Riccardo and Emiliano collaborate on this amazing thingy which is bifidus (two-f
 ## Folder structure
 
 * App is under `blog/`
-* Workshop is (temporarily) under `workshop/`
+* Workshop is (temporarily) under `workshop/`. Additional instructions can be found in `workshop/AGENTS.md`.
 * GCP setup is going under `iac/`. This will include Cloud Build yamls, terraform code for setup, bash scripts, ...
 * Do not use EXTERNAL symlinks, copy the whole app in here, maybe without `.env`. ;)
 
