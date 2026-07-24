@@ -1,3 +1,4 @@
+<!-- ⚠️ AGENT WARNING: This file (SKELETON.md) and CODELAB.md must be kept in sync at all times. A change to one requires a change to the other! -->
 # Workshop Skeleton
 
 This is how the workshop is gonna look, high level:

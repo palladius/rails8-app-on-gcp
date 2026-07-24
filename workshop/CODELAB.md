@@ -1,3 +1,4 @@
+<!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
