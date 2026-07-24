@@ -133,6 +133,23 @@ resource "google_secret_manager_secret_version" "rails_master_key" {
   secret_data = "dummy-key-replace-me"
 }
 
+resource "random_password" "admin_password" {
+  length  = 16
+  special = false
+}
+
+resource "google_secret_manager_secret" "admin_password" {
+  secret_id = "rails-admin-password"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "admin_password" {
+  secret      = google_secret_manager_secret.admin_password.id
+  secret_data = random_password.admin_password.result
+}
+
 # Cloud Run Service (Rails App)
 resource "google_cloud_run_v2_service" "rails_app" {
   name     = "${var.project_id}-rails-app"
@@ -165,6 +182,16 @@ resource "google_cloud_run_v2_service" "rails_app" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.rails_master_key.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "ADMIN_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.admin_password.secret_id
             version = "latest"
           }
         }
@@ -215,6 +242,7 @@ resource "local_file" "readme_md" {
     sql_user_name          = google_sql_user.rails_user.name
     cloud_run_service_name = google_cloud_run_v2_service.rails_app.name
     cloud_run_service_uri  = google_cloud_run_v2_service.rails_app.uri
+    admin_password         = random_password.admin_password.result
   })
 }
 
@@ -264,6 +292,7 @@ resource "local_file" "readme_html" {
         <ul>
           <li><strong>rails-master-key</strong>: <a href="https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${var.project_id}">View in Secret Manager</a></li>
           <li><strong>rails-db-password</strong>: <a href="https://console.cloud.google.com/security/secret-manager/secret/rails-db-password/versions?project=${var.project_id}">View in Secret Manager</a></li>
+          <li><strong>rails-admin-password</strong>: <a href="https://console.cloud.google.com/security/secret-manager/secret/rails-admin-password/versions?project=${var.project_id}">View in Secret Manager</a> (Value: <code>${random_password.admin_password.result}</code>)</li>
         </ul>
       </body>
     </html>
