@@ -1,4 +1,4 @@
 <div id="<%= dom_id(comment) %>">
-  <%= comment.content %>
+  <strong><%= comment.author_name %>:</strong> <%= comment.content %>
   <%= time_tag comment.updated_at, "data-local": "time-ago" %>
 </div>
