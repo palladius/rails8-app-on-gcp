@@ -29,3 +29,16 @@ This is how the workshop is gonna look, high level:
    - Integrating a Gemini API feature, like the AI summarizing the post or tagging it automatically.
 
 *Note: Sections 2 and 3 are intentionally ordered this way to keep students active while Cloud SQL provisions in the background.*
+
+---
+
+## Post-Story Implementation Checklist
+*This checklist tracks the actual code and branch creation once the story narrative above is 100% finalized.*
+
+- [ ] Create base `workshop_1_local_baseline` branch from `main`
+- [ ] Flesh out code/config for `workshop_2_cloud_storage`
+- [ ] Flesh out code/config for `workshop_3_cloud_sql`
+- [ ] Flesh out code/config for `workshop_4_secret_manager`
+- [ ] Flesh out code/config for `workshop_5_cloud_run_classic`
+- [ ] Flesh out code/config for `workshop_6_cloud_build_cicd`
+- [ ] Flesh out code/config for `workshop_7_ai_features`
