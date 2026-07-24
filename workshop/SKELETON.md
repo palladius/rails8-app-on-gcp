@@ -14,13 +14,18 @@ This is how the workshop is gonna look, high level:
    - Introducing the database! Cloud SQL should be finished provisioning by now. 
    - Connect the local Rails app to the Cloud SQL instance (using the Auth Proxy).
 
-4. **`workshop_4_cloud_run_classic`**
-   - Taking it live. Deploying the application to Cloud Run via the CLI (manual deployment without CI/CD).
+4. **`workshop_4_secret_manager`**
+   - Secure the app by moving sensitive data to Secret Manager.
+   - Upload the `RAILS_MASTER_KEY` and database credentials to Google Cloud Secret Manager so they can be securely injected at runtime.
 
-5. **`workshop_5_cloud_build_cicd`**
+5. **`workshop_5_cloud_run_classic`**
+   - Taking it live. Deploying the application to Cloud Run via the CLI (manual deployment without CI/CD).
+   - The deployment will securely pull the secrets from Secret Manager.
+
+6. **`workshop_6_cloud_build_cicd`**
    - Automating the deployment. Adding `cloudbuild.yaml` and setting up the CI/CD trigger to deploy to Cloud Run automatically on `git push`.
 
-6. **`workshop_6_ai_features`** (Optional / Stretch)
+7. **`workshop_7_ai_features`** (Optional / Stretch)
    - Integrating a Gemini API feature, like the AI summarizing the post or tagging it automatically.
 
 *Note: Sections 2 and 3 are intentionally ordered this way to keep students active while Cloud SQL provisions in the background.*

@@ -69,7 +69,8 @@ module "service_account_cloud_run" {
   display_name = "Cloud Run Service Account for Rails App"
   iam_project_roles = {
     "${var.project_id}" = [
-      "roles/storage.objectAdmin"
+      "roles/storage.objectAdmin",
+      "roles/secretmanager.secretAccessor"
     ]
   }
 }
@@ -114,9 +115,22 @@ resource "google_secret_manager_secret" "db_password" {
   }
 }
 
+# Store the Rails Master Key in Secret Manager
+resource "google_secret_manager_secret" "rails_master_key" {
+  secret_id = "rails-master-key"
+  replication {
+    auto {}
+  }
+}
+
 resource "google_secret_manager_secret_version" "db_password" {
   secret      = google_secret_manager_secret.db_password.id
   secret_data = random_password.db_password.result
+}
+
+resource "google_secret_manager_secret_version" "rails_master_key" {
+  secret      = google_secret_manager_secret.rails_master_key.id
+  secret_data = "dummy-key-replace-me"
 }
 
 # Cloud Run Service (Rails App)
@@ -134,6 +148,26 @@ resource "google_cloud_run_v2_service" "rails_app" {
       env {
         name  = "DATABASE_URL"
         value = "postgres://${google_sql_user.rails_user.name}:${random_password.db_password.result}@localhost:5432/${google_sql_database.database.name}?host=/cloudsql/${google_sql_database_instance.main.connection_name}"
+      }
+
+      env {
+        name = "DB_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.db_password.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name = "RAILS_MASTER_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.rails_master_key.secret_id
+            version = "latest"
+          }
+        }
       }
 
       volume_mounts {
