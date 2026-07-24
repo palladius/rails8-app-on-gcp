@@ -33,6 +33,6 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 ---
 
-- [~] **Track: Create a terraform README.md generator and update CLI uploader to support sticky posts with comments.**
+- [x] **Track: Create a terraform README.md generator and update CLI uploader to support sticky posts with comments.**
 *Link: [./tracks/tf_readme_generator_20260723/](./tracks/tf_readme_generator_20260723/)*
 

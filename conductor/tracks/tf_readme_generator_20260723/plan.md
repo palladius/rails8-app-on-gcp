@@ -8,7 +8,7 @@
     - [x] Add a `local_file` resource in `iac/main.tf` (or equivalent file) to render `README.md.tftpl` to `iac/TF_README.md` passing the required output variables.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Terraform Markdown Template Generation' (Protocol in workflow.md)
 
-## Phase 2: CLI Uploader Updates (Sticky Post & Comments)
+## Phase 2: CLI Uploader Updates (Sticky Post & Comments) [checkpoint: 5bf3029]
 - [x] Task: Write Tests (Red Phase) [86abf8e]
     - [x] Add test for `bin/new_article.rb` to assert that when a post with the given title already exists, it is updated rather than creating a duplicate.
     - [x] Add test to verify that a `Comment` is created on the existing post when it is updated.
