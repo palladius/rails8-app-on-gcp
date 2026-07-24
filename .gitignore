@@ -3,3 +3,4 @@ private/
 .env
 private/
 private/gcp-key.json
+.worktrees/
