@@ -14,6 +14,10 @@ OptionParser.new do |opts|
     options[:image] = i
   end
 
+  opts.on("-t", "--title TITLE", "Optional title to override the markdown H1 or filename") do |t|
+    options[:title] = t
+  end
+
   opts.on("-h", "--help", "Prints this help") do
     puts opts
     exit
@@ -44,6 +48,9 @@ end
 if body.match(/^#\s+(.+)$/)
   title = $1.strip
 end
+
+# Override with --title option if provided
+title = options[:title] if options[:title]
 
 post = Post.find_by(title: title)
 

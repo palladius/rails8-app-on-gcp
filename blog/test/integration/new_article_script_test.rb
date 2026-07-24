@@ -44,4 +44,15 @@ class NewArticleScriptTest < ActiveSupport::TestCase
       load @script_path.to_s
     end
   end
+
+  test "overrides title with --title option" do
+    assert_difference("Post.count", 1) do
+      ARGV.replace(["--article", @dummy_md.to_s, "--title", "Overridden Title"])
+      load @script_path.to_s
+    end
+
+    post = Post.last
+    assert_equal "Overridden Title", post.title
+    assert_match "Dummy body.", post.body.to_s
+  end
 end
