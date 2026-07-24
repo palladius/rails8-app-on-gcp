@@ -27,7 +27,8 @@ This is how the workshop is gonna look, high level:
    - Automating the deployment. Adding `cloudbuild.yaml` and setting up the CI/CD trigger to deploy to Cloud Run automatically on `git push`.
 
 7. **`workshop_7_ai_features`** (Optional / Stretch)
-   - Integrating a Gemini API feature, like the AI summarizing the post or tagging it automatically.
+   - **NanoBanana Cover Generator**: A Solid Queue background worker uses Gemini/Imagen to generate a contextual cover image for new posts. We enforce a consistent styling prompt: *"in the style of a 'Locandina di un film 1960' (vintage 1960s Italian movie poster)... and MUST feature a banana"*.
+   - **Podcastifier**: Another worker translates the post to Italian and generates a TTS audio file, automatically attaching it via ActiveStorage.
 
 *Note: Sections 2 and 3 are intentionally ordered this way to keep students active while Cloud SQL provisions in the background.*
 
