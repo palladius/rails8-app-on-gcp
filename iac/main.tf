@@ -82,7 +82,7 @@ resource "random_password" "db_password" {
 
 # Cloud SQL PostgreSQL Instance
 resource "google_sql_database_instance" "main" {
-  name             = "${var.project_id}-db"
+  name             = "rails8-app-on-gcp"
   database_version = "POSTGRES_15"
   region           = var.region
 
