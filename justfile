@@ -21,3 +21,6 @@ project-status:
 seed:
 	cd blog && rake db:seed
 
+# check the status of conductor tracks
+conductor-status:
+	agc mcp call conductor conductor-status
