@@ -17,6 +17,7 @@ Welcome to your dynamically generated infrastructure output!
 * **Service**: [${cloud_run_service_name}](https://console.cloud.google.com/run/detail/${region}/${cloud_run_service_name}/metrics?project=${project_id})
 * **URL**: [${cloud_run_service_uri}](${cloud_run_service_uri})
 
+*(TODO: Note that Terraform provisions a placeholder "hello" image initially. Use Cloud Build to push the real built image!)*
 ## 🔐 Secret Manager
 * **rails-master-key**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${project_id})
 * **rails-db-password**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-db-password/versions?project=${project_id})
