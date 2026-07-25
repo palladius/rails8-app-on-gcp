@@ -24,3 +24,7 @@ seed:
 # check the status of conductor tracks
 conductor-status:
 	agc mcp call conductor conductor-status
+
+# apply terraform changes
+terraform-apply:
+	cd iac && terraform apply
