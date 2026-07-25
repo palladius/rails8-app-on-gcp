@@ -229,7 +229,7 @@ resource "google_cloud_run_v2_service_iam_member" "public_access" {
 }
 
 resource "local_file" "readme_md" {
-  filename = "${path.module}/out/TF_README.md"
+  filename = "${path.module}/out/README.md"
   content  = templatefile("${path.module}/README.md.tftpl", {
     project_id             = var.project_id
     region                 = var.region
