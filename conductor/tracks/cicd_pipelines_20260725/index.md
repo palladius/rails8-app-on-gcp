@@ -1,0 +1,5 @@
+# Track cicd_pipelines_20260725 Context
+
+- [Specification](./spec.md)
+- [Implementation Plan](./plan.md)
+- [Metadata](./metadata.json)
