@@ -1,0 +1,57 @@
+steps:
+  # 1. Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:latest'
+      - '.'
+
+  # 2. Extract VERSION and tag image (runs bash to read VERSION file)
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ -f "VERSION" ]; then
+          VERSION=$(cat VERSION)
+          docker tag europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:v$VERSION
+        fi
+
+  # 3. Push all tags to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app'
+
+  # 4. Deploy logic (PR vs Main)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # If this is a Pull Request (using standard GitHub substitution variable)
+        if [ -n "$_PR_NUMBER" ]; then
+          echo "Deploying Ephemeral PR environment for PR #$_PR_NUMBER"
+          gcloud run deploy palladius-genai-rails-app-pr-$_PR_NUMBER \
+            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
+            --region europe-west1 \
+            --allow-unauthenticated
+        else
+          echo "Deploying to DEV environment"
+          gcloud run deploy palladius-genai-rails-app-dev \
+            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
+            --region europe-west1 \
+            --allow-unauthenticated
+            
+          # TODO: Add integration tests step here
+          
+          echo "Deploying to PROD environment"
+          gcloud run deploy palladius-genai-rails-app-prod \
+            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
+            --region europe-west1 \
+            --allow-unauthenticated
+        fi

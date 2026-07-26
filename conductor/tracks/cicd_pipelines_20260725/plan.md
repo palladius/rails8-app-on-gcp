@@ -1,11 +1,11 @@
 # Implementation Plan: CI/CD Pipelines for Cloud Run
 
 ## Phase 1: CI/CD Setup for Cloud Build
-- [ ] Task: Create `cloudbuild.yaml` in the repository root.
-- [ ] Task: Configure the build step to build the Docker image.
-- [ ] Task: Configure the push step to tag and push to Artifact Registry with commit SHA, semver tag (from VERSION file), and latest.
-- [ ] Task: Configure the deploy step for PRs to target isolated Cloud Run services (e.g. `palladius-genai-rails-app-pr-sha`).
-- [ ] Task: Configure the deploy step for `main` to target the `DEV` Cloud Run service.
+- [x] Task: Create `cloudbuild.yaml` in the repository root.
+- [x] Task: Configure the build step to build the Docker image.
+- [x] Task: Configure the push step to tag and push to Artifact Registry with commit SHA, semver tag (from VERSION file), and latest.
+- [x] Task: Configure the deploy step for PRs to target isolated Cloud Run services (e.g. `palladius-genai-rails-app-pr-sha`).
+- [x] Task: Configure the deploy step for `main` to target the `DEV` Cloud Run service.
 - [ ] Task: Conductor - User Manual Verification 'CI/CD Setup for Cloud Build' (Protocol in workflow.md)
 
 ## Phase 2: CI/CD Setup for GitHub Actions
