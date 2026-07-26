@@ -23,7 +23,7 @@ seed:
 
 # check the status of conductor tracks
 conductor-status:
-	agc mcp call conductor conductor-status
+	./bin/conductor-inspector --all --short
 
 # apply terraform changes
 terraform-apply:

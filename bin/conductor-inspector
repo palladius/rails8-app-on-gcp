@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import re
+
+# Terminal Colors
+BOLD = "\033[1m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+RED = "\033[31m"
+CYAN = "\033[36m"
+RESET = "\033[0m"
+
+def print_bold(text, color=""):
+    print(f"{BOLD}{color}{text}{RESET}")
+
+def make_progress_bar(pct, width=10):
+    filled_chars = int(round((pct / 100.0) * width))
+    empty_chars = width - filled_chars
+    return "█" * filled_chars + "░" * empty_chars
+
+def parse_plan_tasks(plan_path):
+    """Parses plan.md to count total, completed, in-progress, and pending tasks."""
+    if not os.path.exists(plan_path):
+        return None
+    
+    total = 0
+    completed = 0
+    in_progress = 0
+    pending = 0
+    
+    # Matches list checkboxes: - [ ] Task, - [x] Task, - [~] Task
+    checkbox_pattern = re.compile(r"^\s*-\s+\[([ x~])\]")
+    
+    try:
+        with open(plan_path, "r", encoding="utf-8") as f:
+            for line in f:
+                match = checkbox_pattern.match(line)
+                if match:
+                    total += 1
+                    status_char = match.group(1)
+                    if status_char == "x":
+                        completed += 1
+                    elif status_char == "~":
+                        in_progress += 1
+                    else:
+                        pending += 1
+    except Exception:
+        return None
+        
+    return {
+        "total": total,
+        "completed": completed,
+        "in_progress": in_progress,
+        "pending": pending
+    }
+
+def inspect_repository(repo_path, show_all=True, short_mode=False):
+    repo_path = os.path.abspath(repo_path)
+    conductor_dir = os.path.join(repo_path, "conductor")
+    
+    print_bold(f"\n🔍 Inspecting Conductor Workspace: {repo_path}", CYAN)
+    
+    if not os.path.isdir(conductor_dir):
+        print(f"{RED}Error: 'conductor/' directory not found in {repo_path}.{RESET}")
+        print("Please ensure Conductor is initialized in this repository.")
+        sys.exit(1)
+        
+    # Read Product Metadata
+    product_path = os.path.join(conductor_dir, "product.md")
+    if os.path.exists(product_path):
+        try:
+            with open(product_path, "r") as f:
+                content = f.read().strip()
+                title_line = [line for line in content.split("\n") if line.startswith("# ")][:1]
+                title = title_line[0].replace("# ", "") if title_line else "Unknown Product"
+                print_bold(f"📦 Product: {title}", BOLD)
+        except Exception:
+            pass
+
+    # Scan Tracks
+    tracks_dir = os.path.join(conductor_dir, "tracks")
+    if not os.path.isdir(tracks_dir):
+        print(f"{YELLOW}No tracks directory found at 'conductor/tracks/'.{RESET}")
+        return
+
+    tracks = os.listdir(tracks_dir)
+    # Filter only directories
+    track_dirs = [t for t in tracks if os.path.isdir(os.path.join(tracks_dir, t))]
+    
+    if not track_dirs:
+        print("No feature/bugfix tracks registered.")
+        return
+        
+    if short_mode:
+        print_bold(f"{'STATUS':^13} | {'PROGRESS':^10} | {'RATIO':^5} | {'TRACK ID'}", BOLD)
+        print("=" * 90)
+    else:
+        print_bold(f"\n🛣️  Tracks Registry ({'all' if show_all else 'open'} tracks):", BOLD)
+        print("=" * 60)
+    
+    track_details = []
+    for track_id in track_dirs:
+        track_path = os.path.join(tracks_dir, track_id)
+        metadata_path = os.path.join(track_path, "metadata.json")
+        plan_path = os.path.join(track_path, "plan.md")
+        
+        status = "unknown"
+        description = "No description"
+        active_questions = []
+        worktree_branch = None
+        worktree_dir = None
+        github_issue_num = None
+        
+        # Parse metadata
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, "r") as f:
+                    meta = json.load(f)
+                    status = meta.get("status", "unknown").upper()
+                    description = meta.get("description", description)
+                    active_questions = meta.get("active_questions", [])
+                    
+                    # v1/v2 compat: worktree can be dict, string path, None, or empty dict
+                    worktree_raw = meta.get("worktree")
+                    if isinstance(worktree_raw, dict):
+                        worktree_branch = worktree_raw.get("branch")
+                        worktree_dir = worktree_raw.get("directory") or worktree_raw.get("path")
+                    elif isinstance(worktree_raw, str):
+                        worktree_dir = worktree_raw
+                        worktree_branch = None
+                    # else: None or unexpected type — leave defaults
+                    
+                    # v1/v2 compat: github_issue can be dict, string URL, None, or int
+                    gh_issue_raw = meta.get("github_issue")
+                    if isinstance(gh_issue_raw, dict):
+                        github_issue_num = gh_issue_raw.get("number")
+                    elif isinstance(gh_issue_raw, str):
+                        # Extract issue number from URL like "https://github.com/.../issues/5"
+                        url_match = re.search(r'/issues/(\d+)', gh_issue_raw)
+                        github_issue_num = int(url_match.group(1)) if url_match else gh_issue_raw
+                    elif isinstance(gh_issue_raw, int):
+                        github_issue_num = gh_issue_raw
+                    # else: None — leave default
+            except Exception as e:
+                status = f"METADATA_ERROR ({str(e)})"
+                
+        # Parse plan: first try JSON tasks list (Conductor++), then fall back to plan.md
+        plan_stats = None
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, "r") as f:
+                    meta = json.load(f)
+                    tasks_list = meta.get("tasks")
+                    if isinstance(tasks_list, list) and len(tasks_list) > 0:
+                        total = len(tasks_list)
+                        completed = sum(1 for t in tasks_list if t.get("status") in ("completed", "resolved"))
+                        in_progress = sum(1 for t in tasks_list if t.get("status") in ("in_progress", "active"))
+                        pending = total - completed - in_progress
+                        plan_stats = {
+                            "total": total,
+                            "completed": completed,
+                            "in_progress": in_progress,
+                            "pending": pending
+                        }
+            except Exception:
+                pass
+
+        if not plan_stats:
+            plan_stats = parse_plan_tasks(plan_path)
+            
+        track_details.append({
+            "track_id": track_id,
+            "status": status,
+            "description": description,
+            "active_questions": active_questions,
+            "worktree_branch": worktree_branch,
+            "worktree_dir": worktree_dir,
+            "github_issue_num": github_issue_num,
+            "plan_stats": plan_stats
+        })
+
+    # Filter completed if we only want open tracks
+    if not show_all:
+        track_details = [t for t in track_details if t["status"] not in ("COMPLETED", "RESOLVED", "CLOSED")]
+
+    # Sort tracks: NEW first, active/pending next, completed last, alphabetically within each group
+    def get_status_order(track):
+        status_val = track["status"].upper()
+        if status_val == "NEW":
+            order = 0
+        elif status_val in ("IN_PROGRESS", "ACTIVE"):
+            order = 1
+        elif status_val == "PENDING":
+            order = 2
+        elif status_val in ("COMPLETED", "RESOLVED", "CLOSED"):
+            order = 4
+        else:
+            order = 3
+        return (order, track["track_id"])
+
+    track_details.sort(key=get_status_order)
+
+    for track in track_details:
+        track_id = track["track_id"]
+        status = track["status"]
+        description = track["description"]
+        active_questions = track["active_questions"]
+        worktree_branch = track["worktree_branch"]
+        worktree_dir = track["worktree_dir"]
+        github_issue_num = track["github_issue_num"]
+        plan_stats = track["plan_stats"]
+        
+        # Format Status with color
+        status_color = RESET
+        if status in ("COMPLETED", "RESOLVED", "CLOSED"):
+            status_color = GREEN
+        elif status in ("IN_PROGRESS", "ACTIVE"):
+            status_color = YELLOW
+        elif status == "PENDING":
+            status_color = CYAN
+            
+        if short_mode:
+            ratio_str = "N/A"
+            pct = 0
+            if plan_stats:
+                if plan_stats["total"] > 0:
+                    pct = int((plan_stats["completed"] / plan_stats["total"]) * 100)
+                ratio_str = f"{plan_stats['completed']}/{plan_stats['total']}"
+            
+            bar = make_progress_bar(pct)
+            status_padded = f"{status:^11}"
+            status_colored = f"[{status_color}{status_padded}{RESET}]"
+            print(f"{status_colored} | {bar} | {ratio_str:>5} | {track_id}")
+            continue
+            
+        print(f"🔸 Track: {BOLD}{track_id}{RESET}")
+        print(f"   Status: {BOLD}{status_color}{status}{RESET}")
+        print(f"   Details: {description}")
+        
+        if github_issue_num:
+            print(f"   GitHub Issue: #{github_issue_num}")
+            
+        if worktree_branch:
+            print(f"   Git Worktree: {worktree_branch} (dir: {worktree_dir})")
+            
+        if plan_stats:
+            pct = 0
+            if plan_stats["total"] > 0:
+                pct = int((plan_stats["completed"] / plan_stats["total"]) * 100)
+            print(f"   Progress: {BOLD}{pct}%{RESET} ({plan_stats['completed']}/{plan_stats['total']} tasks completed, {plan_stats['in_progress']} active)")
+            
+        # Display questions / blockers
+        if active_questions:
+            print_bold(f"   ⚠️ Active Human Questions ({len(active_questions)}):", YELLOW)
+            for q in active_questions:
+                q_status = q.get("status", "awaiting_human").upper()
+                q_color = YELLOW if q_status == "AWAITING_HUMAN" else GREEN
+                print(f"     - [{q_color}{q_status}{RESET}] {q.get('question')}")
+                if q.get("answer"):
+                    print(f"       ↳ {GREEN}Answer: {q['answer']}{RESET}")
+                    
+        print("-" * 60)
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+    
+    parser = argparse.ArgumentParser(description="Inspect a Conductor++ workspace's tracks and tasks.")
+    parser.add_argument("repo_path", nargs="?", default=".", help="Path to the target git repository (default: .)")
+    
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--open", action="store_true", help="Display only open (non-completed) tracks")
+    group.add_argument("--all", action="store_true", help="Display all tracks (including completed/resolved)")
+    
+    parser.add_argument("--short", action="store_true", help="Display only a one-line summary per track with ASCII progress bar")
+    
+    # If no arguments provided, print help and exit
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+        
+    args = parser.parse_args()
+    
+    if not os.path.exists(args.repo_path):
+        print(f"{RED}Error: Path {args.repo_path} does not exist.{RESET}")
+        sys.exit(1)
+        
+    inspect_repository(args.repo_path, show_all=args.all, short_mode=args.short)
