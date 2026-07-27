@@ -1,8 +1,10 @@
 {
   "track_id": "simplify_post_images_20260723",
   "type": "refactor",
-  "status": "new",
+  "status": "completed",
   "created_at": "2026-07-23T14:24:00Z",
-  "updated_at": "2026-07-23T14:24:00Z",
-  "description": "Simplify Post model by removing local_image and exclusively using a single cover_image."
+  "updated_at": "2026-07-27T10:11:00Z",
+  "description": "Simplify Post model by removing local_image and exclusively using a single cover_image.",
+  "worktree": ".worktrees/issue-6-implementer",
+  "github_issue": "https://github.com/palladius/rails8-app-on-gcp/issues/6"
 }
