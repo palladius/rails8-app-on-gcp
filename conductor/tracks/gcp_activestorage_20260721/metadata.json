@@ -1,8 +1,8 @@
 {
   "track_id": "gcp_activestorage_20260721",
   "type": "feature",
-  "status": "in_progress",
+  "status": "completed",
   "created_at": "2026-07-21T13:34:00Z",
-  "updated_at": "2026-07-27T11:13:00Z",
+  "updated_at": "2026-07-27T14:55:00Z",
   "description": "Implement GCP / ActiveStorage setup. i want a script to setup GCS, another to check that itd set up plus it returns number of media per RAILS_ENV on 3 lines, like 14 for development and 3365 for production. Get inspired by turbochat 2026."
 }
