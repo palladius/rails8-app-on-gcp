@@ -50,6 +50,10 @@
           v<%= File.read(Rails.root.join('..', 'VERSION')).strip rescue '?.?.?' %>
         </span>
         <span><%= Rails.env %></span>
+        <% git_branch = `git -C #{Rails.root} rev-parse --abbrev-ref HEAD 2>/dev/null`.strip rescue nil %>
+        <% if git_branch.present? && git_branch != 'main' %>
+          <span class="version-badge" style="background: #8b5cf6;" title="Git branch">🌿 <%= git_branch %></span>
+        <% end %>
         <span>·</span>
         <a href="<%= Rails.application.config.x.app.github_url %>" target="_blank">📦 Code</a>
         <a href="<%= Rails.application.config.x.app.workshop_url %>" target="_blank">📖 Workshop</a>
