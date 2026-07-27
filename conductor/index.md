@@ -36,3 +36,17 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 - [x] **Track: Create a terraform README.md generator and update CLI uploader to support sticky posts with comments.**
 *Link: [./tracks/tf_readme_generator_20260723/](./tracks/tf_readme_generator_20260723/)*
 
+---
+
+- [x] **Track: Workshop skeleton — create milestone branches for each workshop step.**
+*Link: [./tracks/workshop_skeleton_20260724/](./tracks/workshop_skeleton_20260724/)*
+
+---
+
+- [~] **Track: Add optional user_id and commenter_name string to comments.**
+*Link: [./tracks/commenter_name_20260724/](./tracks/commenter_name_20260724/)*
+
+---
+
+- [~] **Track: CI/CD Pipelines for Cloud Run.**
+*Link: [./tracks/cicd_pipelines_20260725/](./tracks/cicd_pipelines_20260725/)*
