@@ -46,16 +46,16 @@ end
 puts "* Adding a local post"
 local_post = Post.find_or_create_by!(title: "Localhost only: The tragicomical tale")
 local_post.update!(
-  body: "This post proves that traditional local file attachment still works. This poor creature has no passport for the cloud and is very sad.",
+  body: "This post proves that local file attachment still works. This poor creature is very sad but at least has a cover image now!",
   updated_at: Time.zone.parse("2026-07-21 10:40:00")
 )
 
 local_image_name = "local_sad_image.png"
 local_image_path = Rails.root.join("app", "assets", "images", local_image_name)
 
-if File.exist?(local_image_path) && !local_post.local_image.attached?
-  puts "* Attaching #{local_image_name} to the local post via standard ActiveStorage"
-  local_post.local_image.attach(
+if File.exist?(local_image_path) && !local_post.cover_image.attached?
+  puts "* Attaching #{local_image_name} to the local post as cover_image"
+  local_post.cover_image.attach(
     io: File.open(local_image_path),
     filename: local_image_name,
     content_type: "image/png"

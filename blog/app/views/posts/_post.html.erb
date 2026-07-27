@@ -14,11 +14,6 @@
       <%= image_tag post.cover_image, style: "max-width: 100%; height: auto;" %>
     </div>
   <% end %>
-  <% if post.local_image.attached? %>
-    <div style="margin-top: 1em; max-width: 600px;">
-      <%= image_tag post.local_image, style: "max-width: 100%; height: auto; border: 2px solid blue;" %>
-    </div>
-  <% end %>
 
   <p>
     <strong>Updated at:</strong>

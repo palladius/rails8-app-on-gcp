@@ -17,13 +17,9 @@
 
   <%# === Body + hero image together in one glass card === %>
   <div class="post-show__body-glass">
-    <% if @post.cover_image.attached? || @post.local_image.attached? %>
+    <% if @post.cover_image.attached? %>
       <div class="post-show__hero-glass">
-        <% if @post.cover_image.attached? %>
           <%= image_tag @post.cover_image, class: "post-show__hero-img" %>
-        <% elsif @post.local_image.attached? %>
-          <%= image_tag @post.local_image, class: "post-show__hero-img" %>
-        <% end %>
       </div>
     <% end %>
 
