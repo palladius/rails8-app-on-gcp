@@ -27,7 +27,7 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 ---
 
-- [ ] **Track: Simplify Post model by removing local_image and exclusively using a single cover_image.**
+- [~] **Track: Simplify Post model by removing local_image and exclusively using a single cover_image.**
 *Link: [./tracks/simplify_post_images_20260723/](./tracks/simplify_post_images_20260723/)*
 
 
