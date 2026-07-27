@@ -3,7 +3,7 @@
 
 ---
 
-- [~] **Track: Add optional user_id and commenter_name string to comments**
+- [x] **Track: Add optional user_id and commenter_name string to comments**
 *Link: [./tracks/commenter_name_20260724/](./tracks/commenter_name_20260724/)*
 
 ---
