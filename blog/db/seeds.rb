@@ -8,7 +8,7 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-#User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
+# User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
 
 puts "* Adding user TODO EMAIL_ADDRESS"
 User.find_or_create_by!(email_address: "riccardo@example.com") do |user|
@@ -30,17 +30,17 @@ image_path = Rails.root.join("app", "assets", "images", image_name)
 
 if File.exist?(image_path) && !welcome_post.cover_image.attached?
   puts "* Attaching #{image_name} to the welcome post from pre-uploaded GCS object"
-  
+
   welcome_post.cover_image.attach(
     io: File.open(image_path),
     filename: image_name,
     content_type: "image/jpeg"
   )
 
-  welcome_post.comments.find_or_create_by!(content: "Gemini: Do you like my cover image?!?")
+  welcome_post.comments.find_or_create_by!(content: "Do you like my cover image?!?", commenter_name: "Gemini")
 else
   puts "* Issues with image / GCS"
-  welcome_post.comments.find_or_create_by!(content: "Gemini: Woopsie - no GCS images I'm afraid")
+  welcome_post.comments.find_or_create_by!(content: "Woopsie - no GCS images I'm afraid", commenter_name: "Gemini")
 end
 
 puts "* Adding a local post"
@@ -63,6 +63,5 @@ if File.exist?(local_image_path) && !local_post.local_image.attached?
 end
 
 puts "* Adding 2 comments to the post"
-# Ricc: I'd rather have, `commentor_name: "Riccardo"`
-welcome_post.comments.find_or_create_by!(content: "Riccardo: This is going to be an epic workshop! 🚀")
-welcome_post.comments.find_or_create_by!(content: "Emiliano: Can't wait to show everyone the Cloud Run setup! ☁️")
+welcome_post.comments.find_or_create_by!(content: "This is going to be an epic workshop! 🚀", commenter_name: "Riccardo")
+welcome_post.comments.find_or_create_by!(content: "Can't wait to show everyone the Cloud Run setup! ☁️", commenter_name: "Emiliano")

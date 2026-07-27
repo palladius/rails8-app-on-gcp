@@ -1,8 +1,12 @@
 class CommentsController < ApplicationController
+  allow_unauthenticated_access only: %i[ create ]
   before_action :set_post
 
   def create
-    @post.comments.create! params.expect(comment: [ :content ])
+    comment_params = params.expect(comment: [ :content, :commenter_name ])
+    @comment = @post.comments.build(comment_params)
+    @comment.user = Current.user if authenticated?
+    @comment.save!
     redirect_to @post
   end
 

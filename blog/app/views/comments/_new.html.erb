@@ -1,4 +1,8 @@
 <%= form_with model: [ post, Comment.new ] do |form| %>
+  <% unless authenticated? %>
+    Your Name (optional):<br>
+    <%= form.text_field :commenter_name %><br>
+  <% end %>
   Your comment:<br>
   <%= form.text_area :content, size: "20x5" %>
   <%= form.submit %>
