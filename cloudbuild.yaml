@@ -102,6 +102,7 @@ steps:
           --set-env-vars="ENABLE_GCP=true" \
           --set-env-vars="ENABLE_SIGNUP=${_ENABLE_SIGNUP}" \
           --set-env-vars="ENVIRONMENT=${_ENVIRONMENT}" \
+          --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID" \
           --allow-unauthenticated
 
         echo "✅ Deployed to Cloud Run: ${_APP_NAME}"
