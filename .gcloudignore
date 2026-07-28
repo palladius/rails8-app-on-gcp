@@ -1,0 +1,33 @@
+# .gcloudignore - Exclude files from gcloud builds submit
+.git
+.gitignore
+.github
+.gemini
+.worktrees
+
+# Terraform (huge)
+iac/.terraform/
+iac/terraform.tfstate*
+iac/out/
+
+# Workshop docs
+workshop/
+
+# Conductor metadata
+conductor/
+
+# Node modules
+node_modules/
+
+# Temp files
+tmp/
+log/
+*.log
+
+# Test artifacts
+blog/test/
+blog/coverage/
+
+# Local config
+.env
+.env.*

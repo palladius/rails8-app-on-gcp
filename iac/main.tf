@@ -16,6 +16,35 @@ provider "google" {
   region  = var.region
 }
 
+# Artifact Registry for Docker images (CI/CD)
+resource "google_artifact_registry_repository" "docker" {
+  location      = var.region
+  repository_id = "rails8-gcp-app"
+  description   = "Docker images for the Rails 8 GCP app"
+  format        = "DOCKER"
+}
+
+# Cloud Build Trigger — auto-deploys on push to main
+resource "google_cloudbuild_trigger" "deploy_on_push" {
+  name     = "on-commit-build-rails8-app-on-gcp"
+  location = "global"
+
+  github {
+    owner = "palladius"
+    name  = "rails8-app-on-gcp"
+    push {
+      branch = "^main$"
+    }
+  }
+
+  filename = "cloudbuild.yaml"
+
+  substitutions = {
+    _AR_REGION = var.region
+    _APP_NAME  = google_cloud_run_v2_service.rails_app.name
+  }
+}
+
 # Development Bucket
 module "gcs_dev" {
   source        = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/gcs?ref=v34.0.0"

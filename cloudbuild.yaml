@@ -1,23 +1,24 @@
 steps:
-  # 1. Build the Docker image
+  # 1. Build the Docker image from the blog/ directory
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA'
+      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA'
       - '-t'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:latest'
-      - '.'
+      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:latest'
+      - './blog'
 
-  # 2. Extract VERSION and tag image (runs bash to read VERSION file)
+  # 2. Extract VERSION and tag image with semver
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         if [ -f "VERSION" ]; then
-          VERSION=$(cat VERSION)
-          docker tag europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:v$VERSION
+          VERSION=$$(cat VERSION)
+          docker tag ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+                     ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:v$$VERSION
         fi
 
   # 3. Push all tags to Artifact Registry
@@ -25,33 +26,42 @@ steps:
     args:
       - 'push'
       - '--all-tags'
-      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app'
+      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog'
 
-  # 4. Deploy logic (PR vs Main)
+  # 4. Deploy to Cloud Run (PR=ephemeral, main=DEV+PROD)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        # If this is a Pull Request (using standard GitHub substitution variable)
-        if [ -n "$_PR_NUMBER" ]; then
-          echo "Deploying Ephemeral PR environment for PR #$_PR_NUMBER"
-          gcloud run deploy palladius-genai-rails-app-pr-$_PR_NUMBER \
-            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
-            --region europe-west1 \
+        if [ -n "$$_PR_NUMBER" ]; then
+          echo "🚀 Deploying ephemeral PR environment for PR #$$_PR_NUMBER"
+          gcloud run deploy ${_APP_NAME}-pr-$$_PR_NUMBER \
+            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+            --region ${_AR_REGION} \
             --allow-unauthenticated
         else
-          echo "Deploying to DEV environment"
-          gcloud run deploy palladius-genai-rails-app-dev \
-            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
-            --region europe-west1 \
+          echo "🚀 Deploying to DEV environment"
+          gcloud run deploy ${_APP_NAME}-dev \
+            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+            --region ${_AR_REGION} \
             --allow-unauthenticated
-            
-          # TODO: Add integration tests step here
-          
-          echo "Deploying to PROD environment"
-          gcloud run deploy palladius-genai-rails-app-prod \
-            --image europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/palladius-genai-rails-app:$COMMIT_SHA \
-            --region europe-west1 \
+
+          # TODO: Add integration/smoke tests before promoting to prod
+
+          echo "🚀 Deploying to PROD environment"
+          gcloud run deploy ${_APP_NAME}-prod \
+            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+            --region ${_AR_REGION} \
             --allow-unauthenticated
         fi
+
+substitutions:
+  _AR_REGION: europe-west1
+  _APP_NAME: palladius-genai-rails-app
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+images:
+  - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog'
