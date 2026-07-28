@@ -35,9 +35,7 @@ steps:
       - 'build'
       - '-t'
       - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
-      - '-f'
-      - 'blog/Dockerfile'
-      - '.'
+      - 'blog/'
 
   # 2. Tag with SHA and VERSION
   - name: 'gcr.io/cloud-builders/docker'
