@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access
+  before_action :require_signup_enabled
 
   def new
     @user = User.new
@@ -19,5 +20,11 @@ class RegistrationsController < ApplicationController
 
   def registration_params
     params.require(:user).permit(:email_address, :password, :password_confirmation)
+  end
+
+  def require_signup_enabled
+    unless ENV.fetch("ENABLE_SIGNUP", "true") == "true"
+      redirect_to new_session_path, alert: "Registration is not available. Please contact an administrator."
+    end
   end
 end

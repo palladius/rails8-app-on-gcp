@@ -23,6 +23,8 @@ substitutions:
   _ENVIRONMENT: dev
   _RAILS_MASTER_KEY: ''
   _DATABASE_URL: ''
+  _CLOUD_SQL_CONNECTION: ''
+  _ENABLE_SIGNUP: 'true'
 
 images:
   - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
@@ -66,7 +68,7 @@ steps:
       - '--all-tags'
       - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog'
 
-  # 4. Deploy to Cloud Run (adapted from ricc-cb-push-to-cloudrun-magic.sh)
+  # 4. Deploy to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'deploy-cloudrun'
     entrypoint: 'bash'
@@ -86,7 +88,9 @@ steps:
           --image "$$IMAGE" \
           --platform managed \
           --region "${_AR_REGION}" \
-          --memory "512Mi" \
+          --port 8080 \
+          --memory "1Gi" \
+          --add-cloudsql-instances="${_CLOUD_SQL_CONNECTION}" \
           --set-env-vars="RAILS_ENV=production" \
           --set-env-vars="RAILS_MASTER_KEY=${_RAILS_MASTER_KEY}" \
           --set-env-vars="DATABASE_URL=${_DATABASE_URL}" \
@@ -95,8 +99,10 @@ steps:
           --set-env-vars="APP_VERSION=$$APP_VERSION" \
           --set-env-vars="GIT_SHORT_SHA=$$SHORT_SHA" \
           --set-env-vars="RUBY_YJIT_ENABLE=true" \
-          --set-env-vars="NO_COLOR=true" \
           --set-env-vars="ENABLE_GCP=true" \
+          --set-env-vars="ENABLE_SIGNUP=${_ENABLE_SIGNUP}" \
+          --set-env-vars="ENVIRONMENT=${_ENVIRONMENT}" \
           --allow-unauthenticated
 
         echo "✅ Deployed to Cloud Run: ${_APP_NAME}"
+

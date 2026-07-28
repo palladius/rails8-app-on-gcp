@@ -1,23 +1,42 @@
 #!/bin/bash
 
-# Stage 1: Local script that sources .env and calls gcloud builds submit
-# with all the substitutions the cloudbuild.yaml needs.
+# Stage 1: Local script that sources .env (secrets) + .env.<env> (config)
+# and calls gcloud builds submit with all substitutions.
 #
 # Usage: bin/cloudbuild-submit [dev|prod]
 #
-# Adapted from rails8-turbo-chat pattern (two-stage Cloud Build).
+# Config layers:
+#   .env       — Secrets (RAILS_MASTER_KEY, DATABASE_URL) — NOT committed
+#   .env.dev   — Dev-specific config  — committed to git
+#   .env.prod  — Prod-specific config — committed to git
 
 set -euo pipefail
 
-SCRIPT_VER="1.0.0"
+SCRIPT_VER="2.0.0"
 ENVIRONMENT="${1:-dev}"
 
-# Source .env for secrets
+# Validate environment
+if [[ "${ENVIRONMENT}" != "dev" && "${ENVIRONMENT}" != "prod" ]]; then
+  echo "❌ Invalid environment: ${ENVIRONMENT}. Use 'dev' or 'prod'."
+  exit 1
+fi
+
+# Source .env for secrets (RAILS_MASTER_KEY, DATABASE_URL, etc.)
 if [ -f .env ]; then
-  echo "📦 Sourcing .env..."
-  source .env
+  echo "🔐 Sourcing .env (secrets)..."
+  set -a; source .env; set +a
 else
-  echo "❌ No .env file found! Create one with the required variables."
+  echo "❌ No .env file found! Create one with secrets (see .env.dist)."
+  exit 1
+fi
+
+# Source .env.<environment> for config (APP_NAME, ENABLE_SIGNUP, etc.)
+ENV_FILE=".env.${ENVIRONMENT}"
+if [ -f "${ENV_FILE}" ]; then
+  echo "⚙️  Sourcing ${ENV_FILE} (config)..."
+  set -a; source "${ENV_FILE}"; set +a
+else
+  echo "❌ No ${ENV_FILE} file found!"
   exit 1
 fi
 
@@ -27,29 +46,33 @@ APP_VERSION="$(cat VERSION 2>/dev/null || echo 'unknown')"
 # Derive settings
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-palladius-genai}"
 REGION="${REGION:-europe-west1}"
-APP_NAME="palladius-genai-rails-app"
-AR_REPO="rails8-gcp-app"
+AR_REPO="${AR_REPO:-rails8-gcp-app}"
+
+# Cloud SQL connection (derive from TF output or .env)
+CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION:-${PROJECT_ID}:${REGION}:rails8-app-on-gcp-7de2}"
 
 echo "🏗️  cloudbuild-submit v${SCRIPT_VER}"
 echo "───────────────────────────────────"
-echo "  PROJECT_ID:  ${PROJECT_ID}"
-echo "  REGION:      ${REGION}"
-echo "  APP_VERSION: ${APP_VERSION}"
-echo "  ENVIRONMENT: ${ENVIRONMENT}"
-echo "  APP_NAME:    ${APP_NAME}"
-echo "  AR_REPO:     ${AR_REPO}"
+echo "  PROJECT_ID:    ${PROJECT_ID}"
+echo "  REGION:        ${REGION}"
+echo "  APP_VERSION:   ${APP_VERSION}"
+echo "  ENVIRONMENT:   ${ENVIRONMENT}"
+echo "  APP_NAME:      ${APP_NAME}"
+echo "  AR_REPO:       ${AR_REPO}"
+echo "  ENABLE_SIGNUP: ${ENABLE_SIGNUP:-not set}"
+echo "  CLOUD_SQL:     ${CLOUD_SQL_CONNECTION}"
 echo "───────────────────────────────────"
 
-# Build substitutions string from .env variables
-# Cloud Build will pass these as $_VAR_NAME to cloudbuild.yaml
+# Build substitutions string
 CB_SUBSTITUTIONS="_AR_REGION=${REGION}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_APP_NAME=${APP_NAME}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_AR_REPO=${AR_REPO}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENVIRONMENT=${ENVIRONMENT}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-placeholder}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_DATABASE_URL=${DATABASE_URL:-placeholder}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_CLOUD_SQL_CONNECTION=${CLOUD_SQL_CONNECTION}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENABLE_SIGNUP=${ENABLE_SIGNUP:-false}"
 
-echo "📋 CB_SUBSTITUTIONS: ${CB_SUBSTITUTIONS}"
 echo ""
 
 # Configure docker auth

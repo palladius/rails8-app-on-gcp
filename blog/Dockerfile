@@ -69,9 +69,10 @@ USER 1000:1000
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
-# Entrypoint prepares the database.
+# Entrypoint prepares the database (runs db:prepare before server start).
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+# Start Puma directly (Cloud Run sets PORT=8080, Puma reads it via config/puma.rb).
+# Thruster removed: Cloud Run already provides TLS, HTTP/2, and compression.
+EXPOSE 8080
+CMD ["./bin/rails", "server"]
