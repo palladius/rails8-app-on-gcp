@@ -1,63 +1,104 @@
-steps:
-  # 1. Build the Docker image from the blog/ directory
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        TAG=$${COMMIT_SHA:-local}
-        docker build \
-          -t ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
-          -t ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:latest \
-          ./blog
+###############################################################################
+# Cloud Build for rails8-app-on-gcp
+#
+# Two-stage pattern (adapted from rails8-turbo-chat):
+#   Stage 1: bin/cloudbuild-submit (local) — sources .env, assembles substitutions
+#   Stage 2: THIS FILE (Cloud Build) — builds, tags, pushes, deploys
+#
+# Substitutions are passed by:
+#   - bin/cloudbuild-submit (local testing)
+#   - Cloud Build Trigger (auto-deploy, configured in Terraform)
+###############################################################################
 
-  # 2. Extract VERSION and tag image with semver
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        if [ -f "VERSION" ]; then
-          VERSION=$$(cat VERSION)
-          TAG=$${COMMIT_SHA:-local}
-          docker tag ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
-                     ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:v$$VERSION
-        fi
-
-  # 3. Push all tags to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - '--all-tags'
-      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog'
-
-  # 4. Deploy to Cloud Run (PR=ephemeral, main=DEV+PROD)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        TAG=$${COMMIT_SHA:-local}
-        if [ -n "$${_PR_NUMBER}" ]; then
-          echo "🚀 Deploying ephemeral PR environment for PR #$${_PR_NUMBER}"
-          gcloud run deploy ${_APP_NAME}-pr-$${_PR_NUMBER} \
-            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
-            --region ${_AR_REGION} \
-            --allow-unauthenticated
-        else
-          echo "🚀 Deploying to DEV environment"
-          gcloud run deploy ${_APP_NAME} \
-            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
-            --region ${_AR_REGION} \
-            --allow-unauthenticated
-        fi
+timeout: 1800s  # 30min
+options:
+  machineType: 'E2_HIGHCPU_8'
+  substitution_option: 'ALLOW_LOOSE'
+  logging: CLOUD_LOGGING_ONLY
 
 substitutions:
   _AR_REGION: europe-west1
   _APP_NAME: palladius-genai-rails-app
-
-options:
-  logging: CLOUD_LOGGING_ONLY
+  _AR_REPO: rails8-gcp-app
+  _ENVIRONMENT: dev
+  _RAILS_MASTER_KEY: ''
+  _DATABASE_URL: ''
 
 images:
-  - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog'
+  - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
+
+steps:
+  # 1. Build Docker image from blog/ directory
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build'
+    args:
+      - 'build'
+      - '-t'
+      - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
+      - '-f'
+      - 'blog/Dockerfile'
+      - '.'
+
+  # 2. Tag with SHA and VERSION
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-tag'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        SHORT_SHA="$${SHORT_SHA:-$${COMMIT_SHA:0:7}}"
+        SHORT_SHA="$${SHORT_SHA:-local}"
+        IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog"
+
+        docker tag "$$IMAGE:latest" "$$IMAGE:sha-$$SHORT_SHA"
+
+        if [ -f "VERSION" ]; then
+          VERSION=$$(cat VERSION)
+          docker tag "$$IMAGE:latest" "$$IMAGE:v$$VERSION"
+          echo "✅ Tagged: latest, sha-$$SHORT_SHA, v$$VERSION"
+        else
+          echo "✅ Tagged: latest, sha-$$SHORT_SHA"
+        fi
+
+  # 3. Push all tags to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-push'
+    args:
+      - 'push'
+      - '--all-tags'
+      - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog'
+
+  # 4. Deploy to Cloud Run (adapted from ricc-cb-push-to-cloudrun-magic.sh)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-cloudrun'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        APP_VERSION=$$(cat VERSION 2>/dev/null || echo 'unknown')
+        SHORT_SHA="$${SHORT_SHA:-$${COMMIT_SHA:0:7}}"
+        SHORT_SHA="$${SHORT_SHA:-local}"
+        IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog:v$$APP_VERSION"
+
+        echo "🚀 Deploying $$IMAGE to ${_APP_NAME}"
+        echo "   Environment: ${_ENVIRONMENT}"
+
+        gcloud run deploy "${_APP_NAME}" \
+          --project "$PROJECT_ID" \
+          --image "$$IMAGE" \
+          --platform managed \
+          --region "${_AR_REGION}" \
+          --memory "512Mi" \
+          --set-env-vars="RAILS_ENV=production" \
+          --set-env-vars="RAILS_MASTER_KEY=${_RAILS_MASTER_KEY}" \
+          --set-env-vars="DATABASE_URL=${_DATABASE_URL}" \
+          --set-env-vars="RAILS_SERVE_STATIC_FILES=true" \
+          --set-env-vars="RAILS_LOG_TO_STDOUT=yesplease" \
+          --set-env-vars="APP_VERSION=$$APP_VERSION" \
+          --set-env-vars="GIT_SHORT_SHA=$$SHORT_SHA" \
+          --set-env-vars="RUBY_YJIT_ENABLE=true" \
+          --set-env-vars="NO_COLOR=true" \
+          --set-env-vars="ENABLE_GCP=true" \
+          --allow-unauthenticated
+
+        echo "✅ Deployed to Cloud Run: ${_APP_NAME}"

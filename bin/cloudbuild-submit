@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Stage 1: Local script that sources .env and calls gcloud builds submit
+# with all the substitutions the cloudbuild.yaml needs.
+#
+# Usage: bin/cloudbuild-submit [dev|prod]
+#
+# Adapted from rails8-turbo-chat pattern (two-stage Cloud Build).
+
+set -euo pipefail
+
+SCRIPT_VER="1.0.0"
+ENVIRONMENT="${1:-dev}"
+
+# Source .env for secrets
+if [ -f .env ]; then
+  echo "📦 Sourcing .env..."
+  source .env
+else
+  echo "❌ No .env file found! Create one with the required variables."
+  exit 1
+fi
+
+# Read VERSION from file
+APP_VERSION="$(cat VERSION 2>/dev/null || echo 'unknown')"
+
+# Derive settings
+PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-palladius-genai}"
+REGION="${REGION:-europe-west1}"
+APP_NAME="palladius-genai-rails-app"
+AR_REPO="rails8-gcp-app"
+
+echo "🏗️  cloudbuild-submit v${SCRIPT_VER}"
+echo "───────────────────────────────────"
+echo "  PROJECT_ID:  ${PROJECT_ID}"
+echo "  REGION:      ${REGION}"
+echo "  APP_VERSION: ${APP_VERSION}"
+echo "  ENVIRONMENT: ${ENVIRONMENT}"
+echo "  APP_NAME:    ${APP_NAME}"
+echo "  AR_REPO:     ${AR_REPO}"
+echo "───────────────────────────────────"
+
+# Build substitutions string from .env variables
+# Cloud Build will pass these as $_VAR_NAME to cloudbuild.yaml
+CB_SUBSTITUTIONS="_AR_REGION=${REGION}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_APP_NAME=${APP_NAME}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_AR_REPO=${AR_REPO}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENVIRONMENT=${ENVIRONMENT}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-placeholder}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_DATABASE_URL=${DATABASE_URL:-placeholder}"
+
+echo "📋 CB_SUBSTITUTIONS: ${CB_SUBSTITUTIONS}"
+echo ""
+
+# Configure docker auth
+gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet 2>/dev/null
+
+echo "🚀 Submitting build to Cloud Build..."
+gcloud --project "${PROJECT_ID}" builds submit . \
+    --region="${REGION}" \
+    --config cloudbuild.yaml \
+    --substitutions="${CB_SUBSTITUTIONS}"

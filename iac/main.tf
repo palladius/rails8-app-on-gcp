@@ -42,6 +42,7 @@ resource "google_cloudbuild_trigger" "deploy_on_push" {
   substitutions = {
     _AR_REGION = var.region
     _APP_NAME  = google_cloud_run_v2_service.rails_app.name
+    _AR_REPO   = google_artifact_registry_repository.docker.repository_id
   }
 }
 
