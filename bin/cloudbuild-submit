@@ -1,18 +1,17 @@
 #!/bin/bash
 
-# Stage 1: Local script that sources .env (secrets) + .env.<env> (config)
-# and calls gcloud builds submit with all substitutions.
+# Stage 1: Local script that sources .env and calls gcloud builds submit
+# with all substitutions for dev or prod.
 #
 # Usage: bin/cloudbuild-submit [dev|prod]
 #
-# Config layers:
-#   .env       — Secrets (RAILS_MASTER_KEY, DATABASE_URL) — NOT committed
-#   .env.dev   — Dev-specific config  — committed to git
-#   .env.prod  — Prod-specific config — committed to git
+# Config:
+#   .env — Secrets + project config (NOT committed to git)
+#   The dev/prod distinction is just the APP_NAME suffix and ENABLE_SIGNUP.
 
 set -euo pipefail
 
-SCRIPT_VER="2.0.0"
+SCRIPT_VER="2.1.0"
 ENVIRONMENT="${1:-dev}"
 
 # Validate environment
@@ -21,22 +20,12 @@ if [[ "${ENVIRONMENT}" != "dev" && "${ENVIRONMENT}" != "prod" ]]; then
   exit 1
 fi
 
-# Source .env for secrets (RAILS_MASTER_KEY, DATABASE_URL, etc.)
+# Source .env for secrets and project config
 if [ -f .env ]; then
-  echo "🔐 Sourcing .env (secrets)..."
+  echo "🔐 Sourcing .env..."
   set -a; source .env; set +a
 else
-  echo "❌ No .env file found! Create one with secrets (see .env.dist)."
-  exit 1
-fi
-
-# Source .env.<environment> for config (APP_NAME, ENABLE_SIGNUP, etc.)
-ENV_FILE=".env.${ENVIRONMENT}"
-if [ -f "${ENV_FILE}" ]; then
-  echo "⚙️  Sourcing ${ENV_FILE} (config)..."
-  set -a; source "${ENV_FILE}"; set +a
-else
-  echo "❌ No ${ENV_FILE} file found!"
+  echo "❌ No .env file found! Create one from .env.dist."
   exit 1
 fi
 
@@ -47,9 +36,15 @@ APP_VERSION="$(cat VERSION 2>/dev/null || echo 'unknown')"
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-palladius-genai}"
 REGION="${REGION:-europe-west1}"
 AR_REPO="${AR_REPO:-rails8-gcp-app}"
-
-# Cloud SQL connection (derive from TF output or .env)
+APP_NAME="palladius-genai-rails-app-${ENVIRONMENT}"
 CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION:-${PROJECT_ID}:${REGION}:rails8-app-on-gcp-7de2}"
+
+# Environment-specific config
+if [[ "${ENVIRONMENT}" == "prod" ]]; then
+  ENABLE_SIGNUP="false"
+else
+  ENABLE_SIGNUP="true"
+fi
 
 echo "🏗️  cloudbuild-submit v${SCRIPT_VER}"
 echo "───────────────────────────────────"
@@ -59,7 +54,7 @@ echo "  APP_VERSION:   ${APP_VERSION}"
 echo "  ENVIRONMENT:   ${ENVIRONMENT}"
 echo "  APP_NAME:      ${APP_NAME}"
 echo "  AR_REPO:       ${AR_REPO}"
-echo "  ENABLE_SIGNUP: ${ENABLE_SIGNUP:-not set}"
+echo "  ENABLE_SIGNUP: ${ENABLE_SIGNUP}"
 echo "  CLOUD_SQL:     ${CLOUD_SQL_CONNECTION}"
 echo "───────────────────────────────────"
 
@@ -71,7 +66,7 @@ CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENVIRONMENT=${ENVIRONMENT}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-placeholder}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_DATABASE_URL=${DATABASE_URL:-placeholder}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_CLOUD_SQL_CONNECTION=${CLOUD_SQL_CONNECTION}"
-CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENABLE_SIGNUP=${ENABLE_SIGNUP:-false}"
+CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENABLE_SIGNUP=${ENABLE_SIGNUP}"
 
 echo ""
 
