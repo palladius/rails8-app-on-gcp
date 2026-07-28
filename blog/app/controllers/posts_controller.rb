@@ -3,7 +3,9 @@ class PostsController < ApplicationController
 
   # GET /posts or /posts.json
   def index
-    @posts = Post.with_attached_cover_image.includes(:comments).all
+    @posts = Post.with_attached_cover_image.includes(:comments)
+                 .where(user: [Current.user, nil])
+                 .order(created_at: :desc)
   end
 
   # GET /posts/1 or /posts/1.json
