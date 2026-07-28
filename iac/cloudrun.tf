@@ -11,7 +11,8 @@ module "service_account_cloud_run" {
   iam_project_roles = {
     "${var.project_id}" = [
       "roles/storage.objectAdmin",
-      "roles/secretmanager.secretAccessor"
+      "roles/secretmanager.secretAccessor",
+      "roles/cloudsql.client"
     ]
   }
 }
