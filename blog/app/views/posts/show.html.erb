@@ -18,6 +18,12 @@
     <%= time_tag @post.updated_at, "data-local": "time", "data-format": "%B %e, %Y %l:%M%P" %>
     &nbsp;·&nbsp;
     💬 <%= pluralize(@post.comments.count, "Comment") %>
+    &nbsp;
+    <% if @post.public? %>
+      <span class="visibility-badge visibility-badge--public">🌍 Public</span>
+    <% else %>
+      <span class="visibility-badge visibility-badge--private">🔒 Private</span>
+    <% end %>
   </p>
 
   <%# === Body + hero image together in one glass card === %>

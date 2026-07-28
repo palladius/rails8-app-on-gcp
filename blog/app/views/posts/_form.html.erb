@@ -26,6 +26,11 @@
     <%= form.file_field :cover_image %>
   </div>
 
+  <div class="form-check">
+    <%= form.check_box :public, class: "form-check__input" %>
+    <%= form.label :public, "🌍 Make this post public", class: "form-check__label" %>
+  </div>
+
   <div>
     <%= form.submit %>
   </div>

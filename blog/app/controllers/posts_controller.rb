@@ -3,8 +3,10 @@ class PostsController < ApplicationController
 
   # GET /posts or /posts.json
   def index
-    @posts = Post.with_attached_cover_image.includes(:comments)
-                 .where(user: [Current.user, nil])
+    @posts = Post.with_attached_cover_image.includes(:comments, :user)
+                 .where(user: Current.user)
+                 .or(Post.where(public: true))
+                 .or(Post.where(user_id: nil))
                  .order(created_at: :desc)
   end
 
@@ -68,6 +70,6 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.expect(post: [ :title, :body, :cover_image ])
+      params.expect(post: [ :title, :body, :cover_image, :public ])
     end
 end
