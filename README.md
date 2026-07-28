@@ -2,6 +2,9 @@
 
 A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cloud Run, ...)
 
+🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
+🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
+
 ## Development
 
 We use `just` to orchestrate common tasks. To get started easily:
