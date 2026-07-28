@@ -47,7 +47,7 @@
       <div class="footer-top">
         <span>💎 <%= Rails.application.config.x.app.name %></span>
         <span class="version-badge">
-          v<%= File.read(Rails.root.join('..', 'VERSION')).strip rescue '?.?.?' %>
+          v<%= ENV.fetch("APP_VERSION") { File.read(Rails.root.join('..', 'VERSION')).strip rescue '?.?.?' } %>
         </span>
         <span><%= ENV.fetch("ENVIRONMENT", Rails.env) %></span>
         <% git_branch = `git -C #{Rails.root} rev-parse --abbrev-ref HEAD 2>/dev/null`.strip rescue nil %>
