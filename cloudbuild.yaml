@@ -1,13 +1,15 @@
 steps:
   # 1. Build the Docker image from the blog/ directory
   - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
     args:
-      - 'build'
-      - '-t'
-      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA'
-      - '-t'
-      - '${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:latest'
-      - './blog'
+      - '-c'
+      - |
+        TAG=$${COMMIT_SHA:-local}
+        docker build \
+          -t ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
+          -t ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:latest \
+          ./blog
 
   # 2. Extract VERSION and tag image with semver
   - name: 'gcr.io/cloud-builders/docker'
@@ -17,7 +19,8 @@ steps:
       - |
         if [ -f "VERSION" ]; then
           VERSION=$$(cat VERSION)
-          docker tag ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+          TAG=$${COMMIT_SHA:-local}
+          docker tag ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
                      ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:v$$VERSION
         fi
 
@@ -34,24 +37,17 @@ steps:
     args:
       - '-c'
       - |
-        if [ -n "$$_PR_NUMBER" ]; then
-          echo "🚀 Deploying ephemeral PR environment for PR #$$_PR_NUMBER"
-          gcloud run deploy ${_APP_NAME}-pr-$$_PR_NUMBER \
-            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+        TAG=$${COMMIT_SHA:-local}
+        if [ -n "$${_PR_NUMBER}" ]; then
+          echo "🚀 Deploying ephemeral PR environment for PR #$${_PR_NUMBER}"
+          gcloud run deploy ${_APP_NAME}-pr-$${_PR_NUMBER} \
+            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
             --region ${_AR_REGION} \
             --allow-unauthenticated
         else
           echo "🚀 Deploying to DEV environment"
-          gcloud run deploy ${_APP_NAME}-dev \
-            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
-            --region ${_AR_REGION} \
-            --allow-unauthenticated
-
-          # TODO: Add integration/smoke tests before promoting to prod
-
-          echo "🚀 Deploying to PROD environment"
-          gcloud run deploy ${_APP_NAME}-prod \
-            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$COMMIT_SHA \
+          gcloud run deploy ${_APP_NAME} \
+            --image ${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/rails8-gcp-app/rails8-blog:$$TAG \
             --region ${_AR_REGION} \
             --allow-unauthenticated
         fi
