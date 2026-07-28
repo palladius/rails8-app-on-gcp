@@ -429,6 +429,17 @@ a[href$="/posts/new"]:hover {
   color: #78909c;
   font-size: 0.85rem;
   margin: 0.2rem 0 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.post-show__author-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(206, 147, 216, 0.4);
+  vertical-align: middle;
 }
 
 /* --- Action buttons --- */

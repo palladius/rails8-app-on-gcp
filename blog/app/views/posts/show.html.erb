@@ -9,6 +9,11 @@
 
   <%# === Meta line: right under title, before body === %>
   <p class="post-show__meta">
+    <% if @post.user %>
+      <%= image_tag @post.user.gravatar_url(size: 20), class: "post-show__author-avatar" %>
+      <strong><%= @post.user.email_address.split('@').first %></strong>
+      &nbsp;·&nbsp;
+    <% end %>
     ✏️ Updated
     <%= time_tag @post.updated_at, "data-local": "time", "data-format": "%B %e, %Y %l:%M%P" %>
     &nbsp;·&nbsp;

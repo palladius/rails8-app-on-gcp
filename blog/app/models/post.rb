@@ -3,6 +3,7 @@ class Post < ApplicationRecord
   has_one_attached :cover_image
   has_one_attached :podcast_audio_it
   has_many :comments, dependent: :destroy
+  belongs_to :user, optional: true
 
   after_commit :generate_cover_image_if_missing, on: [:create, :update]
   after_commit :generate_podcast_audio, on: [:create, :update]
