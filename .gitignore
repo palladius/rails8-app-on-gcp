@@ -4,3 +4,5 @@ private/
 private/
 private/gcp-key.json
 .worktrees/
+blog/config/master.key
+.git-privatize
