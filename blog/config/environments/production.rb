@@ -24,6 +24,11 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :google_prod
 
+  # Serve blobs via proxy instead of signed URL redirect.
+  # Cloud Run Workload Identity can't sign GCS URLs (no private key),
+  # so we proxy through Rails or resolve to public URL directly.
+  config.active_storage.resolve_model_to_route = :rails_storage_proxy
+
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   # config.assume_ssl = true
 
