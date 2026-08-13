@@ -10,6 +10,7 @@ This is how the workshop is gonna look, high level:
 2. **`workshop_2_cloud_storage`**
    - ActiveStorage transition while waiting for SQL. Modify `config/storage.yml` and `production.rb` to use Google Cloud Storage.
    - Students create a *new* post to see the image successfully hit the bucket (the "remote storage thingy").
+   - Buckets stay **private**: Cloud Run has no signing key, so `iam: true` in `storage.yml` signs URLs through the IAM Credentials API. Teaches why the `public: true` shortcut is a trap.
 
 3. **`workshop_3_cloud_sql`**
    - Introducing the database! Cloud SQL should be finished provisioning by now. 

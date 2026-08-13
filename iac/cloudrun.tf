@@ -17,6 +17,23 @@ module "service_account_cloud_run" {
   }
 }
 
+# ActiveStorage signs GCS blob URLs through the IAM Credentials signBlob API
+# (`iam: true` in blog/config/storage.yml), because Cloud Run's metadata server has
+# no private key to sign with. That call needs the API enabled and the service
+# account allowed to sign as itself — without either, every blob returns a 500.
+# See issue #8.
+resource "google_project_service" "iam_credentials" {
+  project            = var.project_id
+  service            = "iamcredentials.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_service_account_iam_member" "cloud_run_sa_signer" {
+  service_account_id = module.service_account_cloud_run.id
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = module.service_account_cloud_run.iam_email
+}
+
 # Cloud Run Service (Rails App)
 resource "google_cloud_run_v2_service" "rails_app" {
   name     = "${var.project_id}-rails-app"

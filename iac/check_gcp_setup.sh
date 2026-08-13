@@ -41,6 +41,24 @@ else
   echo "  ❌ Service Account $SA_EMAIL DOES NOT exist!"
 fi
 
+# ActiveStorage signs blob URLs via the IAM Credentials API, since Cloud Run has no
+# private key to sign with. Missing either of these two = every image 500s (issue #8).
+if gcloud services list --enabled --project "$PROJECT_ID" \
+     --filter="config.name=iamcredentials.googleapis.com" --format="value(config.name)" 2>/dev/null | grep -q .; then
+  echo "  ✅ API iamcredentials.googleapis.com is enabled (needed to sign blob URLs)."
+else
+  echo "  ❌ API iamcredentials.googleapis.com is NOT enabled — ActiveStorage images will 500!"
+  echo "     (Run: gcloud services enable iamcredentials.googleapis.com --project $PROJECT_ID)"
+fi
+
+if gcloud iam service-accounts get-iam-policy "$SA_EMAIL" --format="value(bindings.role)" 2>/dev/null |
+     grep -q "roles/iam.serviceAccountTokenCreator"; then
+  echo "  ✅ SA can sign blob URLs (roles/iam.serviceAccountTokenCreator on itself)."
+else
+  echo "  ❌ SA lacks roles/iam.serviceAccountTokenCreator on itself — ActiveStorage images will 500!"
+  echo "     (Run: cd iac && terraform apply)"
+fi
+
 echo -e "\n=== 3️⃣ Checking RAILS_MASTER_KEY (GCP & Local) ==="
 if gcloud secrets describe "rails-master-key" &>/dev/null; then
   echo "  ✅ GCP Secret 'rails-master-key' exists."
