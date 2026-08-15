@@ -1,3 +1,23 @@
+<%#
+  Signing GCS blob URLs on Cloud Run (issue #8).
+
+  Cloud Run's metadata server hands out access tokens but no private key, so
+  ActiveStorage cannot compute a signature locally and every blob redirect used to
+  500 with "Service account credentials 'issuer (client_email)' is missing".
+
+  `iam: true` makes ActiveStorage sign through the IAM Credentials signBlob API
+  instead, so URLs stay signed and expiring and the buckets stay private (as
+  required by iac/AGENTS.md). The signer needs roles/iam.serviceAccountTokenCreator
+  on itself and the iamcredentials.googleapis.com API enabled — see iac/cloudrun.tf.
+
+  `gsa_email` is what the signature is issued for. On Cloud Run ActiveStorage could
+  read it from the metadata server, but naming it explicitly also makes signing work
+  from a laptop, where there is no metadata server to ask. Override it with
+  GCS_SIGNER_SA_EMAIL when running as a different service account.
+%>
+<% gcp_project = ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
+<% gcs_signer_sa = ENV.fetch("GCS_SIGNER_SA_EMAIL") { "rails-cloudrun-sa@#{gcp_project}.iam.gserviceaccount.com" } %>
+
 test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
@@ -16,18 +36,24 @@ local:
 
 google_dev:
   service: GCS
-  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
-  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-dev
+  project: <%= gcp_project %>
+  bucket: <%= gcp_project %>-activestorage-dev
+  iam: true
+  gsa_email: <%= gcs_signer_sa %>
 
 google_test:
   service: GCS
-  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
-  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-test
+  project: <%= gcp_project %>
+  bucket: <%= gcp_project %>-activestorage-test
+  iam: true
+  gsa_email: <%= gcs_signer_sa %>
 
 google_prod:
   service: GCS
-  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
-  bucket: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>-activestorage-prod
+  project: <%= gcp_project %>
+  bucket: <%= gcp_project %>-activestorage-prod
+  iam: true
+  gsa_email: <%= gcs_signer_sa %>
 
 # mirror:
 #   service: Mirror
