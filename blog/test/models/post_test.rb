@@ -30,6 +30,14 @@ class PostTest < ActiveSupport::TestCase
       
       url = blob.url
       assert_not_nil url, "URL should be generated successfully"
+    rescue Google::Apis::ClientError => e
+      if e.message.include?("PERMISSION_DENIED") && e.message.include?("signBlob")
+        skip "Skipping GCS signed URL test: local ADC lacks iam.serviceAccounts.signBlob. " \
+             "Grant roles/iam.serviceAccountTokenCreator on the Cloud Run SA or set " \
+             "ACTIVE_STORAGE_SERVICE=local to use disk storage in dev."
+      else
+        raise e
+      end
     rescue => e
       if e.class.name == "Google::Cloud::Storage::SignedUrlUnavailable" || 
          (e.class.name == "Google::Cloud::PermissionDeniedError" && e.message.include?("Invalid request"))

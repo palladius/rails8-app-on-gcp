@@ -29,7 +29,9 @@ Rails.application.configure do
   config.cache_store = :memory_store
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :google_dev
+  # Default to :local for hassle-free dev; set ACTIVE_STORAGE_SERVICE=google_dev to test GCS locally
+  # (requires roles/iam.serviceAccountTokenCreator on the Cloud Run SA — see iac/cloudrun.tf).
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false

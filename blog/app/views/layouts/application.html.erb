@@ -54,6 +54,11 @@
         <% if git_branch.present? && git_branch != 'main' %>
           <span class="version-badge" style="background: #8b5cf6;" title="Git branch">🌿 <%= git_branch %></span>
         <% end %>
+        <% storage_service = Rails.configuration.active_storage.service.to_s %>
+        <% is_gcs = storage_service.start_with?("google") %>
+        <span class="version-badge" style="background: <%= is_gcs ? '#0d9488' : '#6b7280' %>;" title="ActiveStorage service: <%= storage_service %>">
+          <%= is_gcs ? '☁️' : '💾' %> <%= is_gcs ? 'GCS' : 'Local' %>
+        </span>
         <span>·</span>
         <a href="<%= Rails.application.config.x.app.github_url %>" target="_blank">📦 Code</a>
         <a href="<%= Rails.application.config.x.app.workshop_url %>" target="_blank">📖 Workshop</a>
