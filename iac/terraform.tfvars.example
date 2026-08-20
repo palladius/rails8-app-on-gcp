@@ -1,0 +1,17 @@
+# terraform.tfvars.example — Copy to terraform.tfvars and fill in your values.
+#
+# Usage:
+#   cp terraform.tfvars.example terraform.tfvars
+#   # Edit terraform.tfvars with your values
+#   terraform init && terraform apply
+
+project_id = "your-gcp-project-id"
+region     = "europe-west1"
+
+# Developer identities allowed to sign GCS blob URLs locally (issue #11).
+# Add your Google account so ACTIVE_STORAGE_SERVICE=google_dev works from your laptop.
+# Format: "user:you@gmail.com" or "group:team@example.com"
+developers = [
+  # "user:alice@gmail.com",
+  # "user:bob@example.com",
+]
