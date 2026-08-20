@@ -8,3 +8,9 @@ variable "region" {
   type        = string
   default     = "europe-west1"
 }
+
+variable "developers" {
+  description = "List of developer identities (e.g. 'user:you@gmail.com') allowed to sign GCS blob URLs locally via IAM signBlob."
+  type        = list(string)
+  default     = []
+}

@@ -34,6 +34,16 @@ resource "google_service_account_iam_member" "cloud_run_sa_signer" {
   member             = module.service_account_cloud_run.iam_email
 }
 
+# Allow developers to sign GCS blob URLs locally via `iam: true` in storage.yml.
+# Without this, running ACTIVE_STORAGE_SERVICE=google_dev locally fails with
+# "iam.serviceAccounts.signBlob denied". See issue #11.
+resource "google_service_account_iam_member" "developer_sa_signer" {
+  for_each           = toset(var.developers)
+  service_account_id = module.service_account_cloud_run.id
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = each.value
+}
+
 # Cloud Run Service (Rails App)
 resource "google_cloud_run_v2_service" "rails_app" {
   name     = "${var.project_id}-rails-app"
