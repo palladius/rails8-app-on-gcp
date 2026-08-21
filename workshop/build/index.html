@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rails 8 on Google Cloud: From Zero to AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+    /* Google Codelab Font and Color Variables */
+    :root {
+      --primary-color: #1a73e8; /* Google Blue */
+      --primary-hover: #1557b0;
+      --sidebar-bg: rgba(248, 249, 250, 0.45); /* Semi-transparent */
+      --border-color: rgba(218, 220, 224, 0.5); /* Transparent borders */
+      --text-color: #3c4043;
+      --heading-color: #202124;
+      --active-bg: rgba(232, 240, 254, 0.65);
+      --header-bg: rgba(255, 255, 255, 0.5);
+      --footer-bg: rgba(255, 255, 255, 0.5);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Google Sans', 'Roboto', 'Helvetica Neue', sans-serif;
+      color: var(--text-color);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      position: relative;
+    }
+    
+    body::before {
+      content: "";
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 45%;
+      height: 45%;
+      background: radial-gradient(circle, rgba(26, 115, 232, 0.12) 0%, rgba(26, 115, 232, 0) 70%);
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    
+    body::after {
+      content: "";
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 55%;
+      height: 55%;
+      background: radial-gradient(circle, rgba(217, 48, 37, 0.08) 0%, rgba(217, 48, 37, 0) 70%);
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(50px);
+    }
+    
+    /* Sidebar styling with Glassmorphism */
+    .sidebar {
+      width: 320px;
+      min-width: 320px;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 10;
+    }
+    
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .codelab-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--heading-color);
+      line-height: 1.4;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+    
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: #5f6368;
+      font-size: 14px;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: var(--heading-color);
+    }
+    
+    .sidebar-item.active {
+      background: var(--active-bg);
+      color: var(--primary-color);
+      border-left-color: var(--primary-color);
+      font-weight: 500;
+    }
+    
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.08);
+      color: #5f6368;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-item.active .step-num {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+    
+    .sidebar-item.completed .step-num {
+      background-color: #137333; /* Google Green */
+      color: #ffffff;
+    }
+    
+    /* Main layout */
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+    
+    /* Header styling with Glassmorphism */
+    .top-header {
+      height: 64px;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 5;
+    }
+    
+    .current-step-title {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--heading-color);
+    }
+    
+    .metadata-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    
+    .metadata-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Content styling */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      scroll-behavior: smooth;
+      z-index: 2;
+    }
+    
+    /* Elegant floating card container for Codelab steps */
+    .content-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+      margin-bottom: 100px;
+    }
+    
+    .step-content {
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    
+    .step-content h1, .step-content h2, .step-content h3 {
+      color: var(--heading-color);
+      margin-top: 24px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    
+    .step-content h2 { font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .step-content h3 { font-size: 18px; }
+    
+    .step-content p {
+      margin-bottom: 16px;
+    }
+    
+    .step-content ul, .step-content ol {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+    
+    .step-content li {
+      margin-bottom: 8px;
+    }
+    
+    .step-content code {
+      font-family: 'Roboto Mono', Consolas, Monaco, monospace;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .step-content pre code {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+    }
+    
+    .step-content pre {
+      margin-bottom: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .step-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      margin: 16px 0;
+      display: block;
+    }
+    
+    /* Info box styling */
+    .info-box {
+      border-left-width: 4px;
+      border-left-style: solid;
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .info-box p:last-child {
+      margin-bottom: 0;
+    }
+    
+    .info-box.positive {
+      background-color: rgba(230, 244, 234, 0.7);
+      border-left-color: #137333;
+    }
+    
+    .info-box.warning {
+      background-color: rgba(254, 247, 224, 0.7);
+      border-left-color: #b06000;
+    }
+    
+    .info-box.negative {
+      background-color: rgba(252, 232, 230, 0.7);
+      border-left-color: #c5221f;
+    }
+    
+    /* Bottom Navigation Bar with Glassmorphism */
+    .bottom-bar {
+      height: 64px;
+      background: var(--footer-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(248, 249, 250, 0.8);
+    }
+    
+    .progress-text {
+      font-size: 14px;
+      color: #5f6368;
+    }
+    
+    /* Ribbon/Badge style */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: rgba(232, 240, 254, 0.6);
+      color: #1a73e8;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    /* Key/Value block for Frontmatter metadata card */
+    .metadata-card {
+      background: rgba(248, 249, 250, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .metadata-card h3 {
+      margin-top: 0 !important;
+      margin-bottom: 12px !important;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .meta-val {
+      font-weight: 500;
+      color: var(--heading-color);
+    }
+    
+    .meta-lbl {
+      font-size: 12px;
+      color: #5f6368;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="codelab-title">Rails 8 on Google Cloud: From Zero to AI</div>
+    </div>
+    <div class="sidebar-menu">
+      
+        <a href="#0" class="sidebar-item" id="sidebar-item-0">
+          <span class="step-num">1</span>
+          <span>Introduction</span>
+        </a>
+      
+        <a href="#1" class="sidebar-item" id="sidebar-item-1">
+          <span class="step-num">2</span>
+          <span>Setup and Prerequisites</span>
+        </a>
+      
+        <a href="#2" class="sidebar-item" id="sidebar-item-2">
+          <span class="step-num">3</span>
+          <span>Step 1: The Local Baseline</span>
+        </a>
+      
+        <a href="#3" class="sidebar-item" id="sidebar-item-3">
+          <span class="step-num">4</span>
+          <span>Step 2: Cloud Storage</span>
+        </a>
+      
+        <a href="#4" class="sidebar-item" id="sidebar-item-4">
+          <span class="step-num">5</span>
+          <span>Step 3: Cloud SQL</span>
+        </a>
+      
+        <a href="#5" class="sidebar-item" id="sidebar-item-5">
+          <span class="step-num">6</span>
+          <span>Step 4: Secret Manager</span>
+        </a>
+      
+        <a href="#6" class="sidebar-item" id="sidebar-item-6">
+          <span class="step-num">7</span>
+          <span>Step 5: Cloud Run Deployment</span>
+        </a>
+      
+        <a href="#7" class="sidebar-item" id="sidebar-item-7">
+          <span class="step-num">8</span>
+          <span>Step 6: Automating with Cloud Build</span>
+        </a>
+      
+        <a href="#8" class="sidebar-item" id="sidebar-item-8">
+          <span class="step-num">9</span>
+          <span>Step 7: AI Features and Background Jobs</span>
+        </a>
+      
+        <a href="#9" class="sidebar-item" id="sidebar-item-9">
+          <span class="step-num">10</span>
+          <span>Conclusion</span>
+        </a>
+      
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+    
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="current-step-title" id="header-step-title">Introduction</div>
+      <div class="metadata-info">
+        
+        
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area" id="main-content">
+      <div class="content-container">
+        
+        <!-- Rendered Steps -->
+        
+          <div class="step-content" id="step-0" style="display: none;">
+            <h1>1. Introduction</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="introduction">Introduction</h2>
+
+<p><img src="assets/images/rails_gcp_logo.jpg" alt="Rails on Google Cloud" /></p>
+
+<p>Welcome to the Rails 8 on Google Cloud workshop! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite setup to a fully scalable, secure, and AI-powered production application on Google Cloud.</p>
+
+<p>We will explore the best practices for deploying Rails, managing secrets, utilizing Cloud SQL, and tapping into Google’s Gemini models for generative AI features.</p>
+
+<h3 id="what-youll-learn">What you’ll learn</h3>
+<ul>
+  <li>How to provision Google Cloud infrastructure using Terraform.</li>
+  <li>How to transition from local disk storage to Google Cloud Storage (ActiveStorage).</li>
+  <li>How to securely connect Rails to Cloud SQL (PostgreSQL).</li>
+  <li>How to use Secret Manager to keep your credentials safe.</li>
+  <li>How to deploy your application to Cloud Run.</li>
+  <li>How to automate your deployments with Cloud Build.</li>
+  <li>How to build AI-powered features (like an auto-generating cover image) using Solid Queue and Gemini.</li>
+</ul>
+
+<p>Let’s get started!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-1" style="display: none;">
+            <h1>2. Setup and Prerequisites</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="setup-and-prerequisites">Setup and Prerequisites</h2>
+
+<blockquote>
+  <p>💡 <strong>Imagine:</strong> Your boss wants you to take an old application and revive it; the last developer left the company, the language went End of Life 5 years ago, but still the application has strong business value for you. You heard the application has clear-text passwords in the code (dev was in a hurry to change role and didn’t anticipate the success of this super app), and was deployed manually to production. Nobody remembers how it was done.</p>
+</blockquote>
+
+<p>Before we begin, you will need a few things set up:</p>
+
+<ol>
+  <li><strong>A Google Cloud Project:</strong> Ensure you have a GCP project created and billing enabled.</li>
+  <li><strong>Google Cloud CLI:</strong> The <code>gcloud</code> CLI should be installed and authenticated (<code>gcloud auth login</code>).</li>
+  <li><strong>Ruby and Rails:</strong> You should have Ruby 3.3+ and Rails 8 installed locally.</li>
+  <li><strong>Terraform:</strong> We will use Terraform to provision the heavy infrastructure.</li>
+</ol>
+
+<p>First, clone the workshop repository and move into the <code>workshop_1_local_baseline</code> branch:</p>
+
+<pre><code class="language-bash">git clone https://github.com/palladius/rails8-app-on-gcp.git
+cd rails8-app-on-gcp
+git checkout workshop_1_local_baseline
+</code></pre>
+
+
+          </div>
+        
+          <div class="step-content" id="step-2" style="display: none;">
+            <h1>3. Step 1: The Local Baseline</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-1-the-local-baseline">Step 1: The Local Baseline</h2>
+
+<p>Our starting point is a standard Rails 8 blog application. It uses SQLite for the database and stores images on your local hard drive.</p>
+
+<p>Run the setup commands to get the app running locally:</p>
+
+<pre><code class="language-bash">bundle install
+bin/rails db:setup
+bin/dev
+</code></pre>
+
+<p>Open <code>http://localhost:3000</code> in your browser. You should see a basic blog. Try creating a post and uploading an image. It works perfectly on your machine!</p>
+
+<p><strong>The Catch:</strong> Cloud Run containers are stateless. If we deploy this right now, your SQLite database and local images will be wiped out every time the container restarts. We need to move our state to the cloud.</p>
+
+<h3 id="provisioning-the-cloud-infrastructure">Provisioning the Cloud Infrastructure</h3>
+
+<p>Cloud SQL takes about 15 minutes to provision. Let’s start that process now so it’s ready when we need it!</p>
+
+<p>Open a new terminal tab and run:</p>
+
+<pre><code class="language-bash">cd iac/
+terraform init
+terraform apply -auto-approve
+</code></pre>
+
+<p>While Terraform does the heavy lifting in the background, let’s fix our storage!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-3" style="display: none;">
+            <h1>4. Step 2: Cloud Storage</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-2-cloud-storage">Step 2: Cloud Storage</h2>
+
+<p>Currently, our blog images are stored in the <code>storage/</code> directory locally. We need to move this to Google Cloud Storage (GCS) so our images survive container restarts.</p>
+
+<p>Our Terraform script is already creating a GCS bucket for us. Let’s configure Rails to use it.</p>
+
+<ol>
+  <li>Checkout the next branch:
+    <pre><code class="language-bash">git checkout workshop_2_cloud_storage
+</code></pre>
+  </li>
+  <li>Open <code>config/storage.yml</code> and look at the <code>google</code> service definition. We use the <code>google-cloud-storage</code> gem to connect to our bucket.</li>
+  <li>Open <code>config/environments/production.rb</code> (and <code>development.rb</code> if you want to test locally) and change the ActiveStorage service:
+    <pre><code class="language-ruby">config.active_storage.service = :google
+</code></pre>
+  </li>
+  <li>Keep the bucket <strong>private</strong>, and tell Rails how to sign URLs without a key. Cloud Run authenticates through the metadata server, which hands out access tokens but no private key — so Rails cannot compute a GCS signature on its own, and every image blows up with <code>Service account credentials 'issuer (client_email)' is missing</code>. One line per service in <code>config/storage.yml</code> fixes it:
+    <pre><code class="language-yaml">iam: true  # sign via the IAM Credentials signBlob API — no private key needed
+</code></pre>
+
+    <blockquote>
+      <p>💡 <strong>Design decision:</strong> the tempting shortcut is <code>public: true</code> plus an <code>allUsers:objectViewer</code> grant on the bucket. Don’t: it makes every upload world-readable forever, and those URLs never expire. Signing through the IAM Credentials API keeps blobs private behind expiring signed URLs, and costs exactly one extra IAM role — <code>roles/iam.serviceAccountTokenCreator</code> on the service account <em>itself</em>, already wired up in our Terraform.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<p>Restart your Rails server and try creating a new post with an image. The image is now safely stored in a Google Cloud Storage bucket!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-4" style="display: none;">
+            <h1>5. Step 3: Cloud SQL</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-3-cloud-sql">Step 3: Cloud SQL</h2>
+
+<p>Check your Terraform output in the other terminal. If it’s finished, you now have a fully managed PostgreSQL database!</p>
+
+<p>Let’s switch our application from SQLite to Cloud SQL.</p>
+
+<ol>
+  <li>Checkout the next branch:
+    <pre><code class="language-bash">git checkout workshop_3_cloud_sql
+</code></pre>
+  </li>
+  <li>We need to connect to our new Cloud SQL instance. In production, Cloud Run handles this natively. Locally, we will use the <strong>Cloud SQL Auth Proxy</strong> to securely connect to our database.</li>
+  <li>Open <code>config/database.yml</code>. Notice how the <code>production</code> block is now configured to use the <code>postgresql</code> adapter and expects a <code>DATABASE_URL</code> environment variable.</li>
+</ol>
+
+
+          </div>
+        
+          <div class="step-content" id="step-5" style="display: none;">
+            <h1>6. Step 4: Secret Manager</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-4-secret-manager">Step 4: Secret Manager</h2>
+
+<p>Security is critical. We have a database password and a <code>RAILS_MASTER_KEY</code> (used to decrypt Rails credentials) that we cannot check into version control.</p>
+
+<p>Instead of relying on fragile <code>.env</code> files in production, we will use <strong>Google Cloud Secret Manager</strong>.</p>
+
+<ol>
+  <li>Checkout the next branch:
+    <pre><code class="language-bash">git checkout workshop_4_secret_manager
+</code></pre>
+  </li>
+  <li>Our Terraform script created two empty secrets: <code>rails-master-key</code> and <code>rails-db-password</code>.</li>
+  <li>Let’s populate them! Use the <code>gcloud</code> CLI to add your actual <code>master.key</code> content to Secret Manager:</li>
+</ol>
+
+<pre><code class="language-bash">gcloud secrets versions add rails-master-key --data-file=config/master.key
+</code></pre>
+
+<p>Now, when we deploy our app, Cloud Run will automatically fetch this secret and inject it into our container as an environment variable!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-6" style="display: none;">
+            <h1>7. Step 5: Cloud Run Deployment</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-5-cloud-run-deployment">Step 5: Cloud Run Deployment</h2>
+
+<p>It’s time to take our blog live! We will deploy the application to Google Cloud Run, a fully managed serverless platform.</p>
+
+<ol>
+  <li>Checkout the next branch:
+    <pre><code class="language-bash">git checkout workshop_5_cloud_run_classic
+</code></pre>
+  </li>
+  <li>We will use the <code>gcloud run deploy</code> command to build our container and deploy it in one step.</li>
+</ol>
+
+<pre><code class="language-bash">gcloud run deploy rails-blog \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest"
+</code></pre>
+
+<p>Once the deployment finishes, click the URL provided in the terminal. Your Rails 8 blog is now live on the internet, backed by Cloud SQL and Cloud Storage!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-7" style="display: none;">
+            <h1>8. Step 6: Automating with Cloud Build</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-6-automating-with-cloud-build">Step 6: Automating with Cloud Build</h2>
+
+<p>Deploying from your laptop is great for testing, but in a real team, you want deployments to happen automatically when you push to GitHub.</p>
+
+<ol>
+  <li>Checkout the next branch:
+    <pre><code class="language-bash">git checkout workshop_6_cloud_build_cicd
+</code></pre>
+  </li>
+  <li>Take a look at the <code>cloudbuild.yaml</code> file. This file tells Google Cloud Build exactly how to build our Docker container, run our database migrations, and deploy to Cloud Run.</li>
+  <li>In the Google Cloud Console, we will set up a Cloud Build Trigger connected to our GitHub repository.</li>
+</ol>
+
+<p>Now, every time you <code>git push main</code>, your application will automatically build and deploy!</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-8" style="display: none;">
+            <h1>9. Step 7: AI Features and Background Jobs</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="step-7-ai-features-and-background-jobs">Step 7: AI Features and Background Jobs</h2>
+
+<p><img src="assets/images/nano_banana_mascot.jpg" alt="NanoBanana Mascot" /></p>
+
+<p>Rails 8 introduced <strong>Solid Queue</strong>, a powerful database-backed job queue. We are going to use it to power a magical AI feature: <strong>The “NanoBanana” Auto-Cover Generator</strong>.</p>
+
+<ol>
+  <li>Checkout our final branch:
+    <pre><code class="language-bash">git checkout workshop_7_ai_features
+</code></pre>
+  </li>
+</ol>
+
+<h3 id="the-architecture">The Architecture</h3>
+<p>Instead of making the user wait while we call the Gemini API, we offload the work to a background job. In a Cloud Run environment, this means we deploy the <em>same</em> container twice:</p>
+<ul>
+  <li><strong>Service A (Web):</strong> Listens for HTTP traffic.</li>
+  <li><strong>Service B (Worker):</strong> Runs <code>bundle exec rails solid_queue:start</code> and processes background jobs.</li>
+</ul>
+
+<h3 id="the-ai-magic">The AI Magic</h3>
+<p>When you publish a post without a cover image, our <code>GenerateCoverImageJob</code> is triggered.</p>
+<ol>
+  <li>It sends your article text to the Gemini/Imagen model using this prompt:
+    <blockquote>
+      <p><em>“Create a cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a ‘Locandina di un film 1960’ (a vintage 1960s Italian movie poster). Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. Also, you MUST feature a banana somewhere in the scene.”</em></p>
+    </blockquote>
+  </li>
+  <li>The job downloads the generated image and attaches it to the post via ActiveStorage.</li>
+</ol>
+
+<p>Try it out! Create a new post, leave the image blank, and watch as an AI-generated, perfectly themed cover image appears a few seconds later.</p>
+
+
+          </div>
+        
+          <div class="step-content" id="step-9" style="display: none;">
+            <h1>10. Conclusion</h1>
+            
+            <!-- If overview and we have metadata, show a pretty card -->
+            
+
+            <h2 id="conclusion">Conclusion</h2>
+
+<p>Congratulations! 🎉</p>
+
+<p>You’ve successfully migrated a local Rails 8 application to a production-grade architecture on Google Cloud.</p>
+
+<p>You’ve learned how to:</p>
+<ul>
+  <li>Use <strong>Cloud Storage</strong> for scalable file uploads.</li>
+  <li>Provision and connect to <strong>Cloud SQL</strong>.</li>
+  <li>Securely manage credentials with <strong>Secret Manager</strong>.</li>
+  <li>Deploy serverless containers with <strong>Cloud Run</strong>.</li>
+  <li>Automate CI/CD pipelines with <strong>Cloud Build</strong>.</li>
+  <li>Leverage <strong>Solid Queue</strong> and <strong>Gemini</strong> to build robust, asynchronous AI features.</li>
+</ul>
+
+<h3 id="extra-credit">Extra Credit</h3>
+<p>If you want to keep exploring, check out our <code>IDEAS.md</code> for advanced challenges, such as:</p>
+<ul>
+  <li>Deploying the app on a single VM using <strong>Kamal</strong>.</li>
+  <li>Building a <strong>Multi-language Podcastifier</strong> that uses Cloud Translation and Text-to-Speech to generate localized audio versions of your blog posts!</li>
+</ul>
+
+          </div>
+        
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-bar">
+      <a href="#" class="btn btn-secondary" id="prev-btn">BACK</a>
+      <span class="progress-text" id="progress-indicator">Step 1 of 10</span>
+      <a href="#" class="btn btn-primary" id="next-btn">NEXT</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-terraform.min.js"></script>
+  
+  <script>
+    // Detailed JavaScript to manage step navigation client-side, documented for 13yo as requested 🦖
+    
+    // This function runs every time the page URL hash changes (e.g. from #1 to #2) or on load
+    function showStep() {
+      // 1. Get the current hash from the browser URL, defaulting to #0 (first step) if empty
+      let hash = window.location.hash;
+      if (!hash || !hash.match(/^#\d+$/)) {
+        hash = '#0';
+      }
+      
+      // 2. Extract the numeric index from the hash (e.g. "#3" -> 3)
+      let stepIndex = parseInt(hash.substring(1));
+      
+      // 3. Find the HTML container for this step
+      let stepElement = document.getElementById('step-' + stepIndex);
+      
+      // 4. Fallback check: if the step element doesn't exist (e.g. user went to #999), go to step 0
+      if (!stepElement) {
+        hash = '#0';
+        stepIndex = 0;
+        stepElement = document.getElementById('step-0');
+      }
+      
+      // 5. Hide all step content sections
+      document.querySelectorAll('.step-content').forEach(el => {
+        el.style.display = 'none';
+      });
+      
+      // 6. Show the currently active step section
+      if (stepElement) {
+        stepElement.style.display = 'block';
+        
+        // Update the top header's title to match the active step title
+        let stepHeader = stepElement.querySelector('h1');
+        if (stepHeader) {
+          // Remove the "X. " prefix from header title for top bar display
+          let titleText = stepHeader.innerText.replace(/^\d+\.\s+/, '');
+          document.getElementById('header-step-title').innerText = titleText;
+        }
+      }
+      
+      // 7. Update sidebar navigation styles
+      document.querySelectorAll('.sidebar-item').forEach((el, idx) => {
+        // Clear active class
+        el.classList.remove('active');
+        
+        // Add "completed" class to all steps prior to current step, so the user knows progress
+        if (idx < stepIndex) {
+          el.classList.add('completed');
+        } else {
+          el.classList.remove('completed');
+        }
+      });
+      
+      // Highlight the active step in the sidebar
+      let activeSidebarItem = document.getElementById('sidebar-item-' + stepIndex);
+      if (activeSidebarItem) {
+        activeSidebarItem.classList.add('active');
+        
+        // Ensure the active item is visible in the scrollable sidebar area
+        activeSidebarItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+      
+      // 8. Configure the BACK button
+      let prevButton = document.getElementById('prev-btn');
+      if (stepIndex > 0) {
+        prevButton.style.visibility = 'visible';
+        prevButton.href = '#' + (stepIndex - 1);
+      } else {
+        // Hide the BACK button on the very first page
+        prevButton.style.visibility = 'hidden';
+      }
+      
+      // 9. Configure the NEXT button
+      let nextButton = document.getElementById('next-btn');
+      let totalSteps = document.querySelectorAll('.step-content').length;
+      
+      if (stepIndex < totalSteps - 1) {
+        nextButton.style.visibility = 'visible';
+        nextButton.href = '#' + (stepIndex + 1);
+        nextButton.innerText = 'NEXT';
+      } else {
+        // On the final page, show 'RESTART' and link to step 0
+        nextButton.style.visibility = 'visible';
+        nextButton.href = '#0'; // Wrap back to step 0
+        nextButton.innerText = 'RESTART 🔄';
+      }
+      
+      // 10. Update the progress indicator text (e.g. "Step 3 of 8")
+      document.getElementById('progress-indicator').innerText = 'Step ' + (stepIndex + 1) + ' of ' + totalSteps;
+      
+      // 11. Scroll the main content window back to top so user starts reading from the top
+      document.getElementById('main-content').scrollTop = 0;
+      
+      // 12. Run Prism code block syntax highlighter for the new content
+      if (window.Prism) {
+        Prism.highlightAll();
+      }
+    }
+    
+    // Process markdown blockquotes and turn them into styled Google Codelab info-boxes!
+    function processBlockquotes() {
+      document.querySelectorAll('blockquote').forEach(bq => {
+        const text = bq.innerText || '';
+        
+        // Color code based on emojis or github alert notation
+        if (text.includes('💡') || text.includes('ℹ️') || text.includes('🟢') || text.includes('[!NOTE]') || text.includes('[!TIP]')) {
+          bq.classList.add('info-box', 'positive');
+        } else if (text.includes('⚠️') || text.includes('🟡') || text.includes('[!WARNING]') || text.includes('[!IMPORTANT]')) {
+          bq.classList.add('info-box', 'warning');
+        } else if (text.includes('🛑') || text.includes('🚨') || text.includes('🔴') || text.includes('[!CAUTION]')) {
+          bq.classList.add('info-box', 'negative');
+        } else {
+          bq.classList.add('info-box', 'positive'); // Default fallback
+        }
+        
+        // Clean up the github alert markdown tags if present
+        bq.innerHTML = bq.innerHTML
+          .replace(/\[!NOTE\]/gi, '<strong>Note:</strong>')
+          .replace(/\[!TIP\]/gi, '<strong>Tip:</strong>')
+          .replace(/\[!WARNING\]/gi, '<strong>Warning:</strong>')
+          .replace(/\[!IMPORTANT\]/gi, '<strong>Important:</strong>')
+          .replace(/\[!CAUTION\]/gi, '<strong>Caution:</strong>');
+      });
+    }
+
+    // Attach listeners for hash changes and load events
+    window.addEventListener('hashchange', showStep);
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      processBlockquotes();
+      showStep();
+    });
+  </script>
+</body>
+</html>

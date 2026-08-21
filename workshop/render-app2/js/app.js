@@ -1,20 +1,21 @@
-const pages = [
-    '01-intro.md',
-    '02-local-setup.md',
-    '03-cloud-storage.md',
-    '04-cloud-sql.md',
-    '05-cloud-run.md',
-    '06-cicd.md',
-    '07-conclusion.md'
-];
-
+let pages = [];
 let currentPage = 0;
 const sliderTrack = document.getElementById('slider-track');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const indicator = document.getElementById('page-indicator');
 const navList = document.getElementById('nav-list');
+
 async function loadPages() {
+    try {
+        const response = await fetch('pages/pages.json');
+        if (!response.ok) throw new Error('Could not load pages.json');
+        pages = await response.json();
+    } catch (e) {
+        console.error('Failed to load pages.json, falling back to defaults:', e);
+        pages = ['01-overview.md'];
+    }
+
     for (let i = 0; i < pages.length; i++) {
         const slide = document.createElement('div');
         slide.className = 'page-slide';

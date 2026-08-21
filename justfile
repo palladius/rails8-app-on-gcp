@@ -33,3 +33,8 @@ conductor-status:
 # apply terraform changes
 terraform-apply:
 	cd iac && terraform apply
+
+# Generate static HTML for GitHub pages from CODELAB.md
+build-ghpages:
+	cd workshop && ruby split_codelab.rb
+	cd workshop && ruby build_ghpages.rb

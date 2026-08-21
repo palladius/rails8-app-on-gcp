@@ -239,8 +239,10 @@ puts "💡 Tip: Edit the markdown file and just refresh the browser to see updat
 puts "Press Ctrl+C to stop the server."
 puts "\n"
 
-# Run Sinatra app
-CodelabServer.run!
+# Run Sinatra app only if executed directly
+if __FILE__ == $0
+  CodelabServer.run!
+end
 
 __END__
 
