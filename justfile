@@ -14,6 +14,10 @@ install:
 dev:
     cd blog && just dev
 
+# run all tests
+test:
+    cd blog && just test
+
 # run the workshop codelab visualizer server
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
