@@ -9,6 +9,7 @@ class RegistrationsController < ApplicationController
   def create
     @user = User.new(registration_params)
     if @user.save
+      UserMailer.with(user: @user).welcome.deliver_later
       start_new_session_for @user
       redirect_to root_path, notice: "Welcome aboard! 🎉 Account created successfully."
     else
