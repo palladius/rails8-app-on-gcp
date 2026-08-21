@@ -13,7 +13,7 @@ const sliderTrack = document.getElementById('slider-track');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const indicator = document.getElementById('page-indicator');
-
+const navList = document.getElementById('nav-list');
 async function loadPages() {
     for (let i = 0; i < pages.length; i++) {
         const slide = document.createElement('div');
@@ -25,6 +25,19 @@ async function loadPages() {
         slide.appendChild(card);
         sliderTrack.appendChild(slide);
 
+        // Pre-create navigation button
+        const li = document.createElement('li');
+        const navBtn = document.createElement('button');
+        navBtn.id = `nav-btn-${i}`;
+        navBtn.textContent = `...`;
+        if (i === 0) navBtn.classList.add('active');
+        navBtn.addEventListener('click', () => {
+            currentPage = i;
+            updateNavigation();
+        });
+        li.appendChild(navBtn);
+        navList.appendChild(li);
+
         fetch(`pages/${pages[i]}`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to load ' + pages[i] + '. (Make sure to run this via a local server, e.g. python3 -m http.server)');
@@ -32,9 +45,15 @@ async function loadPages() {
             })
             .then(text => {
                 card.innerHTML = marked.parse(text);
+                
+                // Extract title from first H1, or use filename fallback
+                const match = text.match(/^#\s+(.+)$/m);
+                const title = match ? match[1] : pages[i].replace('.md', '').replace(/^\d+-/, '').replace(/-/g, ' ');
+                navBtn.textContent = title;
             })
             .catch(err => {
                 card.innerHTML = `<h2>Error</h2><p>${err.message}</p>`;
+                navBtn.textContent = 'Error';
             });
     }
 }
@@ -44,6 +63,15 @@ function updateNavigation() {
     prevBtn.disabled = currentPage === 0;
     nextBtn.disabled = currentPage === pages.length - 1;
     indicator.textContent = `${currentPage + 1} / ${pages.length}`;
+    
+    // Update active class on nav links
+    document.querySelectorAll('.nav-list button').forEach((btn, idx) => {
+        if (idx === currentPage) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 }
 
 prevBtn.addEventListener('click', () => {

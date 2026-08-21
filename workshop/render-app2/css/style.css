@@ -95,6 +95,61 @@ body {
     font-weight: 600;
 }
 
+/* App Layout */
+.app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border-color);
+    padding: 2rem 1rem;
+    overflow-y: auto;
+    z-index: 5;
+}
+.sidebar-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    padding-left: 0.5rem;
+}
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.nav-list li {
+    margin-bottom: 0.5rem;
+}
+.nav-list button {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: all 0.2s ease;
+}
+.nav-list button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+.nav-list button.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #60a5fa;
+    font-weight: 600;
+}
+
 /* Slider */
 .slider-container {
     flex: 1;
@@ -168,4 +223,10 @@ body {
     margin: 0;
     padding-left: 1rem;
     color: #cbd5e1;
+}
+.content-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
