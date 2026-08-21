@@ -1,1 +1,1 @@
-architecture :rails
+architecture :vanilla_rails
