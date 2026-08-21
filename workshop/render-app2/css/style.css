@@ -1,0 +1,171 @@
+:root {
+    --bg-color: #0f172a;
+    --text-color: #f8fafc;
+    --primary-color: #3b82f6;
+    --secondary-color: #8b5cf6;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --font-main: 'Inter', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Glassmorphism Background Blobs */
+.background-blobs {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+.blob {
+    position: absolute;
+    filter: blur(80px);
+    opacity: 0.5;
+    border-radius: 50%;
+    animation: float 20s infinite ease-in-out alternate;
+}
+.blob-1 {
+    width: 500px; height: 500px;
+    background: var(--primary-color);
+    top: -100px; left: -100px;
+}
+.blob-2 {
+    width: 600px; height: 600px;
+    background: var(--secondary-color);
+    bottom: -150px; right: -100px;
+    animation-delay: -10s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 50px) scale(1.1); }
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.5rem;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.controls button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    transition: all 0.2s ease;
+}
+.controls button:not(:disabled):hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#page-indicator {
+    margin: 0 1rem;
+    font-weight: 600;
+}
+
+/* Slider */
+.slider-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    padding: 2rem;
+}
+.slider-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.page-slide {
+    min-width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+/* Markdown Content Container */
+.content-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 800px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    height: max-content;
+    min-height: 80%;
+    margin-bottom: 2rem;
+}
+
+/* Markdown Styles */
+.content-card h1, .content-card h2, .content-card h3 {
+    font-family: var(--font-heading);
+    margin-top: 0;
+}
+.content-card h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+.content-card a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+.content-card a:hover {
+    text-decoration: underline;
+}
+.content-card pre {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+}
+.content-card code {
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+.content-card blockquote {
+    border-left: 4px solid var(--primary-color);
+    margin: 0;
+    padding-left: 1rem;
+    color: #cbd5e1;
+}
