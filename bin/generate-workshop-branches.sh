@@ -12,7 +12,7 @@ BASE_BRANCH="main"
 
 # Define the steps and their branch names
 STEPS=(
-  "page1_baseline:workshop/page1"
+  "page1_vanilla:workshop/page1"
   "page2_cloud_storage:workshop/page2"
   "page3_cloud_sql:workshop/page3"
   "page4_secret_manager:workshop/page4"
@@ -22,7 +22,8 @@ STEPS=(
 )
 
 echo "🗑️  Deleting old branches..."
-for step_info in "${STEPS[@]}"; step_info_arr=(${step_info//:/ }); branch_name=${step_info_arr[1]}; do
+for step_info in "${STEPS[@]}"; do
+  IFS=':' read -r step_folder branch_name <<< "$step_info"
   git branch -D "$branch_name" 2>/dev/null || true
 done
 
