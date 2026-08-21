@@ -1,0 +1,4 @@
+Task: Create docker-compose.yml with db, pgadmin, mail, jobs, gcs services.
+Summary of changes: Added docker-compose.yml with PostgreSQL, pgAdmin, Mailpit, fake-gcs-server, and jobs services.
+Files modified: blog/docker-compose.yml
+Why: To provide a robust local development environment with all required backing services.
