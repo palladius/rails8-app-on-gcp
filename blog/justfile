@@ -8,3 +8,7 @@ install:
 
 dev:
     bin/dev -p 9090
+
+test:
+    bin/rails test
+    bundle exec archspec check
