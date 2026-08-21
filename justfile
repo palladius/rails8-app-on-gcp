@@ -13,6 +13,11 @@ install:
 # run the local development server
 dev:
     cd blog && just dev
+
+# run the workshop codelab visualizer server
+workshop-dev port="8080":
+    cd workshop && ./server.rb --port {{port}}
+
 # show project status
 project-status:
     cd iac && ./check_gcp_setup.sh

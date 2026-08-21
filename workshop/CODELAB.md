@@ -3,6 +3,8 @@
 
 ## Introduction
 
+![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
+
 Welcome to the Rails 8 on Google Cloud workshop! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite setup to a fully scalable, secure, and AI-powered production application on Google Cloud. 
 
 We will explore the best practices for deploying Rails, managing secrets, utilizing Cloud SQL, and tapping into Google's Gemini models for generative AI features.
@@ -19,6 +21,8 @@ We will explore the best practices for deploying Rails, managing secrets, utiliz
 Let's get started!
 
 ## Setup and Prerequisites
+
+> 💡 **Imagine:** Your boss wants you to take an old application and revive it; the last developer left the company, the language went End of Life 5 years ago, but still the application has strong business value for you. You heard the application has clear-text passwords in the code (dev was in a hurry to change role and didn't anticipate the success of this super app), and was deployed manually to production. Nobody remembers how it was done.
 
 Before we begin, you will need a few things set up:
 
@@ -155,6 +159,8 @@ Deploying from your laptop is great for testing, but in a real team, you want de
 Now, every time you `git push main`, your application will automatically build and deploy!
 
 ## Step 7: AI Features and Background Jobs
+
+![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
 
 Rails 8 introduced **Solid Queue**, a powerful database-backed job queue. We are going to use it to power a magical AI feature: **The "NanoBanana" Auto-Cover Generator**.
 
