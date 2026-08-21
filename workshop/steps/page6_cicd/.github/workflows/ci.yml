@@ -1,0 +1,37 @@
+name: Workshop CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-branches:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Need full history for branch operations
+        
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.0' # Matches .ruby-version
+        bundler-cache: true
+        
+    - name: Configure Git User
+      run: |
+        git config --global user.name "GitHub Actions CI"
+        git config --global user.email "ci@example.com"
+        
+    - name: Run Workshop Branch Generator
+      run: |
+        # Ensure we run this from a clean state on main
+        git checkout main
+        
+        # This script generates branches page1 through page7
+        # and runs `rails test` after applying each patch.
+        # It ensures that every step in the workshop is valid and passing!
+        ./bin/generate-workshop-branches.sh

@@ -33,7 +33,7 @@ jobs:
           ruby-version: '3.3'
 
       - name: Install dependencies
-        run: gem install kramdown
+        run: gem install kramdown kramdown-parser-gfm
 
       - name: Build Workshop Sites
         run: |

@@ -5,8 +5,9 @@ require 'fileutils'
 require 'yaml'
 begin
   require 'kramdown'
+  require 'kramdown-parser-gfm'
 rescue LoadError
-  puts "Missing kramdown gem. Please run `gem install kramdown`"
+  puts "Missing kramdown gem. Please run `gem install kramdown kramdown-parser-gfm`"
   exit 1
 end
 
