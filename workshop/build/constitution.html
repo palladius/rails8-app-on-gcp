@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📜 Rails 8 on GCP Workshop Constitution & Architectural Blueprint</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+    /* Google Codelab Font and Color Variables */
+    :root {
+      --primary-color: #1a73e8; /* Google Blue */
+      --primary-hover: #1557b0;
+      --sidebar-bg: rgba(248, 249, 250, 0.45); /* Semi-transparent */
+      --border-color: rgba(218, 220, 224, 0.5); /* Transparent borders */
+      --text-color: #3c4043;
+      --heading-color: #202124;
+      --active-bg: rgba(232, 240, 254, 0.65);
+      --header-bg: rgba(255, 255, 255, 0.65);
+      --footer-bg: rgba(255, 255, 255, 0.65);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Google Sans', 'Roboto', 'Helvetica Neue', sans-serif;
+      color: var(--text-color);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      position: relative;
+    }
+    
+    body::before {
+      content: "";
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 45%;
+      height: 45%;
+      background: radial-gradient(circle, rgba(26, 115, 232, 0.12) 0%, rgba(26, 115, 232, 0) 70%);
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+    
+    body::after {
+      content: "";
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 55%;
+      height: 55%;
+      background: radial-gradient(circle, rgba(217, 48, 37, 0.08) 0%, rgba(217, 48, 37, 0) 70%);
+      z-index: 1;
+      pointer-events: none;
+      filter: blur(50px);
+    }
+    
+    /* Sidebar styling with Glassmorphism */
+    .sidebar {
+      width: 320px;
+      min-width: 320px;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 10;
+    }
+    
+    .sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.4);
+    }
+    
+    .codelab-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--heading-color);
+      line-height: 1.4;
+    }
+
+    /* Doc Switcher Pills */
+    .doc-switcher {
+      display: flex;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 3px;
+      border-radius: 8px;
+      margin-top: 12px;
+      gap: 2px;
+    }
+
+    .doc-tab {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 500;
+      text-decoration: none;
+      color: #5f6368;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .doc-tab:hover {
+      color: var(--heading-color);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .doc-tab.active {
+      background: #ffffff;
+      color: var(--primary-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-weight: 600;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+    
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      text-decoration: none;
+      color: #5f6368;
+      font-size: 14px;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: var(--heading-color);
+    }
+    
+    .sidebar-item.active {
+      background: var(--active-bg);
+      color: var(--primary-color);
+      border-left-color: var(--primary-color);
+      font-weight: 500;
+    }
+    
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0.08);
+      color: #5f6368;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-item.active .step-num {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+    
+    .sidebar-item.completed .step-num {
+      background-color: #137333; /* Google Green */
+      color: #ffffff;
+    }
+    
+    /* Main layout */
+    .main-layout {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+    
+    /* Header styling with Glassmorphism */
+    .top-header {
+      height: 64px;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      z-index: 5;
+    }
+    
+    .current-step-title {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--heading-color);
+    }
+    
+    .metadata-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    
+    .metadata-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    /* Content styling */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      scroll-behavior: smooth;
+      z-index: 2;
+    }
+    
+    .content-container {
+      max-width: 840px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+      margin-bottom: 100px;
+    }
+    
+    .step-content {
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    
+    .step-content h1, .step-content h2, .step-content h3, .step-content h4 {
+      color: var(--heading-color);
+      margin-top: 24px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    
+    .step-content h2 { font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .step-content h3 { font-size: 18px; }
+    .step-content h4 { font-size: 16px; font-weight: 600; }
+    
+    .step-content p { margin-bottom: 16px; }
+    .step-content ul, .step-content ol { margin-bottom: 16px; padding-left: 24px; }
+    .step-content li { margin-bottom: 8px; }
+    
+    .step-content code {
+      font-family: 'Roboto Mono', Consolas, Monaco, monospace;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .step-content pre code { background-color: transparent; padding: 0; }
+    .step-content pre { margin-bottom: 24px; border-radius: 8px; overflow: hidden; }
+    .step-content img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); margin: 16px 0; display: block; }
+    
+    /* Info box styling */
+    .info-box {
+      border-left-width: 4px;
+      border-left-style: solid;
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .info-box p:last-child { margin-bottom: 0; }
+    .info-box.positive { background-color: rgba(230, 244, 234, 0.7); border-left-color: #137333; }
+    .info-box.warning { background-color: rgba(254, 247, 224, 0.7); border-left-color: #b06000; }
+    .info-box.negative { background-color: rgba(252, 232, 230, 0.7); border-left-color: #c5221f; }
+    
+    /* Bottom Navigation Bar with Glassmorphism */
+    .bottom-bar {
+      height: 64px;
+      background: var(--footer-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary { background-color: var(--primary-color); color: #ffffff; border: none; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); color: var(--primary-color); border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: rgba(248, 249, 250, 0.8); }
+    .progress-text { font-size: 14px; color: #5f6368; }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: rgba(232, 240, 254, 0.6);
+      color: #1a73e8;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .metadata-card {
+      background: rgba(248, 249, 250, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .metadata-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .meta-val { font-weight: 500; color: var(--heading-color); }
+    .meta-lbl { font-size: 12px; color: #5f6368; text-transform: uppercase; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="codelab-title">📜 Rails 8 on GCP Workshop Constitution & Architectural Blueprint</div>
+      <div class="doc-switcher">
+        <a href="index.html" class="doc-tab ">📖 Codelab</a>
+        <a href="constitution.html" class="doc-tab active">📜 Constitution</a>
+        <a href="skeleton.html" class="doc-tab ">🦴 Skeleton</a>
+      </div>
+    </div>
+    <div class="sidebar-menu">
+      
+        <a href="#0" class="sidebar-item" id="sidebar-item-0">
+          <span class="step-num">1</span>
+          <span>Overview</span>
+        </a>
+      
+        <a href="#1" class="sidebar-item" id="sidebar-item-1">
+          <span class="step-num">2</span>
+          <span>🎯 1. Workshop Mission & North Star</span>
+        </a>
+      
+        <a href="#2" class="sidebar-item" id="sidebar-item-2">
+          <span class="step-num">3</span>
+          <span>👥 2. Personas & Workshop Conventions</span>
+        </a>
+      
+        <a href="#3" class="sidebar-item" id="sidebar-item-3">
+          <span class="step-num">4</span>
+          <span>🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</span>
+        </a>
+      
+        <a href="#4" class="sidebar-item" id="sidebar-item-4">
+          <span class="step-num">5</span>
+          <span>🗺️ 4. Master Steps Walkthrough</span>
+        </a>
+      
+        <a href="#5" class="sidebar-item" id="sidebar-item-5">
+          <span class="step-num">6</span>
+          <span>🛟 5. Fallbacks & Escape Hatches</span>
+        </a>
+      
+        <a href="#6" class="sidebar-item" id="sidebar-item-6">
+          <span class="step-num">7</span>
+          <span>🔒 6. Governance & Modification Rules</span>
+        </a>
+      
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+    
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="current-step-title" id="header-step-title">Overview</div>
+      <div class="metadata-info">
+        
+        
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area" id="main-content">
+      <div class="content-container">
+        
+        <!-- Rendered Steps -->
+        
+          <div class="step-content" id="step-0" style="display: none;">
+            <h1>1. Overview</h1>
+            
+            
+
+            
+<blockquote>
+  <p><strong>STATUS: 🟡 DRAFT</strong> (Under review by Riccardo &amp; Emiliano).  <br />
+Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONSTITUTION</strong> to which all workshop branches, <code>CODELAB.md</code>, <code>SKELETON.md</code>, automation scripts, and UI viewers must strictly adhere.</p>
+</blockquote>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-1" style="display: none;">
+            <h1>2. 🎯 1. Workshop Mission & North Star</h1>
+            
+            
+
+            <h2 id="-1-workshop-mission--north-star">🎯 1. Workshop Mission &amp; North Star</h2>
+
+<ol>
+  <li><strong>Target Audience:</strong> Ruby/Rails developers exploring modern deployment options, cloud practitioners, and DevOps engineers wanting a clean, production-grade Rails 8 blueprint on Google Cloud Platform.</li>
+  <li><strong>Pedagogical Flow:</strong> Meet developers where they are (local SQLite, <code>bin/dev</code>, instant local satisfaction), incrementally introduce cloud-native primitives (Cloud Storage, Cloud SQL, Secret Manager, Cloud Run multi-container, Cloud Build), and culminate with AI-powered background jobs using Solid Queue and Gemini.</li>
+  <li><strong>Core Philosophy:</strong>
+    <ul>
+      <li><strong>Zero Magic / Explicit Security:</strong> No fake shortcuts that leak credentials (no public <code>0.0.0.0/0</code> in production, no world-readable GCS buckets, no <code>.env</code> files in git).</li>
+      <li><strong>Pacing Optimization:</strong> Heavy cloud provisioning (Cloud SQL ~10–12 min) is launched asynchronously upfront so students are never sitting idle.</li>
+      <li><strong>The 4-Part Contract:</strong> Every step must clearly define its <strong>Prerequisites (<code>needs</code>)</strong>, <strong>Actions &amp; Learnings (<code>does</code>)</strong>, <strong>Aha! / Wow Moment (<code>wow</code>)</strong>, and <strong>Outcomes (<code>creates</code>)</strong>.</li>
+      <li><strong>Flexible Tracks:</strong> Full Cloud Track (with billing &amp; Cloud SQL) vs. <strong>Zero-Billing / Free Track</strong> (SQLite on Cloud Run + Gemini Free Tier API key, <em>ohne</em> Cloud SQL).</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-2" style="display: none;">
+            <h1>3. 👥 2. Personas & Workshop Conventions</h1>
+            
+            
+
+            <h2 id="-2-personas--workshop-conventions">👥 2. Personas &amp; Workshop Conventions</h2>
+
+<ul>
+  <li><strong>Riccardo:</strong> Supreme Leader and pun-master 🦖</li>
+  <li><strong>Emiliano:</strong> Al Mudnais cal’scorda i symlink 🍝🏎️</li>
+  <li><strong>Theme &amp; Branding:</strong> Colorful, high-energy Google branding with the “NanoBanana” mascot 🍌.</li>
+  <li><strong>Tone:</strong> Technical rigor paired with approachable, fun analogies.</li>
+</ul>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-3" style="display: none;">
+            <h1>4. 🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</h1>
+            
+            
+
+            <h2 id="️-3-the-4-part-step-blueprint-the-enhanced-contract">🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</h2>
+
+<p>Every chapter in the workshop adheres to the <strong>Trifecta + Wow Contract</strong>:<br />
+\(\text{Step} = \langle \text{needs}, \text{does}, \text{wow}, \text{creates} \rangle\)</p>
+
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ 1. PREREQUISITES (needs)                                    │
+│    - Git branch baseline                                    │
+│    - CLI tools / IAM permissions / Background job state     │
+├─────────────────────────────────────────────────────────────┤
+│ 2. ACTIONS &amp; TEACHABLE MOMENTS (does)                       │
+│    - Concrete code/config modifications                     │
+│    - Commands executed                                      │
+│    - Anti-patterns explored &amp; corrected (e.g. 0.0.0.0/0)    │
+├─────────────────────────────────────────────────────────────┤
+│ 3. THE AHA! / WOW MOMENT (wow) ✨                           │
+│    - Visible instant gratification for the student          │
+│    - Sensory/visual proof that the cloud piece works        │
+├─────────────────────────────────────────────────────────────┤
+│ 4. DELIVERABLES (creates)                                   │
+│    - Verifiable local/remote functionality                  │
+│    - Git branch checkpoint tag                              │
+│    - Cloud infrastructure state                             │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-4" style="display: none;">
+            <h1>5. 🗺️ 4. Master Steps Walkthrough</h1>
+            
+            
+
+            <h2 id="️-4-master-steps-walkthrough">🗺️ 4. Master Steps Walkthrough</h2>
+
+<pre><code class="language-mermaid">flowchart TD
+    S0["Step 0: Setup &amp; Async Cloud Provisioning&lt;br/&gt;(Terraform / provision script + Free Track option)"] --&gt; S1["Step 1: The Local Baseline&lt;br/&gt;(SQLite + RichText drag &amp; drop + Gemini exploration)"]
+    S1 --&gt; S2["Step 2: Cloud Storage (ActiveStorage + GCS)&lt;br/&gt;(Private bucket + IAM signing + Live GCS drop)"]
+    S2 --&gt; S3A["Step 3A: The Naive DB Connection&lt;br/&gt;(0.0.0.0/0 test &amp; Security breakdown)"]
+    S3A --&gt; S3B["Step 3B: Local Cloud SQL Auth Proxy&lt;br/&gt;('Welcome to Cloud SQL' seeded post appears!)"]
+    S3B --&gt; S4["Step 4: Secret Manager&lt;br/&gt;(RAILS_MASTER_KEY &amp; DB credentials via gcloud)"]
+    S4 --&gt; S5["Step 5: Multi-Container Cloud Run&lt;br/&gt;(Web + SolidQueue Worker + Cloud SQL Proxy)"]
+    S5 -.-&gt;|Optional / Skippable| S6["Step 6: CI/CD with Cloud Build&lt;br/&gt;(cloudbuild.yaml + Triggers)"]
+    S5 --&gt; S7["Step 7: AI Features with Solid Queue&lt;br/&gt;(NanoBanana Cover Generator + Podcastifier)"]
+    S6 --&gt; S7
+</code></pre>
+
+<hr />
+
+<h3 id="-step-0-setup--async-cloud-provisioning">🔹 Step 0: Setup &amp; Async Cloud Provisioning</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>GCP project (Billing enabled for Cloud SQL track, or Free Tier for Zero-Billing track).</li>
+      <li>Installed CLI tools: <code>gcloud</code>, <code>ruby</code> 3.3+, <code>gem install rails</code>, <code>terraform</code>, <code>docker</code>, and <code>cloud-sql-proxy</code>.</li>
+      <li>Google Antigravity IDE or VS Code Antigravity Extension.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Clones the workshop repository.</li>
+      <li>Authenticates <code>gcloud auth login</code> and <code>gcloud auth application-default login</code>.</li>
+      <li>Verifies billing status (<code>gcloud billing projects describe $PROJECT_ID</code>).</li>
+      <li><strong>IMMEDIATELY kicks off Cloud SQL &amp; GCS provisioning</strong> in the background via Terraform or helper script (<code>./bin/provision-cloudsql.sh</code>).</li>
+      <li><em>(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite volume/GCS free tier)</em>.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: One command starts heavy cloud provisioning in the background without freezing the student’s terminal!</li>
+  <li><strong><code>creates</code></strong>: Background cloud provisioning job in progress (elapsed time: ~12 minutes).</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-1-the-local-baseline-instant-local-gratification">🔹 Step 1: The Local Baseline (Instant Local Gratification)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Step 0 completed.</li>
+      <li>Branch: <code>workshop_1_local_baseline</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Runs <code>bundle install</code>, <code>bin/rails db:setup</code>, and <code>bin/dev</code>.</li>
+      <li>Opens <code>http://localhost:3000</code>, logs in (<code>riccardo@example.com</code> / <code>Ch4ng3m3!!1</code>).</li>
+      <li>Creates a new blog post and uses ActionText / Trix editor to drag-and-drop a local image directly into the post body.</li>
+      <li><strong>Gemini / Antigravity Interactive Exploration:</strong>
+        <ul>
+          <li>Uses Antigravity to inspect ActiveRecord models and generate a Mermaid ER diagram.</li>
+          <li>Discusses why local disk storage and SQLite are ephemeral in container environments.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: App is fully working locally in under 2 minutes with rich-text image drag-and-drop!</li>
+  <li><strong><code>creates</code></strong>: Verified local baseline application running on SQLite.</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-2-cloud-storage-with-activestorage--gcs">🔹 Step 2: Cloud Storage with ActiveStorage &amp; GCS</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>GCS Bucket provisioned from Step 0.</li>
+      <li>Branch: <code>workshop_2_cloud_storage</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Configures <code>config/storage.yml</code> with the <code>google</code> service.</li>
+      <li>Sets <code>config.active_storage.service = :google</code> in <code>config/environments/production.rb</code> (and <code>development.rb</code>).</li>
+      <li><strong>The Teachable Moment:</strong>
+        <ul>
+          <li>Configures <code>iam: true</code> in <code>storage.yml</code> to sign blob URLs via the Google IAM Credentials API without requiring static private keys.</li>
+          <li>Explains why <code>public: true</code> / <code>allUsers</code> is an insecure anti-pattern.</li>
+        </ul>
+      </li>
+      <li>Drag-and-drops an image into the post editor; inspects the network tab and GCS Console to see the blob land live in the cloud.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Drag-and-dropping an image into the Rails editor now uploads directly to a private Google Cloud Storage bucket with expiring signed URLs!</li>
+  <li><strong><code>creates</code></strong>: Working ActiveStorage integration uploading to private GCS with short-lived signed URLs.</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-3-cloud-sql--from-naive-exposure-to-secure-auth-proxy">🔹 Step 3: Cloud SQL — From Naive Exposure to Secure Auth Proxy</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Cloud SQL PostgreSQL instance ready (<code>READY</code> state from Step 0).</li>
+      <li>Branch: <code>workshop_3_cloud_sql</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <h4 id="phase-a-the-naive-connection-the-00000-anti-pattern">Phase A: The Naive Connection (The <code>0.0.0.0/0</code> Anti-Pattern)</h4>
+    <ol>
+      <li>Creates database (<code>rails_production</code>) and user (<code>rails_user</code>).</li>
+      <li>Adds authorized network <code>0.0.0.0/0</code> with a password.</li>
+      <li>Tests direct connection: <code>psql -h &lt;PUBLIC_IP&gt; -U rails_user -d rails_production</code>.</li>
+      <li><strong>Security Breakdown:</strong> Details why exposing port 5432 to <code>0.0.0.0/0</code> invites port scanners, brute-force bots, and breaches.
+        <h4 id="phase-b-the-cloud-sql-auth-proxy-fix--migration">Phase B: The Cloud SQL Auth Proxy Fix &amp; Migration</h4>
+      </li>
+      <li>Removes <code>0.0.0.0/0</code> from authorized networks.</li>
+      <li>Runs <code>cloud-sql-proxy --port 5432 $INSTANCE_CONNECTION_NAME</code> on localhost.</li>
+      <li>Runs database migration &amp; seed through the secure IAM tunnel:
+        <pre><code class="language-bash">DATABASE_URL=postgresql://rails_user:$DB_PASS@127.0.0.1:5432/rails_production bin/rails db:migrate db:seed
+</code></pre>
+      </li>
+      <li>Launches local server pointing to Cloud SQL.</li>
+    </ol>
+  </li>
+  <li><strong><code>wow</code></strong>: Refreshing <code>http://localhost:3000</code> reveals a new seeded post: <em>“🐘 Welcome to Cloud SQL!”</em> loaded live from the managed cloud database through the secure IAM proxy!</li>
+  <li><strong><code>creates</code></strong>: Migrated PostgreSQL schema on Cloud SQL and verified local proxy connection.</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-4-secret-management-google-cloud-secret-manager">🔹 Step 4: Secret Management (Google Cloud Secret Manager)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Step 3 completed.</li>
+      <li>Branch: <code>workshop_4_secret_manager</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Explains the danger of committing <code>.env</code> or master keys to git.</li>
+      <li>Pushes <code>config/master.key</code> and DB credentials to Google Secret Manager:
+        <pre><code class="language-bash">gcloud secrets create rails-master-key --data-file=config/master.key
+gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
+</code></pre>
+      </li>
+      <li>Verifies retrieval directly via CLI:
+        <pre><code class="language-bash">gcloud secrets versions access latest --secret=rails-master-key
+</code></pre>
+      </li>
+      <li>Grants Secret Accessor IAM roles to the runtime service account.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Secrets are safely retrieved from Google Cloud Secret Manager with zero plain-text files in git!</li>
+  <li><strong><code>creates</code></strong>: Centralized, encrypted secrets in Secret Manager ready for container injection.</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-5-multi-container-orchestration-docker-compose--cloud-run">🔹 Step 5: Multi-Container Orchestration (Docker Compose &amp; Cloud Run)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Secrets and DB ready.</li>
+      <li>Branch: <code>workshop_5_cloud_run_classic</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Introduces Emiliano’s 3-container architecture (<code>compose.prod.yaml</code>):
+        <ol>
+          <li><code>web</code>: Rails Puma server on port 8080.</li>
+          <li><code>worker</code>: Solid Queue processor running <code>bundle exec rails solid_queue:start</code>.</li>
+          <li><code>cloudsql-proxy</code>: Sidecar container (<code>gcr.io/cloud-sql-connectors/cloud-sql-proxy:2</code>).</li>
+        </ol>
+      </li>
+      <li>Tests the full stack locally via <code>docker compose -f compose.prod.yaml up</code>.</li>
+      <li>Deploys the multi-container configuration to Google Cloud Run:
+        <pre><code class="language-bash">gcloud run deploy rails-blog --source . --region us-central1 ...
+</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: The entire 3-container production stack (Web + Background Worker + Cloud SQL Proxy sidecar) boots with a single command and deploys live to Cloud Run!</li>
+  <li><strong><code>creates</code></strong>: Production Rails 8 application live on Cloud Run with segregated web and worker processes.</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-6-automated-cicd-with-cloud-build-optional--skippable">🔹 Step 6: Automated CI/CD with Cloud Build <em>(Optional / Skippable)</em></h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Working Cloud Run deployment from Step 5.</li>
+      <li>Branch: <code>workshop_6_cloud_build_cicd</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Inspects <code>cloudbuild.yaml</code> multi-step pipeline (Test -&gt; Build Image -&gt; Database Migrate Job -&gt; Cloud Run Deploy).</li>
+      <li>(Optional) Configures Cloud Build Trigger connected to GitHub.</li>
+      <li>Pushes a commit to <code>main</code> and monitors live build logs in GCP Console.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Every <code>git push</code> automatically tests, builds, migrates, and deploys the app to Cloud Run!</li>
+  <li><strong><code>creates</code></strong>: Automated CI/CD pipeline on Google Cloud (can be skipped to jump straight to AI features).</li>
+</ul>
+
+<hr />
+
+<h3 id="-step-7-ai-features-with-solid-queue--gemini-">🔹 Step 7: AI Features with Solid Queue &amp; Gemini 🍌</h3>
+<ul>
+  <li><strong><code>needs</code></strong>:
+    <ul>
+      <li>Step 5 (or Step 6) completed.</li>
+      <li>Branch: <code>workshop_7_ai_features</code>.</li>
+      <li><code>GEMINI_API_KEY</code> stored in Secret Manager.</li>
+    </ul>
+  </li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Implements <strong>NanoBanana Cover Generator</strong> (<code>GenerateCoverImageJob</code>):
+        <ul>
+          <li>Submits post content to Imagen/Gemini with the vintage Italian poster prompt (“must include a banana”).</li>
+          <li>Worker downloads generated image and attaches it via ActiveStorage.</li>
+        </ul>
+      </li>
+      <li>(Optional / Bonus) Implements <strong>Podcastifier</strong>:
+        <ul>
+          <li>Translates post to Italian and synthesizes <code>.mp3</code> audio using Google Cloud Text-to-Speech.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in the background in real-time!</li>
+  <li><strong><code>creates</code></strong>: Intelligent, asynchronous AI capabilities running seamlessly on background workers.</li>
+</ul>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-5" style="display: none;">
+            <h1>6. 🛟 5. Fallbacks & Escape Hatches</h1>
+            
+            
+
+            <h2 id="-5-fallbacks--escape-hatches">🛟 5. Fallbacks &amp; Escape Hatches</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Challenge</th>
+      <th>Fallback Mechanism</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>No GCP Billing / Zero-Billing Track</td>
+      <td>Run SQLite mode on Cloud Run with volume mount + Gemini Free Tier API Key.</td>
+    </tr>
+    <tr>
+      <td>Cloud SQL provisioning fails or times out</td>
+      <td>Pre-warmed fallback project/instance connection string provided by instructors.</td>
+    </tr>
+    <tr>
+      <td>Docker / Proxy networking issues locally</td>
+      <td>Direct connection with environment variable overrides (<code>DATABASE_URL</code> pointing to localhost or fallback).</td>
+    </tr>
+    <tr>
+      <td>Cloud Run multi-container deploy fails</td>
+      <td>Single-container standard deploy script (<code>gcloud run deploy --image ...</code>).</td>
+    </tr>
+    <tr>
+      <td>Missing Gemini API Quota</td>
+      <td>Mock AI worker engine that returns bundled sample cover art and audio clips.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+
+          </div>
+        
+          <div class="step-content" id="step-6" style="display: none;">
+            <h1>7. 🔒 6. Governance & Modification Rules</h1>
+            
+            
+
+            <h2 id="-6-governance--modification-rules">🔒 6. Governance &amp; Modification Rules</h2>
+
+<ol>
+  <li>Any proposed modification to workshop narrative or step order <strong>must first be updated in this file</strong>.</li>
+  <li>Once this file is marked <strong>🟢 FINAL</strong>, <code>SKELETON.md</code> and <code>CODELAB.md</code> must be regenerated to reflect it 1:1.</li>
+  <li>Automated test scripts (<code>just test</code> / <code>split_codelab.rb</code>) must pass before commits are finalized.</li>
+</ol>
+
+          </div>
+        
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-bar">
+      <a href="#" class="btn btn-secondary" id="prev-btn">BACK</a>
+      <span class="progress-text" id="progress-indicator">Step 1 of 7</span>
+      <a href="#" class="btn btn-primary" id="next-btn">NEXT</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-terraform.min.js"></script>
+  
+  <script>
+    function showStep() {
+      let hash = window.location.hash;
+      if (!hash || !hash.match(/^#\d+$/)) {
+        hash = '#0';
+      }
+      
+      let stepIndex = parseInt(hash.substring(1));
+      let stepElement = document.getElementById('step-' + stepIndex);
+      
+      if (!stepElement) {
+        hash = '#0';
+        stepIndex = 0;
+        stepElement = document.getElementById('step-0');
+      }
+      
+      document.querySelectorAll('.step-content').forEach(el => {
+        el.style.display = 'none';
+      });
+      
+      if (stepElement) {
+        stepElement.style.display = 'block';
+        let stepHeader = stepElement.querySelector('h1');
+        if (stepHeader) {
+          let titleText = stepHeader.innerText.replace(/^\d+\.\s+/, '');
+          document.getElementById('header-step-title').innerText = titleText;
+        }
+      }
+      
+      document.querySelectorAll('.sidebar-item').forEach((el, idx) => {
+        el.classList.remove('active');
+        if (idx < stepIndex) {
+          el.classList.add('completed');
+        } else {
+          el.classList.remove('completed');
+        }
+      });
+      
+      let activeSidebarItem = document.getElementById('sidebar-item-' + stepIndex);
+      if (activeSidebarItem) {
+        activeSidebarItem.classList.add('active');
+        activeSidebarItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+      
+      let prevButton = document.getElementById('prev-btn');
+      if (stepIndex > 0) {
+        prevButton.style.visibility = 'visible';
+        prevButton.href = '#' + (stepIndex - 1);
+      } else {
+        prevButton.style.visibility = 'hidden';
+      }
+      
+      let nextButton = document.getElementById('next-btn');
+      let totalSteps = document.querySelectorAll('.step-content').length;
+      
+      if (stepIndex < totalSteps - 1) {
+        nextButton.style.visibility = 'visible';
+        nextButton.href = '#' + (stepIndex + 1);
+        nextButton.innerText = 'NEXT';
+      } else {
+        nextButton.style.visibility = 'visible';
+        nextButton.href = '#0';
+        nextButton.innerText = 'RESTART 🔄';
+      }
+      
+      document.getElementById('progress-indicator').innerText = 'Step ' + (stepIndex + 1) + ' of ' + totalSteps;
+      document.getElementById('main-content').scrollTop = 0;
+      
+      if (window.Prism) {
+        Prism.highlightAll();
+      }
+    }
+    
+    function processBlockquotes() {
+      document.querySelectorAll('blockquote').forEach(bq => {
+        const text = bq.innerText || '';
+        if (text.includes('💡') || text.includes('ℹ️') || text.includes('🟢') || text.includes('[!NOTE]') || text.includes('[!TIP]')) {
+          bq.classList.add('info-box', 'positive');
+        } else if (text.includes('⚠️') || text.includes('🟡') || text.includes('[!WARNING]') || text.includes('[!IMPORTANT]')) {
+          bq.classList.add('info-box', 'warning');
+        } else if (text.includes('🛑') || text.includes('🚨') || text.includes('🔴') || text.includes('[!CAUTION]')) {
+          bq.classList.add('info-box', 'negative');
+        } else {
+          bq.classList.add('info-box', 'positive');
+        }
+        
+        bq.innerHTML = bq.innerHTML
+          .replace(/\[!NOTE\]/gi, '<strong>Note:</strong>')
+          .replace(/\[!TIP\]/gi, '<strong>Tip:</strong>')
+          .replace(/\[!WARNING\]/gi, '<strong>Warning:</strong>')
+          .replace(/\[!IMPORTANT\]/gi, '<strong>Important:</strong>')
+          .replace(/\[!CAUTION\]/gi, '<strong>Caution:</strong>');
+      });
+    }
+
+    window.addEventListener('hashchange', showStep);
+    document.addEventListener('DOMContentLoaded', () => {
+      processBlockquotes();
+      showStep();
+    });
+  </script>
+</body>
+</html>

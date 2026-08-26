@@ -1,319 +1,9 @@
-#!/usr/bin/env ruby
-#
-=begin
-This is a Sinatra-based web server that visualizes a generic CODELAB.md (or similar Markdown files)
-in a multi-page workshop format similar to Google Codelabs.
-
-It parses the Markdown file, splits it by H2 headers (##) into separate steps,
-and serves a clean, responsive web interface with:
-- A sidebar navigation listing all steps.
-- Prev/Next buttons for stepping through.
-- Custom styled boxes (like info/warning boxes).
-- Multi-document switcher (Codelab, Constitution, Skeleton).
-- Hot-reloading (reads and parses the markdown file on every request, so refreshing the browser shows changes immediately).
-
-Usage:
-  ./server.rb [options] [path_to_markdown_file]
-
-Run with -h or --help to see all options.
-=end
-
-# Set up environment for user-installed gems to ensure write access
-ENV['GEM_HOME'] = Gem.user_dir
-ENV['GEM_PATH'] = Gem.user_dir
-Gem.clear_paths
-
-# List of required gems for the server to run
-REQUIRED_GEMS = {
-  'sinatra' => 'sinatra/base',
-  'kramdown' => 'kramdown',
-  'kramdown-parser-gfm' => 'kramdown-parser-gfm',
-  'puma' => 'puma',
-  'rackup' => 'rackup'
-}
-
-missing_gems = []
-REQUIRED_GEMS.each do |gem_name, require_name|
-  begin
-    require require_name
-  rescue LoadError
-    missing_gems << gem_name
-  end
-end
-
-if missing_gems.any?
-  puts "🔍 Missing gems: #{missing_gems.join(', ')}"
-  puts "🚀 Installing them to user gem home (~/.local/share/gem/ruby)..."
-  success = system("gem install --user-install #{missing_gems.join(' ')}")
-  if success
-    Gem.clear_paths
-    missing_gems.each do |gem_name|
-      require REQUIRED_GEMS[gem_name]
-    end
-  else
-    puts "❌ Error: Failed to install gems automatically."
-    puts "Please install manually with: gem install --user-install #{missing_gems.join(' ')}"
-    exit 1
-  end
-end
-
-require 'yaml'
-require 'json'
-require 'optparse'
-
-# Parse Command Line Options
-cli_options = {
-  port: 8080,
-  bind: 'localhost',
-  file: nil
-}
-
-OptionParser.new do |opts|
-  opts.banner = "Usage: server.rb [options] [markdown_file]"
-  
-  opts.on("-p", "--port PORT", Integer, "Port to run the server on (default: 8080)") do |p|
-    cli_options[:port] = p
-  end
-  
-  opts.on("-b", "--bind BIND", "IP address to bind the server to (default: localhost)") do |b|
-    cli_options[:bind] = b
-  end
-  
-  opts.on("-h", "--help", "Prints this help") do
-    puts opts
-    exit
-  end
-end.parse!
-
-# If a file is specified as the remaining argument
-if ARGV.any?
-  cli_options[:file] = ARGV.first
-else
-  # Default files to check in priority order
-  default_files = ['./CODELAB.md', './WORKSHOP.md', '../CODELAB.md', '../workshop/CODELAB.md']
-  cli_options[:file] = default_files.find { |f| File.exist?(f) }
-  cli_options[:file] ||= Dir.glob('*.md').first
-end
-
-if cli_options[:file].nil? || !File.exist?(cli_options[:file])
-  puts "❌ Error: Markdown file not found!"
-  puts "Please specify a markdown file: ruby server.rb path/to/file.md"
-  exit 1
-end
-
-# Define the Sinatra App
-CLI_OPTIONS = cli_options
-
-class CodelabServer < Sinatra::Base
-  enable :inline_templates
-  set :port, CLI_OPTIONS[:port]
-  set :bind, CLI_OPTIONS[:bind]
-  set :base_dir, File.dirname(File.expand_path(CLI_OPTIONS[:file]))
-  set :default_file, File.expand_path(CLI_OPTIONS[:file])
-  
-  helpers do
-    def render_markdown(text)
-      Kramdown::Document.new(text, input: 'GFM', syntax_highlighter: nil).to_html
-    end
-
-    def resolve_doc_path(doc_param)
-      return settings.default_file if doc_param.nil? || doc_param.empty?
-
-      case doc_param.to_s.downcase
-      when 'codelab'
-        candidate = File.join(settings.base_dir, 'CODELAB.md')
-      when 'constitution'
-        candidate = File.join(settings.base_dir, 'UNTOUCHABLE-CONSTITUTION.md')
-      when 'skeleton'
-        candidate = File.join(settings.base_dir, 'SKELETON.md')
-      else
-        candidate = File.expand_path(doc_param, settings.base_dir)
-      end
-
-      File.exist?(candidate) ? candidate : settings.default_file
-    end
-
-    def current_doc_type(file_path)
-      base = File.basename(file_path).downcase
-      if base.include?('constitution')
-        'constitution'
-      elsif base.include?('skeleton')
-        'skeleton'
-      else
-        'codelab'
-      end
-    end
-  end
-  
-  # Main route
-  get '/' do
-    target_file = if params[:doc]
-                    resolve_doc_path(params[:doc])
-                  elsif params[:file]
-                    resolve_doc_path(params[:file])
-                  else
-                    settings.default_file
-                  end
-    @active_doc = current_doc_type(target_file)
-    @codelab = parse_markdown(target_file)
-    erb :index
-  end
-
-  get '/codelab' do
-    target_file = resolve_doc_path('codelab')
-    @active_doc = 'codelab'
-    @codelab = parse_markdown(target_file)
-    erb :index
-  end
-
-  get '/constitution' do
-    target_file = resolve_doc_path('constitution')
-    @active_doc = 'constitution'
-    @codelab = parse_markdown(target_file)
-    erb :index
-  end
-
-  get '/skeleton' do
-    target_file = resolve_doc_path('skeleton')
-    @active_doc = 'skeleton'
-    @codelab = parse_markdown(target_file)
-    erb :index
-  end
-  
-  # A2UI JSON endpoint
-  get '/a2ui' do
-    content_type :json
-    target_file = params[:doc] ? resolve_doc_path(params[:doc]) : settings.default_file
-    codelab = parse_markdown(target_file)
-    
-    {
-      a2ui: "1.0",
-      metadata: {
-        title: codelab[:title],
-        author: codelab[:frontmatter]['author'],
-        duration: codelab[:frontmatter]['duration']
-      },
-      components: codelab[:steps].map.with_index do |step, idx|
-        {
-          id: "step-#{idx}",
-          type: "StepCard",
-          properties: {
-            index: idx,
-            title: step[:title],
-            content: render_markdown(step[:content])
-          }
-        }
-      end
-    }.to_json
-  end
-
-  # Catch-all route to serve local assets
-  get '/*' do |path|
-    md_dir = settings.base_dir
-    target_path = File.expand_path(path, md_dir)
-    
-    # Also try relative to the git root directory (one level up from markdown file)
-    git_root = File.expand_path('..', md_dir)
-    git_target_path = File.expand_path(path, git_root)
-    
-    if target_path.start_with?(md_dir) && File.exist?(target_path) && !File.directory?(target_path)
-      send_file target_path
-    elsif git_target_path.start_with?(git_root) && File.exist?(git_target_path) && !File.directory?(git_target_path)
-      send_file git_target_path
-    else
-      status 404
-      "Asset not found: #{path}"
-    end
-  end
-  
-  private
-  
-  def parse_markdown(file_path)
-    content = File.read(file_path)
-    frontmatter = {}
-    
-    # Extract YAML frontmatter if it exists at the start of the file
-    if content =~ /\A(---\s*\n.*?\n?^---\s*$\n?)/m
-      frontmatter_raw = $1
-      content = content.sub(frontmatter_raw, '')
-      begin
-        frontmatter = YAML.safe_load(frontmatter_raw)
-      rescue => e
-        puts "⚠️ Error parsing frontmatter: #{e.message}"
-      end
-    end
-    
-    # Find H1 for the main workshop title
-    main_title = frontmatter['title']
-    if content =~ /^#\s+(.+)$/
-      main_title ||= $1.strip
-      # Remove the main title line from content so it's not rendered inside step 0
-      content = content.sub(/^#\s+.+$/, '')
-    end
-    main_title ||= File.basename(file_path, '.md').capitalize
-    
-    # Split content by H2 headers (##) or H3 if no H2
-    parts = content.split(/^##\s+/)
-    if parts.size <= 1 && content =~ /^###\s+/
-      parts = content.split(/^###\s+/)
-    end
-    
-    steps = []
-    
-    # Process text before the first header
-    first_part = parts.shift
-    if first_part && first_part.strip.length > 0 && first_part.gsub(/<!--.*?-->/m, '').strip.length > 0
-      steps << {
-        title: "Overview",
-        content: first_part
-      }
-    end
-    
-    parts.each do |part|
-      lines = part.lines
-      title = lines.shift.strip
-      body = lines.join
-      
-      steps << {
-        title: title,
-        content: body
-      }
-    end
-    
-    {
-      title: main_title,
-      frontmatter: frontmatter,
-      steps: steps
-    }
-  end
-end
-
-# Startup Banner
-puts "\n"
-puts "🚀 Starting Codelab Visualizer Server on http://#{cli_options[:bind]}:#{cli_options[:port]}"
-puts "🦖 Hello, Supreme Leader and pun-master Riccardo!"
-puts "📖 Default file: #{cli_options[:file]}"
-puts "✨ Multi-Doc Switching Available:"
-puts "   👉 Codelab     : http://#{cli_options[:bind]}:#{cli_options[:port]}/codelab"
-puts "   👉 Constitution: http://#{cli_options[:bind]}:#{cli_options[:port]}/constitution"
-puts "   👉 Skeleton    : http://#{cli_options[:bind]}:#{cli_options[:port]}/skeleton"
-puts "💡 Tip: Edit any markdown file and refresh your browser to see updates instantly!"
-puts "Press Ctrl+C to stop the server.\n\n"
-
-# Run Sinatra app only if executed directly
-if __FILE__ == $0
-  CodelabServer.run!
-end
-
-__END__
-
-@@index
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= @codelab[:title] %></title>
+  <title>Workshop Skeleton</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
   <style>
     /* Google Codelab Font and Color Variables */
@@ -663,20 +353,25 @@ __END__
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <div class="codelab-title"><%= @codelab[:title] %></div>
+      <div class="codelab-title">Workshop Skeleton</div>
       <div class="doc-switcher">
-        <a href="/codelab" class="doc-tab <%= @active_doc == 'codelab' ? 'active' : '' %>">📖 Codelab</a>
-        <a href="/constitution" class="doc-tab <%= @active_doc == 'constitution' ? 'active' : '' %>">📜 Constitution</a>
-        <a href="/skeleton" class="doc-tab <%= @active_doc == 'skeleton' ? 'active' : '' %>">🦴 Skeleton</a>
+        <a href="index.html" class="doc-tab ">📖 Codelab</a>
+        <a href="constitution.html" class="doc-tab ">📜 Constitution</a>
+        <a href="skeleton.html" class="doc-tab active">🦴 Skeleton</a>
       </div>
     </div>
     <div class="sidebar-menu">
-      <% @codelab[:steps].each_with_index do |step, idx| %>
-        <a href="#<%= idx %>" class="sidebar-item" id="sidebar-item-<%= idx %>">
-          <span class="step-num"><%= idx + 1 %></span>
-          <span><%= step[:title] %></span>
+      
+        <a href="#0" class="sidebar-item" id="sidebar-item-0">
+          <span class="step-num">1</span>
+          <span>Overview</span>
         </a>
-      <% end %>
+      
+        <a href="#1" class="sidebar-item" id="sidebar-item-1">
+          <span class="step-num">2</span>
+          <span>Post-Story Implementation Checklist</span>
+        </a>
+      
     </div>
   </div>
 
@@ -687,16 +382,8 @@ __END__
     <div class="top-header">
       <div class="current-step-title" id="header-step-title">Overview</div>
       <div class="metadata-info">
-        <% if @codelab[:frontmatter]['author'] %>
-          <div class="metadata-item">
-            <span>By: <strong><%= @codelab[:frontmatter]['author'] %></strong></span>
-          </div>
-        <% end %>
-        <% if @codelab[:frontmatter]['duration'] %>
-          <div class="metadata-item">
-            <span class="badge">⏱️ <%= @codelab[:frontmatter]['duration'] %> mins</span>
-          </div>
-        <% end %>
+        
+        
       </div>
     </div>
 
@@ -705,34 +392,166 @@ __END__
       <div class="content-container">
         
         <!-- Rendered Steps -->
-        <% @codelab[:steps].each_with_index do |step, idx| %>
-          <div class="step-content" id="step-<%= idx %>" style="display: none;">
-            <h1><%= idx + 1 %>. <%= step[:title] %></h1>
+        
+          <div class="step-content" id="step-0" style="display: none;">
+            <h1>1. Overview</h1>
             
-            <% if idx == 0 && (@codelab[:frontmatter] && @codelab[:frontmatter].any?) %>
-              <div class="metadata-card">
-                <h3>Workshop Details</h3>
-                <div class="metadata-grid">
-                  <% @codelab[:frontmatter].each do |k, v| %>
-                    <% next if k == 'title' %>
-                    <div>
-                      <div class="meta-lbl"><%= k %></div>
-                      <div class="meta-val">
-                        <% if v.is_a?(Array) %>
-                          <%= v.join(', ') %>
-                        <% else %>
-                          <%= v %>
-                        <% end %>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
+            
 
-            <%= render_markdown(step[:content]) %>
+            <!-- ⚠️ AGENT WARNING: This file (SKELETON.md) and CODELAB.md must be kept in sync at all times. A change to one requires a change to the other! -->
+<!-- 📜 Adheres to workshop/UNTOUCHABLE-CONSTITUTION.md -->
+
+<p>This is the high-level roadmap and step breakdown for the Rails 8 on Google Cloud workshop:</p>
+
+<hr />
+
+<h3 id="step-0-setup--async-cloud-provisioning">Step 0: Setup &amp; Async Cloud Provisioning</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: GCP Project (Billing enabled for Cloud SQL, or Free Tier for Zero-Billing track), installed CLIs (<code>gcloud</code>, <code>ruby</code> 3.3+, <code>rails</code> 8, <code>terraform</code>, <code>docker</code>, <code>cloud-sql-proxy</code>), Antigravity IDE / VS Code extension.</li>
+  <li><strong><code>does</code></strong>: Clone repo, authenticate with GCP (<code>gcloud auth login</code> &amp; <code>gcloud auth application-default login</code>), verify billing, and immediately launch Cloud SQL + GCS provisioning in the background (<code>./bin/provision-cloudsql.sh</code> or <code>cd iac &amp;&amp; terraform apply</code>). <em>(Zero-Billing track: skip Cloud SQL and use local/volume SQLite)</em>.</li>
+  <li><strong><code>wow</code></strong>: One command starts heavy cloud provisioning in the background without freezing the terminal!</li>
+  <li><strong><code>creates</code></strong>: Background infrastructure cooking in GCP (~10-12 mins) while students proceed immediately without blocking.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-1-workshop_1_local_baseline-the-local-baseline--exploration">Step 1: <code>workshop_1_local_baseline</code> (The Local Baseline &amp; Exploration)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Step 0 completed, branch <code>workshop_1_local_baseline</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Run <code>bundle install</code>, <code>bin/rails db:setup</code>, and <code>bin/dev</code>.</li>
+      <li>Log in with seeded user (<code>riccardo@example.com</code> / <code>Ch4ng3m3!!1</code>), create a post, and drag-and-drop an image directly into the ActionText editor.</li>
+      <li><strong>Gemini / Antigravity Exploration</strong>: Prompt Gemini to inspect ActiveRecord models and generate a Mermaid ER diagram.</li>
+      <li>Discover why local SQLite &amp; disk storage are ephemeral in container environments.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: The app works locally in under 2 minutes with rich-text image drag-and-drop out of the box!</li>
+  <li><strong><code>creates</code></strong>: Verified local Rails 8 application and motivation for cloud-native persistence.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-2-workshop_2_cloud_storage-activestorage--gcs">Step 2: <code>workshop_2_cloud_storage</code> (ActiveStorage &amp; GCS)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: GCS Bucket ready from Step 0, branch <code>workshop_2_cloud_storage</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Configure <code>config/storage.yml</code> with the <code>google</code> service and set <code>config.active_storage.service = :google</code>.</li>
+      <li><strong>Teachable Moment</strong>: Configure <code>iam: true</code> for IAM Credentials blob signing; explain why <code>public: true</code> / <code>allUsers</code> is an insecure anti-pattern.</li>
+      <li>Drag-and-drop an image into the editor; inspect the network tab and GCS Console to see the blob land live in the cloud.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Dragging and dropping an image into Rails now auto-uploads directly to a private Google Cloud Storage bucket with expiring signed URLs!</li>
+  <li><strong><code>creates</code></strong>: Working ActiveStorage integration with private GCS bucket &amp; expiring signed URLs.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-3-workshop_3_cloud_sql-cloud-sql-from-naive-exposure-to-auth-proxy">Step 3: <code>workshop_3_cloud_sql</code> (Cloud SQL: From Naive Exposure to Auth Proxy)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Cloud SQL PostgreSQL instance in <code>READY</code> state, branch <code>workshop_3_cloud_sql</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li><strong>Phase 3A (The Naive Test)</strong>: Create DB <code>rails_production</code> and user <code>rails_user</code>. Add authorized network <code>0.0.0.0/0</code> and test direct public connection. Discuss the security disaster of exposing port 5432 to the world.</li>
+      <li><strong>Phase 3B (The Cloud SQL Auth Proxy Fix)</strong>: Remove <code>0.0.0.0/0</code>, run <code>cloud-sql-proxy</code> locally on <code>127.0.0.1:5432</code>, and run database migrations &amp; seeds through the secure IAM tunnel.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Refreshing <code>localhost:3000</code> shows a new seeded post: <em>“🐘 Welcome to Cloud SQL!”</em> loaded live from the cloud database via the secure IAM proxy!</li>
+  <li><strong><code>creates</code></strong>: Database schema migrated to Cloud SQL via secure localhost proxy.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-4-workshop_4_secret_manager-google-cloud-secret-manager">Step 4: <code>workshop_4_secret_manager</code> (Google Cloud Secret Manager)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Step 3 completed, branch <code>workshop_4_secret_manager</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Push <code>config/master.key</code> and database password to Google Secret Manager (<code>rails-master-key</code>, <code>rails-db-password</code>).</li>
+      <li>Verify secret retrieval directly via <code>gcloud secrets versions access latest --secret=rails-master-key</code>.</li>
+      <li>Configure runtime IAM service account roles (<code>roles/secretmanager.secretAccessor</code>).</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Sensitive credentials are encrypted and verified via CLI with zero plain-text secrets in git!</li>
+  <li><strong><code>creates</code></strong>: Encrypted secrets stored in GCP, eliminating plain-text secrets and <code>.env</code> leaks.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-5-workshop_5_cloud_run_classic-multi-container-cloud-run--docker-compose">Step 5: <code>workshop_5_cloud_run_classic</code> (Multi-Container Cloud Run &amp; Docker Compose)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Secrets &amp; DB provisioned, branch <code>workshop_5_cloud_run_classic</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Introduce the 3-container architecture (<code>compose.prod.yaml</code>):
+        <ol>
+          <li><code>web</code>: Rails Puma server on port 8080.</li>
+          <li><code>worker</code>: Solid Queue processor (<code>bundle exec rails solid_queue:start</code>).</li>
+          <li><code>cloudsql-proxy</code>: Official proxy container (<code>gcr.io/cloud-sql-connectors/cloud-sql-proxy:2</code>).</li>
+        </ol>
+      </li>
+      <li>Test locally with <code>docker compose -f compose.prod.yaml up</code> and deploy multi-container service to Cloud Run.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: The entire 3-container production stack (Web + Worker + Auth Proxy sidecar) boots with one command and deploys live to Cloud Run!</li>
+  <li><strong><code>creates</code></strong>: Production multi-container Rails 8 application running live on Cloud Run.</li>
+</ul>
+
+<hr />
+
+<h3 id="step-6-workshop_6_cloud_build_cicd-automating-with-cloud-build---optional--skippable">Step 6: <code>workshop_6_cloud_build_cicd</code> (Automating with Cloud Build - <em>Optional / Skippable</em>)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Live Cloud Run service, branch <code>workshop_6_cloud_build_cicd</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Inspect <code>cloudbuild.yaml</code> automated pipeline (Build, Migrate DB, Deploy to Cloud Run).</li>
+      <li>(Optional) Configure GitHub Cloud Build Trigger and verify automatic deployment on <code>git push</code>.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Every <code>git push</code> automatically tests, builds, migrates, and deploys the app to Cloud Run!</li>
+  <li><strong><code>creates</code></strong>: Automated CI/CD pipeline on Google Cloud (can be skipped to jump straight to AI features).</li>
+</ul>
+
+<hr />
+
+<h3 id="step-7-workshop_7_ai_features-ai-background-jobs-with-solid-queue--gemini-">Step 7: <code>workshop_7_ai_features</code> (AI Background Jobs with Solid Queue &amp; Gemini 🍌)</h3>
+<ul>
+  <li><strong><code>needs</code></strong>: Step 5 (or Step 6) completed, <code>GEMINI_API_KEY</code> in Secret Manager, branch <code>workshop_7_ai_features</code>.</li>
+  <li><strong><code>does</code></strong>:
+    <ul>
+      <li>Implement <strong>NanoBanana Auto-Cover Generator</strong> (<code>GenerateCoverImageJob</code>): generates vintage Italian poster art with a banana via Gemini/Imagen and attaches it via ActiveStorage.</li>
+      <li>(Bonus) Implement <strong>Podcastifier</strong>: Translates post to Italian and synthesizes <code>.mp3</code> audio via Cloud Text-to-Speech.</li>
+    </ul>
+  </li>
+  <li><strong><code>wow</code></strong>: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in real-time!</li>
+  <li><strong><code>creates</code></strong>: Intelligent, asynchronous AI features powered by Solid Queue workers.</li>
+</ul>
+
+<hr />
+
+
           </div>
-        <% end %>
+        
+          <div class="step-content" id="step-1" style="display: none;">
+            <h1>2. Post-Story Implementation Checklist</h1>
+            
+            
+
+            <h2 id="post-story-implementation-checklist">Post-Story Implementation Checklist</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_1_local_baseline</code> branch verified</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_2_cloud_storage</code> branch verified</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_3_cloud_sql</code> branch verified (includes Auth Proxy local config)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_4_secret_manager</code> branch verified</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_5_cloud_run_classic</code> branch verified (includes <code>compose.prod.yaml</code>)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_6_cloud_build_cicd</code> branch verified (optional track)</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code>workshop_7_ai_features</code> branch verified</li>
+</ul>
+
+          </div>
+        
 
       </div>
     </div>
@@ -740,7 +559,7 @@ __END__
     <!-- Bottom Navigation Bar -->
     <div class="bottom-bar">
       <a href="#" class="btn btn-secondary" id="prev-btn">BACK</a>
-      <span class="progress-text" id="progress-indicator">Step 1 of <%= @codelab[:steps].size %></span>
+      <span class="progress-text" id="progress-indicator">Step 1 of 2</span>
       <a href="#" class="btn btn-primary" id="next-btn">NEXT</a>
     </div>
 

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.8] - 2026-08-26
+### Added
+- 🔀 Enhanced `workshop/server.rb` with a multi-document switcher supporting Codelab, Constitution, and Skeleton seamlessly.
+- 📖 Created comprehensive User Manual & Extraction Architecture in `docs/USER_MANUAL.md` and `workshop/USER_MANUAL.md`.
+- 🏗️ Upgraded `workshop/build_ghpages.rb` to statically compile `index.html`, `constitution.html`, and `skeleton.html`.
+- ⚡ Added `just workshop-constitution` recipe to `justfile`.
+
 ## [0.1.7] - 2026-08-26
 ### Added
 - 📜 Created `workshop/UNTOUCHABLE-CONSTITUTION.md` establishing the 4-part contract (`needs`, `does`, `wow`, `creates`) for all 8 workshop chapters.

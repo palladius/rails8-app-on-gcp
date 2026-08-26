@@ -15,8 +15,8 @@
       --text-color: #3c4043;
       --heading-color: #202124;
       --active-bg: rgba(232, 240, 254, 0.65);
-      --header-bg: rgba(255, 255, 255, 0.5);
-      --footer-bg: rgba(255, 255, 255, 0.5);
+      --header-bg: rgba(255, 255, 255, 0.65);
+      --footer-bg: rgba(255, 255, 255, 0.65);
     }
     
     * {
@@ -76,16 +76,50 @@
     }
     
     .sidebar-header {
-      padding: 24px;
+      padding: 20px 24px;
       border-bottom: 1px solid var(--border-color);
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.4);
     }
     
     .codelab-title {
-      font-size: 18px;
-      font-weight: 500;
+      font-size: 17px;
+      font-weight: 600;
       color: var(--heading-color);
       line-height: 1.4;
+    }
+
+    /* Doc Switcher Pills */
+    .doc-switcher {
+      display: flex;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 3px;
+      border-radius: 8px;
+      margin-top: 12px;
+      gap: 2px;
+    }
+
+    .doc-tab {
+      flex: 1;
+      text-align: center;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 500;
+      text-decoration: none;
+      color: #5f6368;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .doc-tab:hover {
+      color: var(--heading-color);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .doc-tab.active {
+      background: #ffffff;
+      color: var(--primary-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-weight: 600;
     }
     
     .sidebar-menu {
@@ -194,17 +228,16 @@
       z-index: 2;
     }
     
-    /* Elegant floating card container for Codelab steps */
     .content-container {
-      max-width: 800px;
+      max-width: 840px;
       margin: 0 auto;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 16px;
       padding: 48px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
       margin-bottom: 100px;
     }
     
@@ -213,7 +246,7 @@
       font-size: 16px;
     }
     
-    .step-content h1, .step-content h2, .step-content h3 {
+    .step-content h1, .step-content h2, .step-content h3, .step-content h4 {
       color: var(--heading-color);
       margin-top: 24px;
       margin-bottom: 16px;
@@ -222,19 +255,11 @@
     
     .step-content h2 { font-size: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
     .step-content h3 { font-size: 18px; }
+    .step-content h4 { font-size: 16px; font-weight: 600; }
     
-    .step-content p {
-      margin-bottom: 16px;
-    }
-    
-    .step-content ul, .step-content ol {
-      margin-bottom: 16px;
-      padding-left: 24px;
-    }
-    
-    .step-content li {
-      margin-bottom: 8px;
-    }
+    .step-content p { margin-bottom: 16px; }
+    .step-content ul, .step-content ol { margin-bottom: 16px; padding-left: 24px; }
+    .step-content li { margin-bottom: 8px; }
     
     .step-content code {
       font-family: 'Roboto Mono', Consolas, Monaco, monospace;
@@ -244,26 +269,9 @@
       font-size: 14px;
     }
     
-    .step-content pre code {
-      background-color: transparent;
-      padding: 0;
-      border-radius: 0;
-    }
-    
-    .step-content pre {
-      margin-bottom: 24px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    
-    .step-content img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-      margin: 16px 0;
-      display: block;
-    }
+    .step-content pre code { background-color: transparent; padding: 0; }
+    .step-content pre { margin-bottom: 24px; border-radius: 8px; overflow: hidden; }
+    .step-content img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); margin: 16px 0; display: block; }
     
     /* Info box styling */
     .info-box {
@@ -274,24 +282,10 @@
       border-radius: 0 8px 8px 0;
     }
     
-    .info-box p:last-child {
-      margin-bottom: 0;
-    }
-    
-    .info-box.positive {
-      background-color: rgba(230, 244, 234, 0.7);
-      border-left-color: #137333;
-    }
-    
-    .info-box.warning {
-      background-color: rgba(254, 247, 224, 0.7);
-      border-left-color: #b06000;
-    }
-    
-    .info-box.negative {
-      background-color: rgba(252, 232, 230, 0.7);
-      border-left-color: #c5221f;
-    }
+    .info-box p:last-child { margin-bottom: 0; }
+    .info-box.positive { background-color: rgba(230, 244, 234, 0.7); border-left-color: #137333; }
+    .info-box.warning { background-color: rgba(254, 247, 224, 0.7); border-left-color: #b06000; }
+    .info-box.negative { background-color: rgba(252, 232, 230, 0.7); border-left-color: #c5221f; }
     
     /* Bottom Navigation Bar with Glassmorphism */
     .bottom-bar {
@@ -325,33 +319,12 @@
       transition: background-color 0.2s;
     }
     
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: #ffffff;
-      border: none;
-    }
+    .btn-primary { background-color: var(--primary-color); color: #ffffff; border: none; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); color: var(--primary-color); border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: rgba(248, 249, 250, 0.8); }
+    .progress-text { font-size: 14px; color: #5f6368; }
     
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-    
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(5px);
-      color: var(--primary-color);
-      border: 1px solid var(--border-color);
-    }
-    
-    .btn-secondary:hover {
-      background: rgba(248, 249, 250, 0.8);
-    }
-    
-    .progress-text {
-      font-size: 14px;
-      color: #5f6368;
-    }
-    
-    /* Ribbon/Badge style */
     .badge {
       display: inline-block;
       padding: 4px 8px;
@@ -362,7 +335,6 @@
       font-weight: 500;
     }
     
-    /* Key/Value block for Frontmatter metadata card */
     .metadata-card {
       background: rgba(248, 249, 250, 0.6);
       border: 1px solid var(--border-color);
@@ -371,30 +343,9 @@
       margin-bottom: 24px;
     }
     
-    .metadata-card h3 {
-      margin-top: 0 !important;
-      margin-bottom: 12px !important;
-      font-size: 16px;
-      font-weight: 500;
-    }
-    
-    .metadata-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-    }
-    
-    .meta-val {
-      font-weight: 500;
-      color: var(--heading-color);
-    }
-    
-    .meta-lbl {
-      font-size: 12px;
-      color: #5f6368;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
+    .metadata-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .meta-val { font-weight: 500; color: var(--heading-color); }
+    .meta-lbl { font-size: 12px; color: #5f6368; text-transform: uppercase; margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -403,6 +354,11 @@
   <div class="sidebar">
     <div class="sidebar-header">
       <div class="codelab-title">Rails 8 on Google Cloud: From Zero to AI</div>
+      <div class="doc-switcher">
+        <a href="index.html" class="doc-tab active">📖 Codelab</a>
+        <a href="constitution.html" class="doc-tab ">📜 Constitution</a>
+        <a href="skeleton.html" class="doc-tab ">🦴 Skeleton</a>
+      </div>
     </div>
     <div class="sidebar-menu">
       
@@ -464,7 +420,7 @@
     
     <!-- Top Header -->
     <div class="top-header">
-      <div class="current-step-title" id="header-step-title">Introduction</div>
+      <div class="current-step-title" id="header-step-title">Overview</div>
       <div class="metadata-info">
         
         
@@ -480,7 +436,6 @@
           <div class="step-content" id="step-0" style="display: none;">
             <h1>1. Introduction</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="introduction">Introduction</h2>
@@ -509,7 +464,6 @@
           <div class="step-content" id="step-1" style="display: none;">
             <h1>2. Setup and Prerequisites</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="setup-and-prerequisites">Setup and Prerequisites</h2>
@@ -571,7 +525,6 @@ git checkout workshop_1_local_baseline
           <div class="step-content" id="step-2" style="display: none;">
             <h1>3. Step 1: The Local Baseline</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-1-the-local-baseline">Step 1: The Local Baseline</h2>
@@ -614,7 +567,6 @@ bin/dev
           <div class="step-content" id="step-3" style="display: none;">
             <h1>4. Step 2: Cloud Storage</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-2-cloud-storage">Step 2: Cloud Storage</h2>
@@ -653,7 +605,6 @@ Making a bucket public (<code>public: true</code> / <code>allUsers:objectViewer<
           <div class="step-content" id="step-4" style="display: none;">
             <h1>5. Step 3: Cloud SQL (From Naive Exposure to Auth Proxy)</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-3-cloud-sql-from-naive-exposure-to-auth-proxy">Step 3: Cloud SQL (From Naive Exposure to Auth Proxy)</h2>
@@ -725,7 +676,6 @@ Exposing port <code>5432</code> to <code>0.0.0.0/0</code> on the public internet
           <div class="step-content" id="step-5" style="display: none;">
             <h1>6. Step 4: Secret Manager</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-4-secret-manager">Step 4: Secret Manager</h2>
@@ -766,7 +716,6 @@ gcloud secrets add-iam-policy-binding rails-db-password \
           <div class="step-content" id="step-6" style="display: none;">
             <h1>7. Step 5: Multi-Container Cloud Run & Docker Compose</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-5-multi-container-cloud-run--docker-compose">Step 5: Multi-Container Cloud Run &amp; Docker Compose</h2>
@@ -807,7 +756,6 @@ gcloud secrets add-iam-policy-binding rails-db-password \
           <div class="step-content" id="step-7" style="display: none;">
             <h1>8. Step 6: Automating with Cloud Build (Optional / Skippable)</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-6-automating-with-cloud-build-optional--skippable">Step 6: Automating with Cloud Build (Optional / Skippable)</h2>
@@ -841,7 +789,6 @@ gcloud secrets add-iam-policy-binding rails-db-password \
           <div class="step-content" id="step-8" style="display: none;">
             <h1>9. Step 7: AI Features and Background Jobs</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="step-7-ai-features-and-background-jobs">Step 7: AI Features and Background Jobs</h2>
@@ -876,7 +823,6 @@ gcloud secrets add-iam-policy-binding rails-db-password \
           <div class="step-content" id="step-9" style="display: none;">
             <h1>10. Conclusion</h1>
             
-            <!-- If overview and we have metadata, show a pretty card -->
             
 
             <h2 id="conclusion">Conclusion</h2>
@@ -921,53 +867,36 @@ gcloud secrets add-iam-policy-binding rails-db-password \
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-terraform.min.js"></script>
   
   <script>
-    // Detailed JavaScript to manage step navigation client-side, documented for 13yo as requested 🦖
-    
-    // This function runs every time the page URL hash changes (e.g. from #1 to #2) or on load
     function showStep() {
-      // 1. Get the current hash from the browser URL, defaulting to #0 (first step) if empty
       let hash = window.location.hash;
       if (!hash || !hash.match(/^#\d+$/)) {
         hash = '#0';
       }
       
-      // 2. Extract the numeric index from the hash (e.g. "#3" -> 3)
       let stepIndex = parseInt(hash.substring(1));
-      
-      // 3. Find the HTML container for this step
       let stepElement = document.getElementById('step-' + stepIndex);
       
-      // 4. Fallback check: if the step element doesn't exist (e.g. user went to #999), go to step 0
       if (!stepElement) {
         hash = '#0';
         stepIndex = 0;
         stepElement = document.getElementById('step-0');
       }
       
-      // 5. Hide all step content sections
       document.querySelectorAll('.step-content').forEach(el => {
         el.style.display = 'none';
       });
       
-      // 6. Show the currently active step section
       if (stepElement) {
         stepElement.style.display = 'block';
-        
-        // Update the top header's title to match the active step title
         let stepHeader = stepElement.querySelector('h1');
         if (stepHeader) {
-          // Remove the "X. " prefix from header title for top bar display
           let titleText = stepHeader.innerText.replace(/^\d+\.\s+/, '');
           document.getElementById('header-step-title').innerText = titleText;
         }
       }
       
-      // 7. Update sidebar navigation styles
       document.querySelectorAll('.sidebar-item').forEach((el, idx) => {
-        // Clear active class
         el.classList.remove('active');
-        
-        // Add "completed" class to all steps prior to current step, so the user knows progress
         if (idx < stepIndex) {
           el.classList.add('completed');
         } else {
@@ -975,26 +904,20 @@ gcloud secrets add-iam-policy-binding rails-db-password \
         }
       });
       
-      // Highlight the active step in the sidebar
       let activeSidebarItem = document.getElementById('sidebar-item-' + stepIndex);
       if (activeSidebarItem) {
         activeSidebarItem.classList.add('active');
-        
-        // Ensure the active item is visible in the scrollable sidebar area
         activeSidebarItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
       
-      // 8. Configure the BACK button
       let prevButton = document.getElementById('prev-btn');
       if (stepIndex > 0) {
         prevButton.style.visibility = 'visible';
         prevButton.href = '#' + (stepIndex - 1);
       } else {
-        // Hide the BACK button on the very first page
         prevButton.style.visibility = 'hidden';
       }
       
-      // 9. Configure the NEXT button
       let nextButton = document.getElementById('next-btn');
       let totalSteps = document.querySelectorAll('.step-content').length;
       
@@ -1003,30 +926,22 @@ gcloud secrets add-iam-policy-binding rails-db-password \
         nextButton.href = '#' + (stepIndex + 1);
         nextButton.innerText = 'NEXT';
       } else {
-        // On the final page, show 'RESTART' and link to step 0
         nextButton.style.visibility = 'visible';
-        nextButton.href = '#0'; // Wrap back to step 0
+        nextButton.href = '#0';
         nextButton.innerText = 'RESTART 🔄';
       }
       
-      // 10. Update the progress indicator text (e.g. "Step 3 of 8")
       document.getElementById('progress-indicator').innerText = 'Step ' + (stepIndex + 1) + ' of ' + totalSteps;
-      
-      // 11. Scroll the main content window back to top so user starts reading from the top
       document.getElementById('main-content').scrollTop = 0;
       
-      // 12. Run Prism code block syntax highlighter for the new content
       if (window.Prism) {
         Prism.highlightAll();
       }
     }
     
-    // Process markdown blockquotes and turn them into styled Google Codelab info-boxes!
     function processBlockquotes() {
       document.querySelectorAll('blockquote').forEach(bq => {
         const text = bq.innerText || '';
-        
-        // Color code based on emojis or github alert notation
         if (text.includes('💡') || text.includes('ℹ️') || text.includes('🟢') || text.includes('[!NOTE]') || text.includes('[!TIP]')) {
           bq.classList.add('info-box', 'positive');
         } else if (text.includes('⚠️') || text.includes('🟡') || text.includes('[!WARNING]') || text.includes('[!IMPORTANT]')) {
@@ -1034,10 +949,9 @@ gcloud secrets add-iam-policy-binding rails-db-password \
         } else if (text.includes('🛑') || text.includes('🚨') || text.includes('🔴') || text.includes('[!CAUTION]')) {
           bq.classList.add('info-box', 'negative');
         } else {
-          bq.classList.add('info-box', 'positive'); // Default fallback
+          bq.classList.add('info-box', 'positive');
         }
         
-        // Clean up the github alert markdown tags if present
         bq.innerHTML = bq.innerHTML
           .replace(/\[!NOTE\]/gi, '<strong>Note:</strong>')
           .replace(/\[!TIP\]/gi, '<strong>Tip:</strong>')
@@ -1047,9 +961,7 @@ gcloud secrets add-iam-policy-binding rails-db-password \
       });
     }
 
-    // Attach listeners for hash changes and load events
     window.addEventListener('hashchange', showStep);
-    
     document.addEventListener('DOMContentLoaded', () => {
       processBlockquotes();
       showStep();

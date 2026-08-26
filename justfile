@@ -22,6 +22,10 @@ test:
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
 
+# run the workshop visualizer directly focused on the Untouchable Constitution
+workshop-constitution port="8080":
+    cd workshop && ./server.rb --port {{port}} UNTOUCHABLE-CONSTITUTION.md
+
 # show project status
 project-status:
     cd iac && ./check_gcp_setup.sh
