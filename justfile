@@ -18,6 +18,12 @@ dev:
 test:
     cd blog && just test
 
+# autopush: run tests, rebuild static pages, and push to origin main
+autopush:
+    just test
+    just build-ghpages
+    git push origin main
+
 # run the workshop codelab visualizer server
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
