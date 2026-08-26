@@ -51,7 +51,11 @@ bin/rails db:setup
 bin/dev
 ```
 
-Open `http://localhost:3000` in your browser. You should see a basic blog. Try creating a post and uploading an image. It works perfectly on your machine!
+Open `http://localhost:3000` in your browser. You should see a basic blog. You can log in with the default seeded user:
+- **Email:** `riccardo@example.com`
+- **Password:** `Ch4ng3m3!!1`
+
+Try creating a post and uploading an image. It works perfectly on your machine!
 
 **The Catch:** Cloud Run containers are stateless. If we deploy this right now, your SQLite database and local images will be wiped out every time the container restarts. We need to move our state to the cloud.
 

@@ -25,3 +25,13 @@ bundle install
 bin/rails db:prepare
 bin/dev -p 9090
 ```
+
+## Workshop
+
+The workshop is nicely active on GitHUb Pages:
+
+* https://palladius.github.io/rails8-app-on-gcp/ (dark Astro look and feel)
+* https://palladius.github.io/rails8-app-on-gcp/static/ (light Google Codelab look n' feel)
+
+![dark mode](image.png)
+![light mode](image-1.png)
