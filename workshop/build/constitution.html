@@ -389,7 +389,7 @@
       
         <a href="#1" class="sidebar-item" id="sidebar-item-1">
           <span class="step-num">2</span>
-          <span>🎯 1. Workshop Mission & North Star</span>
+          <span>🎯 1. Mission & The Dual North Stars</span>
         </a>
       
         <a href="#2" class="sidebar-item" id="sidebar-item-2">
@@ -399,12 +399,12 @@
       
         <a href="#3" class="sidebar-item" id="sidebar-item-3">
           <span class="step-num">4</span>
-          <span>🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</span>
+          <span>🏛️ 3. The 5-Part Step Contract</span>
         </a>
       
         <a href="#4" class="sidebar-item" id="sidebar-item-4">
           <span class="step-num">5</span>
-          <span>🗺️ 4. Master Steps Walkthrough</span>
+          <span>🗺️ 4. Master Step Breakdown</span>
         </a>
       
         <a href="#5" class="sidebar-item" id="sidebar-item-5">
@@ -445,8 +445,8 @@
 
             
 <blockquote>
-  <p><strong>STATUS: 🟡 DRAFT</strong> (Under review by Riccardo &amp; Emiliano).  <br />
-Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONSTITUTION</strong> to which all workshop branches, <code>CODELAB.md</code>, <code>SKELETON.md</code>, automation scripts, and UI viewers must strictly adhere.</p>
+  <p><strong>STATUS: 🟡 DRAFT (v2)</strong> (Revised with Dual North Stars).  <br />
+Once finalized and approved by Riccardo &amp; Emiliano, this document serves as the <strong>UNTOUCHABLE CONSTITUTION</strong> governing <code>main</code>, workshop branches, <code>CODELAB.md</code>, <code>SKELETON.md</code>, automation scripts, and visualizers.</p>
 </blockquote>
 
 <hr />
@@ -455,21 +455,41 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
           </div>
         
           <div class="step-content" id="step-1" style="display: none;">
-            <h1>2. 🎯 1. Workshop Mission & North Star</h1>
+            <h1>2. 🎯 1. Mission & The Dual North Stars</h1>
             
             
 
-            <h2 id="-1-workshop-mission--north-star">🎯 1. Workshop Mission &amp; North Star</h2>
+            <h2 id="-1-mission--the-dual-north-stars">🎯 1. Mission &amp; The Dual North Stars</h2>
 
+<p>This project is bifidus and achieves two equally crucial strategic goals:</p>
+
+<h3 id="-north-star-1-the-canonical-rails-8-on-gcp-production-blueprint-main">🌟 North Star 1: The Canonical “Rails 8 on GCP” Production Blueprint (<code>main</code>)</h3>
 <ol>
-  <li><strong>Target Audience:</strong> Ruby/Rails developers exploring modern deployment options, cloud practitioners, and DevOps engineers wanting a clean, production-grade Rails 8 blueprint on Google Cloud Platform.</li>
-  <li><strong>Pedagogical Flow:</strong> Meet developers where they are (local SQLite, <code>bin/dev</code>, instant local satisfaction), incrementally introduce cloud-native primitives (Cloud Storage, Cloud SQL, Secret Manager, Cloud Run multi-container, Cloud Build), and culminate with AI-powered background jobs using Solid Queue and Gemini.</li>
-  <li><strong>Core Philosophy:</strong>
+  <li><strong>The Destination:</strong> <code>main</code> in this repository is the complete, working, battle-tested, editable reference architecture (“The Gold Standard”) for running Rails 8 on Google Cloud Platform.</li>
+  <li><strong>Blueprint Capabilities:</strong>
     <ul>
-      <li><strong>Zero Magic / Explicit Security:</strong> No fake shortcuts that leak credentials (no public <code>0.0.0.0/0</code> in production, no world-readable GCS buckets, no <code>.env</code> files in git).</li>
-      <li><strong>Pacing Optimization:</strong> Heavy cloud provisioning (Cloud SQL ~10–12 min) is launched asynchronously upfront so students are never sitting idle.</li>
-      <li><strong>The 4-Part Contract:</strong> Every step must clearly define its <strong>Prerequisites (<code>needs</code>)</strong>, <strong>Actions &amp; Learnings (<code>does</code>)</strong>, <strong>Aha! / Wow Moment (<code>wow</code>)</strong>, and <strong>Outcomes (<code>creates</code>)</strong>.</li>
-      <li><strong>Flexible Tracks:</strong> Full Cloud Track (with billing &amp; Cloud SQL) vs. <strong>Zero-Billing / Free Track</strong> (SQLite on Cloud Run + Gemini Free Tier API key, <em>ohne</em> Cloud SQL).</li>
+      <li>Managed PostgreSQL on <strong>Cloud SQL</strong> with connection pooling.</li>
+      <li>Private <strong>Google Cloud Storage</strong> with IAM Credential blob signing (<code>iam: true</code> / zero public buckets).</li>
+      <li>Enterprise credential management via <strong>Google Cloud Secret Manager</strong>.</li>
+      <li>Production multi-container sidecar topology on <strong>Cloud Run</strong> (<code>web</code> + <code>worker</code> Solid Queue + <code>cloudsql-proxy</code> sidecar).</li>
+      <li>Automated CI/CD pipelines via <strong>Cloud Build</strong>.</li>
+      <li>Asynchronous Generative AI background pipelines (Gemini / Imagen auto-cover generation &amp; audio podcast synthesis).</li>
+    </ul>
+  </li>
+  <li><strong>Branching Model:</strong> <code>main</code> contains the full end-state blueprint. The <code>workshop_*</code> branches provide progressive, curated stepping stones that build up to <code>main</code>.</li>
+</ol>
+
+<hr />
+
+<h3 id="-north-star-2-the-universal-developer-workshop-gcp--antigravity-for-everyone">🌟 North Star 2: The Universal Developer Workshop (GCP &amp; Antigravity for Everyone)</h3>
+<ol>
+  <li><strong>The Audience Reality:</strong> While launching at a Ruby conference (Oct 2), <strong>~90% of future workshop attendees will have zero Ruby background</strong>. They are developers, SREs, and cloud practitioners eager to learn Google Cloud, serverless architecture, and modern AI development.</li>
+  <li><strong>Pedagogical Mandate:</strong>
+    <ul>
+      <li><strong>Zero Language Friction:</strong> Never let Ruby syntax or Rails idiosyncrasies block an attendee. App commands are standardized (<code>bin/dev</code>, <code>bin/rails db:...</code>).</li>
+      <li><strong>Antigravity as Co-Pilot:</strong> Use <strong>Google Antigravity</strong> as the universal pair programmer to inspect the codebase, explain architecture, generate Mermaid diagrams, and debug issues in real-time.</li>
+      <li><strong>Cloud-First Teachable Moments:</strong> Focus on real cloud problems—statelessness, security anti-patterns (why <code>0.0.0.0/0</code> and public buckets are dangerous), IAM tunneling with Cloud SQL Auth Proxy, sidecar orchestration, and async AI workers.</li>
+      <li><strong>Dual Track Flexibility:</strong> Full Cloud Track (with billing &amp; Cloud SQL) vs. <strong>Zero-Billing Free Track</strong> (SQLite on Cloud Run + Gemini Free Tier API Key).</li>
     </ul>
   </li>
 </ol>
@@ -489,8 +509,8 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
 <ul>
   <li><strong>Riccardo:</strong> Supreme Leader and pun-master 🦖</li>
   <li><strong>Emiliano:</strong> Al Mudnais cal’scorda i symlink 🍝🏎️</li>
-  <li><strong>Theme &amp; Branding:</strong> Colorful, high-energy Google branding with the “NanoBanana” mascot 🍌.</li>
-  <li><strong>Tone:</strong> Technical rigor paired with approachable, fun analogies.</li>
+  <li><strong>Theme &amp; Branding:</strong> Colorful, vibrant Google branding featuring the vintage Italian “NanoBanana” mascot 🍌.</li>
+  <li><strong>Tone:</strong> Technically rigorous, engaging, and welcoming to developers of all backgrounds.</li>
 </ul>
 
 <hr />
@@ -499,33 +519,33 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
           </div>
         
           <div class="step-content" id="step-3" style="display: none;">
-            <h1>4. 🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</h1>
+            <h1>4. 🏛️ 3. The 5-Part Step Contract</h1>
             
             
 
-            <h2 id="️-3-the-4-part-step-blueprint-the-enhanced-contract">🏛️ 3. The 4-Part Step Blueprint (The Enhanced Contract)</h2>
+            <h2 id="️-3-the-5-part-step-contract">🏛️ 3. The 5-Part Step Contract</h2>
 
-<p>Every chapter in the workshop adheres to the <strong>Trifecta + Wow Contract</strong>:<br />
-\(\text{Step} = \langle \text{needs}, \text{does}, \text{wow}, \text{creates} \rangle\)</p>
+<p>Every chapter in the workshop adheres to the <strong>Enhanced Step Contract</strong>:<br />
+\(\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow}, \text{creates} \rangle\)</p>
 
 <pre><code>┌─────────────────────────────────────────────────────────────┐
 │ 1. PREREQUISITES (needs)                                    │
-│    - Git branch baseline                                    │
-│    - CLI tools / IAM permissions / Background job state     │
+│    - Git branch checkpoint                                  │
+│    - CLI tools / IAM permissions / Background state         │
 ├─────────────────────────────────────────────────────────────┤
 │ 2. ACTIONS &amp; TEACHABLE MOMENTS (does)                       │
 │    - Concrete code/config modifications                     │
-│    - Commands executed                                      │
 │    - Anti-patterns explored &amp; corrected (e.g. 0.0.0.0/0)    │
 ├─────────────────────────────────────────────────────────────┤
-│ 3. THE AHA! / WOW MOMENT (wow) ✨                           │
-│    - Visible instant gratification for the student          │
-│    - Sensory/visual proof that the cloud piece works        │
+│ 3. ANTIGRAVITY CO-PILOT (antigravity) 🤖                     │
+│    - AI pair programming prompts for non-Rubyists           │
+│    - Codebase exploration &amp; automated diagram generation    │
 ├─────────────────────────────────────────────────────────────┤
-│ 4. DELIVERABLES (creates)                                   │
-│    - Verifiable local/remote functionality                  │
-│    - Git branch checkpoint tag                              │
-│    - Cloud infrastructure state                             │
+│ 4. THE AHA! / WOW MOMENT (wow) ✨                           │
+│    - Visual &amp; sensory proof of working cloud technology     │
+├─────────────────────────────────────────────────────────────┤
+│ 5. DELIVERABLES (creates)                                   │
+│    - Verified milestone towards the `main` blueprint        │
 └─────────────────────────────────────────────────────────────┘
 </code></pre>
 
@@ -535,22 +555,23 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
           </div>
         
           <div class="step-content" id="step-4" style="display: none;">
-            <h1>5. 🗺️ 4. Master Steps Walkthrough</h1>
+            <h1>5. 🗺️ 4. Master Step Breakdown</h1>
             
             
 
-            <h2 id="️-4-master-steps-walkthrough">🗺️ 4. Master Steps Walkthrough</h2>
+            <h2 id="️-4-master-step-breakdown">🗺️ 4. Master Step Breakdown</h2>
 
 <pre><code class="language-mermaid">flowchart TD
-    S0["Step 0: Setup &amp; Async Cloud Provisioning&lt;br/&gt;(Terraform / provision script + Free Track option)"] --&gt; S1["Step 1: The Local Baseline&lt;br/&gt;(SQLite + RichText drag &amp; drop + Gemini exploration)"]
-    S1 --&gt; S2["Step 2: Cloud Storage (ActiveStorage + GCS)&lt;br/&gt;(Private bucket + IAM signing + Live GCS drop)"]
+    S0["Step 0: Setup &amp; Async Cloud Launch&lt;br/&gt;(Terraform / provision script started in background)"] --&gt; S1["Step 1: The Local Baseline&lt;br/&gt;(Local app + Antigravity ER diagram discovery)"]
+    S1 --&gt; S2["Step 2: Cloud Storage (ActiveStorage + GCS)&lt;br/&gt;(Private bucket + IAM signing + Live drop)"]
     S2 --&gt; S3A["Step 3A: The Naive DB Connection&lt;br/&gt;(0.0.0.0/0 test &amp; Security breakdown)"]
-    S3A --&gt; S3B["Step 3B: Local Cloud SQL Auth Proxy&lt;br/&gt;('Welcome to Cloud SQL' seeded post appears!)"]
+    S3A --&gt; S3B["Step 3B: Local Cloud SQL Auth Proxy&lt;br/&gt;('Welcome to Cloud SQL' seeded post via IAM)"]
     S3B --&gt; S4["Step 4: Secret Manager&lt;br/&gt;(RAILS_MASTER_KEY &amp; DB credentials via gcloud)"]
     S4 --&gt; S5["Step 5: Multi-Container Cloud Run&lt;br/&gt;(Web + SolidQueue Worker + Cloud SQL Proxy)"]
-    S5 -.-&gt;|Optional / Skippable| S6["Step 6: CI/CD with Cloud Build&lt;br/&gt;(cloudbuild.yaml + Triggers)"]
+    S5 -.-&gt;|Optional / Skippable| S6["Step 6: CI/CD with Cloud Build&lt;br/&gt;(cloudbuild.yaml + Git Trigger)"]
     S5 --&gt; S7["Step 7: AI Features with Solid Queue&lt;br/&gt;(NanoBanana Cover Generator + Podcastifier)"]
     S6 --&gt; S7
+    S7 ==&gt; MAIN["🏆 The 'main' Blueprint Reached!"]
 </code></pre>
 
 <hr />
@@ -560,7 +581,7 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
   <li><strong><code>needs</code></strong>:
     <ul>
       <li>GCP project (Billing enabled for Cloud SQL track, or Free Tier for Zero-Billing track).</li>
-      <li>Installed CLI tools: <code>gcloud</code>, <code>ruby</code> 3.3+, <code>gem install rails</code>, <code>terraform</code>, <code>docker</code>, and <code>cloud-sql-proxy</code>.</li>
+      <li>CLI tools: <code>gcloud</code>, <code>ruby</code> 3.3+, <code>gem install rails</code>, <code>terraform</code>, <code>docker</code>, and <code>cloud-sql-proxy</code>.</li>
       <li>Google Antigravity IDE or VS Code Antigravity Extension.</li>
     </ul>
   </li>
@@ -568,98 +589,83 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
     <ul>
       <li>Clones the workshop repository.</li>
       <li>Authenticates <code>gcloud auth login</code> and <code>gcloud auth application-default login</code>.</li>
-      <li>Verifies billing status (<code>gcloud billing projects describe $PROJECT_ID</code>).</li>
-      <li><strong>IMMEDIATELY kicks off Cloud SQL &amp; GCS provisioning</strong> in the background via Terraform or helper script (<code>./bin/provision-cloudsql.sh</code>).</li>
-      <li><em>(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite volume/GCS free tier)</em>.</li>
+      <li><strong>IMMEDIATELY kicks off Cloud SQL &amp; GCS provisioning</strong> in the background (<code>./bin/provision-cloudsql.sh</code> or <code>cd iac &amp;&amp; terraform apply</code>).</li>
+      <li><em>(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite on Cloud Run + Gemini Free Tier)</em>.</li>
     </ul>
   </li>
-  <li><strong><code>wow</code></strong>: One command starts heavy cloud provisioning in the background without freezing the student’s terminal!</li>
-  <li><strong><code>creates</code></strong>: Background cloud provisioning job in progress (elapsed time: ~12 minutes).</li>
+  <li><strong><code>antigravity</code></strong>: Use Antigravity to verify environment prerequisites and active GCP project configuration.</li>
+  <li><strong><code>wow</code></strong>: One command starts heavy cloud provisioning asynchronously without blocking the student’s workflow!</li>
+  <li><strong><code>creates</code></strong>: Background infrastructure cooking in GCP (~10-12 mins) while students proceed immediately to Step 1.</li>
 </ul>
 
 <hr />
 
-<h3 id="-step-1-the-local-baseline-instant-local-gratification">🔹 Step 1: The Local Baseline (Instant Local Gratification)</h3>
+<h3 id="-step-1-the-local-baseline-exploration-for-rubyists--non-rubyists">🔹 Step 1: The Local Baseline (Exploration for Rubyists &amp; Non-Rubyists)</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Step 0 completed.</li>
-      <li>Branch: <code>workshop_1_local_baseline</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Step 0 completed, branch <code>workshop_1_local_baseline</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
       <li>Runs <code>bundle install</code>, <code>bin/rails db:setup</code>, and <code>bin/dev</code>.</li>
-      <li>Opens <code>http://localhost:3000</code>, logs in (<code>riccardo@example.com</code> / <code>Ch4ng3m3!!1</code>).</li>
-      <li>Creates a new blog post and uses ActionText / Trix editor to drag-and-drop a local image directly into the post body.</li>
-      <li><strong>Gemini / Antigravity Interactive Exploration:</strong>
-        <ul>
-          <li>Uses Antigravity to inspect ActiveRecord models and generate a Mermaid ER diagram.</li>
-          <li>Discusses why local disk storage and SQLite are ephemeral in container environments.</li>
-        </ul>
-      </li>
+      <li>Opens <code>http://localhost:3000</code>, logs in with seeded credentials (<code>riccardo@example.com</code> / <code>Ch4ng3m3!!1</code>).</li>
+      <li>Creates a new blog post and drags-and-drops an image directly into the ActionText / Trix rich-text editor.</li>
     </ul>
   </li>
-  <li><strong><code>wow</code></strong>: App is fully working locally in under 2 minutes with rich-text image drag-and-drop!</li>
-  <li><strong><code>creates</code></strong>: Verified local baseline application running on SQLite.</li>
+  <li><strong><code>antigravity</code></strong>: Prompt Antigravity:
+    <blockquote>
+      <p><em>“Analyze this Rails 8 application and generate a Mermaid diagram explaining how Posts, Comments, and ActiveStorage models connect.”</em><br />
+<em>(Gives non-Rubyists instant architectural clarity!)</em></p>
+    </blockquote>
+  </li>
+  <li><strong><code>wow</code></strong>: Full web app running locally in &lt;2 minutes with rich-text drag-and-drop image uploads out of the box.</li>
+  <li><strong><code>creates</code></strong>: Verified local baseline and clear motivation for cloud-native persistence (explaining why stateless containers wipe local SQLite/disk storage).</li>
 </ul>
 
 <hr />
 
-<h3 id="-step-2-cloud-storage-with-activestorage--gcs">🔹 Step 2: Cloud Storage with ActiveStorage &amp; GCS</h3>
+<h3 id="-step-2-cloud-storage-activestorage--gcs">🔹 Step 2: Cloud Storage (ActiveStorage + GCS)</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>GCS Bucket provisioned from Step 0.</li>
-      <li>Branch: <code>workshop_2_cloud_storage</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: GCS Bucket provisioned from Step 0, branch <code>workshop_2_cloud_storage</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
-      <li>Configures <code>config/storage.yml</code> with the <code>google</code> service.</li>
+      <li>Configures <code>config/storage.yml</code> with the <code>google</code> service and <code>iam: true</code>.</li>
       <li>Sets <code>config.active_storage.service = :google</code> in <code>config/environments/production.rb</code> (and <code>development.rb</code>).</li>
-      <li><strong>The Teachable Moment:</strong>
-        <ul>
-          <li>Configures <code>iam: true</code> in <code>storage.yml</code> to sign blob URLs via the Google IAM Credentials API without requiring static private keys.</li>
-          <li>Explains why <code>public: true</code> / <code>allUsers</code> is an insecure anti-pattern.</li>
-        </ul>
-      </li>
-      <li>Drag-and-drops an image into the post editor; inspects the network tab and GCS Console to see the blob land live in the cloud.</li>
+      <li><strong>Teachable Moment:</strong> Explains why <code>public: true</code> / <code>allUsers</code> is a dangerous security trap; shows how IAM Credentials API signs private expiring blob URLs on the fly.</li>
+      <li>Drag-and-drops an image into the editor; inspects the network request and GCS Console to see the blob stream directly to the cloud.</li>
     </ul>
   </li>
-  <li><strong><code>wow</code></strong>: Drag-and-dropping an image into the Rails editor now uploads directly to a private Google Cloud Storage bucket with expiring signed URLs!</li>
-  <li><strong><code>creates</code></strong>: Working ActiveStorage integration uploading to private GCS with short-lived signed URLs.</li>
+  <li><strong><code>antigravity</code></strong>: Prompt Antigravity to review <code>storage.yml</code> and explain how Google Cloud IAM signs blob URLs without requiring private key JSON files.</li>
+  <li><strong><code>wow</code></strong>: Dragging and dropping an image in the browser auto-uploads directly to a private Google Cloud Storage bucket with expiring signed URLs!</li>
+  <li><strong><code>creates</code></strong>: Working ActiveStorage integration with private GCS bucket.</li>
 </ul>
 
 <hr />
 
-<h3 id="-step-3-cloud-sql--from-naive-exposure-to-secure-auth-proxy">🔹 Step 3: Cloud SQL — From Naive Exposure to Secure Auth Proxy</h3>
+<h3 id="-step-3-cloud-sql-from-naive-exposure-to-auth-proxy">🔹 Step 3: Cloud SQL (From Naive Exposure to Auth Proxy)</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Cloud SQL PostgreSQL instance ready (<code>READY</code> state from Step 0).</li>
-      <li>Branch: <code>workshop_3_cloud_sql</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Cloud SQL PostgreSQL instance ready (<code>READY</code> state from Step 0), branch <code>workshop_3_cloud_sql</code>.</li>
   <li><strong><code>does</code></strong>:
-    <h4 id="phase-a-the-naive-connection-the-00000-anti-pattern">Phase A: The Naive Connection (The <code>0.0.0.0/0</code> Anti-Pattern)</h4>
+    <h4 id="phase-3a-the-naive-connection-the-00000-anti-pattern">Phase 3A: The Naive Connection (The <code>0.0.0.0/0</code> Anti-Pattern)</h4>
     <ol>
       <li>Creates database (<code>rails_production</code>) and user (<code>rails_user</code>).</li>
       <li>Adds authorized network <code>0.0.0.0/0</code> with a password.</li>
       <li>Tests direct connection: <code>psql -h &lt;PUBLIC_IP&gt; -U rails_user -d rails_production</code>.</li>
-      <li><strong>Security Breakdown:</strong> Details why exposing port 5432 to <code>0.0.0.0/0</code> invites port scanners, brute-force bots, and breaches.
-        <h4 id="phase-b-the-cloud-sql-auth-proxy-fix--migration">Phase B: The Cloud SQL Auth Proxy Fix &amp; Migration</h4>
+      <li><strong>Security Breakdown:</strong> Details why exposing database port 5432 to <code>0.0.0.0/0</code> invites botnets, port scanners, and breaches.
+        <h4 id="phase-3b-the-cloud-sql-auth-proxy-fix--migration">Phase 3B: The Cloud SQL Auth Proxy Fix &amp; Migration</h4>
       </li>
       <li>Removes <code>0.0.0.0/0</code> from authorized networks.</li>
-      <li>Runs <code>cloud-sql-proxy --port 5432 $INSTANCE_CONNECTION_NAME</code> on localhost.</li>
-      <li>Runs database migration &amp; seed through the secure IAM tunnel:
+      <li>Runs <code>cloud-sql-proxy --port 5432 $INSTANCE_CONNECTION_NAME</code> locally.</li>
+      <li>Runs migrations &amp; seeds through the secure IAM tunnel:
         <pre><code class="language-bash">DATABASE_URL=postgresql://rails_user:$DB_PASS@127.0.0.1:5432/rails_production bin/rails db:migrate db:seed
 </code></pre>
       </li>
-      <li>Launches local server pointing to Cloud SQL.</li>
     </ol>
   </li>
-  <li><strong><code>wow</code></strong>: Refreshing <code>http://localhost:3000</code> reveals a new seeded post: <em>“🐘 Welcome to Cloud SQL!”</em> loaded live from the managed cloud database through the secure IAM proxy!</li>
+  <li><strong><code>antigravity</code></strong>: Prompt Antigravity:
+    <blockquote>
+      <p><em>“Explain how the Cloud SQL Auth Proxy establishes an encrypted mTLS tunnel using Application Default Credentials (ADC) without requiring firewall openings.”</em></p>
+    </blockquote>
+  </li>
+  <li><strong><code>wow</code></strong>: Refreshing <code>http://localhost:3000</code> shows a new seeded post: <em>“🐘 Welcome to Cloud SQL!”</em> loaded live from the cloud database through the secure IAM proxy!</li>
   <li><strong><code>creates</code></strong>: Migrated PostgreSQL schema on Cloud SQL and verified local proxy connection.</li>
 </ul>
 
@@ -667,15 +673,10 @@ Once finalized and approved, this document becomes the <strong>UNTOUCHABLE CONST
 
 <h3 id="-step-4-secret-management-google-cloud-secret-manager">🔹 Step 4: Secret Management (Google Cloud Secret Manager)</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Step 3 completed.</li>
-      <li>Branch: <code>workshop_4_secret_manager</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Step 3 completed, branch <code>workshop_4_secret_manager</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
-      <li>Explains the danger of committing <code>.env</code> or master keys to git.</li>
+      <li>Explains the critical danger of storing credentials in git or <code>.env</code> files.</li>
       <li>Pushes <code>config/master.key</code> and DB credentials to Google Secret Manager:
         <pre><code class="language-bash">gcloud secrets create rails-master-key --data-file=config/master.key
 gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
@@ -688,7 +689,8 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
       <li>Grants Secret Accessor IAM roles to the runtime service account.</li>
     </ul>
   </li>
-  <li><strong><code>wow</code></strong>: Secrets are safely retrieved from Google Cloud Secret Manager with zero plain-text files in git!</li>
+  <li><strong><code>antigravity</code></strong>: Ask Antigravity to audit the repository for plain-text secrets and generate the least-privilege IAM binding commands.</li>
+  <li><strong><code>wow</code></strong>: Sensitive secrets are encrypted and verified via CLI with zero plain-text files in git!</li>
   <li><strong><code>creates</code></strong>: Centralized, encrypted secrets in Secret Manager ready for container injection.</li>
 </ul>
 
@@ -696,12 +698,7 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
 
 <h3 id="-step-5-multi-container-orchestration-docker-compose--cloud-run">🔹 Step 5: Multi-Container Orchestration (Docker Compose &amp; Cloud Run)</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Secrets and DB ready.</li>
-      <li>Branch: <code>workshop_5_cloud_run_classic</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Secrets and DB ready, branch <code>workshop_5_cloud_run_classic</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
       <li>Introduces Emiliano’s 3-container architecture (<code>compose.prod.yaml</code>):
@@ -718,7 +715,12 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
       </li>
     </ul>
   </li>
-  <li><strong><code>wow</code></strong>: The entire 3-container production stack (Web + Background Worker + Cloud SQL Proxy sidecar) boots with a single command and deploys live to Cloud Run!</li>
+  <li><strong><code>antigravity</code></strong>: Prompt Antigravity:
+    <blockquote>
+      <p><em>“Explain how multi-container sidecars work on Cloud Run and how the web and worker containers communicate with the Cloud SQL proxy container on port 5432.”</em></p>
+    </blockquote>
+  </li>
+  <li><strong><code>wow</code></strong>: The entire 3-container production stack boots locally with one Docker Compose command and deploys live to Cloud Run with zero architectural drift!</li>
   <li><strong><code>creates</code></strong>: Production Rails 8 application live on Cloud Run with segregated web and worker processes.</li>
 </ul>
 
@@ -726,12 +728,7 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
 
 <h3 id="-step-6-automated-cicd-with-cloud-build-optional--skippable">🔹 Step 6: Automated CI/CD with Cloud Build <em>(Optional / Skippable)</em></h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Working Cloud Run deployment from Step 5.</li>
-      <li>Branch: <code>workshop_6_cloud_build_cicd</code>.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Working Cloud Run deployment from Step 5, branch <code>workshop_6_cloud_build_cicd</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
       <li>Inspects <code>cloudbuild.yaml</code> multi-step pipeline (Test -&gt; Build Image -&gt; Database Migrate Job -&gt; Cloud Run Deploy).</li>
@@ -739,6 +736,7 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
       <li>Pushes a commit to <code>main</code> and monitors live build logs in GCP Console.</li>
     </ul>
   </li>
+  <li><strong><code>antigravity</code></strong>: Ask Antigravity to explain the Cloud Run Job migration step in <code>cloudbuild.yaml</code>.</li>
   <li><strong><code>wow</code></strong>: Every <code>git push</code> automatically tests, builds, migrates, and deploys the app to Cloud Run!</li>
   <li><strong><code>creates</code></strong>: Automated CI/CD pipeline on Google Cloud (can be skipped to jump straight to AI features).</li>
 </ul>
@@ -747,13 +745,7 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
 
 <h3 id="-step-7-ai-features-with-solid-queue--gemini-">🔹 Step 7: AI Features with Solid Queue &amp; Gemini 🍌</h3>
 <ul>
-  <li><strong><code>needs</code></strong>:
-    <ul>
-      <li>Step 5 (or Step 6) completed.</li>
-      <li>Branch: <code>workshop_7_ai_features</code>.</li>
-      <li><code>GEMINI_API_KEY</code> stored in Secret Manager.</li>
-    </ul>
-  </li>
+  <li><strong><code>needs</code></strong>: Step 5 (or Step 6) completed, <code>GEMINI_API_KEY</code> in Secret Manager, branch <code>workshop_7_ai_features</code>.</li>
   <li><strong><code>does</code></strong>:
     <ul>
       <li>Implements <strong>NanoBanana Cover Generator</strong> (<code>GenerateCoverImageJob</code>):
@@ -769,8 +761,9 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
       </li>
     </ul>
   </li>
+  <li><strong><code>antigravity</code></strong>: Use Antigravity to customize the prompt engineering and test the AI worker locally before triggering it in production.</li>
   <li><strong><code>wow</code></strong>: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in the background in real-time!</li>
-  <li><strong><code>creates</code></strong>: Intelligent, asynchronous AI capabilities running seamlessly on background workers.</li>
+  <li><strong><code>creates</code></strong>: 🏆 <strong>The Complete ‘main’ Blueprint Architecture Achieved!</strong></li>
 </ul>
 
 <hr />
@@ -793,6 +786,10 @@ gcloud secrets create rails-db-password --data-file=&lt;(echo -n "$DB_PASSWORD")
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>Non-Rubyist needs syntax explanation</td>
+      <td>Antigravity AI pair programmer provides instant analogies (e.g. ActiveRecord $\approx$ Prisma/Django ORM).</td>
+    </tr>
     <tr>
       <td>No GCP Billing / Zero-Billing Track</td>
       <td>Run SQLite mode on Cloud Run with volume mount + Gemini Free Tier API Key.</td>
