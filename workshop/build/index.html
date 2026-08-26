@@ -273,6 +273,26 @@
     .step-content pre { margin-bottom: 24px; border-radius: 8px; overflow: hidden; }
     .step-content img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); margin: 16px 0; display: block; }
     
+    /* Mermaid diagram container */
+    .mermaid-container {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
     /* Info box styling */
     .info-box {
       border-left-width: 4px;
@@ -865,8 +885,62 @@ gcloud secrets add-iam-policy-binding rails-db-password \
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-terraform.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
   
   <script>
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'neutral',
+        securityLevel: 'loose',
+        fontFamily: "'Google Sans', 'Roboto', sans-serif"
+      });
+    }
+
+    function renderMermaid(containerElement) {
+      if (typeof mermaid === 'undefined') return;
+      const scope = containerElement || document;
+      const codeBlocks = scope.querySelectorAll('pre code.language-mermaid, pre.language-mermaid code, pre code');
+      let foundMermaid = false;
+
+      codeBlocks.forEach(codeBlock => {
+        const pre = codeBlock.closest('pre');
+        if (!pre || pre.dataset.mermaidProcessed) return;
+
+        const text = codeBlock.textContent.trim();
+        const isMermaid = codeBlock.classList.contains('language-mermaid') ||
+                          pre.classList.contains('language-mermaid') ||
+                          text.startsWith('flowchart ') ||
+                          text.startsWith('sequenceDiagram') ||
+                          text.startsWith('graph ') ||
+                          text.startsWith('erDiagram') ||
+                          text.startsWith('classDiagram') ||
+                          text.startsWith('stateDiagram') ||
+                          text.startsWith('pie');
+
+        if (isMermaid) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'mermaid-container';
+          const mermaidDiv = document.createElement('div');
+          mermaidDiv.className = 'mermaid';
+          mermaidDiv.textContent = text;
+          wrapper.appendChild(mermaidDiv);
+
+          pre.dataset.mermaidProcessed = 'true';
+          pre.parentNode.replaceChild(wrapper, pre);
+          foundMermaid = true;
+        }
+      });
+
+      if (foundMermaid || scope.querySelector('.mermaid:not([data-processed="true"])')) {
+        try {
+          mermaid.run();
+        } catch (err) {
+          console.warn('Mermaid rendering notice:', err);
+        }
+      }
+    }
+
     function showStep() {
       let hash = window.location.hash;
       if (!hash || !hash.match(/^#\d+$/)) {
@@ -893,6 +967,7 @@ gcloud secrets add-iam-policy-binding rails-db-password \
           let titleText = stepHeader.innerText.replace(/^\d+\.\s+/, '');
           document.getElementById('header-step-title').innerText = titleText;
         }
+        renderMermaid(stepElement);
       }
       
       document.querySelectorAll('.sidebar-item').forEach((el, idx) => {

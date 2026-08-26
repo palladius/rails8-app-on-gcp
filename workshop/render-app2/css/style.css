@@ -230,3 +230,22 @@ body {
     margin: 1rem 0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
+
+/* Mermaid Container */
+.mermaid-container {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+}
+.mermaid-container .mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+

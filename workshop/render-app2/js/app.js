@@ -6,6 +6,58 @@ const nextBtn = document.getElementById('next-btn');
 const indicator = document.getElementById('page-indicator');
 const navList = document.getElementById('nav-list');
 
+if (typeof mermaid !== 'undefined') {
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        fontFamily: "'Outfit', 'Inter', sans-serif"
+    });
+}
+
+function renderMermaidInCard(card) {
+    if (typeof mermaid === 'undefined') return;
+    const codeBlocks = card.querySelectorAll('pre code');
+    let found = false;
+
+    codeBlocks.forEach(codeBlock => {
+        const pre = codeBlock.closest('pre');
+        if (!pre || pre.dataset.mermaidProcessed) return;
+
+        const text = codeBlock.textContent.trim();
+        const isMermaid = codeBlock.classList.contains('language-mermaid') ||
+                          pre.classList.contains('language-mermaid') ||
+                          text.startsWith('flowchart ') ||
+                          text.startsWith('sequenceDiagram') ||
+                          text.startsWith('graph ') ||
+                          text.startsWith('erDiagram') ||
+                          text.startsWith('classDiagram') ||
+                          text.startsWith('stateDiagram') ||
+                          text.startsWith('pie');
+
+        if (isMermaid) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mermaid-container';
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.textContent = text;
+            wrapper.appendChild(mermaidDiv);
+
+            pre.dataset.mermaidProcessed = 'true';
+            pre.parentNode.replaceChild(wrapper, pre);
+            found = true;
+        }
+    });
+
+    if (found) {
+        try {
+            mermaid.run();
+        } catch (err) {
+            console.warn('Mermaid rendering notice:', err);
+        }
+    }
+}
+
 async function loadPages() {
     try {
         const response = await fetch('pages/pages.json');
@@ -46,6 +98,7 @@ async function loadPages() {
             })
             .then(text => {
                 card.innerHTML = marked.parse(text);
+                renderMermaidInCard(card);
                 
                 // Extract title from first H1, or use filename fallback
                 const match = text.match(/^#\s+(.+)$/m);
@@ -73,6 +126,12 @@ function updateNavigation() {
             btn.classList.remove('active');
         }
     });
+
+    // Re-trigger mermaid if needed on current card
+    const currentCard = sliderTrack.children[currentPage]?.querySelector('.content-card');
+    if (currentCard) {
+        renderMermaidInCard(currentCard);
+    }
 }
 
 prevBtn.addEventListener('click', () => {
