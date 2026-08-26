@@ -23,6 +23,31 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
   - Seeded posts evolve with the workshop narrative (e.g. *"[EPHEMERAL] ⚠️ Benvenuto! Sei su un DB locale effimero"* in Step 1 $\to$ *"[CLOUD SQL PERSISTENT] 🐘 Connesso a Google Cloud SQL"* in Step 3 $\to$ *"[AI ACTIVE] 🍌 Nano Banana / Imagen 3 Generatore di Copertine"* in Step 7).
   - This provides instant, tangible visual feedback when students graduate from suboptimal $\to$ cloud-native reference architecture.
 
+## 🔗 Dependencies & Build Artifact Flow
+
+> ⚠️ **CRITICAL DIRECTIVE FOR AGENTS:** **NEVER manually edit generated HTML, JSON, or derived markdown files!** They are ephemeral build products compiled from master Markdown files. Any direct edit to HTML will be wiped out on the next build/CI run!
+
+### 🗺️ File Dependency Map: Source of Truth $\to$ Produced Artifacts
+
+* **`workshop/CODELAB.md` (SOURCE OF TRUTH)**  
+  $\to$ `ruby split_codelab.rb` $\to$ produces `workshop/render-app2/pages/*.md` & `pages.json` *(PRODUCED — DO NOT EDIT)*  
+  $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/index.html` *(PRODUCED — DO NOT EDIT)*
+
+* **`workshop/UNTOUCHABLE-CONSTITUTION.md` (SOURCE OF TRUTH)**  
+  $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/constitution.html` *(PRODUCED — DO NOT EDIT)*
+
+* **`workshop/SKELETON.md` (SOURCE OF TRUTH)**  
+  $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/skeleton.html` *(PRODUCED — DO NOT EDIT)*
+
+* **`workshop/assets/*.jpg` (SOURCE OF TRUTH)**  
+  $\to$ copied to `blog/app/assets/images/` and `workshop/build/assets/` *(PRODUCED)*
+
+* **`workshop/build/` + `workshop/render-app2/`**  
+  $\to$ `.github/workflows/deploy-pages.yml` (CI) $\to$ compiles and deploys `dist/` directly to GitHub Pages *(PRODUCED ON CI)*
+
+* **`VERSION` (SOURCE OF TRUTH)**  
+  $\to$ referenced by `CHANGELOG.md`, footer UI, and release scripts.
+
 ---
 
 ## 👥 Key Personas

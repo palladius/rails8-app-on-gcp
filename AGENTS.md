@@ -20,6 +20,7 @@ Riccardo and Emiliano collaborate on this amazing thingy which is bifidus (two-f
 * Workshop is (temporarily) under `workshop/`. Additional instructions can be found in `workshop/AGENTS.md`.
 * GCP setup is going under `iac/`. This will include Cloud Build yamls, terraform code for setup, bash scripts, ...
 * Do not use EXTERNAL symlinks, copy the whole app in here, maybe without `.env`. ;)
+* ⚠️ **RULE:** NEVER edit generated HTML (`workshop/build/*.html`) or split markdown (`workshop/render-app2/pages/*`). Always edit the master Markdown sources (`CODELAB.md`, `UNTOUCHABLE-CONSTITUTION.md`, `SKELETON.md`). See `GEMINI.md` for full dependency graph.
 
 ## AI Dev
 

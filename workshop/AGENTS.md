@@ -11,3 +11,12 @@ The process is going to look like:
 3. 7 branches => 
 4. complex codelab (which gives instructions to achieve the branch_n -> branc_(n+1) step). This requires the previous to be set in stop
 5. rinse and repeat via automated reproduction of all the steps (probably instructions+branch_n will occasionally fail to bring to N+1 state so this will be slow and painful).
+
+## 🔗 Dependencies & Build Artifact Flow (DO NOT EDIT PRODUCED FILES)
+
+* **`CODELAB.md` (Source of Truth)** $\to$ `ruby split_codelab.rb` $\to$ produces `render-app2/pages/*.md` & `pages.json` *(PRODUCED)*
+* **`CODELAB.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/index.html` *(PRODUCED)*
+* **`UNTOUCHABLE-CONSTITUTION.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/constitution.html` *(PRODUCED)*
+* **`SKELETON.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/skeleton.html` *(PRODUCED)*
+* **`assets/*.jpg` (Source of Truth)** $\to$ copied to `../blog/app/assets/images/` and `build/assets/`
+* ⚠️ **RULE:** NEVER edit generated HTML (`build/*.html`) or split pages (`render-app2/pages/*`). Always modify the Markdown source of truth!
