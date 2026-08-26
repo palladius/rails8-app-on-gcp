@@ -1,12 +1,65 @@
 # 📜 Rails 8 on GCP Workshop Constitution & Architectural Blueprint
-> **STATUS: 🟡 DRAFT (v2)** (Revised with Dual North Stars).  
+> **STATUS: 🟡 DRAFT (v2)** (Revised with Dual North Stars & Exact 1:1 Master Index).  
 > Once finalized and approved by Riccardo & Emiliano, this document serves as the **UNTOUCHABLE CONSTITUTION** governing `main`, workshop branches, `CODELAB.md`, `SKELETON.md`, automation scripts, and visualizers.
 
 ---
 
-## 🎯 1. Mission & The Dual North Stars
+## 🗺️ 1. Executive Summary & Master Step Index
 
-This project is bifidus and achieves two equally crucial strategic goals:
+This workshop takes any developer—whether an experienced Rubyist (10%) or a cloud practitioner with zero Ruby background (90%)—from zero to a production-grade **Rails 8 on Google Cloud** deployment using **Google Antigravity** as an AI pair programmer. 
+
+```mermaid
+flowchart TD
+    S0["Step 0: Setup & Async Cloud Launch<br/>(branch: workshop_0_setup)"] --> S1["Step 1: The Local Baseline<br/>(branch: workshop_1_local_baseline)"]
+    S1 --> S2["Step 2: Cloud Storage<br/>(branch: workshop_2_cloud_storage)"]
+    S2 --> S3["Step 3: Cloud SQL (Naive to Proxy)<br/>(branch: workshop_3_cloud_sql)"]
+    S3 --> S4["Step 4: Secret Manager<br/>(branch: workshop_4_secret_manager)"]
+    S4 --> S5["Step 5: Cloud Run Multi-Container<br/>(branch: workshop_5_cloud_run_multi_container)"]
+    S5 -.->|Optional CI/CD| S6["Step 6: Cloud Build<br/>(branch: workshop_6_cloud_build_cicd)"]
+    S5 --> S7["Step 7: AI Features with Solid Queue<br/>(branch: workshop_7_ai_features)"]
+    S6 --> S7
+    S7 ==> S8["Step 8 / Main: The Gold Standard Blueprint<br/>(branch: main)"]
+```
+
+### 📐 Master Step Directory (Exact 1:1 Index)
+
+* **`workshop_0_setup` (Step 0 — Environment, GCP Auth & Async Infrastructure Launch):** The student verifies their development environment (`gcloud`, `ruby`, `terraform`, `docker`), authenticates against Google Cloud with Application Default Credentials (ADC), and immediately launches the background Cloud SQL and GCS provisioning script (`bin/provision-cloudsql.sh`) so infrastructure builds asynchronously in ~10–12 minutes without blocking local development.
+
+* **`workshop_1_local_baseline` (Step 1 — Local Rails Baseline & Antigravity Model Discovery):** The student boots the local Rails 8 Puma web application (`bin/dev`), logs in as an admin, tests rich-text ActionText drag-and-drop image uploads locally, and prompts Google Antigravity to analyze the codebase and generate an architectural Mermaid diagram explaining how ActiveRecord models interact.
+
+* **`workshop_2_cloud_storage` (Step 2 — Cloud Storage with ActiveStorage & IAM Signed URLs):** The student replaces local disk storage with Google Cloud Storage (`config/storage.yml`), configures `iam: true` for zero-public-bucket security, discovers why stateless containers require cloud blob storage, and verifies that dragged-and-dropped images stream directly to private GCS with expiring signed URLs.
+
+* **`workshop_3_cloud_sql` (Step 3 — Cloud SQL PostgreSQL from Naive 0.0.0.0/0 to Auth Proxy):** The student demonstrates the naive database anti-pattern by opening Cloud SQL to `0.0.0.0/0`, explores why this creates critical security vulnerabilities, replaces it with an encrypted mTLS tunnel using the local Cloud SQL Auth Proxy on port 5432, and migrates the schema to reveal a seeded *"🐘 Welcome to Cloud SQL!"* post.
+
+* **`workshop_4_secret_manager` (Step 4 — Centralized Credentials with Google Secret Manager):** The student eliminates plain-text `.env` and `master.key` files from source control by uploading secrets to Google Cloud Secret Manager via `gcloud`, configures least-privilege IAM access for runtime service accounts, and verifies secret retrieval via CLI.
+
+* **`workshop_5_cloud_run_multi_container` (Step 5 — Cloud Run Multi-Container Sidecar Orchestration):** The student adopts Emiliano's 3-container production architecture (`compose.prod.yaml`) uniting the Puma `web` server, the Solid Queue `worker`, and the official `cloudsql-proxy` sidecar container into a cohesive stack, tests the topology locally, and deploys it live to Google Cloud Run with zero architectural drift.
+
+* **`workshop_6_cloud_build_cicd` (Step 6 — Automated CI/CD Pipelines with Cloud Build *[Optional]*):** The student configures a complete automated build, test, database migration, and deployment pipeline in `cloudbuild.yaml`, connects it to a Git trigger, and observes automated serverless rollouts on every push to `main` (skippable for fast-track AI exploration).
+
+* **`workshop_7_ai_features` (Step 7 — Asynchronous Generative AI Background Jobs & Solid Queue):** The student integrates Gemini and Imagen via Solid Queue background jobs, testing the **NanoBanana Cover Generator** (which auto-synthesizes a vintage 1960s Italian poster with a cameo banana whenever a post is published) and an optional audio **Podcastifier** job using Google Cloud Text-to-Speech.
+
+* **`main` (Step 8 — The Canonical Gold Standard Production Blueprint):** The student inspects the fully assembled, editable reference architecture on `main`, verifying production readiness, connection pooling, IAM security hardening, automated telemetry, and full parity between local Docker Compose and serverless Google Cloud Run.
+
+---
+
+### 🎨 Visual Architecture & Diagram Generation Prompts
+
+To ensure consistent diagrams across codelab pages and slides, use the following verbatim prompts with **NanoBanana / Imagen 3 / Gemini**:
+
+#### 🖼️ Prompt 1: Production Multi-Container Architecture Diagram (Verbatim)
+```text
+A high-resolution, modern Google Cloud serverless architecture diagram on an elegant dark slate glassmorphic background with glowing neon accents. Shows a Google Cloud Run service with three interconnected sidecar containers: (1) a Ruby on Rails 8 Puma web server container on port 8080, (2) a Solid Queue background worker container executing asynchronous AI jobs, and (3) an official Cloud SQL Auth Proxy sidecar container communicating over localhost port 5432. Demonstrates the proxy establishing an encrypted mTLS tunnel to a managed Google Cloud SQL PostgreSQL instance, the web app uploading private blobs to Google Cloud Storage signed via IAM Credentials API, secret injection from Google Cloud Secret Manager, and async jobs calling Gemini 2.5 and Imagen 3. Clean vector isometric iconography, Google blue, green, yellow, red color scheme, labeled interfaces, ultra-crisp typography.
+```
+
+#### 🖼️ Prompt 2: Entity-Relationship & Database Model Schema (Verbatim)
+```text
+An Entity-Relationship (ER) diagram rendered in a sleek modern tech dashboard style. Demonstrates Rails 8 ActiveRecord models: 'User' (email, password_digest, role) has many 'Posts' and 'Comments'; 'Post' (title, body with ActionText rich text, slug, published_at, user_id) has many 'Comments' and ActiveStorage attachments for 'cover_image' and 'podcast_audio'; 'Comment' (body, user_id, post_id); and Solid Queue system tables ('solid_queue_jobs', 'solid_queue_processes', 'solid_queue_ready_executions'). Clean connecting foreign key arrows, glowing blue relation links, polished tech typography on a frosted glass card.
+```
+
+---
+
+## 🎯 2. Dual North Stars & Pedagogical Mandate
 
 ### 🌟 North Star 1: The Canonical "Rails 8 on GCP" Production Blueprint (`main`)
 1. **The Destination:** `main` in this repository is the complete, working, battle-tested, editable reference architecture ("The Gold Standard") for running Rails 8 on Google Cloud Platform.
@@ -19,24 +72,13 @@ This project is bifidus and achieves two equally crucial strategic goals:
    - Asynchronous Generative AI background pipelines (Gemini / Imagen auto-cover generation & audio podcast synthesis).
 3. **Branching Model:** `main` contains the full end-state blueprint. The `workshop_*` branches provide progressive, curated stepping stones that build up to `main`.
 
----
-
 ### 🌟 North Star 2: The Universal Developer Workshop (GCP & Antigravity for Everyone)
 1. **The Audience Reality:** While launching at a Ruby conference (Oct 2), **~90% of future workshop attendees will have zero Ruby background**. They are developers, SREs, and cloud practitioners eager to learn Google Cloud, serverless architecture, and modern AI development.
 2. **Pedagogical Mandate:**
-   - **Zero Language Friction:** Never let Ruby syntax or Rails idiosyncrasies block an attendee. App commands are standardized (`bin/dev`, `bin/rails db:...`).
+   - **Zero Language Friction:** Never let Ruby syntax or Rails idiosyncrasies block an attendee. Standardize commands (`bin/dev`, `bin/rails db:...`).
    - **Antigravity as Co-Pilot:** Use **Google Antigravity** as the universal pair programmer to inspect the codebase, explain architecture, generate Mermaid diagrams, and debug issues in real-time.
    - **Cloud-First Teachable Moments:** Focus on real cloud problems—statelessness, security anti-patterns (why `0.0.0.0/0` and public buckets are dangerous), IAM tunneling with Cloud SQL Auth Proxy, sidecar orchestration, and async AI workers.
    - **Dual Track Flexibility:** Full Cloud Track (with billing & Cloud SQL) vs. **Zero-Billing Free Track** (SQLite on Cloud Run + Gemini Free Tier API Key).
-
----
-
-## 👥 2. Personas & Workshop Conventions
-
-- **Riccardo:** Supreme Leader and pun-master 🦖
-- **Emiliano:** Al Mudnais cal'scorda i symlink 🍝🏎️
-- **Theme & Branding:** Colorful, vibrant Google branding featuring the vintage Italian "NanoBanana" mascot 🍌.
-- **Tone:** Technically rigorous, engaging, and welcoming to developers of all backgrounds.
 
 ---
 
@@ -69,25 +111,7 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 
 ---
 
-## 🗺️ 4. Master Step Breakdown
-
-```mermaid
-flowchart TD
-    S0["Step 0: Setup & Async Cloud Launch<br/>(Terraform / provision script started in background)"] --> S1["Step 1: The Local Baseline<br/>(Local app + Antigravity ER diagram discovery)"]
-    S1 --> S2["Step 2: Cloud Storage (ActiveStorage + GCS)<br/>(Private bucket + IAM signing + Live drop)"]
-    S2 --> S3A["Step 3A: The Naive DB Connection<br/>(0.0.0.0/0 test & Security breakdown)"]
-    S3A --> S3B["Step 3B: Local Cloud SQL Auth Proxy<br/>('Welcome to Cloud SQL' seeded post via IAM)"]
-    S3B --> S4["Step 4: Secret Manager<br/>(RAILS_MASTER_KEY & DB credentials via gcloud)"]
-    S4 --> S5["Step 5: Multi-Container Cloud Run<br/>(Web + SolidQueue Worker + Cloud SQL Proxy)"]
-    S5 -.->|Optional / Skippable| S6["Step 6: CI/CD with Cloud Build<br/>(cloudbuild.yaml + Git Trigger)"]
-    S5 --> S7["Step 7: AI Features with Solid Queue<br/>(NanoBanana Cover Generator + Podcastifier)"]
-    S6 --> S7
-    S7 ==> MAIN["🏆 The 'main' Blueprint Reached!"]
-```
-
----
-
-### 🔹 Step 0: Setup & Async Cloud Provisioning
+## 🔹 Step 0: Setup & Async Cloud Provisioning (`workshop_0_setup`)
 - **`needs`**: 
   - GCP project (Billing enabled for Cloud SQL track, or Free Tier for Zero-Billing track).
   - CLI tools: `gcloud`, `ruby` 3.3+, `gem install rails`, `terraform`, `docker`, and `cloud-sql-proxy`.
@@ -97,13 +121,14 @@ flowchart TD
   - Authenticates `gcloud auth login` and `gcloud auth application-default login`.
   - **IMMEDIATELY kicks off Cloud SQL & GCS provisioning** in the background (`./bin/provision-cloudsql.sh` or `cd iac && terraform apply`).
   - *(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite on Cloud Run + Gemini Free Tier)*.
-- **`antigravity`**: Use Antigravity to verify environment prerequisites and active GCP project configuration.
-- **`wow`**: One command starts heavy cloud provisioning asynchronously without blocking the student's workflow!
+- **`antigravity`**: Prompt Antigravity:
+  > *"Verify my GCP authentication status, active project ID, and whether gcloud ADC credentials are configured correctly for Terraform."*
+- **`wow`**: One command starts heavy cloud provisioning asynchronously in GCP without blocking the student's workflow!
 - **`creates`**: Background infrastructure cooking in GCP (~10-12 mins) while students proceed immediately to Step 1.
 
 ---
 
-### 🔹 Step 1: The Local Baseline (Exploration for Rubyists & Non-Rubyists)
+## 🔹 Step 1: The Local Baseline (`workshop_1_local_baseline`)
 - **`needs`**: Step 0 completed, branch `workshop_1_local_baseline`.
 - **`does`**:
   - Runs `bundle install`, `bin/rails db:setup`, and `bin/dev`.
@@ -117,20 +142,21 @@ flowchart TD
 
 ---
 
-### 🔹 Step 2: Cloud Storage (ActiveStorage + GCS)
+## 🔹 Step 2: Cloud Storage with ActiveStorage & GCS (`workshop_2_cloud_storage`)
 - **`needs`**: GCS Bucket provisioned from Step 0, branch `workshop_2_cloud_storage`.
 - **`does`**:
   - Configures `config/storage.yml` with the `google` service and `iam: true`.
   - Sets `config.active_storage.service = :google` in `config/environments/production.rb` (and `development.rb`).
   - **Teachable Moment:** Explains why `public: true` / `allUsers` is a dangerous security trap; shows how IAM Credentials API signs private expiring blob URLs on the fly.
   - Drag-and-drops an image into the editor; inspects the network request and GCS Console to see the blob stream directly to the cloud.
-- **`antigravity`**: Prompt Antigravity to review `storage.yml` and explain how Google Cloud IAM signs blob URLs without requiring private key JSON files.
+- **`antigravity`**: Prompt Antigravity:
+  > *"Review config/storage.yml and explain how Google Cloud IAM signs private blob URLs without requiring long-lived service account key files."*
 - **`wow`**: Dragging and dropping an image in the browser auto-uploads directly to a private Google Cloud Storage bucket with expiring signed URLs!
 - **`creates`**: Working ActiveStorage integration with private GCS bucket.
 
 ---
 
-### 🔹 Step 3: Cloud SQL (From Naive Exposure to Auth Proxy)
+## 🔹 Step 3: Cloud SQL (Naive Exposure to Auth Proxy) (`workshop_3_cloud_sql`)
 - **`needs`**: Cloud SQL PostgreSQL instance ready (`READY` state from Step 0), branch `workshop_3_cloud_sql`.
 - **`does`**:
   #### Phase 3A: The Naive Connection (The `0.0.0.0/0` Anti-Pattern)
@@ -152,7 +178,7 @@ flowchart TD
 
 ---
 
-### 🔹 Step 4: Secret Management (Google Cloud Secret Manager)
+## 🔹 Step 4: Secret Management with Secret Manager (`workshop_4_secret_manager`)
 - **`needs`**: Step 3 completed, branch `workshop_4_secret_manager`.
 - **`does`**:
   - Explains the critical danger of storing credentials in git or `.env` files.
@@ -166,14 +192,15 @@ flowchart TD
     gcloud secrets versions access latest --secret=rails-master-key
     ```
   - Grants Secret Accessor IAM roles to the runtime service account.
-- **`antigravity`**: Ask Antigravity to audit the repository for plain-text secrets and generate the least-privilege IAM binding commands.
+- **`antigravity`**: Prompt Antigravity:
+  > *"Audit our repository for any plain-text secrets and generate the least-privilege gcloud IAM binding commands for Cloud Secret Manager."*
 - **`wow`**: Sensitive secrets are encrypted and verified via CLI with zero plain-text files in git!
 - **`creates`**: Centralized, encrypted secrets in Secret Manager ready for container injection.
 
 ---
 
-### 🔹 Step 5: Multi-Container Orchestration (Docker Compose & Cloud Run)
-- **`needs`**: Secrets and DB ready, branch `workshop_5_cloud_run_classic`.
+## 🔹 Step 5: Multi-Container Sidecars on Cloud Run (`workshop_5_cloud_run_multi_container`)
+- **`needs`**: Secrets and DB ready, branch `workshop_5_cloud_run_multi_container`.
 - **`does`**:
   - Introduces Emiliano's 3-container architecture (`compose.prod.yaml`):
     1. `web`: Rails Puma server on port 8080.
@@ -191,19 +218,20 @@ flowchart TD
 
 ---
 
-### 🔹 Step 6: Automated CI/CD with Cloud Build *(Optional / Skippable)*
+## 🔹 Step 6: Automated CI/CD with Cloud Build (`workshop_6_cloud_build_cicd`) *(Optional)*
 - **`needs`**: Working Cloud Run deployment from Step 5, branch `workshop_6_cloud_build_cicd`.
 - **`does`**:
   - Inspects `cloudbuild.yaml` multi-step pipeline (Test -> Build Image -> Database Migrate Job -> Cloud Run Deploy).
   - (Optional) Configures Cloud Build Trigger connected to GitHub.
   - Pushes a commit to `main` and monitors live build logs in GCP Console.
-- **`antigravity`**: Ask Antigravity to explain the Cloud Run Job migration step in `cloudbuild.yaml`.
+- **`antigravity`**: Prompt Antigravity:
+  > *"Explain how the Cloud Run Job migration step works in cloudbuild.yaml and why migrations should run in an ephemeral job before container rollout."*
 - **`wow`**: Every `git push` automatically tests, builds, migrates, and deploys the app to Cloud Run!
 - **`creates`**: Automated CI/CD pipeline on Google Cloud (can be skipped to jump straight to AI features).
 
 ---
 
-### 🔹 Step 7: AI Features with Solid Queue & Gemini 🍌
+## 🔹 Step 7: AI Features with Solid Queue & Gemini (`workshop_7_ai_features`)
 - **`needs`**: Step 5 (or Step 6) completed, `GEMINI_API_KEY` in Secret Manager, branch `workshop_7_ai_features`.
 - **`does`**:
   - Implements **NanoBanana Cover Generator** (`GenerateCoverImageJob`):
@@ -211,13 +239,27 @@ flowchart TD
     - Worker downloads generated image and attaches it via ActiveStorage.
   - (Optional / Bonus) Implements **Podcastifier**:
     - Translates post to Italian and synthesizes `.mp3` audio using Google Cloud Text-to-Speech.
-- **`antigravity`**: Use Antigravity to customize the prompt engineering and test the AI worker locally before triggering it in production.
+- **`antigravity`**: Prompt Antigravity:
+  > *"Help me customize the Imagen prompt template in app/jobs/generate_cover_image_job.rb to add custom art styles while preserving the background banana cameo."*
 - **`wow`**: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in the background in real-time!
 - **`creates`**: 🏆 **The Complete 'main' Blueprint Architecture Achieved!**
 
 ---
 
-## 🛟 5. Fallbacks & Escape Hatches
+## 🔹 Step 8: The Gold Standard Blueprint (`main`)
+- **`needs`**: Step 7 completed, branch `main`.
+- **`does`**:
+  - Reviews the complete, unified production architecture on `main`.
+  - Verifies connection pooling, private GCS IAM signed URLs, sidecar container health, and background worker queues.
+  - Explores how to clone, modify, or fork `main` as a reference template for any enterprise Rails 8 application on Google Cloud.
+- **`antigravity`**: Prompt Antigravity:
+  > *"Generate a production readiness checklist for this Rails 8 on GCP blueprint, verifying IAM permissions, secret management, and Cloud Run scaling parameters."*
+- **`wow`**: A modern, monolithic, single-repo Rails 8 enterprise application running serverlessly on Google Cloud with zero server maintenance!
+- **`creates`**: Master reference blueprint ready for production deployment.
+
+---
+
+## 🛟 4. Fallbacks & Escape Hatches
 
 | Challenge | Fallback Mechanism |
 |---|---|
@@ -227,11 +269,3 @@ flowchart TD
 | Docker / Proxy networking issues locally | Direct connection with environment variable overrides (`DATABASE_URL` pointing to localhost or fallback). |
 | Cloud Run multi-container deploy fails | Single-container standard deploy script (`gcloud run deploy --image ...`). |
 | Missing Gemini API Quota | Mock AI worker engine that returns bundled sample cover art and audio clips. |
-
----
-
-## 🔒 6. Governance & Modification Rules
-
-1. Any proposed modification to workshop narrative or step order **must first be updated in this file**.
-2. Once this file is marked **🟢 FINAL**, `SKELETON.md` and `CODELAB.md` must be regenerated to reflect it 1:1.
-3. Automated test scripts (`just test` / `split_codelab.rb`) must pass before commits are finalized.
