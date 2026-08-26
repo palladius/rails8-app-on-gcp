@@ -18,10 +18,9 @@ dev:
 test:
     cd blog && just test
 
-# autopush: run tests, rebuild static pages, and push to origin main
+# autopush: run tests and push to origin main (GitHub Actions builds static pages on CI)
 autopush:
     just test
-    just build-ghpages
     git push origin main
 
 # run the workshop codelab visualizer server
