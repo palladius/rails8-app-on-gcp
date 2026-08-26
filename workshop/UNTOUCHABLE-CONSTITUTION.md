@@ -25,7 +25,7 @@ flowchart TD
 
 * **`workshop_0_setup` (Step 0 — Environment, GCP Auth & Async Infrastructure Launch):** The student verifies their development environment (`gcloud`, `ruby`, `terraform`, `docker`), authenticates against Google Cloud with Application Default Credentials (ADC), and immediately launches the background Cloud SQL and GCS provisioning script (`bin/provision-cloudsql.sh`) so infrastructure builds asynchronously in ~10–12 minutes without blocking local development.
 
-* **`workshop_1_local_baseline` (Step 1 — Local Rails Baseline & Antigravity Model Discovery):** The student boots the local Rails 8 Puma web application (`bin/dev`), logs in as an admin, tests rich-text ActionText drag-and-drop image uploads locally, and prompts Google Antigravity to analyze the codebase and generate an architectural Mermaid diagram explaining how ActiveRecord models interact.
+* **`workshop_1_local_baseline` (Step 1 — Local Rails Baseline, Docker Compose & Email Catcher):** The student launches the local Docker Compose development stack (`web`, `worker`, `db`, `mailpit`, `db-admin`), creates an admin user with their own email address, verifies the confirmation email in the **Mailpit** web UI (port 8025), inspects database tables in **Adminer** (port 8081), and prompts Google Antigravity to analyze the codebase and generate an architectural Mermaid diagram explaining ActiveRecord models and Solid Queue.
 
 * **`workshop_2_cloud_storage` (Step 2 — Cloud Storage with ActiveStorage & IAM Signed URLs):** The student replaces local disk storage with Google Cloud Storage (`config/storage.yml`), configures `iam: true` for zero-public-bucket security, discovers why stateless containers require cloud blob storage, and verifies that dragged-and-dropped images stream directly to private GCS with expiring signed URLs.
 
@@ -33,7 +33,7 @@ flowchart TD
 
 * **`workshop_4_secret_manager` (Step 4 — Centralized Credentials with Google Secret Manager):** The student eliminates plain-text `.env` and `master.key` files from source control by uploading secrets to Google Cloud Secret Manager via `gcloud`, configures least-privilege IAM access for runtime service accounts, and verifies secret retrieval via CLI.
 
-* **`workshop_5_cloud_run_multi_container` (Step 5 — Cloud Run Multi-Container Sidecar Orchestration):** The student adopts Emiliano's 3-container production architecture (`compose.prod.yaml`) uniting the Puma `web` server, the Solid Queue `worker`, and the official `cloudsql-proxy` sidecar container into a cohesive stack, tests the topology locally, and deploys it live to Google Cloud Run with zero architectural drift.
+* **`workshop_5_cloud_run_multi_container` (Step 5 — Cloud Run Multi-Container Sidecar Orchestration):** The student transitions from local Docker Compose to Emiliano's 3-container production architecture (`compose.prod.yaml`) uniting the Puma `web` server (port 8080), the Solid Queue `worker`, and the official `cloudsql-proxy` sidecar container into a cohesive stack, tests the topology locally, and deploys it live to Google Cloud Run with zero architectural drift.
 
 * **`workshop_6_cloud_build_cicd` (Step 6 — Automated CI/CD Pipelines with Cloud Build *[Optional]*):** The student configures a complete automated build, test, database migration, and deployment pipeline in `cloudbuild.yaml`, connects it to a Git trigger, and observes automated serverless rollouts on every push to `main` (skippable for fast-track AI exploration).
 
@@ -163,13 +163,15 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 ## 🔹 Step 1: The Local Baseline (`workshop_1_local_baseline`)
 - **`needs`**: Step 0 completed, branch `workshop_1_local_baseline`.
 - **`does`**:
-  - Runs `bundle install`, `bin/rails db:setup`, and `bin/dev`.
-  - Opens `http://localhost:3000`, logs in with seeded credentials (`riccardo@example.com` / `Ch4ng3m3!!1`).
+  - Boots the development stack either natively (`bin/dev`) or via Docker Compose (`docker compose up` / `compose.yaml`).
+  - Opens `http://localhost:3000` and creates an admin user with the student's own email address.
+  - **Email Catcher Flow:** Opens **Mailpit** at `http://localhost:8025` to intercept and view the outgoing account confirmation and welcome emails without sending them to real inboxes.
+  - **Database Admin Flow:** Opens **Adminer** at `http://localhost:8081` to inspect the underlying PostgreSQL tables (`users`, `posts`, `solid_queue_jobs`).
   - Creates a new blog post and drags-and-drops an image directly into the ActionText / Trix rich-text editor.
 - **`antigravity`**: Prompt Antigravity:
-  > *"Analyze this Rails 8 application and generate a Mermaid diagram explaining how Posts, Comments, and ActiveStorage models connect."*
+  > *"Analyze this Rails 8 application and generate a Mermaid diagram explaining how Users, Posts, Comments, and Solid Queue background jobs interact."*
   *(Gives non-Rubyists instant architectural clarity!)*
-- **`wow`**: Full web app running locally in <2 minutes with rich-text drag-and-drop image uploads out of the box.
+- **`wow`**: Full web stack running locally in <2 minutes with an in-browser database visualizer (Adminer) and zero-friction email testing (Mailpit)!
 - **`creates`**: Verified local baseline and clear motivation for cloud-native persistence (explaining why stateless containers wipe local SQLite/disk storage).
 
 ---
