@@ -587,10 +587,17 @@ Once finalized and approved by Riccardo &amp; Emiliano, this document serves as 
 <h4 id="️-prompt-1-production-multi-container-architecture-diagram-verbatim">🖼️ Prompt 1: Production Multi-Container Architecture Diagram (Verbatim)</h4>
 <pre><code class="language-text">A high-resolution, modern Google Cloud serverless architecture diagram on an elegant dark slate glassmorphic background with glowing neon accents. Shows a Google Cloud Run service with three interconnected sidecar containers: (1) a Ruby on Rails 8 Puma web server container on port 8080, (2) a Solid Queue background worker container executing asynchronous AI jobs, and (3) an official Cloud SQL Auth Proxy sidecar container communicating over localhost port 5432. Demonstrates the proxy establishing an encrypted mTLS tunnel to a managed Google Cloud SQL PostgreSQL instance, the web app uploading private blobs to Google Cloud Storage signed via IAM Credentials API, secret injection from Google Cloud Secret Manager, and async jobs calling Gemini 2.5 and Imagen 3. Clean vector isometric iconography, Google blue, green, yellow, red color scheme, labeled interfaces, ultra-crisp typography.
 </code></pre>
+<p><img src="assets/cloud_run_multi_container_architecture.jpg" alt="Google Cloud Run Multi-Container Architecture" /></p>
 
 <h4 id="️-prompt-2-entity-relationship--database-model-schema-verbatim">🖼️ Prompt 2: Entity-Relationship &amp; Database Model Schema (Verbatim)</h4>
 <pre><code class="language-text">An Entity-Relationship (ER) diagram rendered in a sleek modern tech dashboard style. Demonstrates Rails 8 ActiveRecord models: 'User' (email, password_digest, role) has many 'Posts' and 'Comments'; 'Post' (title, body with ActionText rich text, slug, published_at, user_id) has many 'Comments' and ActiveStorage attachments for 'cover_image' and 'podcast_audio'; 'Comment' (body, user_id, post_id); and Solid Queue system tables ('solid_queue_jobs', 'solid_queue_processes', 'solid_queue_ready_executions'). Clean connecting foreign key arrows, glowing blue relation links, polished tech typography on a frosted glass card.
 </code></pre>
+<p><img src="assets/rails8_active_record_schema.jpg" alt="Rails 8 ActiveRecord Schema &amp; Solid Queue Architecture" /></p>
+
+<h4 id="️-prompt-3-vintage-nanobanana-cover-generator-mascot-verbatim">🖼️ Prompt 3: Vintage NanoBanana Cover Generator Mascot (Verbatim)</h4>
+<pre><code class="language-text">Vintage 1960s Italian cinematic advertising poster in the artistic style of Marcello Dudovich and Leonetto Cappiello. Vibrant retro typography reading 'NANO BANANA'. Features a witty Italian barista serving espresso next to a glowing golden banana and a classic Ruby gemstone, retro Mediterranean pastel color palette, bold screen-printed lithograph texture, subtle film grain.
+</code></pre>
+<p><img src="assets/nanobanana_vintage_poster.jpg" alt="NanoBanana Vintage Italian Poster" /></p>
 
 <hr />
 

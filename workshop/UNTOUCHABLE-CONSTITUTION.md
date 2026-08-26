@@ -59,11 +59,11 @@ An Entity-Relationship (ER) diagram rendered in a sleek modern tech dashboard st
 ```
 ![Rails 8 ActiveRecord Schema & Solid Queue Architecture](assets/rails8_active_record_schema.jpg)
 
-#### 🖼️ Prompt 3: Vintage NanoBanana Cover Generator Mascot (Verbatim)
+#### 🖼️ Prompt 3: Gemini Image Generation Pipeline (Codename: Nano Banana / Imagen 3) (Verbatim)
 ```text
-Vintage 1960s Italian cinematic advertising poster in the artistic style of Marcello Dudovich and Leonetto Cappiello. Vibrant retro typography reading 'NANO BANANA'. Features a witty Italian barista serving espresso next to a glowing golden banana and a classic Ruby gemstone, retro Mediterranean pastel color palette, bold screen-printed lithograph texture, subtle film grain.
+A high-tech conceptual illustration of Google's Gemini multimodal image generation pipeline (codename 'Nano Banana' / Imagen 3). On the left, a stream of glowing code and text representing a Rails blog article flows into a glowing multi-modal Gemini AI neural engine. In the center, the neural network processes text embeddings with glowing cyan, electric blue, and golden amber light rays. On the right, it synthesizes photorealistic, high-resolution blog cover art and posters in real time. Sleek glassmorphic dark-mode UI, floating neural nodes, holographic interface elements, crisp vector tech aesthetics.
 ```
-![NanoBanana Vintage Italian Poster](assets/nanobanana_vintage_poster.jpg)
+![Gemini Nano Banana AI Image Pipeline](assets/nanobanana_ai_image_pipeline.jpg)
 
 ---
 
