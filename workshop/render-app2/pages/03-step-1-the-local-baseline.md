@@ -1,8 +1,10 @@
 # Step 1: The Local Baseline
 
-Our starting point is a standard Rails 8 blog application. It uses SQLite for the database and stores images on your local hard drive. 
+Our starting point is a clean Rails 8 blog application running on SQLite with disk-based ActiveStorage.
 
-Run the setup commands to get the app running locally:
+### 1. Boot the App Locally
+
+Run the setup commands to get the app running:
 
 ```bash
 bundle install
@@ -10,21 +12,20 @@ bin/rails db:setup
 bin/dev
 ```
 
-Open `http://localhost:3000` in your browser. You should see a basic blog. Try creating a post and uploading an image. It works perfectly on your machine!
+Open `http://localhost:3000` in your browser. You can log in with the seeded credentials:
+- **Email:** `riccardo@example.com`
+- **Password:** `Ch4ng3m3!!1`
 
-**The Catch:** Cloud Run containers are stateless. If we deploy this right now, your SQLite database and local images will be wiped out every time the container restarts. We need to move our state to the cloud.
+✨ **The Wow Moment:** The application is fully working locally in under 2 minutes! Try creating a new blog post and drag-and-drop an image directly into the ActionText / Trix rich-text editor. It uploads and renders instantly from your local disk storage.
 
-### Provisioning the Cloud Infrastructure
+### 2. Antigravity & Gemini Code Exploration
 
-Cloud SQL takes about 15 minutes to provision. Let's start that process now so it's ready when we need it!
+Let's use Antigravity / Gemini to inspect our application structure:
+> *"Ask Gemini in Antigravity: Analyze our ActiveRecord models and generate a Mermaid diagram illustrating our Post, User, and ActiveStorage relationships."*
 
-Open a new terminal tab and run:
+### 3. The Catch: Stateless Containers
 
-```bash
-cd iac/
-terraform init
-terraform apply -auto-approve
-```
+Cloud Run containers are stateless and ephemeral. If we deploy our SQLite database and local `storage/` directory directly to Cloud Run, all posts and uploaded images will be permanently wiped out whenever a container scales to zero or restarts.
 
-While Terraform does the heavy lifting in the background, let's fix our storage!
+We need cloud-native persistence: **Cloud Storage** for assets, and **Cloud SQL** for our relational data.
 

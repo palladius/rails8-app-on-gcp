@@ -3,10 +3,10 @@
   "02-setup-and-prerequisites.md",
   "03-step-1-the-local-baseline.md",
   "04-step-2-cloud-storage.md",
-  "05-step-3-cloud-sql.md",
+  "05-step-3-cloud-sql-from-naive-exposure-to-auth-proxy-.md",
   "06-step-4-secret-manager.md",
-  "07-step-5-cloud-run-deployment.md",
-  "08-step-6-automating-with-cloud-build.md",
+  "07-step-5-multi-container-cloud-run-docker-compose.md",
+  "08-step-6-automating-with-cloud-build-optional-skippable-.md",
   "09-step-7-ai-features-and-background-jobs.md",
   "10-conclusion.md"
 ]

@@ -1,19 +1,46 @@
 # Setup and Prerequisites
 
-> 💡 **Imagine:** Your boss wants you to take an old application and revive it; the last developer left the company, the language went End of Life 5 years ago, but still the application has strong business value for you. You heard the application has clear-text passwords in the code (dev was in a hurry to change role and didn't anticipate the success of this super app), and was deployed manually to production. Nobody remembers how it was done.
+> 💡 **The Scenario:** Your team needs to modernize a Rails application for production on Google Cloud. The app was built locally with SQLite and local image storage, but it has high business value. We want a clean, zero-magic, production-grade cloud architecture with proper database pooling, private object storage, secret management, and AI background processing.
 
-Before we begin, you will need a few things set up:
+### Prerequisites
 
-1. **A Google Cloud Project:** Ensure you have a GCP project created and billing enabled.
-2. **Google Cloud CLI:** The `gcloud` CLI should be installed and authenticated (`gcloud auth login`).
-3. **Ruby and Rails:** You should have Ruby 3.3+ and Rails 8 installed locally.
-4. **Terraform:** We will use Terraform to provision the heavy infrastructure.
+Before we begin, make sure you have:
 
-First, clone the workshop repository and move into the `workshop_1_local_baseline` branch:
+1. **A Google Cloud Project:**
+   - **Full Track:** With billing enabled (for Cloud SQL and Cloud Storage).
+   - **Zero-Billing Track:** A Free Tier project using Gemini Free API Key (*ohne* Cloud SQL).
+2. **Google Cloud CLI:** Installed and authenticated:
+   ```bash
+   gcloud auth login
+   gcloud auth application-default login
+   ```
+   Verify your active project:
+   ```bash
+   gcloud config get-value project
+   ```
+3. **Ruby & Rails:** Ruby 3.3+ and Rails 8 installed (`gem install rails`).
+4. **Terraform & Docker:** Installed and available on your PATH.
+5. **Cloud SQL Auth Proxy:** Download the binary from [Google Cloud](https://cloud.google.com/sql/docs/postgres/connect-auth-proxy#install) or install via package manager.
+6. **AI Pair Programming (Google Antigravity):**
+   - **Standalone IDE:** Install [Google Antigravity](https://antigravity.google/download).
+   - **VS Code Extension:** Run `code --install-extension Google.google-antigravity`.
+
+### Clone the Repository
 
 ```bash
 git clone https://github.com/palladius/rails8-app-on-gcp.git
 cd rails8-app-on-gcp
 git checkout workshop_1_local_baseline
 ```
+
+### ⏱️ Launch Cloud SQL Provisioning Immediately!
+
+Cloud SQL instances take about 10–12 minutes to provision. Rather than waiting later, we kick off provisioning right now in the background:
+
+```bash
+./bin/provision-cloudsql.sh
+```
+*(Or navigate to `iac/` and run `terraform init && terraform apply -auto-approve`)*
+
+✨ **The Wow Moment:** One command starts heavy cloud provisioning asynchronously in the background. While Google Cloud builds your managed database, let's jump straight into our local Rails 8 application!
 

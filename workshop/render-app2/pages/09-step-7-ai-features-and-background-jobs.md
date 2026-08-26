@@ -2,23 +2,19 @@
 
 ![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
 
-Rails 8 introduced **Solid Queue**, a powerful database-backed job queue. We are going to use it to power a magical AI feature: **The "NanoBanana" Auto-Cover Generator**.
+Rails 8's **Solid Queue** powers asynchronous background tasks without needing Redis. Let's use it for an AI feature: **The "NanoBanana" Auto-Cover Generator**.
 
 1. Checkout our final branch:
    ```bash
    git checkout workshop_7_ai_features
    ```
 
-### The Architecture
-Instead of making the user wait while we call the Gemini API, we offload the work to a background job. In a Cloud Run environment, this means we deploy the *same* container twice:
-- **Service A (Web):** Listens for HTTP traffic.
-- **Service B (Worker):** Runs `bundle exec rails solid_queue:start` and processes background jobs.
+2. When a post is saved without a cover image, `GenerateCoverImageJob` triggers:
+   - It sends the post title and summary to Google's Gemini / Imagen model with this prompt:
+     > *"Create a cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful vintage Italian cinematic aesthetic. Also, you MUST feature a banana somewhere in the scene."*
+   - The Solid Queue worker downloads the generated image and attaches it directly via ActiveStorage.
 
-### The AI Magic
-When you publish a post without a cover image, our `GenerateCoverImageJob` is triggered. 
-1. It sends your article text to the Gemini/Imagen model using this prompt:
-> *"Create a cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. Also, you MUST feature a banana somewhere in the scene."*
-2. The job downloads the generated image and attaches it to the post via ActiveStorage.
+3. Create a new post, leave the cover image empty, and publish.
 
-Try it out! Create a new post, leave the image blank, and watch as an AI-generated, perfectly themed cover image appears a few seconds later.
+✨ **The Wow Moment:** In a few seconds, an AI-generated vintage Italian poster featuring a cameo banana appears automatically on your post, processed completely asynchronously by Solid Queue on Cloud Run!
 
