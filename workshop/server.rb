@@ -677,6 +677,42 @@ __END__
     .metadata-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
     .meta-val { font-weight: 500; color: var(--heading-color); }
     .meta-lbl { font-size: 12px; color: #5f6368; text-transform: uppercase; margin-bottom: 4px; }
+
+    /* Mobile & Tablet Responsiveness */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+      .sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        max-height: 240px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .main-layout {
+        height: auto;
+        min-height: calc(100vh - 240px);
+      }
+      .top-header {
+        padding: 0 16px;
+      }
+      .content-area {
+        padding: 16px;
+      }
+      .content-container {
+        padding: 20px;
+        margin-bottom: 90px;
+      }
+      .bottom-bar {
+        position: fixed;
+        padding: 0 16px;
+      }
+    }
   </style>
 </head>
 <body>
