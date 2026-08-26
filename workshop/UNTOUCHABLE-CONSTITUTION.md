@@ -107,10 +107,23 @@ A streamlined DevOps CI/CD pipeline infographic for Google Cloud Build. Shows a 
 ### 🌟 North Star 2: The Universal Developer Workshop (GCP & Antigravity for Everyone)
 1. **The Audience Reality:** While launching at a Ruby conference (Oct 2), **~90% of future workshop attendees will have zero Ruby background**. They are developers, SREs, and cloud practitioners eager to learn Google Cloud, serverless architecture, and modern AI development.
 2. **Pedagogical Mandate:**
-   - **Zero Language Friction:** Never let Ruby syntax or Rails idiosyncrasies block an attendee. Standardize commands (`bin/dev`, `bin/rails db:...`).
+   - **Zero Language Friction:** Never let Ruby syntax or Rails idiosyncrasies block an attendee. Standardize commands (`docker compose up`, `bin/dev`, `bin/rails db:...`).
    - **Antigravity as Co-Pilot:** Use **Google Antigravity** as the universal pair programmer to inspect the codebase, explain architecture, generate Mermaid diagrams, and debug issues in real-time.
    - **Cloud-First Teachable Moments:** Focus on real cloud problems—statelessness, security anti-patterns (why `0.0.0.0/0` and public buckets are dangerous), IAM tunneling with Cloud SQL Auth Proxy, sidecar orchestration, and async AI workers.
    - **Dual Track Flexibility:** Full Cloud Track (with billing & Cloud SQL) vs. **Zero-Billing Free Track** (SQLite on Cloud Run + Gemini Free Tier API Key).
+
+### 🏷️ 2.3 Environmental Telemetry & UI Storytelling (Visual Pedagogical Clues)
+To guide candidates through each architectural evolution, the application UI and seeded content dynamically reflect the active persistence and storage tier:
+1. **Dynamic In-App Badges (Navbar / Footer):**
+   - 🟡 **`[EPHEMERAL DB ⚠️]`**: Displayed when running on local Docker Compose PostgreSQL / SQLite.
+   - 🟢 **`[CLOUD SQL PERSISTENT 🐘 🔒]`**: Displayed when connected to managed Google Cloud SQL via Cloud SQL Auth Proxy mTLS.
+   - 🟡 **`[LOCAL DISK STORAGE ⚠️]`**: Displayed when ActiveStorage is configured for local disk.
+   - 🟢 **`[GCS PRIVATE BUCKET 🪣 🔒]`**: Displayed when ActiveStorage is streaming to private Google Cloud Storage (`iam: true`).
+2. **Narrative-Driven Seeded Posts:**
+   - **Step 1:** `"[EPHEMERAL] ⚠️ Benvenuto! Sei su un DB locale effimero"` — *Warns the student that local container restarts will wipe data, setting up the motivation for Cloud Storage (Step 2) and Cloud SQL (Step 3).*
+   - **Step 2:** `"[STORAGE CONNECTED] ☁️ ActiveStorage ora parla a Google Cloud Storage!"` — *Explains that dragged images are safely stored in private GCS buckets via IAM signed URLs.*
+   - **Step 3:** `"[DATABASE PERSISTENT] 🐘 Connesso a Google Cloud SQL via Auth Proxy!"` — *Celebrates graduating from ephemeral local storage to encrypted Cloud SQL.*
+   - **Step 7:** `"[AI ACTIVE] 🍌 Nano Banana / Imagen 3 Generatore di Copertine Attivo!"` — *Demonstrates asynchronous GenAI job completion.*
 
 ---
 
@@ -164,14 +177,15 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 - **`needs`**: Step 0 completed, branch `workshop_1_local_baseline`.
 - **`does`**:
   - Boots the development stack either natively (`bin/dev`) or via Docker Compose (`docker compose up` / `compose.yaml`).
-  - Opens `http://localhost:3000` and creates an admin user with the student's own email address.
-  - **Email Catcher Flow:** Opens **Mailpit** at `http://localhost:8025` to intercept and view the outgoing account confirmation and welcome emails without sending them to real inboxes.
+  - **The "Benvenuto" Admin Onboarding Flow:** Opens `http://localhost:3000` and creates their initial admin user by entering **their own real email address** (e.g. `riccardo@example.com` or `yourname@google.com`).
+  - Rails immediately dispatches a personalized **"🎉 Benvenuto in Rails 8 on Google Cloud!"** HTML welcome email via ActionMailer.
+  - **Email Catcher Verification:** Opens **Mailpit** at `http://localhost:8025` to inspect their own email address receiving the captured welcome email in real-time, verifying email generation and HTML templates with zero risk of external spam.
   - **Database Admin Flow:** Opens **Adminer** at `http://localhost:8081` to inspect the underlying PostgreSQL tables (`users`, `posts`, `solid_queue_jobs`).
   - Creates a new blog post and drags-and-drops an image directly into the ActionText / Trix rich-text editor.
 - **`antigravity`**: Prompt Antigravity:
   > *"Analyze this Rails 8 application and generate a Mermaid diagram explaining how Users, Posts, Comments, and Solid Queue background jobs interact."*
   *(Gives non-Rubyists instant architectural clarity!)*
-- **`wow`**: Full web stack running locally in <2 minutes with an in-browser database visualizer (Adminer) and zero-friction email testing (Mailpit)!
+- **`wow`**: Entering their own email instantly triggers a personalized Italian *Benvenuto* email caught live in the local Mailpit Docker UI, alongside an in-browser database visualizer (Adminer)!
 - **`creates`**: Verified local baseline and clear motivation for cloud-native persistence (explaining why stateless containers wipe local SQLite/disk storage).
 
 ---
