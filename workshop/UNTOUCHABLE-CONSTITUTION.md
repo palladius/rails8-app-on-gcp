@@ -65,6 +65,30 @@ A high-tech conceptual illustration of Google's Gemini multimodal image generati
 ```
 ![Gemini Nano Banana AI Image Pipeline](assets/nanobanana_ai_image_pipeline.jpg)
 
+#### 🖼️ Prompt 4: Google Cloud Storage & IAM Signed URLs Direct Upload (Verbatim)
+```text
+A visual explanation diagram of Google Cloud Storage with Rails ActiveStorage and IAM Credential signed URLs. Shows a user's browser direct-uploading an image blob to a private Google Cloud Storage bucket with a lock icon. Shows Rails requesting a short-lived signed URL from Google Cloud IAM Credentials API instead of world-readable public access. Dark glassmorphic background with Google Cloud blue and green highlights, security shield icon, clear arrows, crisp tech typography.
+```
+![Google Cloud Storage with Rails ActiveStorage IAM Signed URLs](assets/gcs_iam_signing_diagram.jpg)
+
+#### 🖼️ Prompt 5: Cloud SQL 0.0.0.0/0 Anti-Pattern vs Secure Auth Proxy (Verbatim)
+```text
+A cybersecurity comparison infographic comparing two database connection methods. Left side labeled 'NAIVE ANTI-PATTERN (0.0.0.0/0)' showing red warning shields, exposed port 5432, and hacker botnets scanning public IP. Right side labeled 'SECURE CLOUD SQL AUTH PROXY' showing an encrypted green mTLS tunnel running on localhost 5432 using IAM Application Default Credentials (ADC) with zero firewall openings. Modern dark tech UI with neon red vs neon green contrasting aesthetics.
+```
+![Cloud SQL Naive 0.0.0.0/0 vs Secure Cloud SQL Auth Proxy](assets/cloud_sql_proxy_comparison.jpg)
+
+#### 🖼️ Prompt 6: Secret Manager Runtime Injection Workflow (Verbatim)
+```text
+A technical security diagram illustrating Google Cloud Secret Manager runtime injection into containerized Rails applications. Shows an encrypted vault unlocking 'RAILS_MASTER_KEY' and 'DATABASE_URL' credentials, securely passing them into Google Cloud Run environment variables at runtime via IAM Service Account binding, with a crossed-out red git repo showing 'NO SECRETS IN CODE OR .ENV'. Sleek isometric security icon, Google yellow and blue accents, high resolution.
+```
+![Secret Manager Runtime Injection Workflow](assets/secret_manager_workflow.jpg)
+
+#### 🖼️ Prompt 7: Streamlined Cloud Build CI/CD Pipeline (Verbatim)
+```text
+A streamlined DevOps CI/CD pipeline infographic for Google Cloud Build. Shows a 4-stage pipeline with connected nodes: (1) Git Commit trigger, (2) Automated RSpec unit testing in container, (3) Docker image build & push to Artifact Registry, (4) Cloud Run Database Migration Job, and (5) Zero-downtime Cloud Run service rollout. Sleek dark glassmorphic UI with glowing blue and purple connection conduits, step icons, polished typography.
+```
+![Streamlined DevOps CI/CD Pipeline for Google Cloud Build](assets/cloud_build_pipeline.jpg)
+
 ---
 
 ## 🎯 2. Dual North Stars & Pedagogical Mandate
