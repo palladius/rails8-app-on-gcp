@@ -32,8 +32,9 @@ module IapAuthenticatable
         email_address: iap_email,
         password: SecureRandom.hex(16),
         created_via: "iap",
-        description: "Auto-provisioned via Google Cloud Identity-Aware Proxy."
+        description: "Auto-generated as logged in from IAP allow listed users"
       )
+
       is_new = true
     end
 

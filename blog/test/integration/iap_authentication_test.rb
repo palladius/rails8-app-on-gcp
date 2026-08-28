@@ -10,8 +10,9 @@ class IapAuthenticationTest < ActionDispatch::IntegrationTest
     created_user = User.find_by(email_address: "ricc@google.com")
     assert_not_nil created_user
     assert_equal "iap", created_user.created_via
-    assert_not_nil created_user.description
+    assert_equal "Auto-generated as logged in from IAP allow listed users", created_user.description
     assert cookies[:session_id]
+
     assert_includes response.body, "Login recognized by IAP -&gt; User ##{created_user.id} (#{created_user.email_address}) just created!"
   end
 
