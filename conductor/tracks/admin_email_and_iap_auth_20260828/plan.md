@@ -13,12 +13,12 @@
 - [ ] Task: Conductor - User Manual Verification 'Rails 8 IAP Concern' (Protocol in workflow.md)
 
 ## Phase 3: Terraform Infrastructure for Cloud IAP
-- [ ] Task: Add `enable_iap` and `iap_allowed_users` variables to `iac/variables.tf`.
-- [ ] Task: Create `iac/iap.tf` with Serverless NEG, Backend Service with IAP, HTTPS Target Proxy, and IAM bindings.
-- [ ] Task: Run `terraform validate` in `iac/`.
+- [x] Task: Add `enable_iap` and `iap_allowed_users` variables to `iac/variables.tf`.
+- [x] Task: Create `iac/iap.tf` with Serverless NEG, Backend Service with IAP, HTTPS Target Proxy, and IAM bindings.
+- [x] Task: Run `terraform validate` in `iac/`.
 - [ ] Task: Conductor - User Manual Verification 'Terraform IAP Module' (Protocol in workflow.md)
 
 ## Phase 4: Workshop Documentation & Final Verification
-- [ ] Task: Verify `workshop/SKELETON.md` and `workshop/CODELAB.md` are in sync and reflect the Step 1 and Step 8 changes.
-- [ ] Task: Run `just test` to verify all Rails and architecture tests pass.
+- [x] Task: Verify `workshop/SKELETON.md` and `workshop/CODELAB.md` are in sync and reflect the Step 1 and Step 8 changes.
+- [x] Task: Run `just test` to verify all Rails and architecture tests pass.
 - [ ] Task: Conductor - User Manual Verification 'Final Verification' (Protocol in workflow.md)
