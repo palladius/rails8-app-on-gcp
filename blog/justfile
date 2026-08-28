@@ -12,3 +12,7 @@ dev:
 test:
     bin/rails test
     bundle exec archspec check
+
+show-users:
+    @bin/rails runner 'users = User.order(created_at: :desc); if users.empty?; puts "No users found in database."; else; printf "%-4s | %-32s | %-8s | %-16s | %-30s\n", "ID", "EMAIL", "SURFACE", "CREATED AT", "DESCRIPTION"; puts "-" * 98; users.each { |u| created_str = u.created_at ? u.created_at.strftime("%Y%m%d %H:%M") : "N/A"; surface_str = (u.created_via || "nil").to_s; desc_str = (u.description || "").truncate(30); printf "%-4d | %-32s | %-8s | %-16s | %-30s\n", u.id, u.email_address, surface_str, created_str, desc_str }; end'
+

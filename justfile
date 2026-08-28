@@ -51,3 +51,12 @@ terraform-apply:
 build-ghpages:
 	cd workshop && ruby split_codelab.rb
 	cd workshop && ruby build_ghpages.rb
+
+# show registered users in a clean CLI table ordered by created_at DESC
+show-users:
+	cd blog && just show-users
+
+# alias for show-users
+show-isers:
+	just show-users
+
