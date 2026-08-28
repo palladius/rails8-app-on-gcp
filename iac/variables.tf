@@ -26,8 +26,12 @@ variable "iap_allowed_users" {
   type        = list(string)
   default     = [
     "ricc@google.com",
-    "emiliano.dellacasa@gmail.com"
+    "emiliano.dellacasa@gmail.com",
+    "palladiusbonton@gmail.com",
+    "riccardo.and.kate@gmail.com",
+    "riccardo.carlesso@gmail.com"
   ]
 }
+
 
 
