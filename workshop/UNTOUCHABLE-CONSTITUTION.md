@@ -177,7 +177,7 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 - **`needs`**: Step 0 completed, branch `workshop_1_local_baseline`.
 - **`does`**:
   - Boots the development stack either natively (`bin/dev`) or via Docker Compose (`docker compose up` / `compose.yaml`).
-  - **The "Benvenuto" Admin Onboarding Flow:** Opens `http://localhost:3000` and creates their initial admin user by entering **their own real email address** (e.g. `riccardo@example.com` or `yourname@google.com`).
+  - **The "Benvenuto" Admin Onboarding Flow:** Opens `http://localhost:3000` and creates their initial admin user by entering **their own real email address** (e.g. `ricc@google.com` or `yourname@gmail.com`).
   - Rails immediately dispatches a personalized **"🎉 Benvenuto in Rails 8 on Google Cloud!"** HTML welcome email via ActionMailer.
   - **Email Catcher Verification:** Opens **Mailpit** at `http://localhost:8025` to inspect their own email address receiving the captured welcome email in real-time, verifying email generation and HTML templates with zero risk of external spam.
   - **Database Admin Flow:** Opens **Adminer** at `http://localhost:8081` to inspect the underlying PostgreSQL tables (`users`, `posts`, `solid_queue_jobs`).

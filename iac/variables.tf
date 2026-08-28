@@ -26,8 +26,8 @@ variable "iap_allowed_users" {
   type        = list(string)
   default     = [
     "ricc@google.com",
-    "emiliano.dellacasa@gmail.com",
-    "changeme@gmail.com"
+    "emiliano.dellacasa@gmail.com"
   ]
 }
+
 

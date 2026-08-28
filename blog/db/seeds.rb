@@ -10,8 +10,9 @@
 
 # User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
 
-admin_email = ENV.fetch("ADMIN_EMAIL", "riccardo@example.com")
+admin_email = ENV.fetch("ADMIN_EMAIL", "ricc@google.com")
 admin_password = ENV.fetch("ADMIN_PASSWORD", "Ch4ng3m3!!1")
+
 
 puts "* Adding/Updating Admin User: #{admin_email}"
 admin_user = User.find_or_create_by!(email_address: admin_email) do |user|
