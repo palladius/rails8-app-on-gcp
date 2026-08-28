@@ -8,6 +8,7 @@
 
 ---
 
-- [ ] **Track: Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth**
+- [x] **Track: Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth**
 *Link: [./tracks/admin_email_and_iap_auth_20260828/](./tracks/admin_email_and_iap_auth_20260828/)*
+
 
