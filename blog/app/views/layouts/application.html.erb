@@ -41,8 +41,15 @@
       </nav>
     </header>
     <main>
+      <% if notice.present? %>
+        <p class="flash-notice"><%= notice %></p>
+      <% end %>
+      <% if alert.present? %>
+        <p class="flash-alert"><%= alert %></p>
+      <% end %>
       <%= yield %>
     </main>
+
     <footer class="app-footer">
       <div class="footer-top">
         <span>💎 <%= Rails.application.config.x.app.name %></span>

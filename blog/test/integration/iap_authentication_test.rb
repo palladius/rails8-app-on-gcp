@@ -10,6 +10,7 @@ class IapAuthenticationTest < ActionDispatch::IntegrationTest
     created_user = User.find_by(email_address: "ricc@google.com")
     assert_not_nil created_user
     assert cookies[:session_id]
+    assert_includes response.body, "Login recognized by IAP -&gt; User ##{created_user.id} (#{created_user.email_address}) just created!"
   end
 
   test "auto-authenticates existing user when IAP header matches" do
@@ -21,6 +22,7 @@ class IapAuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert cookies[:session_id]
+    assert_includes response.body, "Login recognized by IAP -&gt; User ##{existing_user.id} (#{existing_user.email_address})"
   end
 
   test "redirects to login when no IAP header is present and unauthenticated" do

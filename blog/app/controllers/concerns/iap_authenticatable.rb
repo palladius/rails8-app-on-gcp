@@ -25,10 +25,20 @@ module IapAuthenticatable
     end
 
     # Auto-find or create the user with a secure random password
-    user = User.find_or_create_by!(email_address: iap_email) do |u|
-      u.password = SecureRandom.hex(16)
+    is_new = false
+    user = User.find_by(email_address: iap_email)
+    unless user
+      user = User.create!(email_address: iap_email, password: SecureRandom.hex(16))
+      is_new = true
     end
 
     start_new_session_for(user)
+
+    if is_new
+      flash.now[:notice] = "🛡️ Login recognized by IAP -> User ##{user.id} (#{user.email_address}) just created!"
+    else
+      flash.now[:notice] = "🛡️ Login recognized by IAP -> User ##{user.id} (#{user.email_address})"
+    end
   end
 end
+

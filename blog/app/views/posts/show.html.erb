@@ -1,10 +1,7 @@
 <%= turbo_stream_from @post %>
 
-<% if notice.present? %>
-  <p class="flash-notice"><%= notice %></p>
-<% end %>
-
 <div id="<%= dom_id @post %>" class="post-show">
+
   <h1 class="post-show__title"><%= @post.title %></h1>
 
   <%# === Meta line: right under title, before body === %>
