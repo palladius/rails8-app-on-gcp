@@ -66,36 +66,58 @@ Cloud SQL instances take about 10–12 minutes to provision. Rather than waiting
 
 ✨ **The Wow Moment:** One command starts heavy cloud provisioning asynchronously in the background. While Google Cloud builds your managed database, let's jump straight into our local Rails 8 application!
 
-## Step 1: The Local Baseline
+## Step 1: The Local Baseline, Seeds & Mailpit
 
-Our starting point is a clean Rails 8 blog application running on SQLite with disk-based ActiveStorage.
+Our starting point is a clean Rails 8 blog application running with SQLite/PostgreSQL, Mailpit email interception, and disk-based ActiveStorage.
 
 ### 1. Boot the App Locally
 
-Run the setup commands to get the app running:
+Start the local development stack:
 
 ```bash
 bundle install
 bin/rails db:setup
-bin/dev
 ```
 
-Open `http://localhost:3000` in your browser. You can log in with the seeded credentials:
-- **Email:** `riccardo@example.com`
-- **Password:** `Ch4ng3m3!!1`
+Optionally set your personal Google email in `.env` (or pass it directly to `db:seed`):
+```bash
+ADMIN_EMAIL="myname@gmail.com" bin/rails db:seed
+```
 
-✨ **The Wow Moment:** The application is fully working locally in under 2 minutes! Try creating a new blog post and drag-and-drop an image directly into the ActionText / Trix rich-text editor. It uploads and renders instantly from your local disk storage.
+Boot the services:
+```bash
+docker compose up
+# (Or run bin/dev if running outside Docker)
+```
 
-### 2. Antigravity & Gemini Code Exploration
+### 2. The Mailpit Experience & Console Workout
+
+1. **Catch Outgoing Emails**: Open `http://localhost:8025` in your browser. You will see **Mailpit** running locally. The initial seed or password reset dispatches an ActionMailer notification captured right here in the local inbox without touching real email servers!
+2. **Interactive `rails console`**: Test your Rails muscle memory by dropping into the console:
+   ```bash
+   bin/rails console
+   ```
+   Inspect your seeded admin user and practice resetting credentials in Ruby:
+   ```ruby
+   user = User.find_by(email_address: "myname@gmail.com")
+   user.update!(password: "SuperSecret2026!")
+   exit
+   ```
+3. **Log in to the Blog**: Open `http://localhost:3000` and log in with your updated admin credentials.
+
+✨ **The Wow Moment:** Out-of-the-box rich-text editing, instant image drag-and-drop, email interception via Mailpit, and interactive Rails console mastery in under 5 minutes!
+
+### 3. Antigravity & Gemini Code Exploration
 
 Let's use Antigravity / Gemini to inspect our application structure:
 > *"Ask Gemini in Antigravity: Analyze our ActiveRecord models and generate a Mermaid diagram illustrating our Post, User, and ActiveStorage relationships."*
 
-### 3. The Catch: Stateless Containers
+### 4. The Catch: Stateless Containers
 
 Cloud Run containers are stateless and ephemeral. If we deploy our SQLite database and local `storage/` directory directly to Cloud Run, all posts and uploaded images will be permanently wiped out whenever a container scales to zero or restarts.
 
 We need cloud-native persistence: **Cloud Storage** for assets, and **Cloud SQL** for our relational data.
+
 
 ## Step 2: Cloud Storage
 
@@ -288,18 +310,70 @@ Rails 8's **Solid Queue** powers asynchronous background tasks without needing R
 
 ✨ **The Wow Moment:** In a few seconds, an AI-generated vintage Italian poster featuring a cameo banana appears automatically on your post, processed completely asynchronously by Solid Queue on Cloud Run!
 
+## Step 8: Choose Your Own Adventure (The Quests 🏆)
+
+Now that you have deployed the canonical reference architecture to Cloud Run, the rest of the journey is open-ended! Choose one of the quests below based on your appetite:
+
+---
+
+### 🛡️ Quest 1: Zero-Trust Google IAP (Identity-Aware Proxy)
+* **Difficulty:** Medium (Enterprise Security)
+* **The Goal:** Lock down your Cloud Run application so only your verified Google / Gmail accounts can access it, eliminating password login entirely!
+* **How it Works:**
+  1. An External HTTPS Application Load Balancer terminates Google OAuth and verifies identity before traffic ever reaches Cloud Run.
+  2. Google forwards verified identity headers (`X-Goog-Authenticated-User-Email`).
+  3. Rails automatically logs in the verified Google identity via a controller concern:
+     ```ruby
+     # app/controllers/concerns/iap_authenticatable.rb
+     module IapAuthenticatable
+       extend ActiveSupport::Concern
+       included { before_action :authenticate_via_iap }
+
+       private
+       def authenticate_via_iap
+         return unless (raw = request.headers["X-Goog-Authenticated-User-Email"]).present?
+         email = raw.sub(/^accounts\.google\.com:/, "")
+         user = User.find_or_create_by!(email_address: email) { |u| u.password = SecureRandom.hex(16) }
+         start_new_session_for(user) unless authenticated?
+       end
+     end
+     ```
+  4. Enable the Terraform module in `iac/iap.tf` with `enable_iap = true` and specify your allowed Google accounts:
+     ```hcl
+     iap_allowed_users = ["myemail@gmail.com", "teacher@gmail.com"]
+     ```
+
+---
+
+### 📊 Quest 2: Production SRE Telemetry & Cloud Logging
+* **Difficulty:** Medium (Observability)
+* **The Goal:** Stream structured JSON application logs with trace correlation IDs directly to Google Cloud Logging and catch production exceptions in real-time with Cloud Error Reporting.
+* **How it Works:**
+  - Configure `config/environments/production.rb` to emit structured JSON logs.
+  - Trigger an intentional test exception and watch Google Cloud Error Reporting group and notify you instantly.
+
+---
+
+### 🧠 Quest 3: `pgvector` Semantic Search & Gemini RAG Boss Level
+* **Difficulty:** Hard (GenAI Capstone)
+* **The Goal:** Search articles conceptually using vector embeddings stored in PostgreSQL on Cloud SQL.
+* **How it Works:**
+  - Run `CREATE EXTENSION vector;` on your Cloud SQL PostgreSQL instance.
+  - Add the `neighbor` gem and generate text embeddings with Gemini (`text-embedding-004`) on `Post#after_save`.
+  - Perform cosine distance queries (`<=>`) to power a semantic search bar with Turbo Streams!
+
+---
+
 ## Conclusion
 
 Congratulations! 🎉
 
-You have taken a local Rails 8 application and transformed it into a cloud-native architecture on Google Cloud:
+You have built and deployed a production-grade, enterprise-ready Rails 8 application on Google Cloud:
 - **Cloud Storage:** Scalable, private object storage with IAM blob signing.
 - **Cloud SQL:** Managed PostgreSQL secured with Cloud SQL Auth Proxy.
 - **Secret Manager:** Zero plain-text credentials or `.env` file leaks.
 - **Cloud Run Multi-Container:** Isolated Puma web and Solid Queue worker containers with a proxy sidecar.
-- **Cloud Build:** Zero-touch automated CI/CD (optional).
+- **Cloud Build:** Zero-touch automated CI/CD.
 - **Generative AI:** Contextual vintage poster generation with Gemini and Solid Queue.
+- **Quests:** Zero-Trust IAP, SRE Observability, and pgvector embeddings!
 
-### Extra Credit & Next Steps
-- Explore `IDEAS.md` for Kamal deployments on GCE.
-- Check out the **Podcastifier** for multi-language text-to-speech audio articles.

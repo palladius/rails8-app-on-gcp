@@ -5,3 +5,9 @@
 
 - [ ] **Track: CI/CD Pipelines for Cloud Run**
 *Link: [./tracks/cicd_pipelines_20260725/](./tracks/cicd_pipelines_20260725/)*
+
+---
+
+- [ ] **Track: Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth**
+*Link: [./tracks/admin_email_and_iap_auth_20260828/](./tracks/admin_email_and_iap_auth_20260828/)*
+

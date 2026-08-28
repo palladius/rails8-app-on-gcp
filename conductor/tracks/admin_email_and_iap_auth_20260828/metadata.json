@@ -1,0 +1,8 @@
+{
+  "track_id": "admin_email_and_iap_auth_20260828",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-08-28T13:27:00Z",
+  "updated_at": "2026-08-28T13:27:00Z",
+  "description": "Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth"
+}

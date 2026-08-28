@@ -1,6 +1,6 @@
 This we need to fix
 
-1. [x] Terraform state shoul be on GCS and setup on GCS properly, taking from .env. If we migrate .env, no biggie, we have a different state :) 
+1. [x] Terraform state should be on GCS and setup on GCS properly, taking from .env. If we migrate .env, no biggie, we have a different state :)
 2. [x] There's should be a script like "just project-status" which says things like:
   1. - app GCS exists, contains N pics
   2. - DB exists, contains N posts /..
@@ -11,4 +11,18 @@ This we need to fix
 
 ## TODOs for Emiliano
 
-* [23jul from Ricc] Emi, verifica se il SKELETON.md ha senso.
+* [23jul from Ricc] Emi, verifica se lo SKELETON.md ha senso.
+
+## High-Priority Architectural & Workshop Items (2026-08)
+
+4. [ ] **Day-1 Cloud Logging & Monitoring in Blueprint**:
+   - Ensure the Rails 8 app produces structured JSON logs with trace correlation IDs for Cloud Run / Cloud Logging.
+   - Wire up error reporting and basic ActiveSupport metrics out-of-the-box.
+5. [ ] **Step 1: The Local Baseline, Seeds & Mailpit Experience**:
+   - Update `seeds.rb` to read `ENV["ADMIN_EMAIL"]` and fire a password reset email via ActionMailer.
+   - Guide students to catch the email on Mailpit (`http://localhost:8025`).
+   - Add a `bin/rails console` password recovery exercise while Cloud SQL is provisioning.
+6. [ ] **Step 8: Choose Your Own Adventure (The Quests)**:
+   - Quest 1: Zero-Trust Google IAP & HTTPS Load Balancer (`iac/iap.tf` + `IapAuthenticatable` concern). Tracked in [conductor/tracks/iap_zero_trust_auth_20260828/](conductor/tracks/iap_zero_trust_auth_20260828/).
+   - Quest 2: Structured Cloud Logging & Error Reporting Alerting.
+   - Quest 3: `pgvector` Semantic Search & Gemini Multimodal RAG on Cloud SQL.

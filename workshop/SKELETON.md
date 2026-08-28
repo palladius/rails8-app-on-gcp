@@ -14,14 +14,18 @@ This is the high-level roadmap and step breakdown for the Rails 8 on Google Clou
 
 ---
 
-### Step 1: `workshop_1_local_baseline` (The Local Baseline & Exploration)
+### Step 1: `workshop_1_local_baseline` (The Local Baseline, Mailpit & Console Workout)
 - **`needs`**: Step 0 completed, branch `workshop_1_local_baseline`.
 - **`does`**:
-  - Run `bundle install`, `bin/rails db:setup`, and `bin/dev`.
-  - Log in with seeded user (`riccardo@example.com` / `Ch4ng3m3!!1`), create a post, and drag-and-drop an image directly into the ActionText editor.
+  - Run `bundle install`, `bin/rails db:setup`, and `docker compose up` (or `bin/dev`).
+  - Configure `ADMIN_EMAIL="myname@gmail.com"` in `.env` (or let seeds default).
+  - Run `bin/rails db:seed` which triggers a welcome/reset password email via ActionMailer.
+  - Open **Mailpit UI** (`http://localhost:8025`) to catch the local email without sending external spam!
+  - Drop into `bin/rails console` to inspect `User.last` and practice resetting passwords from Ruby.
+  - Log into `http://localhost:3000`, create a post, and drag-and-drop an image directly into ActionText.
   - **Gemini / Antigravity Exploration**: Prompt Gemini to inspect ActiveRecord models and generate a Mermaid ER diagram.
   - Discover why local SQLite & disk storage are ephemeral in container environments.
-- **`wow`**: The app works locally in under 2 minutes with rich-text image drag-and-drop out of the box!
+- **`wow`**: Out-of-the-box rich text, image drag-and-drop, email interception via Mailpit, and interactive Rails console mastery in under 5 minutes!
 - **`creates`**: Verified local Rails 8 application and motivation for cloud-native persistence.
 
 ---
@@ -91,6 +95,18 @@ This is the high-level roadmap and step breakdown for the Rails 8 on Google Clou
 
 ---
 
+### Step 8: `workshop_8_quests` (Choose Your Own Adventure / Quests 🏆)
+- **`needs`**: Step 7 completed, branch `main`.
+- **`does`**:
+  - Open-ended graduation playground allowing students to pick quests tailored to their interests:
+    - 🛡️ **Quest 1 (Medium - Enterprise Security)**: Zero-Trust Google IAP (Identity-Aware Proxy) + HTTPS Load Balancer with `IapAuthenticatable` concern and `iac/iap.tf`.
+    - 📊 **Quest 2 (Medium - SRE Telemetry)**: Structured JSON logging with trace correlation IDs & Cloud Error Reporting.
+    - 🧠 **Quest 3 (Hard - GenAI Capstone)**: `pgvector` semantic embeddings search on Cloud SQL with Gemini `text-embedding-004`.
+- **`wow`**: Enterprise-grade cloud security, observability, or GenAI vector search completed on top of the canonical architecture!
+- **`creates`**: Custom production enhancements and take-home exploration paths.
+
+---
+
 ## Post-Story Implementation Checklist
 
 - [ ] `workshop_1_local_baseline` branch verified
@@ -100,3 +116,5 @@ This is the high-level roadmap and step breakdown for the Rails 8 on Google Clou
 - [ ] `workshop_5_cloud_run_classic` branch verified (includes `compose.prod.yaml`)
 - [ ] `workshop_6_cloud_build_cicd` branch verified (optional track)
 - [ ] `workshop_7_ai_features` branch verified
+- [ ] `workshop_8_quests` branch / guide verified
+
