@@ -1,15 +1,15 @@
 # Implementation Plan: Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth
 
 ## Phase 1: Local Admin Email & Mailpit Onboarding (Step 1)
-- [ ] Task: Update `blog/db/seeds.rb` to read `ENV["ADMIN_EMAIL"]` and `ENV["ADMIN_PASSWORD"]`, and dispatch `PasswordsMailer.reset(user)`.
-- [ ] Task: Verify `.env.dist` includes `ADMIN_EMAIL` and `ADMIN_PASSWORD` documentation.
-- [ ] Task: Add test in `blog/test/models/user_test.rb` or seed test verifying password reset mailer dispatch.
+- [x] Task: Update `blog/db/seeds.rb` to read `ENV["ADMIN_EMAIL"]` and `ENV["ADMIN_PASSWORD"]`, and dispatch `PasswordsMailer.reset(user)`.
+- [x] Task: Verify `.env.dist` includes `ADMIN_EMAIL` and `ADMIN_PASSWORD` documentation.
+- [x] Task: Add test in `blog/test/models/user_test.rb` or seed test verifying password reset mailer dispatch.
 - [ ] Task: Conductor - User Manual Verification 'Local Admin Email & Mailpit' (Protocol in workflow.md)
 
 ## Phase 2: Rails 8 IAP Zero-Trust Concern & Controller Tests
-- [ ] Task: Create `blog/app/controllers/concerns/iap_authenticatable.rb` extracting `X-Goog-Authenticated-User-Email` and starting session.
-- [ ] Task: Include `IapAuthenticatable` in `ApplicationController`.
-- [ ] Task: Add tests in `blog/test/controllers/sessions_controller_test.rb` verifying header authentication, user auto-creation, and local fallback.
+- [x] Task: Create `blog/app/controllers/concerns/iap_authenticatable.rb` extracting `X-Goog-Authenticated-User-Email` and starting session.
+- [x] Task: Include `IapAuthenticatable` in `ApplicationController`.
+- [x] Task: Add tests in `blog/test/controllers/sessions_controller_test.rb` verifying header authentication, user auto-creation, and local fallback.
 - [ ] Task: Conductor - User Manual Verification 'Rails 8 IAP Concern' (Protocol in workflow.md)
 
 ## Phase 3: Terraform Infrastructure for Cloud IAP

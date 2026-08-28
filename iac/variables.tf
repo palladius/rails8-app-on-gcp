@@ -14,3 +14,20 @@ variable "developers" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_iap" {
+  description = "Whether to provision an External HTTPS Application Load Balancer with Identity-Aware Proxy (IAP) in front of Cloud Run."
+  type        = bool
+  default     = false
+}
+
+variable "iap_allowed_users" {
+  description = "List of Google accounts allowed to access the Cloud Run app through IAP."
+  type        = list(string)
+  default     = [
+    "ricc@google.com",
+    "emiliano.dellacasa@gmail.com",
+    "changeme@gmail.com"
+  ]
+}
+

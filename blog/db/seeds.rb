@@ -10,9 +10,19 @@
 
 # User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
 
-puts "* Adding user TODO EMAIL_ADDRESS"
-User.find_or_create_by!(email_address: "riccardo@example.com") do |user|
-  user.password = "Ch4ng3m3!!1"
+admin_email = ENV.fetch("ADMIN_EMAIL", "riccardo@example.com")
+admin_password = ENV.fetch("ADMIN_PASSWORD", "Ch4ng3m3!!1")
+
+puts "* Adding/Updating Admin User: #{admin_email}"
+admin_user = User.find_or_create_by!(email_address: admin_email) do |user|
+  user.password = admin_password
+end
+
+# In development or when explicitly requested, dispatch a password reset email via ActionMailer
+# which will be intercepted locally by Mailpit on port 8025 (SMTP: 1025).
+if Rails.env.development? || ENV["SEND_ADMIN_RESET_EMAIL"] == "true"
+  puts "* Dispatching password reset email to #{admin_email} (Catch on Mailpit: http://localhost:8025)"
+  PasswordsMailer.reset(admin_user).deliver_later rescue puts("  (Mailer skipped: #{$!.message})")
 end
 
 puts "* Adding a post"

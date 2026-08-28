@@ -1,0 +1,4 @@
+- Code should be DRY
+- We should choose Default over Configuration, whenever we can.
+- Also keep student mental fatigue to a reasonable minimum (eg, does the user need to change that service port likely? if not, probably we dont want to put that in a .env ).
+- The Blog pages should be idempotent/in sync with your course of installation. If you are in a local storage, localhost installation, or in the cloud with local storage , or in the cloud with GCS storage but no passwords, ... the TEXT in the blog should reflect the current status - if possible. Also the nanobanana images shold reflect if the image is local or not, and so on. Use emojis and vissuals to keep it fun, easy, and low cognitive-load.
