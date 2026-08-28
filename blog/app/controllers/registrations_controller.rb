@@ -8,7 +8,9 @@ class RegistrationsController < ApplicationController
 
   def create
     @user = User.new(registration_params)
+    @user.created_via = "ui"
     if @user.save
+
       start_new_session_for @user
       redirect_to root_path, notice: "Welcome aboard! 🎉 Account created successfully."
     else

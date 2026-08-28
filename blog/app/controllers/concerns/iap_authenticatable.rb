@@ -28,9 +28,15 @@ module IapAuthenticatable
     is_new = false
     user = User.find_by(email_address: iap_email)
     unless user
-      user = User.create!(email_address: iap_email, password: SecureRandom.hex(16))
+      user = User.create!(
+        email_address: iap_email,
+        password: SecureRandom.hex(16),
+        created_via: "iap",
+        description: "Auto-provisioned via Google Cloud Identity-Aware Proxy."
+      )
       is_new = true
     end
+
 
     start_new_session_for(user)
 

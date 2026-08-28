@@ -17,7 +17,11 @@ admin_password = ENV.fetch("ADMIN_PASSWORD", "Ch4ng3m3!!1")
 puts "* Adding/Updating Admin User: #{admin_email}"
 admin_user = User.find_or_create_by!(email_address: admin_email) do |user|
   user.password = admin_password
+  user.created_via = "seed"
+  user.description = "Default seeded blog administrator."
 end
+admin_user.update!(created_via: "seed", description: "Default seeded blog administrator.") if admin_user.created_via.blank?
+
 
 # In development or when explicitly requested, dispatch a password reset email via ActionMailer
 # which will be intercepted locally by Mailpit on port 8025 (SMTP: 1025).

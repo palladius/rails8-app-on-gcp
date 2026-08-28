@@ -32,7 +32,20 @@
           <td class="profile-label">🔑 Sessions</td>
           <td><%= @user.sessions.count %> active</td>
         </tr>
+        <% if @user.created_via.present? %>
+          <tr>
+            <td class="profile-label">🚀 Provisioned via</td>
+            <td><code class="version-badge" style="background: #3b82f6;"><%= @user.created_via.upcase %></code></td>
+          </tr>
+        <% end %>
+        <% if @user.description.present? %>
+          <tr>
+            <td class="profile-label">📝 Description</td>
+            <td><%= @user.description %></td>
+          </tr>
+        <% end %>
       </table>
+
     </div>
   </div>
 
