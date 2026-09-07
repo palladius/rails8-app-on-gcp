@@ -10,6 +10,10 @@ style: |
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 24px;
     padding: 35px 55px;
+    background-image: url('images/google-cloud-logo.svg');
+    background-repeat: no-repeat;
+    background-position: right 60px bottom 16px;
+    background-size: 48px auto;
   }
   h1 {
     color: #1a73e8;
@@ -86,6 +90,11 @@ style: |
 <p style="text-align: center; font-size: 0.8em; margin: 6px 0 0 0;">
   <strong>Riccardo Carlesso</strong> 🦖 &amp; <strong>Emiliano</strong> 🍝🏎️ &nbsp;&middot;&nbsp; <em>Google Cloud &amp; Open Source</em>
 </p>
+
+<div style="position: absolute; bottom: 14px; left: 35px; display: flex; align-items: center; gap: 8px;">
+  <img src="images/riccardo-carlesso.webp" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #1a73e8; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Riccardo" />
+  <img src="images/emiliano-della-casa.png" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #188038; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Emiliano" />
+</div>
 
 ---
 
@@ -170,4 +179,9 @@ and guide me step-by-step through the workshop!"
 <p style="text-align: center; font-size: 0.8em; margin: 4px 0 0 0;">
   👉 Head over to <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md"><code>workshop/landing-page/README.md</code></a> to start hacking!
 </p>
+
+<div style="position: absolute; bottom: 14px; left: 35px; display: flex; align-items: center; gap: 8px;">
+  <img src="images/riccardo-carlesso.webp" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #1a73e8; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Riccardo" />
+  <img src="images/emiliano-della-casa.png" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #188038; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Emiliano" />
+</div>
 
