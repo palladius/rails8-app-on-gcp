@@ -79,8 +79,13 @@ style: |
 # Rails 8 on Google Cloud 🚀
 ### Workshop Kickoff & Pair Programming with Google Antigravity
 
-**Riccardo Carlesso** 🦖 & **Emiliano** 🍝🏎️
-Google Cloud & Open Source
+<div style="text-align: center; margin: 10px 0;">
+  <img src="images/slide1-style1-pixar.png" style="max-height: 330px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</div>
+
+<p style="text-align: center; font-size: 0.8em; margin: 6px 0 0 0;">
+  <strong>Riccardo Carlesso</strong> 🦖 &amp; <strong>Emiliano</strong> 🍝🏎️ &nbsp;&middot;&nbsp; <em>Google Cloud &amp; Open Source</em>
+</p>
 
 ---
 
