@@ -208,6 +208,16 @@ class CodelabServer < Sinatra::Base
     }.to_json
   end
 
+  # Slides endpoint
+  get '/slides/?' do
+    slides_html = File.expand_path('../slides/dist/index.html', __dir__)
+    if File.exist?(slides_html)
+      send_file slides_html
+    else
+      redirect 'http://localhost:8082/'
+    end
+  end
+
   # Catch-all route to serve local assets
   get '/*' do |path|
     md_dir = settings.base_dir
