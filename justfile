@@ -14,6 +14,18 @@ install:
 dev:
     cd blog && just dev
 
+# start the local docker compose stack
+compose-up:
+    cd blog && just compose-up
+
+# stop the local docker compose stack
+compose-down:
+    cd blog && just compose-down
+
+# view docker compose logs
+compose-logs:
+    cd blog && just compose-logs
+
 # run all tests
 test:
     cd blog && just test

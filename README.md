@@ -5,26 +5,55 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
 🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
 
-## Development
+## 🚀 Quickstart: Starting the Apps & Services
 
-We use `just` to orchestrate common tasks. To get started easily:
+You can run the project in three different local modes depending on your development focus:
 
+### 1️⃣ Mode 1: Native Rails App (`just dev`)
+Fastest feedback loop for application development using SQLite and Tailwind watcher.
 ```bash
-# Installs dependencies and prepares the database
+# Install dependencies & prepare DB
 just install
 
-# Boots up the local development server
+# Start local Rails development server (Puma on port 8088)
 just dev
+# (or: cd blog && bin/dev -p 8088)
 ```
 
-If you don't have `just` installed, you can simply change into the `blog/` directory and use standard Rails commands:
-
+### 2️⃣ Mode 2: Local Docker Compose Stack (`just compose-up`)
+Full cloud-parity environment running PostgreSQL, background worker, Mailpit email catcher, and Adminer DB admin.
 ```bash
-cd blog/
-bundle install
-bin/rails db:prepare
-bin/dev -p 9090
+# Start all containers in detached mode
+just compose-up
+# (or: cd blog && docker compose up -d)
+
+# Follow container logs
+just compose-logs
+
+# Stop containers
+just compose-down
 ```
+
+### 3️⃣ Mode 3: Local Workshop Codelab Server (`just workshop-dev`)
+Sinatra-based interactive Codelab visualizer with hot-reloading.
+```bash
+# Start the workshop server on port 8080
+just workshop-dev
+# (or: cd workshop && ./server.rb --port 8080)
+
+# Or launch directly into the Untouchable Constitution on port 8081
+just workshop-constitution
+```
+
+---
+
+## 🧭 Localhost Services & Port Matrix
+
+| Mode / Environment | How to Start | Localhost Port(s) & URLs | Included Services |
+| :--- | :--- | :--- | :--- |
+| 🚀 **1. Native Rails App** | `just dev` | • [http://localhost:8088](http://localhost:8088) | Rails 8 Puma Server + Tailwind CSS Watcher (SQLite) |
+| 🐳 **2. Docker Compose** | `just compose-up` | • [http://localhost:3000](http://localhost:3000)<br>• [http://localhost:8025](http://localhost:8025)<br>• [http://localhost:8081](http://localhost:8081)<br>• `localhost:5432` | • Rails 8 Web Server (`:3000`)<br>• Mailpit Email UI (`:8025`, SMTP `:1025`)<br>• Adminer DB GUI (`:8081`)<br>• PostgreSQL 16 DB (`:5432`)<br>• Solid Queue Worker (Background) |
+| 📖 **3. Workshop Web UI** | `just workshop-dev` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/constitution](http://localhost:8080/constitution)<br>• [http://localhost:8080/skeleton](http://localhost:8080/skeleton)<br>• [http://localhost:8080/a2ui](http://localhost:8080/a2ui) | • Interactive Codelab Visualizer (`CODELAB.md`)<br>• Untouchable Constitution<br>• Workshop Skeleton<br>• A2UI JSON API |
 
 ## Workshop
 

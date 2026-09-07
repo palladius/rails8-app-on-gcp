@@ -7,7 +7,19 @@ install:
     bin/rails db:seed
 
 dev:
-    bin/dev -p 9090
+    bin/dev -p 8088
+
+# start docker compose stack
+compose-up:
+    docker compose up -d
+
+# stop docker compose stack
+compose-down:
+    docker compose down
+
+# follow docker compose logs
+compose-logs:
+    docker compose logs -f
 
 test:
     bin/rails test

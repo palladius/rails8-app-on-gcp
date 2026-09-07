@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.13] - 2026-09-07
+### Changed
+- 🔌 Changed default native Rails development port from `9090` to `8088` in `blog/justfile` and `README.md` to keep all local development ports cleanly aligned in the 808x family.
+
+## [0.1.12] - 2026-09-07
+### Added
+- 📖 Documented the 3 startup modes (Native Rails app, Local Docker Compose stack, Workshop Codelab UI) and their complete 3x3 localhost port matrix in `README.md`.
+- ⚡ Added `just compose-up`, `just compose-down`, and `just compose-logs` convenience recipes in root `justfile` and `blog/justfile`.
+
 ## [0.1.11] - 2026-09-07
 ### Added
 - 💌 Added `UserMailer` with welcome email templates (HTML & text) triggered asynchronously upon user registration.
