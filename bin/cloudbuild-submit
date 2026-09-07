@@ -22,8 +22,8 @@ fi
 
 # Source .env for secrets and project config
 if [ -f .env ]; then
-  echo "🔐 Sourcing .env..."
-  set -a; source .env; set +a
+  echo "🔐 Sourcing ./.env..."
+  set -a; source ./.env; set +a
 else
   echo "❌ No .env file found! Create one from .env.dist."
   exit 1
