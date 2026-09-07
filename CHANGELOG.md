@@ -8,8 +8,11 @@ All notable changes to this project will be documented in this file.
   - Added `/slides/index.md` containing a clean, 5-step Marp presentation introducing attendees to downloading Google Antigravity, signing in, claiming cloud credits, launching the pair programming session, and embracing the Socratic pedagogical contract ("Guide me, don't do everything for me").
   - Added `slides/README.md` with usage instructions for live presentation and static HTML/PDF exports.
   - Added `workshop/landing-page/README.md` (English primary) and `workshop/landing-page/README.it.md` (Italian companion) serving as the kickoff directive for Antigravity and workshop attendees.
-  - Added `just slides [port]` (default `8082`) and `just build-slides` recipes to root `justfile` with automatic fallback to `npx` if global `marp` is not installed.
-  - Updated `.gitignore` to ignore compiled `slides/dist/` artifacts.
+  - Added `just slides [port]` (default `8082`), `just build-slides`, and `just test-slides` recipes to root `justfile` with automatic fallback to `npx` if global `marp` is not installed.
+  - Added visual boundary regression test in `blog/test/integration/slides_presentation_test.rb` running Headless Chrome via Selenium to automatically verify that no slide overflows its 1280x720 viewport.
+  - Fixed typography, line-height, and padding in `slides/index.md` to ensure all content (including callout boxes) renders cleanly without overflowing slide boundaries.
+  - Added `/slides` endpoint to `workshop/server.rb` serving the compiled presentation deck directly.
+  - Updated `.gitignore` to ignore compiled `slides/dist/` and `log/` artifacts.
 
 ## [0.1.23] - 2026-09-07
 ### Changed

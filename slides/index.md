@@ -8,35 +8,64 @@ color: #1a1a1a
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    padding: 35px 55px;
   }
   h1 {
     color: #1a73e8;
+    font-size: 1.7em;
+    margin: 0 0 0.3em 0;
   }
   h2 {
     color: #188038;
+    font-size: 1.3em;
+    margin: 0 0 0.3em 0;
+  }
+  h3 {
+    font-size: 1.05em;
+    margin: 0 0 0.3em 0;
+    color: #3c4043;
+  }
+  p, ul, ol {
+    margin: 0.25em 0;
+    line-height: 1.35;
+  }
+  ul ul {
+    margin: 0.1em 0;
   }
   footer {
     font-size: 0.55em;
     color: #5f6368;
   }
+  pre {
+    margin: 0.3em 0;
+    font-size: 0.65em;
+    padding: 10px;
+  }
   .highlight {
     background-color: #e8f0fe;
     border-left: 5px solid #1a73e8;
-    padding: 12px 18px;
+    padding: 8px 14px;
     border-radius: 4px;
+    font-size: 0.88em;
+    margin-top: 0.4em;
+  }
+  .highlight p {
+    margin: 0.2em 0;
   }
   .prompt-box {
     background-color: #202124;
     color: #e8eaed;
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-radius: 8px;
     font-family: monospace;
-    font-size: 0.85em;
-    line-height: 1.5;
+    font-size: 0.8em;
+    line-height: 1.4;
+    margin: 0.4em 0;
   }
   .badge {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 12px;
     font-size: 0.7em;
     font-weight: bold;
@@ -59,7 +88,7 @@ Google Cloud & Open Source
 
 Google Antigravity is your agentic pair programming harness for this workshop.
 
-- **Download:** Get the latest release for your OS:
+- **Download:** Get the latest release for your operating system:
   - 🍏 **macOS** (Universal `.dmg` / `.zip`)
   - 🐧 **Linux** (`.deb` / `.AppImage` / tarball)
   - 🪟 **Windows** (`.exe` installer)
@@ -101,7 +130,7 @@ If this is a live in-person or virtual workshop, redeem your Google Cloud credit
 
 <div class="highlight">
 
-⚠️ **Localhost First!** Everything in the initial workshop steps runs 100% locally on your machine with SQLite and Docker Compose before touching the cloud.
+⚠️ **Localhost First!** Initial workshop steps run 100% locally on SQLite and Docker Compose before touching the cloud.
 
 </div>
 

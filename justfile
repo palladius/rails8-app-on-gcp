@@ -56,6 +56,10 @@ build-slides:
         npx -y @marp-team/marp-cli slides/index.md -o slides/dist/index.html --html; \
     fi
 
+# run visual and structural unit tests on Marp slides
+test-slides:
+    cd blog && bin/rails test test/integration/slides_presentation_test.rb
+
 
 # show project status
 project-status:
