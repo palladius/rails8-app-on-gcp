@@ -158,11 +158,16 @@ and guide me step-by-step through the workshop!"
 # Thank You! 🎉
 ### Let's Build Rails 8 on Google Cloud 🚀
 
-<div style="text-align: center; margin: 10px 0;">
-  <img src="images/slide1-style3-flat-vector.png" style="max-height: 330px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+<div style="text-align: center; margin: 8px 0;">
+  <img src="images/slide1-style3-flat-vector.png" style="max-height: 280px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
 </div>
 
-<p style="text-align: center; font-size: 0.85em; margin: 6px 0 0 0;">
+<p style="text-align: center; font-size: 0.8em; margin: 4px 0;">
+  🦖 <strong>Riccardo Carlesso:</strong> <a href="https://linkedin.com/in/riccardocarlesso">linkedin.com/in/riccardocarlesso</a> &nbsp;&middot;&nbsp; 
+  🏎️ <strong>Emiliano Della Casa:</strong> <a href="https://www.linkedin.com/in/emilianodellacasa">linkedin.com/in/emilianodellacasa</a>
+</p>
+
+<p style="text-align: center; font-size: 0.8em; margin: 4px 0 0 0;">
   👉 Head over to <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md"><code>workshop/landing-page/README.md</code></a> to start hacking!
 </p>
 
