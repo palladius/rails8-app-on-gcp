@@ -39,6 +39,10 @@ autopush:
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
 
+# run the workshop pre-flight diagnostics suite (validates Gmail identity, GCP billing, ADC, keys, canary asset)
+workshop-test:
+    @./bin/workshop_diagnostics.rb
+
 
 # show project status
 project-status:

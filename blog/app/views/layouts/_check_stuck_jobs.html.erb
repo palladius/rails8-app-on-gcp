@@ -1,0 +1,51 @@
+<%# 
+  Pedagogical helper for Workshop Stages 1 & 2 (Issue #22).
+  When deploying with a single Puma container (no background worker sidecar),
+  ActiveJobs using Solid Queue remain in pending state.
+  This partial warns the student and turns a potential "bug" into a learning moment.
+  At Stage 3 (Enterprise Sidecars), this file auto-hides when count is 0 or can be commented out.
+%>
+<% pending_jobs_count = SolidQueue::Job.where(finished_at: nil).count rescue 0 %>
+
+<% if pending_jobs_count > 0 %>
+  <div class="stuck-jobs-alert" style="
+    background-color: #fffbeb;
+    border-left: 5px solid #f59e0b;
+    color: #92400e;
+    padding: 12px 16px;
+    margin: 12px auto;
+    max-width: 1200px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.5rem;">⚠️</span>
+      <div>
+        <strong>Notice: <%= pluralize(pending_jobs_count, "background job") %> currently pending execution.</strong>
+        <div style="font-size: 0.85rem; color: #b45309; margin-top: 2px;">
+          Solid Queue worker is not running in this single-container deployment.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="#stuck-jobs-modal" 
+         onclick="alert('💡 Why is this happening?\n\nIn Stages 1 & 2, Rails runs as a single web container (Puma).\nHeavy background jobs (like GenAI image & audio synthesis) wait in the database queue.\n\nIn Stage 3 (Deploy 3), we will attach a dedicated Solid Queue worker sidecar container to drain this queue asynchronously!'); return false;"
+         style="
+           background-color: #fef3c7;
+           border: 1px solid #f59e0b;
+           color: #78350f;
+           padding: 6px 12px;
+           border-radius: 4px;
+           text-decoration: none;
+           font-size: 0.85rem;
+           font-weight: 600;">
+        Why? (Ask AI) 🤖
+      </a>
+    </div>
+  </div>
+<% end %>

@@ -40,6 +40,10 @@
         </div>
       </nav>
     </header>
+
+    <%# === WORKSHOP STAGES 1 & 2 TELEMETRY (Issue #22: POLA warning for stuck jobs) === %>
+    <%= render "layouts/check_stuck_jobs" %>
+
     <main>
       <% if notice.present? %>
         <p class="flash-notice"><%= notice %></p>
