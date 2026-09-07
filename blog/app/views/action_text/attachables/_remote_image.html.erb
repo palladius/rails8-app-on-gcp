@@ -1,0 +1,24 @@
+<%# Override ActionText default partial to prevent Propshaft::MissingAssetError 500 crashes (Fixes #7) %>
+<figure class="attachment attachment--preview">
+  <%
+    caption = remote_image.try(:caption)
+    img_tag = begin
+      image_tag(remote_image.url, width: remote_image.width, height: remote_image.height)
+    rescue Propshaft::MissingAssetError
+      # Graceful fallback when the asset is not found in Propshaft load path (e.g. local path or missing file)
+      tag.img(
+        src: remote_image.url,
+        width: remote_image.width,
+        height: remote_image.height,
+        class: "attachment__broken-image",
+        alt: caption.presence || "Missing asset: #{remote_image.url}"
+      )
+    end
+  %>
+  <%= img_tag %>
+  <% if caption.present? %>
+    <figcaption class="attachment__caption">
+      <%= caption %>
+    </figcaption>
+  <% end %>
+</figure>
