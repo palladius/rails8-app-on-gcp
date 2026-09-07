@@ -20,10 +20,10 @@ services:
       TARGET_PORT: "3000"
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      DATABASE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_CACHE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_QUEUE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_CABLE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
+      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     ports:
       - "8080:8080"
@@ -39,10 +39,10 @@ services:
       RAILS_ENV: production
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      DATABASE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_CACHE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_QUEUE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
-      DATABASE_CABLE_URL: postgresql://rails:${DB_PASSWORD}@cloudsql-proxy:5432/rails8_turbo_chat_production
+      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     depends_on:
       - cloudsql-proxy

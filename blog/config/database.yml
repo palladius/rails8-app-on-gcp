@@ -31,16 +31,19 @@ production:
     database: <%= ENV['DATABASE_URL'].present? ? nil : 'storage/production.sqlite3' %>
   cache:
     <<: *default
-    adapter: sqlite3
-    database: storage/production_cache.sqlite3
+    adapter: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_CACHE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_cache.sqlite3' %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    adapter: sqlite3
-    database: storage/production_queue.sqlite3
+    adapter: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_QUEUE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_queue.sqlite3' %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    adapter: sqlite3
-    database: storage/production_cable.sqlite3
+    adapter: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_CABLE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_cable.sqlite3' %>
     migrations_paths: db/cable_migrate

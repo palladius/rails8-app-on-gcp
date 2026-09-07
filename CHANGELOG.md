@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.16] - 2026-09-07
+### Changed
+- 🐘 Configured `config/database.yml` in production so Solid Queue, Solid Cache, and Solid Cable inherit `DATABASE_URL` (or dedicated URL env vars) when running PostgreSQL on Cloud Run, preventing multi-container ephemeral SQLite isolation.
+- ⚙️ Aligned database and user credentials in `compose.prod.yaml` with Terraform (`${DB_USER:-rails_user}` and `${DB_NAME:-rails_production}`).
+- ✉️ Corrected service name (`worker`) and SMTP host (`mailpit`) in `blog/bin/test_email.sh`.
+- 🧪 Added `DockerComposeConfigurationTest` to prevent regressions in local and production compose configurations.
+
 ## [0.1.15] - 2026-09-07
 ### Changed
 - 🧭 Consolidated all workshop views (`/`, `/constitution`, `/skeleton`, `/a2ui`) onto the single Workshop Sinatra server on port `8080`.

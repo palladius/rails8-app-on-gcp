@@ -3,7 +3,7 @@
 set -e
 
 echo "✉️ Sending a test email using Rails runner..."
-docker compose run --rm -e SMTP_HOST=mail jobs bin/rails runner "user = User.first || User.create!(email_address: 'ricc@example.com', password: 'password'); UserMailer.with(user: user).welcome.deliver_now"
+docker compose run --rm -e SMTP_HOST=mailpit worker bin/rails runner "user = User.first || User.create!(email_address: 'ricc@example.com', password: 'password'); UserMailer.with(user: user).welcome.deliver_now"
 
 echo "✅ Email sent. Verifying in Mailpit..."
 sleep 2
