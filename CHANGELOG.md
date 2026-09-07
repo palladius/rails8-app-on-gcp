@@ -1,11 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
- 
-## [0.1.24] - 2026-09-07
+## [0.1.25] - 2026-09-07
 ### Added
 - 📊 **Workshop Kickoff Slides with Marp (Fixes [#20](https://github.com/palladius/rails8-app-on-gcp/issues/20))**:
-  - Added `/slides/index.md` containing a clean, 5-step Marp presentation introducing attendees to downloading Google Antigravity, signing in, claiming cloud credits, launching the pair programming session, and embracing the Socratic pedagogical contract ("Guide me, don't do everything for me").
+  - Added `/slides/index.md` containing a clean, 6-step Marp presentation introducing attendees to downloading Google Antigravity, signing in, claiming cloud credits, launching the pair programming session, and closing with thanks and contact links.
   - Added `slides/README.md` with usage instructions for live presentation and static HTML/PDF exports.
   - Added `workshop/landing-page/README.md` (English primary) and `workshop/landing-page/README.it.md` (Italian companion) serving as the kickoff directive for Antigravity and workshop attendees.
   - Added `just slides [port]` (default `8082`), `just build-slides`, and `just test-slides` recipes to root `justfile` with automatic fallback to `npx` if global `marp` is not installed.
@@ -13,8 +12,12 @@ All notable changes to this project will be documented in this file.
   - Fixed typography, line-height, and padding in `slides/index.md` to ensure all content (including callout boxes) renders cleanly without overflowing slide boundaries.
   - Added `/slides` endpoint to `workshop/server.rb` serving the compiled presentation deck directly.
   - Generated 3 distinctive cover art options via Nano Banana Pro (`slides/images/`): attached Pixar 3D style to Slide 1, preserved Retro Synthwave for future use, and attached Modern Minimalist Vector art to the final "Thank You!" closing slide (including LinkedIn contact links for Riccardo and Emiliano).
-  - Archived Slide 5 ("The Pedagogical Contract") to `slides/archive/pedagogical-contract.md` to keep the active presentation focused on the 5 essential onboarding steps while preserving pedagogical instructions in `workshop/landing-page/README.md`.
+  - Archived Slide 5 ("The Pedagogical Contract") to `slides/archive/pedagogical-contract.md` to keep the active presentation focused on the essential onboarding steps while preserving pedagogical instructions in `workshop/landing-page/README.md`.
   - Updated `.gitignore` to ignore compiled `slides/dist/` and `log/` artifacts.
+
+## [0.1.24] - 2026-09-07
+### Changed
+- 📝 **Workshop ABOUT Page Overhaul**: Restructured `workshop/ABOUT.md` with a punchy title, Antigravity-powered abstract, and colorful Google-branded highlights linking Cloud Run Docker Compose, Solid Queue, IAP, Cloud SQL, and short-lived signed URLs.
 
 ## [0.1.23] - 2026-09-07
 ### Changed
