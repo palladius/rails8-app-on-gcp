@@ -1,7 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
- 
+## [0.1.24] - 2026-09-07
+### Changed
+- 📝 **Workshop ABOUT Page Overhaul**: Restructured `workshop/ABOUT.md` with a punchy title, Antigravity-powered abstract, and colorful Google-branded highlights linking Cloud Run Docker Compose, Solid Queue, IAP, Cloud SQL, and short-lived signed URLs.
+
 ## [0.1.23] - 2026-09-07
 ### Changed
 - 🔓 **Unauthenticated Access for Public Posts**: Configured `PostsController` to allow unauthenticated access to `index` and `show` (`allow_unauthenticated_access only: %i[ index show ]`), allowing visitors and automated health/UAT probes to view public posts directly without redirecting to `/session/new`.
