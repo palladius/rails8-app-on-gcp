@@ -60,6 +60,10 @@ build-slides:
 test-slides:
     cd blog && bin/rails test test/integration/slides_presentation_test.rb
 
+# run the workshop pre-flight diagnostics suite (validates Gmail identity, GCP billing, ADC, keys, canary asset)
+workshop-test:
+    @./bin/workshop_diagnostics.rb
+
 
 # show project status
 project-status:

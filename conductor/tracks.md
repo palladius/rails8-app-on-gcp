@@ -16,3 +16,8 @@
 - [x] **Track: Local Docker Compose (Issue #10)**
 *Link: [./tracks/docker_compose_issue_10_20260820/index.md](./tracks/docker_compose_issue_10_20260820/index.md)*
 
+---
+
+- [x] **Track: Diagnostics Suite (`just workshop-test`) (Issue #24)**
+*Link: [./tracks/diagnostics_suite_issue_24_20260907/plan.md](./tracks/diagnostics_suite_issue_24_20260907/plan.md)*
+
