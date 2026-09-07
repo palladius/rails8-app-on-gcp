@@ -29,6 +29,37 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should show post with unresolvable local image in ActionText body without 500 crash" do
+    @post.update!(body: '<action-text-attachment url="../out/both_starwars_world.png" content-type="image/png" caption="Star Wars"></action-text-attachment>')
+    get post_url(@post)
+    assert_response :success
+    assert_select "img.attachment__broken-image[src=?]", "../out/both_starwars_world.png"
+    assert_select "figcaption.attachment__caption", text: "Star Wars"
+  end
+
+  test "should show post with external remote image in ActionText body" do
+    @post.update!(body: '<action-text-attachment url="https://example.com/starwars.png" content-type="image/png"></action-text-attachment>')
+    get post_url(@post)
+    assert_response :success
+    assert_select "img[src=?]", "https://example.com/starwars.png"
+  end
+
+  test "rescues from Propshaft::MissingAssetError with 404" do
+    PostsController.class_eval do
+      def missing_asset_action
+        raise Propshaft::MissingAssetError.new("missing.png")
+      end
+    end
+    Rails.application.routes.draw do
+      get "test_missing_asset", to: "posts#missing_asset_action"
+    end
+
+    get "/test_missing_asset"
+    assert_response :not_found
+  ensure
+    Rails.application.reload_routes!
+  end
+
   test "should get edit" do
     get edit_post_url(@post)
     assert_response :success

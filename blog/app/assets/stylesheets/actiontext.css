@@ -438,3 +438,13 @@ trix-editor .attachment__metadata {
   padding: 0 !important;
   max-width: 100% !important;
 }
+
+.trix-content .attachment__broken-image {
+  border: 1px dashed #d73a4a;
+  padding: 4px 8px;
+  background: #fff5f5;
+  color: #d73a4a;
+  border-radius: 4px;
+  max-width: 100%;
+}
+

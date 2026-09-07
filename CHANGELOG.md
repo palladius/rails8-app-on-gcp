@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.22] - 2026-09-07
+### Fixed
+- 🐛 **ActionText Propshaft Missing Asset Handling (Fixes [#7](https://github.com/palladius/rails8-app-on-gcp/issues/7))**:
+  - Overrode `app/views/action_text/attachables/_remote_image.html.erb` to catch `Propshaft::MissingAssetError` when an ActionText body contains relative/local file references (e.g. `../out/...` from pasted markdown or HTML) and gracefully fall back to `tag.img` with `.attachment__broken-image` class instead of crashing with HTTP 500.
+  - Added `.attachment__broken-image` styling in `app/assets/stylesheets/actiontext.css` for clear visual indication of missing/unresolved assets.
+  - Added defense-in-depth `rescue_from Propshaft::MissingAssetError` in `ApplicationController` returning HTTP 404 instead of an unhandled HTTP 500.
+  - Added regression test suite in `test/controllers/posts_controller_test.rb`.
+
 ## [0.1.21] - 2026-09-07
 ### Changed
 - 🗣️ Clarified **Language Directive** in `AGENTS.md` / `GEMINI.md`: AI agents must converse flexibly in the user's preferred language (e.g., Italian with Riccardo/Emiliano) while strictly authoring all repository resources, code, documentation, UI strings, and commits in English.
