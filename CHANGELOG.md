@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
   - Added visual boundary regression test in `blog/test/integration/slides_presentation_test.rb` running Headless Chrome via Selenium to automatically verify that no slide overflows its 1280x720 viewport.
   - Fixed typography, line-height, and padding in `slides/index.md` to ensure all content (including callout boxes) renders cleanly without overflowing slide boundaries.
   - Added `/slides` endpoint to `workshop/server.rb` serving the compiled presentation deck directly.
+  - Generated 3 distinctive cover art options via Nano Banana Pro (`slides/images/`): attached Pixar 3D style to Slide 1, preserved Retro Synthwave for future use, and attached Modern Minimalist Vector art to the final "Thank You!" closing slide.
   - Archived Slide 5 ("The Pedagogical Contract") to `slides/archive/pedagogical-contract.md` to keep the active presentation focused on the 5 essential onboarding steps while preserving pedagogical instructions in `workshop/landing-page/README.md`.
   - Updated `.gitignore` to ignore compiled `slides/dist/` and `log/` artifacts.
 
