@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.24] - 2026-09-07
+### Added
+- 📊 **Workshop Kickoff Slides with Marp (Fixes [#20](https://github.com/palladius/rails8-app-on-gcp/issues/20))**:
+  - Added `/slides/index.md` containing a clean, 5-step Marp presentation introducing attendees to downloading Google Antigravity, signing in, claiming cloud credits, launching the pair programming session, and embracing the Socratic pedagogical contract ("Guide me, don't do everything for me").
+  - Added `slides/README.md` with usage instructions for live presentation and static HTML/PDF exports.
+  - Added `workshop/LANDING_PAGE.md` (English primary) and `workshop/LANDING_PAGE.it.md` (Italian companion) serving as the kickoff directive for Antigravity and workshop attendees.
+  - Added `just slides [port]` (default `8082`) and `just build-slides` recipes to root `justfile` with automatic fallback to `npx` if global `marp` is not installed.
+  - Updated `.gitignore` to ignore compiled `slides/dist/` artifacts.
+
 ## [0.1.23] - 2026-09-07
 ### Changed
 - 🔓 **Unauthenticated Access for Public Posts**: Configured `PostsController` to allow unauthenticated access to `index` and `show` (`allow_unauthenticated_access only: %i[ index show ]`), allowing visitors and automated health/UAT probes to view public posts directly without redirecting to `/session/new`.

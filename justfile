@@ -39,6 +39,23 @@ autopush:
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
 
+# run the Marp presentation slides server (default port: 8082)
+slides port="8082":
+    @if command -v marp >/dev/null 2>&1; then \
+        PORT={{port}} marp --server slides --html; \
+    else \
+        PORT={{port}} npx -y @marp-team/marp-cli --server slides --html; \
+    fi
+
+# build static HTML slides into slides/dist/
+build-slides:
+    @mkdir -p slides/dist
+    @if command -v marp >/dev/null 2>&1; then \
+        marp slides/index.md -o slides/dist/index.html --html; \
+    else \
+        npx -y @marp-team/marp-cli slides/index.md -o slides/dist/index.html --html; \
+    fi
+
 
 # show project status
 project-status:

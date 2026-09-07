@@ -11,5 +11,6 @@ worktrees/
 workshop/build/
 workshop/render-app2/pages/
 dist/
+slides/dist/
 
 .gprism/
