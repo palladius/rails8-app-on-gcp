@@ -84,21 +84,21 @@ Google Cloud & Open Source
 
 ---
 
-## 1. Download & Install Antigravity 📥
+## 1. Download Google Antigravity 2.0 📥
 
-Google Antigravity is your agentic pair programming harness for this workshop.
-
-- **Download:** Get the latest release for your operating system:
-  - 🍏 **macOS** (Universal `.dmg` / `.zip`)
-  - 🐧 **Linux** (`.deb` / `.AppImage` / tarball)
-  - 🪟 **Windows** (`.exe` installer)
-
-<div class="highlight">
-
-💡 **No Ruby experience needed!** 
-Antigravity pairs with you to explain every concept, command, and cloud architecture decision.
-
+<div style="margin: 8px 0 12px 0;">
+  <a href="https://antigravity.google/download" style="display: inline-block; background-color: #1a73e8; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
+    🚀 Download Antigravity 2.0 (antigravity.google/download)
+  </a>
 </div>
+
+<div style="text-align: center; margin: 4px 0;">
+  <img src="images/antigravity-download.png" style="max-height: 290px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border: 1px solid #dadce0;" />
+</div>
+
+<p style="font-size: 0.8em; color: #5f6368; text-align: center; margin: 6px 0 0 0;">
+  💡 <strong>Note:</strong> Not CLI, not IDE — <strong>Antigravity 2.0</strong> is all you need!
+</p>
 
 ---
 
