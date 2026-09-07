@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.23] - 2026-09-07
+### Changed
+- 🔓 **Unauthenticated Access for Public Posts**: Configured `PostsController` to allow unauthenticated access to `index` and `show` (`allow_unauthenticated_access only: %i[ index show ]`), allowing visitors and automated health/UAT probes to view public posts directly without redirecting to `/session/new`.
+- 📦 Updated `.gcloudignore` to exclude local `worktrees/`, `blog/vendor/bundle/`, and `blog/storage/` from Cloud Build upload bundles.
+
 ## [0.1.22] - 2026-09-07
 ### Fixed
 - 🐛 **ActionText Propshaft Missing Asset Handling (Fixes [#7](https://github.com/palladius/rails8-app-on-gcp/issues/7))**:

@@ -4,6 +4,9 @@
 .github
 .gemini
 .worktrees
+worktrees/
+blog/vendor/bundle/
+blog/storage/
 
 # Terraform (huge)
 iac/.terraform/

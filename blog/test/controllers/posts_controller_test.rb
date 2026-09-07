@@ -11,6 +11,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should get index without authentication" do
+    sign_out
+    get posts_url
+    assert_response :success
+  end
+
+  test "should get show without authentication" do
+    sign_out
+    get post_url(@post)
+    assert_response :success
+  end
+
   test "should get new" do
     get new_post_url
     assert_response :success
