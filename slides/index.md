@@ -114,8 +114,8 @@ Open Antigravity and paste the following prompt in the chat:
 <div class="prompt-box">
 "I am attending the Rails 8 on Google Cloud workshop.<br/>
 Please inspect:<br/>
-https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/LANDING_PAGE.md<br/>
-(or workshop/LANDING_PAGE.it.md if you prefer Italian)<br/>
+https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md<br/>
+(or workshop/landing-page/README.it.md if you prefer Italian)<br/>
 and guide me step-by-step through the workshop!"
 </div>
 

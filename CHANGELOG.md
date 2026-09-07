@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - 📊 **Workshop Kickoff Slides with Marp (Fixes [#20](https://github.com/palladius/rails8-app-on-gcp/issues/20))**:
   - Added `/slides/index.md` containing a clean, 5-step Marp presentation introducing attendees to downloading Google Antigravity, signing in, claiming cloud credits, launching the pair programming session, and embracing the Socratic pedagogical contract ("Guide me, don't do everything for me").
   - Added `slides/README.md` with usage instructions for live presentation and static HTML/PDF exports.
-  - Added `workshop/LANDING_PAGE.md` (English primary) and `workshop/LANDING_PAGE.it.md` (Italian companion) serving as the kickoff directive for Antigravity and workshop attendees.
+  - Added `workshop/landing-page/README.md` (English primary) and `workshop/landing-page/README.it.md` (Italian companion) serving as the kickoff directive for Antigravity and workshop attendees.
   - Added `just slides [port]` (default `8082`) and `just build-slides` recipes to root `justfile` with automatic fallback to `npx` if global `marp` is not installed.
   - Updated `.gitignore` to ignore compiled `slides/dist/` artifacts.
 

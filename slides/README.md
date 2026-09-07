@@ -50,5 +50,5 @@ marp slides/index.md --pdf -o slides/dist/slides.pdf
 2. **Download & Install Antigravity**: Cross-platform binaries.
 3. **Launch & Connect**: Sign in with Google identity.
 4. **[Optional] Cloud Credits**: QR voucher redemption for hands-on GCP projects.
-5. **Set the Mission**: Launch prompt pointing Antigravity to `workshop/LANDING_PAGE.md`.
+5. **Set the Mission**: Launch prompt pointing Antigravity to `workshop/landing-page/README.md`.
 6. **The Pedagogical Contract**: Socratic tutoring ("Guide me, don't do everything for me").
