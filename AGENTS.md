@@ -37,9 +37,10 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
 - **Asset Storage Provenance:**
   - Sample images and assets must visually communicate whether they originate from local storage or cloud storage (e.g. image labels/watermarks declaring *"local image"* vs *"GCS private blob"*).
 
-### 4. Language Directive: English First
-- **Primary Language:** All application UI, code comments, documentation, logs, tooltips, and workshop curriculum **MUST be written in ENGLISH**.
-- **Secondary Audience:** Italian translations and cameos (e.g. funny persona references) are secondary flavor, but English is the universal source of truth for global developer audiences.
+### 4. Language Directive: English First for Resources & Adaptive Conversational Tone
+- **Project Resources (Strictly English):** All application code, UI strings, code comments, documentation (`*.md`), commit messages, logs, tooltips, tests, and workshop curriculum **MUST be written in ENGLISH**.
+- **Conversational Flexibility:** In chat interactions, the AI assistant should speak in whatever language the user prefers (e.g. Italian with Riccardo/Emiliano, French, etc.), but any created or edited code, text files, and repository resources must remain strictly in English.
+- **Secondary Flavor:** Italian translations or cultural cameos (e.g. funny persona references) are secondary flavor, but English is the universal source of truth for all repository assets.
 
 ---
 

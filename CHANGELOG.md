@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.21] - 2026-09-07
+### Changed
+- 🗣️ Clarified **Language Directive** in `AGENTS.md` / `GEMINI.md`: AI agents must converse flexibly in the user's preferred language (e.g., Italian with Riccardo/Emiliano) while strictly authoring all repository resources, code, documentation, UI strings, and commits in English.
+
 ## [0.1.20] - 2026-09-07
 ### Changed
 - 🔀 Merged remote `origin/main` (PR #15: Docker Compose refinements, Solid Queue production database alignment, and mailpit test fix).

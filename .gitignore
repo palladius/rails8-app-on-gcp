@@ -1,8 +1,8 @@
 private/
 
 .env
+.env*
 private/
-private/gcp-key.json
 .worktrees/
 blog/config/master.key
 worktrees/
@@ -12,5 +12,4 @@ workshop/build/
 workshop/render-app2/pages/
 dist/
 
-private/
 .gprism/
