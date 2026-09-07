@@ -26,6 +26,18 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+gcs_local:
+  service: GCS
+  project: local-project
+  bucket: local-bucket
+  endpoint: http://127.0.0.1:4443
+  credentials:
+    type: service_account
+    project_id: local-project
+    client_email: fake@localhost
+    private_key: "-----BEGIN PRIVATE KEY-----\nFAKE\n-----END PRIVATE KEY-----\n"
+
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

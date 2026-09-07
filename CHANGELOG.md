@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.11] - 2026-09-07
+### Added
+- 💌 Added `UserMailer` with welcome email templates (HTML & text) triggered asynchronously upon user registration.
+- 🧪 Added full integration test for welcome email delivery on signup in `blog/test/controllers/registrations_controller_test.rb`.
+- 🪣 Added `gcs_local` service to `config/storage.yml` and `fake-gcs-server` emulator to `compose.yaml`.
+- 📧 Added `blog/bin/test_email.sh` helper to verify local Mailpit delivery.
+- 🚦 Integrated and completed Conductor track for Issue #10.
+
 ## [0.1.10] - 2026-08-28
 ### Added
 - 👤 Added `description` and `created_via` columns to `User` model, tracking creation provenance (`"iap"`, `"seed"`, `"ui"`).

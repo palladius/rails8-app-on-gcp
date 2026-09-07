@@ -11,4 +11,8 @@
 - [x] **Track: Admin Email, Mailpit Onboarding & Zero-Trust Google Cloud IAP Auth**
 *Link: [./tracks/admin_email_and_iap_auth_20260828/](./tracks/admin_email_and_iap_auth_20260828/)*
 
+---
+
+- [x] **Track: Local Docker Compose (Issue #10)**
+*Link: [./tracks/docker_compose_issue_10_20260820/index.md](./tracks/docker_compose_issue_10_20260820/index.md)*
 

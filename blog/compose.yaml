@@ -72,5 +72,12 @@ services:
     depends_on:
       - db
 
+  # 🪣 Fake GCS Server: Local emulator for Google Cloud Storage
+  gcs:
+    image: fsouza/fake-gcs-server:latest
+    ports:
+      - "4443:4443"
+    command: -scheme http -port 4443
+
 volumes:
   postgres_data:
