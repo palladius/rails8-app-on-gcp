@@ -13,3 +13,4 @@ workshop/render-app2/pages/
 dist/
 
 private/
+.gprism/
