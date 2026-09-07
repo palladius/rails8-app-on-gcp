@@ -15,9 +15,9 @@ Fastest feedback loop for application development using SQLite and Tailwind watc
 # Install dependencies & prepare DB
 just install
 
-# Start local Rails development server (Puma on port 8088)
+# Start local Rails development server (Puma on port 3000)
 just dev
-# (or: cd blog && bin/dev -p 8088)
+# (or: cd blog && bin/dev -p 3000)
 ```
 
 ### 2️⃣ Mode 2: Local Docker Compose Stack (`just compose-up`)
@@ -52,9 +52,11 @@ just workshop-dev
 
 ## 🧭 Localhost Services & Port Matrix
 
+> 💡 **Fail-Fast Safety (Anti-POLA)**: Both **Native Dev** and **Docker Compose** intentionally target **Port 3000**. They are mutually exclusive, protecting you from ghost servers and ensuring [http://localhost:3000](http://localhost:3000) is *always* your Rails blog. Look at the **`RAILS8_ENV_LAUNCH_MODE`** telemetry badge in the footer to instantly see which runtime is responding!
+
 | Mode / Environment | How to Start | Localhost Port(s) & URLs | Included Services |
 | :--- | :--- | :--- | :--- |
-| 🚀 **1. Native Rails App** | `just dev` | • [http://localhost:8088](http://localhost:8088) | Rails 8 Puma Server + Tailwind CSS Watcher (SQLite) |
+| 🚀 **1. Native Rails App** | `just dev` | • [http://localhost:3000](http://localhost:3000) | Rails 8 Puma Server + Tailwind CSS Watcher (SQLite) |
 | 🐳 **2. Docker Compose** | `just compose-up` | • [http://localhost:3000](http://localhost:3000)<br>• [http://localhost:8025](http://localhost:8025)<br>• [http://localhost:8081](http://localhost:8081)<br>• `localhost:5432` | • Rails 8 Web Server (`:3000`)<br>• Mailpit Email UI (`:8025`, SMTP `:1025`)<br>• Adminer DB GUI (`:8081`)<br>• PostgreSQL 16 DB (`:5432`)<br>• Solid Queue Worker (Background) |
 | 📖 **3. Workshop Web UI** | `just workshop-dev` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/constitution](http://localhost:8080/constitution)<br>• [http://localhost:8080/skeleton](http://localhost:8080/skeleton)<br>• [http://localhost:8080/a2ui](http://localhost:8080/a2ui) | • Interactive Codelab Visualizer (`CODELAB.md`)<br>• Untouchable Constitution<br>• Workshop Skeleton<br>• A2UI JSON API |
 

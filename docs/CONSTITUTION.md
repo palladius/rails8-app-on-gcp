@@ -1,25 +1,54 @@
-# Constitution
+# 📜 The Project Constitution
 
 <!--
-
-Current version: 1.0.0
-
+Current version: 1.0.1
+Ratified by: Riccardo 🦖, Emiliano 🏎️, Antigravity AI 🤖
 -->
 
-This is  an immutable constitution.
-GEMINI.md / AGENTS.md must poblige to these bullet points at ANY GIVEN TIME.
-the only changes we can do to this constitution need to be agreed by 2/3 of people (Riccardo, Emiliano and AI).
-this needs to be documented in a PR linked to a GHI where 2 of them has spoken.
+This is the **immutable meta-constitution** of the repository.
+`AGENTS.md` (and its symlink `GEMINI.md`), `workshop/UNTOUCHABLE-CONSTITUTION.md`, and all contributor workflows **MUST** adhere to these principles at all times.
 
-The idea is that this constituion provides meta-steps which AGENTS.md need to obey to.
+Any modification to this constitution requires a **2/3 supermajority agreement** among the three maintainer personas:
+1. **Riccardo** (Supreme Leader & Author 🦖)
+2. **Emiliano** (Cloud & DevOps Architect 🏎️)
+3. **AI** (Antigravity / Gemini Pair Programmer 🤖)
 
-## Principles
+All proposed constitutional changes must be documented in a Pull Request referencing an issue where at least two maintainers have explicitly approved.
 
-1. This app is a modern blueprint for Rails (8) developers on GCP.
-2. A workshop for this app MUST be present, either in workshop/ or in a public Google repository which will contain that content. (Ideally, we're migrating from the first to the second one as a migration path).
-3. The workshop will have N step. For every workshop step, we'll have a branch with a deterministic name (eeg workshop/step1..).
-4. Since the workshop contains a number of "versions" of the same app (since students/practitioners have been requested to take an initial version and then change the code for a number of steps.
-,
-we agree that MAIN will try as much as possibly to converge with the FINAL version of the workshop (where the Database on cloud SQL works, the connection to GCS works, and so on).
-6. The workshop shld be able to work in localhost at ANY GIVEN TIME. Tests with decent timeouts  (<5sec) willl give a meaningful mesage to user if DB is not reachable, GCS is not configured and so on. Ideally the student should be able at any given time to know whats working and whats missing so they can (alone or guided by AI) .
-7. To make thigns eay for practitioners, we want thew Blog to contain messages which help them and guide them. Eg, a local image might be an image which contains the writing "local image" in it,  or localhost, .. An image supposed to be on GCS will equally say so within the image. A blog post written from db:seed will say "written by db seed" somewhere, etc.
+---
+
+## 🏛️ Core Principles
+
+### 0. Language Directive: English First
+All application UI, code, comments, documentation, logs, tooltips, and workshop curriculum **MUST be written in ENGLISH**. Secondary audience is Italian, so Italian translations and cameo flavor are welcome, but English remains the universal source of truth.
+
+### 1. Modern Rails 8 Reference Blueprint on GCP
+The repository serves as the definitive, production-grade reference architecture for running modern Ruby on Rails 8 applications on Google Cloud Platform.
+
+### 2. Workshop Presence & Future Migration Path
+A companion step-by-step workshop **MUST** be maintained alongside the application. It currently resides under `workshop/`, with a recognized migration path toward a dedicated public Google repository in the future.
+
+### 3. Deterministic Branch Naming via Git Namespaces
+Every workshop step **MUST** correspond to a deterministic branch name using Git directory-style slashes:
+`workshop/step-<N>-<slug>` (e.g., `workshop/step-0-setup`, `workshop/step-1-local-baseline`, `workshop/step-2-cloud-storage`).
+> **Best Practice Note on Slashes (`/`):** Using slashes creates a clean hierarchical namespace under `refs/heads/workshop/`. Git clients, GitHub, and GitLab automatically group these branches into a collapsible tree view, preventing workshop steps from cluttering the root branch list.
+
+### 4. `main` Converges with the Workshop End-State
+Because the workshop guides learners through incremental code evolution, the `main` branch represents the fully assembled, production-ready final step (Step 8: Gold Standard). On `main`, managed Google Cloud SQL, private GCS with IAM signing, Secret Manager, Cloud Run sidecars, and background AI jobs are fully configured.
+
+### 5. Environmental Telemetry & UI Storytelling
+To maximize learning clarity, the application UI must provide instant, tangible visual cues about its running environment:
+- **Dynamic Badges:** Explicitly distinguish ephemeral states (local SQLite, local Postgres container, local disk storage) from cloud-persistent states (Cloud SQL mTLS proxy, private GCS).
+- **Narrative Content:** Seeded records must clearly identify their origin (e.g., *"written by db:seed"*).
+- **Asset Provenance:** Placeholder images and media must visually communicate their storage tier (e.g., watermark/label indicating *"local image"* vs *"GCS private blob"*).
+
+### 6. Localhost Invariant & Fast Diagnostic Tests (< 5s)
+- **Localhost Invariant:** The application and workshop baseline must run on `localhost` at **ANY GIVEN TIME** without requiring live cloud credentials or an active internet connection.
+- **Fast Diagnostic Tests:** Automated tests must execute with strict timeouts (**< 5 seconds**) and emit clear, actionable diagnostic messages if backing services (e.g., database, GCS, Cloud SQL Proxy) are unreachable or missing configuration. Learners and AI pair programmers must always be able to determine what is currently functional versus what requires configuration.
+
+### 7. Hierarchical Document Authority
+`docs/CONSTITUTION.md` is the supreme governing document of this repository. In case of any conflict:
+1. `docs/CONSTITUTION.md` (Supreme Meta-Constitution)
+2. `AGENTS.md` / `GEMINI.md` (Agent Operational Directives)
+3. `workshop/UNTOUCHABLE-CONSTITUTION.md` (Workshop Curriculum Specification)
+4. Derived artifacts, scripts, and documentation

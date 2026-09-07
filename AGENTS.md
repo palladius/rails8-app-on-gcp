@@ -4,9 +4,10 @@
 > `GEMINI.md` is a symlink pointing directly to this file.
 >
 
-## File change
+## 📜 Constitutional Hierarchy & File Changes
 
-Note: This MD file **MUST** to adhere to `docs/CONSTITUTION.md` at all times. Make sure to ensure this before committing a change.
+> ⚠️ **SUPREME DIRECTIVE:** This file **MUST adhere to [`docs/CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/CONSTITUTION.md) at all times.**
+> `docs/CONSTITUTION.md` is the immutable meta-constitution ratified by Riccardo, Emiliano, and AI. If any conflict arises between this document and `docs/CONSTITUTION.md`, the meta-constitution wins.
 
 ---
 
@@ -30,8 +31,15 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
   - 🟡 **`[EPHEMERAL DB / STORAGE]` Badge:** Active when connected to local SQLite, local Docker Postgres (`localhost`/`db`), or local disk storage.
   - 🟢 **`[CLOUD PERSISTENT]` Badge:** Active when connected to managed Google Cloud SQL (via Cloud SQL Auth Proxy mTLS) and private Google Cloud Storage (`iam: true`).
 - **Narrative-Driven Seeded Posts:**
-  - Seeded posts evolve with the workshop narrative (e.g. *"[EPHEMERAL] ⚠️ Benvenuto! Sei su un DB locale effimero"* in Step 1 $\to$ *"[CLOUD SQL PERSISTENT] 🐘 Connesso a Google Cloud SQL"* in Step 3 $\to$ *"[AI ACTIVE] 🍌 Nano Banana / Imagen 3 Generatore di Copertine"* in Step 7).
+  - Seeded posts evolve with the workshop narrative (e.g. *"[EPHEMERAL] ⚠️ Welcome! You are on an ephemeral local DB"* in Step 1 $\to$ *"[CLOUD SQL PERSISTENT] 🐘 Connected to Google Cloud SQL"* in Step 3 $\to$ *"[AI ACTIVE] 🍌 Nano Banana / Imagen 3 Cover Generator"* in Step 7).
+  - Seeded posts must explicitly indicate origin (e.g. *"written by db:seed"*).
   - This provides instant, tangible visual feedback when students graduate from suboptimal $\to$ cloud-native reference architecture.
+- **Asset Storage Provenance:**
+  - Sample images and assets must visually communicate whether they originate from local storage or cloud storage (e.g. image labels/watermarks declaring *"local image"* vs *"GCS private blob"*).
+
+### 4. Language Directive: English First
+- **Primary Language:** All application UI, code comments, documentation, logs, tooltips, and workshop curriculum **MUST be written in ENGLISH**.
+- **Secondary Audience:** Italian translations and cameos (e.g. funny persona references) are secondary flavor, but English is the universal source of truth for global developer audiences.
 
 ---
 
@@ -76,11 +84,15 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 
 ### 🗺️ File Dependency Map: Source of Truth $\to$ Produced Artifacts
 
+* **`docs/CONSTITUTION.md` (SUPREME GOVERNING SOURCE OF TRUTH)**
+  $\to$ The immutable meta-constitution governing this repository, `AGENTS.md`, and all workshop steps.
+
 * **`workshop/CODELAB.md` (SOURCE OF TRUTH)**
   $\to$ `ruby split_codelab.rb` $\to$ produces `workshop/render-app2/pages/*.md` & `pages.json` *(PRODUCED — DO NOT EDIT)*
   $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/index.html` *(PRODUCED — DO NOT EDIT)*
 
 * **`workshop/UNTOUCHABLE-CONSTITUTION.md` (SOURCE OF TRUTH)**
+  $\to$ Workshop curriculum architectural blueprint.
   $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/constitution.html` *(PRODUCED — DO NOT EDIT)*
 
 * **`workshop/SKELETON.md` (SOURCE OF TRUTH)**
@@ -102,6 +114,9 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 - **Pair Programming Assistants:** Gemini CLI, Claude Code, and Antigravity. Ensure the Conductor extension/skill is available: https://github.com/gemini-cli-extensions/conductor
 - **Strict Semantic Versioning:** Ensure proper versioning in `VERSION` and `CHANGELOG.md` aligning with releases (e.g. useful for workshop errata).
 - **Footer UI:** Surface app version in the footer alongside a link to GitHub code.
+- **Localhost Invariant:** The application and workshop baseline must run on `localhost` at **ANY GIVEN TIME** without requiring live Google Cloud credentials or internet connectivity.
+- **Fast Diagnostic Tests & Strict Timeouts (< 5s):** Tests (`just test`, `bin/rails test`) must complete with tight timeouts (< 5 seconds) and provide clear, informative diagnostics if external cloud dependencies (Cloud SQL, GCS) are offline or missing.
+- **Deterministic Workshop Branch Naming:** When creating or managing workshop branches, use the hierarchical pattern `workshop/step-<N>-<slug>` (e.g. `workshop/step-0-setup`, `workshop/step-1-local-baseline`). The slash (`/`) creates a dedicated Git namespace grouped neatly in GitHub/GitLab.
 - **TDD:** Start with a failing test, prove it fails first, and iterate until green.
 - **Verification Gates:** Ensure all tests pass. Never commit unless `just test` passes.
 

@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.19] - 2026-09-07
+### Changed
+- 📜 **Constitution v1.0.1 Ratification**: Cleaned and formalized [`docs/CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/CONSTITUTION.md), fixing numbering, incomplete sentences, and typos while establishing the 2/3 maintainer consensus rule (Riccardo, Emiliano, AI).
+- 🌿 **Git Branch Naming Standard**: Reconciled workshop branch naming convention to use best-practice Git directory slashes `workshop/step-<N>-<slug>` (e.g. `workshop/step-1-local-baseline`), taking advantage of GitHub/GitLab collapsible tree views.
+- ⚙️ **Localhost & Fast Test Invariants in `AGENTS.md`**: Embedded Constitutional Principle 6 into `AGENTS.md` / `GEMINI.md`, enforcing that the app runs on localhost at any time and automated tests fail fast (< 5s) with explicit diagnostic messages if external cloud services are offline.
+- 🖼️ **Telemetry & Asset Provenance**: Added explicit requirements in `AGENTS.md` for visual asset watermarking ("local image" vs "GCS blob") and seed post origin tracking ("written by db:seed").
+- 🏛️ **Document Hierarchy**: Explicitly structured hierarchy between the supreme meta-constitution (`docs/CONSTITUTION.md`), operational directives (`AGENTS.md`), and the workshop curriculum blueprint (`workshop/UNTOUCHABLE-CONSTITUTION.md`).
+
+## [0.1.18] - 2026-09-07
+### Changed
+- 🌐 Standardized all app UI badges, runtime telemetry tooltips, and documentation strings to English as the primary language across `blog/`, `compose.yaml`, `.env.dist`, and `AGENTS.md`.
+- 📜 Added **Language Directive (English First)** to `AGENTS.md` specifying English as the universal source of truth for global audiences with Italian as optional secondary flavor.
+
+## [0.1.17] - 2026-09-07
+### Changed
+- 💅 Replaced `just dev` in badge labels and tooltip text with standard `Local Rails · SQLite` and `bin/dev` to avoid confusion for non-`just` users.
+
+## [0.1.16] - 2026-09-07
+### Added
+- 🛡️ Implemented Anti-POLA runtime telemetry via `RAILS8_ENV_LAUNCH_MODE` environment variable and `ApplicationHelper#launch_mode_info`.
+- 🎨 Added interactive runtime badge in the UI footer displaying distinct badges, colors, and explanatory tooltip stories:
+  - 💻 `[💻 just dev · SQLite]` (`#6366f1`): *"Ciao! Sono l'app nativa avviata con just dev su SQLite locale."*
+  - 🐳 `[🐳 Docker Compose · Postgres]` (`#0284c7`): *"Ciao! Sono l'app containerizzata avviata con Docker Compose."*
+  - ☁️ `[☁️ Google Cloud Run]` (`#059669`): *"Ciao! Sto girando serverless su Google Cloud Run."*
+- 🧪 Added full unit test suite for launch mode detection in `blog/test/helpers/application_helper_test.rb`.
+- 📝 Documented `RAILS8_ENV_LAUNCH_MODE` in `.env.dist`, `blog/justfile`, `blog/compose.yaml`, `blog/compose.prod.yaml`, and `README.md`.
+
 ## [0.1.15] - 2026-09-07
 ### Changed
 - 🧭 Consolidated all workshop views (`/`, `/constitution`, `/skeleton`, `/a2ui`) onto the single Workshop Sinatra server on port `8080`.

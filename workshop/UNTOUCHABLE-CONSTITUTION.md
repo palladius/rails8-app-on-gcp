@@ -1,6 +1,7 @@
 # 📜 Rails 8 on GCP Workshop Constitution & Architectural Blueprint
 > **STATUS: 🟡 DRAFT (v2)** (Revised with Dual North Stars & Exact 1:1 Master Index).  
-> Once finalized and approved by Riccardo & Emiliano, this document serves as the **UNTOUCHABLE CONSTITUTION** governing `main`, workshop branches, `CODELAB.md`, `SKELETON.md`, automation scripts, and visualizers.
+> **GOVERNANCE:** Subordinate to the supreme meta-constitution in [`docs/CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/CONSTITUTION.md).
+> Once finalized and approved by Riccardo & Emiliano, this document serves as the **WORKSHOP ARCHITECTURAL CONSTITUTION** governing `main`, workshop branches, `CODELAB.md`, `SKELETON.md`, automation scripts, and visualizers.
 
 ---
 

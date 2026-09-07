@@ -9,6 +9,7 @@ services:
       - "3000:3000"
     environment:
       RAILS_ENV: development
+      RAILS8_ENV_LAUNCH_MODE: "Hello! I am the containerized app running on PostgreSQL via Docker Compose."
       DATABASE_URL: postgresql://postgres:password@db:5432/blog_development
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
@@ -28,6 +29,7 @@ services:
     command: bundle exec rails solid_queue:start
     environment:
       RAILS_ENV: development
+      RAILS8_ENV_LAUNCH_MODE: "Hello! I am the containerized app running on PostgreSQL via Docker Compose."
       DATABASE_URL: postgresql://postgres:password@db:5432/blog_development
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"

@@ -57,6 +57,10 @@
           v<%= ENV.fetch("APP_VERSION") { File.read(Rails.root.join('..', 'VERSION')).strip rescue '?.?.?' } %>
         </span>
         <span><%= ENV.fetch("ENVIRONMENT", Rails.env) %></span>
+        <% launch_info = launch_mode_info %>
+        <span class="version-badge" style="background: <%= launch_info[:color] %>; cursor: help;" title="<%= launch_info[:tooltip] %>">
+          <%= launch_info[:badge] %>
+        </span>
         <% git_branch = `git -C #{Rails.root} rev-parse --abbrev-ref HEAD 2>/dev/null`.strip rescue nil %>
         <% if git_branch.present? && git_branch != 'main' %>
           <span class="version-badge" style="background: #8b5cf6;" title="Git branch">🌿 <%= git_branch %></span>

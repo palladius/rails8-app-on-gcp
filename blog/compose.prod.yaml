@@ -17,6 +17,7 @@ services:
     environment:
       RAILS_ENV: production
       PORT: "8080"
+      RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@cloudsql-proxy:5432/blog_production
@@ -33,6 +34,7 @@ services:
     command: ["bash", "-c", "until bundle exec rails solid_queue:start; do echo 'SolidQueue: database not ready, retrying in 10s...'; sleep 10; done"]
     environment:
       RAILS_ENV: production
+      RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@cloudsql-proxy:5432/blog_production

@@ -7,7 +7,7 @@ install:
     bin/rails db:seed
 
 dev:
-    bin/dev -p 8088
+    RAILS8_ENV_LAUNCH_MODE="Hello! I am the native app launched with bin/dev on local SQLite." bin/dev -p 3000
 
 # start docker compose stack
 compose-up:
