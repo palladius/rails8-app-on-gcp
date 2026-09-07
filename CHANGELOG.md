@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.15] - 2026-09-07
+### Changed
+- 🧭 Consolidated all workshop views (`/`, `/constitution`, `/skeleton`, `/a2ui`) onto the single Workshop Sinatra server on port `8080`.
+- 🧹 Removed obsolete `workshop-constitution` on port `8081` from `justfile` to eliminate port collision with Docker Compose Adminer (`:8081`).
+
+## [0.1.14] - 2026-09-07
+### Changed
+- 🤖 Consolidated all AI guidelines and architectural directives from `GEMINI.md` into `AGENTS.md` as the single canonical source of truth for both Gemini and Claude Code.
+- 🔗 Replaced `GEMINI.md` with an internal symlink pointing to `AGENTS.md`.
+
 ## [0.1.13] - 2026-09-07
 ### Changed
 - 🔌 Changed default native Rails development port from `9090` to `8088` in `blog/justfile` and `README.md` to keep all local development ports cleanly aligned in the 808x family.

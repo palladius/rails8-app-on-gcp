@@ -35,14 +35,17 @@ just compose-down
 ```
 
 ### 3️⃣ Mode 3: Local Workshop Codelab Server (`just workshop-dev`)
-Sinatra-based interactive Codelab visualizer with hot-reloading.
+Sinatra-based interactive Codelab visualizer with hot-reloading (includes built-in document switcher for Codelab, Constitution, and Skeleton).
 ```bash
 # Start the workshop server on port 8080
 just workshop-dev
 # (or: cd workshop && ./server.rb --port 8080)
 
-# Or launch directly into the Untouchable Constitution on port 8081
-just workshop-constitution
+# Direct document URLs:
+# • Codelab:      http://localhost:8080/codelab
+# • Constitution: http://localhost:8080/constitution
+# • Skeleton:     http://localhost:8080/skeleton
+# • A2UI JSON:    http://localhost:8080/a2ui
 ```
 
 ---

@@ -35,13 +35,10 @@ autopush:
     just test
     git push origin main
 
-# run the workshop codelab visualizer server
+# run the workshop codelab visualizer server (serves /, /constitution, /skeleton, /a2ui)
 workshop-dev port="8080":
     cd workshop && ./server.rb --port {{port}}
 
-# run the workshop visualizer directly focused on the Untouchable Constitution
-workshop-constitution port="8081":
-    cd workshop && ./server.rb --port {{port}} UNTOUCHABLE-CONSTITUTION.md
 
 # show project status
 project-status:
