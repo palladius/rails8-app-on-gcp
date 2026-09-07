@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.20] - 2026-09-07
+### Changed
+- 🔀 Merged remote `origin/main` (PR #15: Docker Compose refinements, Solid Queue production database alignment, and mailpit test fix).
+
 ## [0.1.19] - 2026-09-07
 ### Changed
 - 📜 **Constitution v1.0.1 Ratification**: Cleaned and formalized [`docs/CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/CONSTITUTION.md), fixing numbering, incomplete sentences, and typos while establishing the 2/3 maintainer consensus rule (Riccardo, Emiliano, AI).
@@ -20,12 +24,17 @@ All notable changes to this project will be documented in this file.
 - 💅 Replaced `just dev` in badge labels and tooltip text with standard `Local Rails · SQLite` and `bin/dev` to avoid confusion for non-`just` users.
 
 ## [0.1.16] - 2026-09-07
+### Changed
+- 🐘 Configured `config/database.yml` in production so Solid Queue, Solid Cache, and Solid Cable inherit `DATABASE_URL` (or dedicated URL env vars) when running PostgreSQL on Cloud Run, preventing multi-container ephemeral SQLite isolation.
+- ⚙️ Aligned database and user credentials in `compose.prod.yaml` with Terraform (`${DB_USER:-rails_user}` and `${DB_NAME:-rails_production}`).
+- ✉️ Corrected service name (`worker`) and SMTP host (`mailpit`) in `blog/bin/test_email.sh`.
+- 🧪 Added `DockerComposeConfigurationTest` to prevent regressions in local and production compose configurations.
 ### Added
 - 🛡️ Implemented Anti-POLA runtime telemetry via `RAILS8_ENV_LAUNCH_MODE` environment variable and `ApplicationHelper#launch_mode_info`.
 - 🎨 Added interactive runtime badge in the UI footer displaying distinct badges, colors, and explanatory tooltip stories:
-  - 💻 `[💻 just dev · SQLite]` (`#6366f1`): *"Ciao! Sono l'app nativa avviata con just dev su SQLite locale."*
-  - 🐳 `[🐳 Docker Compose · Postgres]` (`#0284c7`): *"Ciao! Sono l'app containerizzata avviata con Docker Compose."*
-  - ☁️ `[☁️ Google Cloud Run]` (`#059669`): *"Ciao! Sto girando serverless su Google Cloud Run."*
+  - 💻 `[💻 just dev · SQLite]` (`#6366f1`): *"Hello! I am the native app running with just dev on local SQLite."*
+  - 🐳 `[🐳 Docker Compose · Postgres]` (`#0284c7`): *"Hello! I am the containerized app running with Docker Compose."*
+  - ☁️ `[☁️ Google Cloud Run]` (`#059669`): *"Hello! I am running serverless on Google Cloud Run."*
 - 🧪 Added full unit test suite for launch mode detection in `blog/test/helpers/application_helper_test.rb`.
 - 📝 Documented `RAILS8_ENV_LAUNCH_MODE` in `.env.dist`, `blog/justfile`, `blog/compose.yaml`, `blog/compose.prod.yaml`, and `README.md`.
 

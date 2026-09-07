@@ -20,7 +20,7 @@ services:
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@cloudsql-proxy:5432/blog_production
+      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     ports:
       - "8080:8080"
@@ -37,7 +37,7 @@ services:
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      DATABASE_URL: postgresql://postgres:${DB_PASSWORD}@cloudsql-proxy:5432/blog_production
+      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     depends_on:
       - cloudsql-proxy
