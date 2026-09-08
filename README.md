@@ -60,10 +60,12 @@ just workshop-dev
 | 🐳 **2. Docker Compose** | `just compose-up` | • [http://localhost:3000](http://localhost:3000)<br>• [http://localhost:8025](http://localhost:8025)<br>• [http://localhost:8081](http://localhost:8081)<br>• `localhost:5432` | • Rails 8 Web Server (`:3000`)<br>• Mailpit Email UI (`:8025`, SMTP `:1025`)<br>• Adminer DB GUI (`:8081`)<br>• PostgreSQL 16 DB (`:5432`)<br>• Solid Queue Worker (Background) |
 | 📖 **3. Workshop Web UI** | `just workshop-dev` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/constitution](http://localhost:8080/constitution)<br>• [http://localhost:8080/skeleton](http://localhost:8080/skeleton)<br>• [http://localhost:8080/a2ui](http://localhost:8080/a2ui) | • Interactive Codelab Visualizer (`CODELAB.md`)<br>• Untouchable Constitution<br>• Workshop Skeleton<br>• A2UI JSON API |
 
-## Workshop
+## 📖 Workshop
 
-The workshop is nicely active on GitHub Pages:
+The workshop is published on GitHub Pages:
 
-* https://palladius.github.io/rails8-app-on-gcp/ (official Google Codelab look n' feel)
+* 🌐 **Live Codelab:** [https://palladius.github.io/rails8-app-on-gcp/](https://palladius.github.io/rails8-app-on-gcp/) (official Google Codelab visualizer)
+* 📜 **Constitution:** [https://palladius.github.io/rails8-app-on-gcp/constitution.html](https://palladius.github.io/rails8-app-on-gcp/constitution.html)
+* 🦴 **Skeleton:** [https://palladius.github.io/rails8-app-on-gcp/skeleton.html](https://palladius.github.io/rails8-app-on-gcp/skeleton.html)
 
-![Workshop Preview](image-1.png)
+![Workshop Preview](assets/workshop_preview.png)

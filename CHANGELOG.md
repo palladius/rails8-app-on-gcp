@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
   - Removed the prototype dark Astro/Glassmorphism SPA (`workshop/render-app2/`) and the codelab splitting script (`workshop/split_codelab.rb`).
   - Removed `/static/` routing from GitHub Pages deployment; static artifacts are now compiled directly into the root of `dist/` via `build_ghpages.rb`.
   - Updated `README.md`, `justfile`, `AGENTS.md`, `workshop/AGENTS.md`, and `docs/USER_MANUAL.md` to reference the single canonical build pipeline and official URL.
+  - Polished `README.md` workshop section with direct links to Codelab, Constitution, and Skeleton, moving the preview screenshot under `assets/workshop_preview.png`.
   - Preserved a demo video of the dark theme sliding transition under `assets/demos/black_theme_transition.mp4` before retirement.
   - Hardened parallel test execution in `blog/test/integration/new_article_script_test.rb` using isolated temporary filenames.
 
