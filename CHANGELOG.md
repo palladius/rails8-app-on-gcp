@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.33] - 2026-09-08
+### Changed
+- 📘 **Codelab v2.0.0alpha: Header, Introduction, Step 0 & Step 1 Rewrite (Issue [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29))**:
+  - Upgraded `workshop/CODELAB.md` to `2.0.0alpha`, replacing legacy branch-based narratives with the canonical 8-Step and 3-Deploy architecture.
+  - Rewrote **Step 0: Prerequisites, Antigravity Setup & Billing Verification** with mandatory billing guard gate check (`gcloud beta billing projects describe`), ADC setup, and instant validation (`just workshop-eval 0`).
+  - Rewrote **Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics** introducing pre-flight diagnostics (`just workshop-test`), fast isolated UAT testing (`just workshop-uat 1`), and asynchronous background Cloud SQL provisioning.
+  - Verified compilation of static documentation site via `just build-ghpages`.
+
 ## [0.1.32] - 2026-09-08
 ### Added
 - 🍌 **Nano Banana Auto-Cover Generation on Vertex AI (Fixes [#18](https://github.com/palladius/rails8-app-on-gcp/issues/18))**:

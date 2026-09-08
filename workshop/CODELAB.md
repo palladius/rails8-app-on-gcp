@@ -1,70 +1,137 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
-<!-- 📜 Adheres to workshop/UNTOUCHABLE-CONSTITUTION.md -->
+<!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
+<!-- 🏷️ Codelab Version: 2.0.0alpha -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
 
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 
-Welcome to the Rails 8 on Google Cloud workshop! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite setup to a fully scalable, secure, and AI-powered production application on Google Cloud.
+Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.0alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
-We will explore best practices for deploying Rails 8, managing secrets, connecting securely to Cloud SQL via the **Cloud SQL Auth Proxy**, orchestrating multi-container services on Cloud Run with Docker Compose, and tapping into Google's Gemini models for generative AI features.
+This curriculum is structured around the **3 Progressive Cloud Run Deployments**, the **Zero-Branch Time-Machine** progression model, and AI pair programming with **Google Antigravity**:
+1. **Deploy 1 (Step 3 - The Stateless Shock):** Deploy a single container with local SQLite to experience serverless statelessness first-hand in under 3 minutes.
+2. **Deploy 2 (Step 4 - GCS Persistent Storage):** Wire ActiveStorage to Google Cloud Storage with private IAM Credentials blob signing (`iam: true`) and observe the POLA stuck jobs warning banner.
+3. **Deploy 3 (Step 6 - Gold Standard Multi-Container Sidecars):** Deploy the canonical production architecture with Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar containers connecting to managed PostgreSQL.
 
 ### What you'll learn
-- How to provision Google Cloud infrastructure asynchronously using Terraform or CLI scripts.
-- How to transition from local disk storage to private Google Cloud Storage with IAM blob signing.
-- How to connect Rails to Cloud SQL using the Cloud SQL Auth Proxy (and why opening to `0.0.0.0/0` is an anti-pattern).
-- How to manage secrets securely using Google Cloud Secret Manager.
-- How to run multi-container setups (`web` + Solid Queue `worker` + `cloudsql-proxy` sidecar) in Docker Compose and deploy them to Cloud Run.
-- How to build AI-powered background features (like the **NanoBanana Auto-Cover Generator**) using Solid Queue and Gemini.
+- How to pair-program with Google Antigravity to demystify Rails 8 and Google Cloud.
+- How to run automated pre-flight diagnostics (`just workshop-test`) and test stages in isolated clones (`just workshop-uat`).
+- How to transition configurations seamlessly without branch confusion using `just workshop-rewind` and `just workshop-restore-gold`.
+- How to provision Google Cloud infrastructure asynchronously using Terraform while continuing local development without blocking.
+- How to eliminate security anti-patterns: private GCS buckets (`iam: true`) and Cloud SQL Auth Proxy mTLS tunnels instead of opening `0.0.0.0/0`.
+- How to inject secrets directly from Google Cloud Secret Manager.
+- How to orchestrate asynchronous GenAI background jobs (NanoBanana cover generator, bilingual podcast synthesis) via Solid Queue.
 
 Let's get started!
 
-## Setup and Prerequisites
+## Step 0: Prerequisites, Antigravity Setup & Billing Verification
 
-> 💡 **The Scenario:** Your team needs to modernize a Rails application for production on Google Cloud. The app was built locally with SQLite and local image storage, but it has high business value. We want a clean, zero-magic, production-grade cloud architecture with proper database pooling, private object storage, secret management, and AI background processing.
+> 💡 **The Scenario:** You and your team are building a mission-critical Rails 8 application. Before touching code or launching cloud resources, we must establish our toolchain, connect Google Antigravity, and verify our Google Cloud credentials and billing foundation.
 
-### Prerequisites
+### 1. Prerequisites Checklist
 
-Before we begin, make sure you have:
+Before we begin, ensure you have the following tools available in your environment:
+- **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
+- **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
+- **Docker & Docker Compose:** Installed and running locally.
+- **Ruby 3.3+ & Rails 8:** (`ruby -v`, `rails -v`).
+- **Google Antigravity IDE / Gemini CLI:** Your autonomous AI pair programming assistant ([Download Google Antigravity](https://antigravity.google/download)).
 
-1. **A Google Cloud Project:**
-   - **Full Track:** With billing enabled (for Cloud SQL and Cloud Storage).
-   - **Zero-Billing Track:** A Free Tier project *ohne* Cloud SQL. AI features use Vertex AI via your own credentials (no API keys); without them the app attaches an honest "fake" cover image instead.
-2. **Google Cloud CLI:** Installed and authenticated:
-   ```bash
-   gcloud auth login
-   gcloud auth application-default login
-   ```
-   Verify your active project:
-   ```bash
-   gcloud config get-value project
-   ```
-3. **Ruby & Rails:** Ruby 3.3+ and Rails 8 installed (`gem install rails`).
-4. **Terraform & Docker:** Installed and available on your PATH.
-5. **Cloud SQL Auth Proxy:** Download the binary from [Google Cloud](https://cloud.google.com/sql/docs/postgres/connect-auth-proxy#install) or install via package manager.
-6. **AI Pair Programming (Google Antigravity):**
-   - **Standalone IDE:** Install [Google Antigravity](https://antigravity.google/download).
-   - **VS Code Extension:** Run `code --install-extension Google.google-antigravity`.
+### 2. Google Cloud Authentication & Project Selection
 
-### Clone the Repository
+Authenticate your user account and Application Default Credentials (ADC), which allows Google Antigravity, Vertex AI, and local test suites to communicate securely with Google Cloud:
 
+```bash
+gcloud auth login
+gcloud auth application-default login
+```
+
+Set your active Google Cloud Project ID:
+```bash
+export PROJECT_ID="your-project-id"
+gcloud config set project $PROJECT_ID
+```
+
+### 3. 🚨 Mandatory Guard Gate: GCP Billing Verification
+
+> ⚠️ **CRITICAL GUARD GATE:** Google Cloud SQL and Cloud Run deployments require an active linked billing account or valid workshop educational credits. Checking this now prevents cryptic quota or billing failures halfway through the lab!
+
+Run the billing verification check:
+```bash
+gcloud beta billing projects describe $PROJECT_ID
+```
+Ensure `billingEnabled: true` is returned. If billing is disabled, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
+
+### 4. Clone the Repository & Pair with Antigravity
+
+Clone the repository and enter the directory. Notice that we stay entirely on **`main`**:
 ```bash
 git clone https://github.com/palladius/rails8-app-on-gcp.git
 cd rails8-app-on-gcp
-git checkout workshop_1_local_baseline
 ```
 
-### ⏱️ Launch Cloud SQL Provisioning Immediately!
+Open this directory in **Google Antigravity**. Antigravity will automatically inspect the repository, read `AGENTS.md`, and stand by as your pair programmer.
 
-Cloud SQL instances take about 10–12 minutes to provision. Rather than waiting later, we kick off provisioning right now in the background:
+### 5. Automated Step 0 Validation
 
+Verify that your Step 0 environment is 100% compliant with the evaluation suite:
 ```bash
-./bin/provision-cloudsql.sh
+just workshop-eval 0
 ```
-*(Or navigate to `iac/` and run `terraform init && terraform apply -auto-approve`)*
+✨ **The Wow Moment:** Antigravity and the workshop evaluation engine verify your CLI versions, Ruby environment, and ADC authentication in under 2 seconds!
 
-✨ **The Wow Moment:** One command starts heavy cloud provisioning asynchronously in the background. While Google Cloud builds your managed database, let's jump straight into our local Rails 8 application!
+## Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics
+
+> 💡 **The Strategy:** Managed databases like Google Cloud SQL PostgreSQL take approximately 10–12 minutes to provision. Rather than waiting idly later, we launch immutable infrastructure via Terraform **right now in the background** while we develop locally!
+
+### 1. Run Automated Pre-Flight Diagnostics Suite
+
+Before launching cloud infrastructure, run the comprehensive pre-flight test suite:
+```bash
+just workshop-test
+```
+This script (`bin/workshop_diagnostics.rb`):
+- Verifies your `ADMIN_EMAIL` identity configuration.
+- Verifies active billing and project linkage.
+- Validates Application Default Credentials (ADC) for Vertex AI.
+- Confirms the ActiveStorage canary seed image (`blog/app/assets/images/gcs_dev_image.jpg`).
+
+If `.env` is missing, copy it from the documented template:
+```bash
+cp .env.dist .env
+# Edit .env and configure ADMIN_EMAIL with your Google/Gmail account
+```
+
+### 2. ⏱️ Launch Terraform Infrastructure Asynchronously
+
+Navigate to the `iac/` directory and initialize Terraform:
+```bash
+cd iac
+terraform init
+terraform apply -auto-approve
+cd ..
+```
+*(Or use the top-level shorthand: `just terraform-apply`)*
+
+**What Terraform Provisions:**
+- **Google Cloud Storage Bucket:** Created with private access and IAM Credentials signing (`iam: true`).
+- **Canary Test Image:** Uploads `gcs_dev_image.jpg` to the bucket to enable end-to-end blob verification.
+- **Google Cloud SQL PostgreSQL Instance:** Initiates background provisioning (~10-12 minutes).
+
+### 3. Automated Step 1 Validation & Fast UAT
+
+Verify that Step 1 prerequisites and configurations pass:
+```bash
+just workshop-eval 1
+```
+
+Want to see how an automated grader or clean CI runner evaluates this step in an isolated clone? Run our fast UAT harness:
+```bash
+just workshop-uat 1
+```
+
+✨ **The Wow Moment:** One command launches heavy enterprise infrastructure cooking in Google Cloud while you immediately proceed to local development without waiting!
 
 ## Step 1: The Local Baseline, Seeds & Mailpit
 

@@ -1,6 +1,9 @@
 # Conductor Tracks Registry
 
-- [ ] **Track: Workshop Warnings & Admin Bootstrap (Issue #21)**
+- [~] **Track: Rewrite CODELAB.md to v2.0.0alpha (Issue #29)**
+*Link: [tracks/rewrite_codelab_v2_20260908/index.md](tracks/rewrite_codelab_v2_20260908/index.md)*
+
+- [x] **Track: Workshop Warnings & Admin Bootstrap (Issue #21)**
 *Link: [tracks/workshop_warnings_and_admin_bootstrap_20260908/index.md](tracks/workshop_warnings_and_admin_bootstrap_20260908/index.md)*
 
 - [ ] **Track: Merge workshop/steps into time-machine while preserving legacy test resources (Issue #28)**
