@@ -91,7 +91,12 @@ if ARGV.any?
   cli_options[:file] = ARGV.first
 else
   # Default files to check in priority order
-  default_files = ['./CODELAB.md', './WORKSHOP.md', '../CODELAB.md', '../workshop/CODELAB.md']
+  default_files = [
+    './CODELAB.md',
+    '../CODELAB.md',
+    File.expand_path('../../CODELAB.md', __FILE__),
+    File.expand_path('../CODELAB.md', __FILE__)
+  ]
   cli_options[:file] = default_files.find { |f| File.exist?(f) }
   cli_options[:file] ||= Dir.glob('*.md').first
 end
@@ -120,13 +125,17 @@ class CodelabServer < Sinatra::Base
     def resolve_doc_path(doc_param)
       return settings.default_file if doc_param.nil? || doc_param.empty?
 
+      # Find workshop dir and repo root
+      workshop_dir = settings.base_dir.end_with?('visualizer') ? File.expand_path('..', settings.base_dir) : settings.base_dir
+      repo_root = File.expand_path('..', workshop_dir)
+
       case doc_param.to_s.downcase
       when 'codelab'
-        candidate = File.join(settings.base_dir, 'CODELAB.md')
+        candidate = File.join(workshop_dir, 'CODELAB.md')
       when 'constitution'
-        candidate = File.exist?(File.join(settings.base_dir, '..', 'docs', 'CONSTITUTION.md')) ? File.expand_path(File.join(settings.base_dir, '..', 'docs', 'CONSTITUTION.md')) : File.join(settings.base_dir, 'UNTOUCHABLE-CONSTITUTION.md')
+        candidate = File.join(repo_root, 'docs', 'CONSTITUTION.md')
       when 'skeleton'
-        candidate = File.join(settings.base_dir, 'SKELETON.md')
+        candidate = File.join(workshop_dir, 'SKELETON.md')
       else
         candidate = File.expand_path(doc_param, settings.base_dir)
       end

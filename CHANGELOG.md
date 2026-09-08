@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
   - Preserved `workshop/app/SPEC.md` into `~/git/respec/docs/tools/workshop-visualizer/SPEC.md` and safely deleted obsolete stub `workshop/app/`.
   - Moved `workshop/IDEAS.md` to durable location `docs/ideas/WORKSHOP_IDEAS.md` and linked directly from `SKELETON.md`.
   - Removed obsolete draft `workshop/UNTOUCHABLE-CONSTITUTION.md` and redundant stub `workshop/USER_MANUAL.md`.
-  - Updated `workshop/server.rb` and `workshop/build_ghpages.rb` to dynamically serve and compile `docs/CONSTITUTION.md` as the single source of truth.
+  - Isolated all visualizer and build engine code into dedicated subfolder `workshop/visualizer/` (`server.rb`, `build_ghpages.rb`), leaving `workshop/` lean and focused on curriculum content.
+  - Updated `justfile`, CI workflow `.github/workflows/deploy-pages.yml`, `README.md`, and documentation to reflect the new `workshop/visualizer/` path.
   - Filed follow-up issue [#28](https://github.com/palladius/rails8-app-on-gcp/issues/28) to merge `workshop/steps/` into `workshop/time-machine/` and [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29) to rewrite `workshop/CODELAB.md`.
 
 ## [0.1.26] - 2026-09-08

@@ -37,7 +37,7 @@ autopush:
 
 # run the workshop codelab visualizer server (serves /, /constitution, /skeleton, /a2ui)
 workshop-dev port="8080":
-    cd workshop && ./server.rb --port {{port}}
+    ruby workshop/visualizer/server.rb --port {{port}}
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
@@ -83,7 +83,7 @@ terraform-apply:
 
 # Generate static HTML for GitHub pages from CODELAB.md
 build-ghpages:
-	cd workshop && ruby build_ghpages.rb
+	ruby workshop/visualizer/build_ghpages.rb
 
 # show registered users in a clean CLI table ordered by created_at DESC
 show-users:

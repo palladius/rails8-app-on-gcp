@@ -14,9 +14,9 @@ The process is going to look like:
 
 ## 🔗 Dependencies & Build Artifact Flow (DO NOT EDIT PRODUCED FILES)
 
-* **`docs/CONSTITUTION.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/constitution.html` *(PRODUCED)*
-* **`CODELAB.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/index.html` *(PRODUCED)*
-* **`SKELETON.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/skeleton.html` *(PRODUCED)*
+* **`docs/CONSTITUTION.md` (Source of Truth)** $\to$ `ruby visualizer/build_ghpages.rb` $\to$ produces `build/constitution.html` *(PRODUCED)*
+* **`CODELAB.md` (Source of Truth)** $\to$ `ruby visualizer/build_ghpages.rb` $\to$ produces `build/index.html` *(PRODUCED)*
+* **`SKELETON.md` (Source of Truth)** $\to$ `ruby visualizer/build_ghpages.rb` $\to$ produces `build/skeleton.html` *(PRODUCED)*
 * **`assets/*.jpg` (Source of Truth)** $\to$ copied to `../blog/app/assets/images/` and `build/assets/`
 * ⚠️ **RULE:** NEVER edit generated HTML (`build/*.html`). Always modify the Markdown source of truth!
 

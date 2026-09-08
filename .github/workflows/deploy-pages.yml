@@ -40,7 +40,7 @@ jobs:
           cd workshop
           
           # Build the Static HTML (Google Codelab style)
-          ruby build_ghpages.rb
+          ruby visualizer/build_ghpages.rb
           
           # Assemble the deployment directory
           cd ..

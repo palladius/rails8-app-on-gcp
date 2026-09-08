@@ -13,8 +13,8 @@ Writing technical workshops is often painful when tied to heavy frameworks or pr
 1. **Single Source of Truth:** Write your entire workshop in standard GitHub Flavored Markdown (`CODELAB.md` or `UNTOUCHABLE-CONSTITUTION.md`).
 2. **Deterministic Step Splitting:** Every Level 2 header (`## Step Title`) or Level 3 header (`### Step Title`) automatically becomes a discrete, trackable chapter.
 3. **Live & Static Visualizers:**
-   - **Interactive Live Server (`server.rb`):** A self-healing Sinatra server with client-side hash navigation, code syntax highlighting, callout boxes, and multi-doc switching.
-   - **Static Site Generator (`build_ghpages.rb`):** Compiles clean, zero-server static HTML files for hosting on GitHub Pages, Google Cloud Storage, or Firebase Hosting.
+   - **Interactive Live Server (`visualizer/server.rb`):** A self-healing Sinatra server with client-side hash navigation, code syntax highlighting, callout boxes, and multi-doc switching.
+   - **Static Site Generator (`visualizer/build_ghpages.rb`):** Compiles clean, zero-server static HTML files for hosting on GitHub Pages, Google Cloud Storage, or Firebase Hosting.
 
 ---
 
@@ -23,18 +23,19 @@ Writing technical workshops is often painful when tied to heavy frameworks or pr
 ```
 workshop/
 ├── CODELAB.md                      # 📖 Master workshop narrative
-├── UNTOUCHABLE-CONSTITUTION.md     # 📜 Master architectural contract & rules
 ├── SKELETON.md                     # 🦴 High-level steps summary
+├── ABOUT.md                        # 📝 Workshop presentation & overview
 │
-├── server.rb                       # 🚀 Live Sinatra visualization server (with doc switcher)
-├── build_ghpages.rb                # 🏗️ Compiles multi-doc static HTML to build/
+├── visualizer/                     # 🚀 Self-contained Visualizer & Build Engine
+│   ├── server.rb                   # Live Sinatra visualization server (with doc switcher)
+│   └── build_ghpages.rb            # Compiles multi-doc static HTML to workshop/build/
 │
 ├── assets/                         # 🖼️ Workshop images & media
 │   └── images/
 │
 └── build/                          # 📦 Static HTML output (ready for GH Pages/GCS)
     ├── index.html                  # Codelab viewer
-    ├── constitution.html           # Constitution viewer
+    ├── constitution.html           # Constitution viewer (compiled from docs/CONSTITUTION.md)
     ├── skeleton.html               # Skeleton viewer
     └── assets/                     # Copied media assets
 ```
@@ -53,24 +54,20 @@ just workshop-dev
 
 # Launch on a custom port (e.g. 4567)
 just workshop-dev port=4567
-
-# Launch directly focused on the Untouchable Constitution
-just workshop-constitution
 ```
 
-Or using Ruby directly from the `workshop/` folder:
+Or using Ruby directly:
 ```bash
-cd workshop
-./server.rb                       # Serves CODELAB.md by default
-./server.rb UNTOUCHABLE-CONSTITUTION.md   # Serves any specific markdown file
-./server.rb -p 3000 SKELETON.md   # Custom port
+ruby workshop/visualizer/server.rb                       # Serves CODELAB.md by default
+ruby workshop/visualizer/server.rb docs/CONSTITUTION.md   # Serves any specific markdown file
+ruby workshop/visualizer/server.rb -p 3000 workshop/SKELETON.md   # Custom port
 ```
 
 ### 🔀 Multi-Document Switching
 
 The live server automatically provides tabbed navigation in the sidebar header:
 - `http://localhost:8080/` or `/codelab` $\rightarrow$ [`CODELAB.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/workshop/CODELAB.md)
-- `http://localhost:8080/constitution` $\rightarrow$ [`UNTOUCHABLE-CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/workshop/UNTOUCHABLE-CONSTITUTION.md)
+- `http://localhost:8080/constitution` $\rightarrow$ [`docs/CONSTITUTION.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/CONSTITUTION.md)
 - `http://localhost:8080/skeleton` $\rightarrow$ [`SKELETON.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/workshop/SKELETON.md)
 - `http://localhost:8080/?file=path/to/any.md` $\rightarrow$ Any arbitrary markdown file!
 
@@ -83,8 +80,8 @@ just build-ghpages
 ```
 
 This will:
-1. Run `build_ghpages.rb` to generate `build/index.html`, `build/constitution.html`, and `build/skeleton.html`.
-2. Copy all media assets from `assets/` to `build/assets/`.
+1. Run `workshop/visualizer/build_ghpages.rb` to generate `workshop/build/index.html`, `workshop/build/constitution.html`, and `workshop/build/skeleton.html`.
+2. Copy all media assets from `workshop/assets/` to `workshop/build/assets/`.
 
 ---
 

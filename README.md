@@ -39,7 +39,7 @@ Sinatra-based interactive Codelab visualizer with hot-reloading (includes built-
 ```bash
 # Start the workshop server on port 8080
 just workshop-dev
-# (or: cd workshop && ./server.rb --port 8080)
+# (or: ruby workshop/visualizer/server.rb --port 8080)
 
 # Direct document URLs:
 # • Codelab:      http://localhost:8080/codelab

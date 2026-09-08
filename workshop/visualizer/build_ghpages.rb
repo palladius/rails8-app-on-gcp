@@ -11,6 +11,11 @@ rescue LoadError
   exit 1
 end
 
+# Ensure we operate with workshop/ as the reference directory for sources and output
+script_dir = File.dirname(File.expand_path(__FILE__))
+workshop_dir = File.expand_path('..', script_dir)
+repo_root = File.expand_path('..', workshop_dir)
+
 puts "🏗️ Building Codelab static multi-doc site..."
 
 def parse_markdown(file_path)
@@ -72,16 +77,17 @@ def render_markdown(text)
 end
 
 # Extract template from server.rb
-server_code = File.read('server.rb')
+server_rb_path = File.join(script_dir, 'server.rb')
+server_code = File.read(server_rb_path)
 template_string = server_code.split("@@index\n").last
 
-build_dir = 'build'
+build_dir = File.join(workshop_dir, 'build')
 FileUtils.mkdir_p(build_dir)
 
 docs_to_build = [
-  { source: 'CODELAB.md', target: 'index.html', active: 'codelab' },
-  { source: (File.exist?('../docs/CONSTITUTION.md') ? '../docs/CONSTITUTION.md' : 'UNTOUCHABLE-CONSTITUTION.md'), target: 'constitution.html', active: 'constitution' },
-  { source: 'SKELETON.md', target: 'skeleton.html', active: 'skeleton' }
+  { source: File.join(workshop_dir, 'CODELAB.md'), target: 'index.html', active: 'codelab' },
+  { source: File.join(repo_root, 'docs', 'CONSTITUTION.md'), target: 'constitution.html', active: 'constitution' },
+  { source: File.join(workshop_dir, 'SKELETON.md'), target: 'skeleton.html', active: 'skeleton' }
 ]
 
 docs_to_build.each do |doc|
@@ -101,13 +107,14 @@ docs_to_build.each do |doc|
   
   target_file = File.join(build_dir, doc[:target])
   File.write(target_file, html)
-  puts "   📄 Rendered #{doc[:source]} -> #{build_dir}/#{doc[:target]}"
+  puts "   📄 Rendered #{File.basename(doc[:source])} -> workshop/build/#{doc[:target]}"
 end
 
 # Copy assets
-if Dir.exist?('assets')
+assets_dir = File.join(workshop_dir, 'assets')
+if Dir.exist?(assets_dir)
   FileUtils.mkdir_p(File.join(build_dir, 'assets'))
-  FileUtils.cp_r(Dir.glob('assets/*'), File.join(build_dir, 'assets/'))
+  FileUtils.cp_r(Dir.glob(File.join(assets_dir, '*')), File.join(build_dir, 'assets/'))
 end
 
-puts "✅ Successfully built multi-doc static site into workshop/#{build_dir}/"
+puts "✅ Successfully built multi-doc static site into #{build_dir}/"
