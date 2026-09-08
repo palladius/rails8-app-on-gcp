@@ -25,14 +25,14 @@
       <div>
         <strong>Notice: No administrator user found in database!</strong>
         <div style="font-size: 0.85rem; color: #b91c1c; margin-top: 2px;">
-          Run <code>just seed</code> locally, or pass <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code> to Cloud Run.
+          Run <code>just seed</code> locally, or pass <code>GOOGLE_CLOUD_ACCOUNT</code> and <code>APP_ADMIN_PASSWORD</code> to Cloud Run.
         </div>
       </div>
     </div>
 
     <div>
       <a href="#missing-admin-modal" 
-         onclick="alert('💡 Why is this happening?\n\nYour database is currently empty (0 users found).\n\nTo bootstrap your admin user:\n1. In local dev: ensure ADMIN_EMAIL is set in .env and run `just seed` (or `bin/rails db:seed`).\n2. In Cloud Run: provide ADMIN_EMAIL and ADMIN_PASSWORD in your environment variables so the container bootstraps your account automatically!'); return false;"
+         onclick="alert('💡 Why is this happening?\n\nYour database is currently empty (0 users found).\n\nTo bootstrap your admin user:\n1. In local dev: ensure GOOGLE_CLOUD_ACCOUNT is set in .env and run `just seed` (or `bin/rails db:seed`).\n2. In Cloud Run: provide GOOGLE_CLOUD_ACCOUNT and APP_ADMIN_PASSWORD in your environment variables so the container bootstraps your account automatically!'); return false;"
          style="
            background-color: #fee2e2;
            border: 1px solid #ef4444;
