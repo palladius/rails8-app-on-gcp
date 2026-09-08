@@ -5,13 +5,15 @@ class Post < ApplicationRecord
   has_many :comments, dependent: :destroy
   belongs_to :user, optional: true
 
-  after_commit :generate_cover_image_if_missing, on: [:create, :update]
-  after_commit :generate_podcast_audio, on: [:create, :update]
+  after_commit :generate_cover_image_if_missing, on: [ :create, :update ]
+  after_commit :generate_podcast_audio, on: [ :create, :update ]
 
   private
 
   def generate_cover_image_if_missing
-    # We enqueue the NanoBanana generator job if there's no cover image attached yet.
+    # Nano Banana auto-cover (issue #18): enqueue the generator when no cover is
+    # attached yet. The job re-checks, so the extra enqueue on later updates is
+    # harmless and the attach performed by the job itself does not loop.
     GenerateCoverImageJob.perform_later(id) unless cover_image.attached?
   end
 

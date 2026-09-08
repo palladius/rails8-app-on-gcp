@@ -52,22 +52,30 @@ end
 # Override with --title option if provided
 title = options[:title] if options[:title]
 
-post = Post.find_by(title: title)
+post = Post.find_by(title: title) || Post.new(title: title)
+is_new = post.new_record?
+post.body = body
 
-if post
-  post.update!(body: body)
-  post.comments.create!(content: "Automatically updated via CLI at #{Time.current.strftime('%Y-%m-%d %H:%M:%S')}")
-  puts "Updated existing post: '#{title}'"
-else
-  post = Post.create!(title: title, body: body)
-  puts "Created new post: '#{title}'"
-end
-
+# Attach BEFORE saving (issue #18): the after_commit callback only enqueues the
+# Nano Banana cover generator when no cover is attached, so a CLI-provided image
+# must be on the record when the commit fires.
+image_attached = false
 if options[:image]
   if File.exist?(options[:image])
     post.cover_image.attach(io: File.open(options[:image]), filename: File.basename(options[:image]))
-    puts "Attached image: #{options[:image]}"
+    image_attached = true
   else
     warn "Warning: Image file '#{options[:image]}' not found. Skipping attachment."
   end
 end
+
+post.save!
+
+if is_new
+  puts "Created new post: '#{title}'"
+else
+  post.comments.create!(content: "Automatically updated via CLI at #{Time.current.strftime('%Y-%m-%d %H:%M:%S')}")
+  puts "Updated existing post: '#{title}'"
+end
+
+puts "Attached image: #{options[:image]}" if image_attached

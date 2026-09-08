@@ -1,4 +1,24 @@
 module ApplicationHelper
+  # :local (ephemeral disk) or :gcs (private bucket). See Nanobanana.storage_tier.
+  def storage_tier
+    Nanobanana.storage_tier
+  end
+
+  # Cover images on local disk are shown in "sad" grayscale (issue #18): the
+  # original bytes stay untouched, so the same image turns colorful again once
+  # ActiveStorage moves to GCS. Generated covers are also grayscale server-side.
+  def cover_image_classes(*extra)
+    class_names(*extra, "cover-image--local" => storage_tier == :local)
+  end
+
+  def cover_image_title
+    if storage_tier == :local
+      "Stored on ephemeral local disk: sad grayscale mode 💾 (ask AI why!)"
+    else
+      "Stored as a private blob on Google Cloud Storage ☁️"
+    end
+  end
+
   def launch_mode_info
     raw = ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.strip
 

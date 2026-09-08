@@ -40,3 +40,7 @@
 
 - [x] **Track: Workshop Skeleton Branches**
 *Link: [tracks/workshop_skeleton_20260724/index.md](tracks/workshop_skeleton_20260724/index.md)*
+
+- [x] **Track: Nano Banana Auto-Cover Generation on Vertex AI (Issue #18)**
+*Link: [./tracks/nanobanana_cover_issue_18_20260908/plan.md](./tracks/nanobanana_cover_issue_18_20260908/plan.md)*
+

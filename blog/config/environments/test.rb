@@ -29,7 +29,10 @@ Rails.application.configure do
   config.action_controller.allow_forgery_protection = false
 
   # Store uploaded files on the local file system in a temporary directory.
-  config.active_storage.service = :google_test
+  # Tests must run offline and in < 5 s (docs/CONSTITUTION.md §6), so the test
+  # suite never talks to a real GCS bucket. Use ACTIVE_STORAGE_SERVICE=google_test
+  # explicitly when you want to exercise the bucket by hand.
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "test").to_sym
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the

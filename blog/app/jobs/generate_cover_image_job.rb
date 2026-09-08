@@ -1,25 +1,32 @@
+# Nano Banana auto-cover (issue #18): a Post saved without a cover image gets a
+# vintage Italian movie poster generated on Vertex AI, or an honest fake cover
+# when credentials are missing. See lib/nanobanana.rb for the details.
 class GenerateCoverImageJob < ApplicationJob
   queue_as :default
 
+  discard_on ActiveRecord::RecordNotFound
+
   def perform(post_id)
     post = Post.find(post_id)
-    return if post.cover_image.attached?
+    return if post.cover_image.attached? # title + body + image → nothing to do
 
-    Rails.logger.info "🍌 NanoBanana AI: Generating cover image for Post #{post.id}..."
+    Rails.logger.info "🍌 Nano Banana: generating cover image for Post #{post.id}..."
 
-    prompt = <<~PROMPT
-      Create a cover image for a blog post titled "#{post.title}".
-      The article contains the following text: "#{post.content.to_s.truncate(500)}".
-      
-      CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a "Locandina di un film 1960" (a vintage 1960s Italian movie poster). 
-      Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. 
-      Also, you MUST feature a banana somewhere in the scene.
-    PROMPT
+    prompt = Nanobanana.prompt_for(post.title, post.body.to_plain_text)
+    result = Nanobanana.generate_image(prompt)
+    tier   = Nanobanana.storage_tier
+    png    = Nanobanana.stamp_provenance(result.data, tier: tier)
 
-    # Mocking the AI service call for now. In a real app, we'd use Gemini/Imagen here.
-    # image_io = AiService.generate_image(prompt)
-    # post.cover_image.attach(io: image_io, filename: "cover_#{post.id}.jpg")
-    
-    Rails.logger.info "🎨 Cover image generated with prompt: #{prompt.inspect}"
+    post.cover_image.attach(
+      io: StringIO.new(png),
+      filename: "cover_#{post.id}_#{result.source}_#{tier}.png",
+      content_type: "image/png"
+    )
+
+    # posts/show.html.erb subscribes with `turbo_stream_from @post`: whoever is
+    # looking at the post sees the cover appear without reloading.
+    Turbo::StreamsChannel.broadcast_refresh_to(post)
+
+    Rails.logger.info "🎨 Nano Banana: cover attached to Post #{post.id} (#{result.source}, #{tier})"
   end
 end
