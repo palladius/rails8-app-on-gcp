@@ -90,7 +90,7 @@ build-ghpages:
 show-users:
 	cd blog && just show-users
 
-# alias for show-users
-show-isers:
-	just show-users
 
+list:
+    @just --list
+    gh issue list
