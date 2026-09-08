@@ -60,3 +60,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [ ] **Track: Declarative Workshop Skeleton in YAML with Automated Hybrid & LLM EVALs**
 *Link: [./tracks/declarative_skeleton_yaml_20260908/](./tracks/declarative_skeleton_yaml_20260908/)*
+
+---
+
+- [ ] **Track: Workshop UI Alerts Hub & Admin Bootstrap Guard**
+*Link: [./tracks/workshop_warnings_and_admin_bootstrap_20260908/](./tracks/workshop_warnings_and_admin_bootstrap_20260908/)*
