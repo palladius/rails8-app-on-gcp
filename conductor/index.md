@@ -48,7 +48,7 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 ---
 
-- [~] **Track: CI/CD Pipelines for Cloud Run.**
+- [ ] **Track: CI/CD Pipelines for Cloud Run (Issue #33 - Paused for Milestone 2.0)**
 *Link: [./tracks/cicd_pipelines_20260725/](./tracks/cicd_pipelines_20260725/)*
 
 ---

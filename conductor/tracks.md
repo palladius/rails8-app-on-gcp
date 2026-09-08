@@ -12,7 +12,7 @@
 - [ ] **Track: Local Docker Compose (Issue #10)**
 *Link: [tracks/docker_compose_issue_10_20260820/index.md](tracks/docker_compose_issue_10_20260820/index.md)*
 
-- [ ] **Track: CI/CD Pipelines for Cloud Run**
+- [ ] **Track: CI/CD Pipelines for Cloud Run (Issue #33 - Paused for Milestone 2.0)**
 *Link: [tracks/cicd_pipelines_20260725/index.md](tracks/cicd_pipelines_20260725/index.md)*
 
 - [ ] **Track: Workshop Web App Visualizer**
