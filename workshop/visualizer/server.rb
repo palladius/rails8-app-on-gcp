@@ -219,8 +219,12 @@ class CodelabServer < Sinatra::Base
 
   # Slides endpoint
   get '/slides/?' do
-    slides_html = File.expand_path('../slides/dist/index.html', __dir__)
-    if File.exist?(slides_html)
+    slides_candidates = [
+      File.expand_path('../../slides/dist/index.html', __dir__),
+      File.expand_path('../slides/dist/index.html', __dir__)
+    ]
+    slides_html = slides_candidates.find { |f| File.exist?(f) }
+    if slides_html
       send_file slides_html
     else
       redirect 'http://localhost:8082/'
