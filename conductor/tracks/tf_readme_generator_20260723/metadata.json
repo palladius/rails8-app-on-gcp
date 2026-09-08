@@ -4,5 +4,6 @@
   "status": "completed",
   "created_at": "2026-07-23T14:30:00Z",
   "updated_at": "2026-07-24T17:57:00Z",
-  "description": "Create a terraform README.md generator and update CLI uploader to support sticky posts with comments."
+  "description": "Create a terraform README.md generator and update CLI uploader to support sticky posts with comments.",
+  "github_issue": 3
 }

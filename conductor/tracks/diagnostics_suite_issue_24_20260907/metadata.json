@@ -1,0 +1,11 @@
+{
+  "track_id": "diagnostics_suite_issue_24_20260907",
+  "type": "feature",
+  "status": "completed",
+  "description": "Workshop: Diagnostics Suite (just workshop-test)",
+  "github_issue": {
+    "number": 24
+  },
+  "created_at": "2026-09-07T10:00:00Z",
+  "updated_at": "2026-09-07T18:00:00Z"
+}
