@@ -8,11 +8,20 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# User.create!(email_address: "<YOUR EMAIL ADDRESS>", password: "<YOUR PASSWORD>")
+# --- Admin User Bootstrapping & Guard Gate (Issue #21) ---
+admin_email = ENV["ADMIN_EMAIL"]&.strip
+admin_password = ENV["ADMIN_PASSWORD"]&.strip
 
-admin_email = ENV.fetch("ADMIN_EMAIL", "ricc@google.com")
-admin_password = ENV.fetch("ADMIN_PASSWORD", "Ch4ng3m3!!1")
+# Strict Guard Gate: fail fast if admin email is missing or placeholder
+if admin_email.blank? || admin_email == "your-email@gmail.com"
+  warn "\n❌ [db:seed ERROR] ADMIN_EMAIL is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] ADMIN_EMAIL is not set in environment!")
+  warn "   👉 You MUST set your email address before seeding."
+  warn "   - In local development: set ADMIN_EMAIL=\"yourname@gmail.com\" in .env"
+  warn "   - On Google Cloud Run: deploy with --set-env-vars ADMIN_EMAIL=\"yourname@gmail.com\"\n"
+  exit 1
+end
 
+admin_password = "Ch4ng3m3!!1" if admin_password.blank?
 
 puts "* Adding/Updating Admin User: #{admin_email}"
 admin_user = User.find_or_create_by!(email_address: admin_email) do |user|

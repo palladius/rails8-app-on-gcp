@@ -41,8 +41,8 @@
       </nav>
     </header>
 
-    <%# === WORKSHOP STAGES 1 & 2 TELEMETRY (Issue #22: POLA warning for stuck jobs) === %>
-    <%= render "layouts/check_stuck_jobs" %>
+    <%# === WORKSHOP ALERTS HUB (Issues #21 & #22: centralized educational warnings) === %>
+    <%= render "workshop/alerts/hub" %>
 
     <main>
       <% if notice.present? %>

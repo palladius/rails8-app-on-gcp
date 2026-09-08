@@ -1,0 +1,49 @@
+<%# 
+  Pedagogical helper for Workshop First-Run & Cloud Run Deployments (Issue #21).
+  When launching on a fresh database without seed or without ADMIN_EMAIL set,
+  this partial warns the student and prevents confusion when trying to authenticate.
+%>
+<% users_count = User.count rescue 0 %>
+
+<% if users_count == 0 %>
+  <div class="workshop-missing-admin-alert" style="
+    background-color: #fef2f2;
+    border-left: 5px solid #ef4444;
+    color: #991b1b;
+    padding: 12px 16px;
+    margin: 12px auto;
+    max-width: 1200px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.5rem;">👤</span>
+      <div>
+        <strong>Notice: No administrator user found in database!</strong>
+        <div style="font-size: 0.85rem; color: #b91c1c; margin-top: 2px;">
+          Run <code>just seed</code> locally, or pass <code>ADMIN_EMAIL</code> and <code>ADMIN_PASSWORD</code> to Cloud Run.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="#missing-admin-modal" 
+         onclick="alert('💡 Why is this happening?\n\nYour database is currently empty (0 users found).\n\nTo bootstrap your admin user:\n1. In local dev: ensure ADMIN_EMAIL is set in .env and run `just seed` (or `bin/rails db:seed`).\n2. In Cloud Run: provide ADMIN_EMAIL and ADMIN_PASSWORD in your environment variables so the container bootstraps your account automatically!'); return false;"
+         style="
+           background-color: #fee2e2;
+           border: 1px solid #ef4444;
+           color: #7f1d1d;
+           padding: 6px 12px;
+           border-radius: 4px;
+           text-decoration: none;
+           font-size: 0.85rem;
+           font-weight: 600;">
+        Why? (Ask AI) 🤖
+      </a>
+    </div>
+  </div>
+<% end %>

@@ -1,6 +1,15 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.28] - 2026-09-08
+### Added
+- 🚨 **Workshop Unified Alerts Hub & Admin Bootstrap Guard (Fixes [#21](https://github.com/palladius/rails8-app-on-gcp/issues/21))**:
+  - Unified all educational workshop UI banners under `blog/app/views/workshop/alerts/` (`_hub.html.erb`, `_missing_admin.html.erb`, `_stuck_jobs.html.erb`).
+  - Added global flag `DISABLE_WORKSHOP_ALERTS=true` to easily disable all workshop warnings in production environments or when removing `app/views/workshop/`.
+  - Added strict guard gate in `blog/db/seeds.rb` that aborts if `ADMIN_EMAIL` is missing or set to placeholder, enforcing explicit student identity setup.
+  - Added educational "Notice: No administrator user found in database!" banner (`_missing_admin.html.erb`) with "Why? (Ask AI) 🤖" explainer modal when `User.count == 0`.
+  - Added comprehensive integration tests in `blog/test/integration/missing_admin_warning_test.rb`.
+
 ## [0.1.27] - 2026-09-08
 ### Changed
 - 🧹 **Workshop Documentation Reconciliation & Cleanup (Fixes [#27](https://github.com/palladius/rails8-app-on-gcp/issues/27))**:
