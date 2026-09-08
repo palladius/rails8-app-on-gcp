@@ -118,19 +118,15 @@ style: |
 
 ## 2. Launch & Connect Your Account 🔐
 
-1. Open **Google Antigravity** on your laptop.
-2. Sign in with your **Google Account** (`@gmail.com` or corporate Google identity).
-3. Authorize the pair programmer agent.
+1. Open **Google Antigravity** &nbsp;&middot;&nbsp; 2. Click **Sign in with Google** &nbsp;&middot;&nbsp; 3. Authorize agent.
 
-```
-┌────────────────────────────────────────────────────────┐
-│  🚀 Welcome to Google Antigravity                      │
-│                                                        │
-│  [ G  Sign in with Google ]                            │
-│                                                        │
-│  Connected: you@domain.com  🟢 Ready                   │
-└────────────────────────────────────────────────────────┘
-```
+<div style="text-align: center; margin: 10px 0;">
+  <img src="images/antigravity-login.png" style="max-height: 310px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); border: 1px solid #3c4043;" alt="Sign in with Google" />
+</div>
+
+<p style="font-size: 0.8em; color: #5f6368; text-align: center; margin: 4px 0 0 0;">
+  💡 Sign in with your personal <code>@gmail.com</code> or workshop Google identity.
+</p>
 
 ---
 

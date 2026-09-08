@@ -68,6 +68,7 @@ All notable changes to this project will be documented in this file.
   - Generated 3 distinctive cover art options via Nano Banana Pro (`slides/images/`): attached Pixar 3D style to Slide 1, preserved Retro Synthwave for future use, and attached Modern Minimalist Vector art to the final "Thank You!" closing slide (including LinkedIn contact links for Riccardo and Emiliano).
   - Added Google Cloud official SVG logomark to bottom-right of every slide via scoped Marp CSS.
   - Added circular face avatar badges of Riccardo and Emiliano to bottom-left of Slide 1 and Slide 6.
+  - Replaced ASCII mockup on Slide 2/3 with real Google Antigravity "Sign into Google" screenshot (`slides/images/antigravity-login.png`).
   - Archived Slide 5 ("The Pedagogical Contract") to `slides/archive/pedagogical-contract.md` to keep the active presentation focused on the essential onboarding steps while preserving pedagogical instructions in `workshop/landing-page/README.md`.
   - Updated `.gitignore` to ignore compiled `slides/dist/` and `log/` artifacts.
 
