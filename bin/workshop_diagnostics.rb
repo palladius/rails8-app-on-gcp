@@ -49,14 +49,14 @@ admin_email = env_vars["ADMIN_EMAIL"] || ENV["ADMIN_EMAIL"]
 
 # Auto-discover GCP account from gcloud if omitted in .env
 active_gcloud_account = `gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null`.strip
-if gcp_account.to_s.strip.empty?
+if gcp_account.to_s.strip.empty? || gcp_account == "your-personal-email@gmail.com" || gcp_account == "your-email@gmail.com"
   if !active_gcloud_account.empty?
     gcp_account = active_gcloud_account
-    puts "ℹ️  GOOGLE_CLOUD_ACCOUNT not set in .env; detected active account from gcloud: #{gcp_account}".blue
+    puts "ℹ️  GOOGLE_CLOUD_ACCOUNT not customized in .env; detected active account from gcloud: #{gcp_account}".blue
   else
-    puts "❌ [ERROR] GOOGLE_CLOUD_ACCOUNT is missing in .env and gcloud has no active logged-in account!".red
+    puts "❌ [ERROR] GOOGLE_CLOUD_ACCOUNT is missing or placeholder in .env and gcloud has no active logged-in account!".red
     puts "   👉 Un account Google valido è OBBLIGATORIO per: risorse billable, Terraform e IAM/IAP."
-    puts "   👉 Set GOOGLE_CLOUD_ACCOUNT in .env or run: gcloud auth login"
+    puts "   👉 Set GOOGLE_CLOUD_ACCOUNT=\"yourname@gmail.com\" in .env or run: gcloud auth login"
     errors_count += 1
   end
 else

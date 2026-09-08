@@ -14,7 +14,7 @@ admin_email = (ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"] || ENV["
 admin_password = (ENV["APP_ADMIN_PASSWORD"] || ENV["ADMIN_PASSWORD"])&.strip
 
 # Strict Guard Gate: fail fast if account email is missing or placeholder
-if admin_email.blank? || admin_email == "your-email@gmail.com"
+if admin_email.blank? || admin_email == "your-email@gmail.com" || admin_email == "your-personal-email@gmail.com"
   warn "\n❌ [db:seed ERROR] GOOGLE_CLOUD_ACCOUNT (or ADMIN_EMAIL) is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] GOOGLE_CLOUD_ACCOUNT (or ADMIN_EMAIL) is not set in environment!")
   warn "   👉 You MUST set your Google account email address before seeding."
   warn "   - In local development: set GOOGLE_CLOUD_ACCOUNT=\"yourname@gmail.com\" in .env"
