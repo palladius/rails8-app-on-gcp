@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.31] - 2026-09-08
+### Added
+- 🧪 **Fast Isolated Workshop Step UAT Harness (`bin/workshop_uat.rb`)**:
+  - Implemented an automated User Acceptance Testing (UAT) harness for validating workshop progression.
+  - Automatically spins up a fresh, network-free local `git clone` in `/tmp`, replicates `.env`, applies Step N configuration (Time-Machine rewind or baseline), runs `bin/workshop_eval.rb <step>`, and tears down the sandbox cleanly.
+  - Added recipe `just workshop-uat <step>` (defaults to Step 1). Enables lightning-fast validation of student onboarding without repetitive manual clones or branch switching.
+
 ## [0.1.30] - 2026-09-08
 ### Changed
 - ⏳ **Consolidate Workshop Steps into Zero-Branch Time-Machine (Fixes [#28](https://github.com/palladius/rails8-app-on-gcp/issues/28))**:

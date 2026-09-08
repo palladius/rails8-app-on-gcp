@@ -97,6 +97,10 @@ workshop-restore-gold:
 workshop-eval step="all":
 	ruby bin/workshop_eval.rb {{step}}
 
+# run fast end-to-end UAT test for a workshop step in an isolated local git clone
+workshop-uat step="1":
+	ruby bin/workshop_uat.rb {{step}}
+
 # Generate static HTML for GitHub pages from CODELAB.md and SKELETON.md
 build-ghpages:
 	just build-skeleton
