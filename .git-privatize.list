@@ -1,3 +1,4 @@
 private/gcp-key.json
 blog/config/master.key
 .env
+GEMINI.riccardo.md

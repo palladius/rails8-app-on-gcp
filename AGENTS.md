@@ -116,7 +116,7 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 - **Deterministic Workshop Branch Naming:** When creating or managing workshop branches, use the hierarchical pattern `workshop/step-<N>-<slug>` (e.g. `workshop/step-0-setup`, `workshop/step-1-local-baseline`). The slash (`/`) creates a dedicated Git namespace grouped neatly in GitHub/GitLab.
 - **TDD:** Start with a failing test, prove it fails first, and iterate until green.
 - **Verification Gates:** Ensure all tests pass. Never commit unless `just test` passes.
-
+- if USER is `ricc` or `riccardo`, search for an additional `GEMINI.riccardo.md` with personal directives. Read that file very carefully.
 ---
 
 ## 📦 Related Repositories
