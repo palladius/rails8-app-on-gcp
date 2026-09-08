@@ -14,9 +14,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Google Antigravity IDE or Gemini CLI environment
 - **`pseudocode`**:
   ```bash
-  gcloud auth login && gcloud auth application-default login
-  gcloud config set project $PROJECT_ID
-  gcloud beta billing projects describe $PROJECT_ID
+  gcloud auth login $GOOGLE_CLOUD_ACCOUNT && gcloud auth application-default login
+  gcloud config set project $GOOGLE_CLOUD_PROJECT
+  gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
   ```
 - **`postrequisites`**:
   - Authenticated gcloud and Application Default Credentials (ADC)
@@ -57,19 +57,19 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Local Docker engine running
 - **`pseudocode`**:
   ```bash
-  cp .env.dist .env && vim .env # set ADMIN_EMAIL
+  cp .env.dist .env && vim .env # set GOOGLE_CLOUD_ACCOUNT
   docker compose up -d
   bin/rails db:prepare db:seed
   open http://localhost:8025 # Mailpit
   ```
 - **`postrequisites`**:
   - Running local Rails 8 application with SQLite/Docker Postgres
-  - Admin account bootstrapped from ADMIN_EMAIL
+  - Admin account bootstrapped from GOOGLE_CLOUD_ACCOUNT
   - Intercepted welcome/reset password email in local Mailpit
   - Observed [EPHEMERAL DB / STORAGE] UI badge
 - **`evals`**:
   - `[SHELL]` Verify local Rails test suite passes
-  - `[RUBY]` Verify db/seeds.rb enforces ADMIN_EMAIL presence
+  - `[RUBY]` Verify db/seeds.rb enforces GOOGLE_CLOUD_ACCOUNT presence
   - `[LLM]` Evaluate student's first local blog post for creativity and workshop adherence
 
 ---
@@ -82,7 +82,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 1
-  gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars ADMIN_EMAIL=$ADMIN_EMAIL
+  gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
   # Test restart & observe lost data
   ```
 - **`postrequisites`**:

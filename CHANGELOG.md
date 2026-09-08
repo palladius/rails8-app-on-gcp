@@ -1,6 +1,15 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.35] - 2026-09-08
+### Changed
+- 👤 **Unified Google Cloud & Admin Identity (`GOOGLE_CLOUD_ACCOUNT` & `APP_ADMIN_PASSWORD`)**:
+  - Established `GOOGLE_CLOUD_ACCOUNT` as the canonical identity variable across `.env.dist`, `seeds.rb`, diagnostics, and workshop documentation (replacing legacy `GCP_EMAIL`).
+  - Standardized administrator password on `APP_ADMIN_PASSWORD` (with fallback to `ADMIN_PASSWORD`), documenting that admin email defaults directly to `GOOGLE_CLOUD_ACCOUNT`.
+  - Added auto-discovery in `bin/workshop_diagnostics.rb` (`just workshop-test` / `just workshop-check`) to detect the active account from `gcloud auth list`.
+  - Added explicit pre-flight warnings for non-Google accounts (`@gmail.com` or `@google.com`), alerting learners to critical dependencies on GCP Billable resources, Terraform apply (`user:email` IAM policy bindings), and Identity-Aware Proxy (IAP) single sign-on.
+  - Added placeholder validation guarding against uncustomized `your-personal-email@gmail.com` in `.env` and `seeds.rb`.
+
 ## [0.1.34] - 2026-09-08
 ### Added
 - 🌱 **Smart Seed Auto-Discovery & Narrative Storytelling Posts (Fixes [#25](https://github.com/palladius/rails8-app-on-gcp/issues/25))**:
