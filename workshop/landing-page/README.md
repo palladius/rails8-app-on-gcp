@@ -3,12 +3,15 @@
 > **🤖 Instruction for Google Antigravity:**
 > You are acting as a patient, encouraging, and highly technical pair-programming tutor for this workshop.
 > 
-> **Supreme Rule of Engagement:**
-> **DO NOT DO EVERYTHING FOR THE STUDENT.**
-> - Guide them step by step.
-> - Explain *why* things work the way they do (Ruby on Rails 8 concepts, GCP serverless patterns, security boundaries).
-> - Give the student terminal commands and code snippets to run or inspect, and ask them to verify results before moving on.
-> - When debugging, guide them to discover the error rather than blindly fixing it in the background.
+> **Supreme Rules of Engagement:**
+> 1. **DO NOT DO EVERYTHING FOR THE STUDENT.**
+>    - Guide them step by step.
+>    - Explain *why* things work the way they do (Ruby on Rails 8 concepts, GCP serverless patterns, security boundaries).
+>    - Give the student terminal commands and code snippets to run or inspect, and ask them to verify results before moving on.
+>    - When debugging, guide them to discover the error rather than blindly fixing it in the background.
+> 2. **DIAGNOSTICS FIRST:**
+>    - Your very first act is to verify the student's local environment by running or guiding them to run `just workshop-test`.
+>    - If any check fails (missing Ruby, missing gcloud ADC, missing Billing), prioritize unblocking the student before writing any code.
 
 ---
 
@@ -20,49 +23,99 @@ You are building a production-grade, cloud-native blog platform with **Ruby on R
 
 ---
 
-## 🗺️ Repository Anatomy
+## 🌉 The Bridge: From Step -1 to Step 0
 
-Everything you need is organized in this repository:
+### Step -1 (Recap from Slides):
+You downloaded **Google Antigravity 2.0**, logged in with your Google account, and pointed Antigravity to this landing page. **You are in the right place!**
 
-- 📄 [`justfile`](file:///justfile): **The command center.** Contains all recipes to build, run, test, and deploy.
-  - `just slides`: Run the presentation deck at `http://localhost:8082`
-  - `just workshop-dev`: Run the interactive step-by-step Codelab UI at `http://localhost:8080`
-  - `just dev`: Run the local Rails 8 application at `http://localhost:3000`
-  - `just test`: Run the test suite (fast & diagnostic)
-  - `just compose-up`: Run multi-container local stack (app + PostgreSQL + Solid Queue)
-- 📁 [`blog/`](file:///blog/): The core Rails 8 application codebase.
-  - Built with modern Rails 8 features: Solid Queue (DB-backed background jobs), Propshaft, Importmaps, ActionText, and ActiveStorage.
-- 📁 [`workshop/`](file:///workshop/): Workshop curriculum, steps, and interactive codelab viewer.
-  - See [`workshop/CODELAB.md`](file:///workshop/CODELAB.md) for the complete curriculum.
-  - Steps are grouped into Git branches: `workshop/step-1-local-baseline`, `workshop/step-2-docker-compose`, etc.
-- 📁 [`iac/`](file:///iac/): Infrastructure as Code.
-  - Cloud Run, Cloud SQL (PostgreSQL), Google Cloud Storage, Secret Manager, Cloud Build configurations.
-- 📁 [`slides/`](file:///slides/): Marp presentation slides.
+### Step 0: The Local Environment Foundation ("La Valle delle Lacrime" Solved!)
+Before we touch the cloud, we need our local tools ready. You need:
+1. **Ruby 3.3+** (Rails 8 runtime)
+2. **Google Cloud SDK (`gcloud`)** (authenticated with your account)
+3. **Docker** (for local services & Mailpit)
+4. **Just** (command runner)
+5. **Terraform** (for Step 1 cloud infrastructure)
+
+#### 💻 Quick Setup by Operating System:
+
+##### 🍎 macOS (via Homebrew):
+```bash
+# Core CLI tools:
+brew install just terraform google-cloud-sdk
+# Ruby via rbenv:
+brew install rbenv
+rbenv install 3.3.8 && rbenv global 3.3.8
+```
+
+##### 🐧 Linux / Debian / Ubuntu:
+```bash
+# Core dev dependencies:
+sudo apt-get update && sudo apt-get install -y git curl build-essential libssl-dev libyaml-dev
+# Just runner:
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
+# Ruby via rbenv:
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+~/.rbenv/bin/rbenv init
+# Install Ruby 3.3+
+```
+
+##### ☁️ Google Cloud Shell / VM:
+```bash
+# Cloud Shell has gcloud, Docker, and Terraform pre-installed!
+# Just verify or install Ruby 3.3+ using rbenv or chruby.
+```
 
 ---
 
-## 🚀 How to Begin (Step 0)
+## 🧪 Step 0 Verification: The Pre-Flight Diagnostics Gate
 
-1. **Verify Your Local Setup:**
-   Run the following in your terminal to see available commands:
-   ```bash
-   just
-   ```
-2. **Start the Workshop Guide:**
-   Launch the workshop codelab server:
-   ```bash
-   just workshop-dev
-   ```
-   Then open [http://localhost:8080](http://localhost:8080) in your browser.
+Once tools are installed, create your local configuration and run our diagnostic suite:
 
-3. **Start the Rails App:**
-   ```bash
-   just dev
-   ```
-   Visit [http://localhost:3000](http://localhost:3000) to see your fresh Rails 8 application running locally on SQLite.
+```bash
+# 1. Copy environment template
+cp .env.dist .env
 
-4. **Pair with Antigravity:**
-   Ask Antigravity:
-   > *"I have the app running on localhost. What is Step 1 of the workshop, and how does Rails 8 handle database storage locally vs in GCP?"*
+# 2. Authenticate with Google Cloud
+gcloud auth login
+gcloud auth application-default login
+
+# 3. Run the automated pre-flight diagnostics
+just workshop-test
+```
+
+The diagnostic suite (`just workshop-test`) validates in real-time:
+- 👤 **Identity & Admin Email**: Validates `ADMIN_EMAIL` in `.env`.
+- ☁️ **GCP Project & Billing**: Validates `GCP_PROJECT_ID` and **mandatory active GCP billing** (`gcloud beta billing projects describe`).
+- 🔐 **ADC Credentials**: Validates Application Default Credentials for Vertex AI without API keys.
+- 🔑 **Rails Master Key**: Verifies local decryption keys.
+- 🐤 **Storage Canary**: Checks for GCS canary asset readiness.
+
+---
+
+## 🗺️ Repository Anatomy & Local Command Center
+
+Everything is orchestrated through [`justfile`](file:///justfile):
+
+- 📄 [`justfile`](file:///justfile):
+  - `just workshop-test`: Run pre-flight diagnostics suite 🧪
+  - `just workshop-dev`: Run the interactive Codelab visualizer at `http://localhost:8080`
+  - `just slides`: Run presentation slides at `http://localhost:8082`
+  - `just dev`: Run local Rails 8 Puma server at `http://localhost:3000`
+  - `just test`: Run fast automated unit & integration tests (< 5s)
+  - `just compose-up`: Run multi-container local stack (app + PostgreSQL + Solid Queue + Mailpit)
+- 📁 [`blog/`](file:///blog/): The core Rails 8 application codebase.
+- 📁 [`workshop/`](file:///workshop/):
+  - [`workshop/SKELETON.md`](file:///workshop/SKELETON.md): Master 8-step roadmap.
+  - [`workshop/CODELAB.md`](file:///workshop/CODELAB.md): Extended narrative curriculum.
+  - [`workshop/visualizer/`](file:///workshop/visualizer/): Isolated Sinatra Codelab viewer and GitHub Pages compiler.
+- 📁 [`iac/`](file:///iac/): Infrastructure as Code (Terraform Cloud SQL, GCS, Cloud Run).
+
+---
+
+## 🚀 Ready to Begin Step 1?
+
+Once `just workshop-test` outputs a clean green report, tell Google Antigravity:
+
+> *"All pre-flight checks are green! Let's proceed to Step 1: configuring our .env and launching immutable Terraform infrastructure!"*
 
 Enjoy the journey! 🚀
