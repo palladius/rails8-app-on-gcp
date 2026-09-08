@@ -55,3 +55,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [~] **Track: Workshop Web App**
 *Link: [./tracks/workshop_webapp_20260821/](./tracks/workshop_webapp_20260821/)*
+
+---
+
+- [ ] **Track: Declarative Workshop Skeleton in YAML with Automated Hybrid & LLM EVALs**
+*Link: [./tracks/declarative_skeleton_yaml_20260908/](./tracks/declarative_skeleton_yaml_20260908/)*
