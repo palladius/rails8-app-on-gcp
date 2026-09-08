@@ -41,21 +41,55 @@ else
   warnings_count += 1
 end
 
-puts "\n--- 👤 1. Checking Identity & Admin Email ---".bold
+puts "\n--- 👤 1. Checking Google Cloud & Admin Identity (GCP_EMAIL) ---".bold
+# GCP_EMAIL is primary for billing, terraform, IAM, ADC, and IAP; ADMIN_EMAIL defaults to it.
+gcp_email = env_vars["GCP_EMAIL"] || ENV["GCP_EMAIL"]
 admin_email = env_vars["ADMIN_EMAIL"] || ENV["ADMIN_EMAIL"]
-if admin_email.to_s.strip.empty?
-  puts "❌ [ERROR] ADMIN_EMAIL is missing in .env!".red
-  puts "   👉 Required for creating the initial blog admin user."
+
+# Auto-discover GCP account from gcloud if omitted in .env
+active_gcloud_account = `gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null`.strip
+if gcp_email.to_s.strip.empty?
+  if !active_gcloud_account.empty?
+    gcp_email = active_gcloud_account
+    puts "ℹ️  GCP_EMAIL not set in .env; detected active account from gcloud: #{gcp_email}".blue
+  else
+    puts "❌ [ERROR] GCP_EMAIL is missing in .env and gcloud has no active logged-in account!".red
+    puts "   👉 Un account Google valido è OBBLIGATORIO per: risorse billable, Terraform e IAM/IAP."
+    puts "   👉 Set GCP_EMAIL in .env or run: gcloud auth login"
+    errors_count += 1
+  end
+else
+  puts "✅ GCP_EMAIL configured: #{gcp_email}".green
+end
+
+# Admin email resolution: defaults strictly to GCP_EMAIL
+effective_admin = admin_email.to_s.strip.empty? ? gcp_email : admin_email
+if effective_admin.to_s.strip.empty?
+  puts "❌ [ERROR] ADMIN_EMAIL could not be resolved from GCP_EMAIL or .env!".red
   errors_count += 1
 else
-  puts "✅ ADMIN_EMAIL configured: #{admin_email}".green
-  if admin_email.end_with?("@gmail.com") || admin_email.end_with?("@google.com")
-    puts "✅ Email provider is Google/Gmail (Recommended for IAP and GCP access)".green
-  else
-    puts "⚠️  [WARNING] ADMIN_EMAIL is not a @gmail.com or @google.com address!".yellow
-    puts "   Recommendation: Using a Gmail address makes IAP and Google Cloud access seamless."
+  puts "✅ Blog Admin User defaults to: #{effective_admin}".green
+end
+
+# Mandatory Warning: Non-Google/Gmail account
+if !gcp_email.to_s.strip.empty?
+  unless gcp_email.end_with?("@gmail.com") || gcp_email.end_with?("@google.com")
+    puts "⚠️  [WARNING] GCP_EMAIL (#{gcp_email}) is not a @gmail.com or @google.com address!".yellow
+    puts "   Attenzione: Se usi un account non Google/Gmail ti apri a problemi critici con GCP:"
+    puts "   - Attivazione e linking account di fatturazione (Billable resources)"
+    puts "   - Esecuzione di `terraform apply` (IAM policy bindings per user:email)"
+    puts "   - Zero-Trust Identity-Aware Proxy (IAP) e matching utente."
     warnings_count += 1
+  else
+    puts "✅ Google Account verified: #{gcp_email} (Ready for Billing, Terraform, IAM & IAP)".green
   end
+end
+
+# Warning if someone explicitly overrode ADMIN_EMAIL to be different
+if !admin_email.to_s.strip.empty? && !gcp_email.to_s.strip.empty? && admin_email.strip.downcase != gcp_email.strip.downcase
+  puts "⚠️  [WARNING] ADMIN_EMAIL (#{admin_email}) and GCP_EMAIL (#{gcp_email}) differ!".yellow
+  puts "   Se usi 2 email diverse puoi avere problemi con Mailpit, single sign-on IAP e matching utente."
+  warnings_count += 1
 end
 
 puts "\n--- ☁️  2. Checking Google Cloud Project & Billing ---".bold

@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.32] - 2026-09-08
+### Changed
+- 👤 **Unified GCP & Admin Identity (`GCP_EMAIL`)**:
+  - Established `GCP_EMAIL` as the primary standard identity variable in `.env.dist` and across workshop tooling.
+  - The Rails blog administrator account in `blog/db/seeds.rb` now defaults strictly to `GCP_EMAIL` (with fallback to `ADMIN_EMAIL`).
+  - Added auto-discovery in `bin/workshop_diagnostics.rb` (`just workshop-test` / `just workshop-check`) to detect the logged-in Google account from `gcloud auth list` if omitted in `.env`.
+  - Added explicit pre-flight warnings if a non-Google account (`@gmail.com` or `@google.com`) is configured, highlighting the critical dependencies on GCP Billable resources, Terraform apply (`user:email` IAM policy bindings), and Identity-Aware Proxy (IAP) single sign-on.
+
 ## [0.1.31] - 2026-09-08
 ### Added
 - 🧪 **Fast Isolated Workshop Step UAT Harness (`bin/workshop_uat.rb`)**:

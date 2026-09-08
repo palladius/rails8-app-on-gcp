@@ -8,16 +8,17 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# --- Admin User Bootstrapping & Guard Gate (Issue #21) ---
-admin_email = ENV["ADMIN_EMAIL"]&.strip
+# --- Admin User Bootstrapping & Guard Gate (Issue #21 & #29) ---
+# Primary Google Cloud identity for IAM, billing, ADC, IAP, and blog administrator.
+admin_email = (ENV["GCP_EMAIL"] || ENV["ADMIN_EMAIL"])&.strip
 admin_password = ENV["ADMIN_PASSWORD"]&.strip
 
-# Strict Guard Gate: fail fast if admin email is missing or placeholder
+# Strict Guard Gate: fail fast if account email is missing or placeholder
 if admin_email.blank? || admin_email == "your-email@gmail.com"
-  warn "\n❌ [db:seed ERROR] ADMIN_EMAIL is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] ADMIN_EMAIL is not set in environment!")
-  warn "   👉 You MUST set your email address before seeding."
-  warn "   - In local development: set ADMIN_EMAIL=\"yourname@gmail.com\" in .env"
-  warn "   - On Google Cloud Run: deploy with --set-env-vars ADMIN_EMAIL=\"yourname@gmail.com\"\n"
+  warn "\n❌ [db:seed ERROR] GCP_EMAIL (or ADMIN_EMAIL) is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] GCP_EMAIL (or ADMIN_EMAIL) is not set in environment!")
+  warn "   👉 You MUST set your Google account email address before seeding."
+  warn "   - In local development: set GCP_EMAIL=\"yourname@gmail.com\" in .env"
+  warn "   - On Google Cloud Run: deploy with --set-env-vars GCP_EMAIL=\"yourname@gmail.com\"\n"
   exit 1
 end
 
