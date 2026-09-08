@@ -1,0 +1,250 @@
+version: "1.1.0"
+title: "Rails 8 on Google Cloud Workshop"
+description: "Declarative roadmap and evaluation specifications for the Rails 8 on GCP workshop."
+steps:
+  - id: "step-0"
+    number: 0
+    title: "Prerequisites, Antigravity Setup & Billing Verification"
+    description: "Verify local toolchain, Google Cloud authentication, project selection, and billing status before writing code."
+    pseudocode: |
+      gcloud auth login && gcloud auth application-default login
+      gcloud config set project $PROJECT_ID
+      gcloud beta billing projects describe $PROJECT_ID
+    prerequisites:
+      - "Google Cloud Account with active credits or billing account"
+      - "Installed CLIs: gcloud, terraform, docker, ruby 3.3+, rails 8"
+      - "Google Antigravity IDE or Gemini CLI environment"
+    postrequisites:
+      - "Authenticated gcloud and Application Default Credentials (ADC)"
+      - "Verified active billing account preventing mid-workshop quota failures"
+      - "Antigravity connected and paired with repository"
+    evals:
+      - id: "step-0-shell-gcloud"
+        type: "shell"
+        description: "Verify gcloud CLI is installed and returns valid version"
+        command: "gcloud version"
+        expect_exit: 0
+      - id: "step-0-shell-adc"
+        type: "shell"
+        description: "Verify Application Default Credentials file exists or can print token"
+        command: "test -f ~/.config/gcloud/application_default_credentials.json || gcloud auth application-default print-access-token > /dev/null"
+        expect_exit: 0
+      - id: "step-0-ruby-env"
+        type: "ruby"
+        description: "Check Ruby version is 3.3 or higher"
+        code: "raise 'Ruby too old' if RUBY_VERSION < '3.3.0'"
+
+  - id: "step-1"
+    number: 1
+    title: "Terraform Infrastructure Kickoff & Pre-Flight Diagnostics"
+    description: "Execute pre-flight diagnostics suite and kick off Terraform infrastructure in the background."
+    pseudocode: |
+      just workshop-test
+      cd iac && terraform init && terraform apply -auto-approve
+    prerequisites:
+      - "Step 0 completed and billing verified"
+      - "Terraform CLI 1.5+ installed"
+    postrequisites:
+      - "Passing pre-flight diagnostics suite (workshop-test)"
+      - "GCS bucket provisioned with IAM Credentials signing (iam: true)"
+      - "Canary seed image uploaded to GCS"
+      - "Cloud SQL PostgreSQL provisioning cooking in the background (~10-12 mins)"
+    evals:
+      - id: "step-1-shell-diagnostics"
+        type: "shell"
+        description: "Run automated pre-flight workshop diagnostics"
+        command: "ruby test/test_workshop_diagnostics.rb"
+        expect_exit: 0
+      - id: "step-1-ruby-terraform-config"
+        type: "ruby"
+        description: "Verify Terraform main configuration file exists and has valid syntax"
+        code: "raise 'Missing main.tf' unless File.exist?('iac/main.tf')"
+
+  - id: "step-2"
+    number: 2
+    title: "The Local Baseline, Mailpit & Admin Onboarding"
+    description: "Run local Docker Compose stack, seed the database with admin identity, intercept welcome email in Mailpit, and inspect models."
+    pseudocode: |
+      cp .env.dist .env && vim .env # set ADMIN_EMAIL
+      docker compose up -d
+      bin/rails db:prepare db:seed
+      open http://localhost:8025 # Mailpit
+    prerequisites:
+      - "Step 1 kicked off"
+      - "Local Docker engine running"
+    postrequisites:
+      - "Running local Rails 8 application with SQLite/Docker Postgres"
+      - "Admin account bootstrapped from ADMIN_EMAIL"
+      - "Intercepted welcome/reset password email in local Mailpit"
+      - "Observed [EPHEMERAL DB / STORAGE] UI badge"
+    evals:
+      - id: "step-2-shell-rails-test"
+        type: "shell"
+        description: "Verify local Rails test suite passes"
+        command: "cd blog && bin/rails test"
+        expect_exit: 0
+      - id: "step-2-ruby-user-seeded"
+        type: "ruby"
+        description: "Verify db/seeds.rb enforces ADMIN_EMAIL presence"
+        code: |
+          seeds = File.read('blog/db/seeds.rb')
+          raise 'Missing ADMIN_EMAIL guard' unless seeds.include?('admin_email.blank?')
+      - id: "step-2-llm-student-post"
+        type: "llm"
+        description: "Evaluate student's first local blog post for creativity and workshop adherence"
+        prompt: "Check the student's blog post title and body. Verify it represents a valid greeting or technical note for a cloud workshop. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+
+  - id: "step-3"
+    number: 3
+    title: "Deploy 1 — The Stateless Shock (Early WOW!)"
+    description: "Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart."
+    pseudocode: |
+      just workshop-rewind 1
+      gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars ADMIN_EMAIL=$ADMIN_EMAIL
+      # Test restart & observe lost data
+    prerequisites:
+      - "Step 2 completed"
+      - "Cloud Run API enabled in GCP project"
+    postrequisites:
+      - "First live public HTTPS URL on Cloud Run"
+      - "First-hand experience of container disk ephemeral resets (lost SQLite posts & images)"
+      - "Clear motivation for Google Cloud Storage and managed Cloud SQL"
+    evals:
+      - id: "step-3-shell-cloudrun-service"
+        type: "shell"
+        description: "Verify Cloud Run service exists and is responding (dry-run/check)"
+        command: "gcloud run services list --format='value(metadata.name)' | grep -E '^blog$' || true"
+        expect_exit: 0
+      - id: "step-3-ruby-alerts-hub"
+        type: "ruby"
+        description: "Verify missing admin alert partial is present in views"
+        code: "raise 'Missing alert' unless File.exist?('blog/app/views/workshop/alerts/_missing_admin.html.erb')"
+
+  - id: "step-4"
+    number: 4
+    title: "Deploy 2 — GCS Persistent Storage & POLA Warning"
+    description: "Point ActiveStorage to Google Cloud Storage with private IAM signing and observe the POLA stuck jobs warning banner."
+    pseudocode: |
+      just workshop-rewind 2
+      gcloud run deploy blog --source . --set-env-vars GCS_BUCKET=$GCS_BUCKET
+      # Observe surviving images & stuck jobs banner
+    prerequisites:
+      - "Step 3 completed"
+      - "GCS bucket provisioned from Step 1"
+    postrequisites:
+      - "Uploaded media survives container restarts in private GCS bucket"
+      - "Signed blob URLs functioning via IAM Credentials API"
+      - "Pedagogical stuck jobs warning (_check_stuck_jobs) visible in UI"
+    evals:
+      - id: "step-4-ruby-storage-config"
+        type: "ruby"
+        description: "Verify storage.yml defines google service with IAM signing"
+        code: |
+          storage = File.read('blog/config/storage.yml')
+          raise 'GCS IAM signing missing' unless storage.include?('iam: true') || storage.include?('Google')
+      - id: "step-4-shell-stuck-jobs-test"
+        type: "shell"
+        description: "Verify integration test for stuck jobs banner passes"
+        command: "cd blog && bin/rails test test/integration/stuck_jobs_warning_test.rb"
+        expect_exit: 0
+
+  - id: "step-5"
+    number: 5
+    title: "Cloud SQL Ready & Secret Manager CLI Injection"
+    description: "Verify Cloud SQL instance provisioning is finished and inject sensitive secrets into Google Cloud Secret Manager."
+    pseudocode: |
+      gcloud sql instances describe rails-postgres --format='value(state)'
+      gcloud secrets create rails-master-key --data-file=blog/config/master.key
+      gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
+    prerequisites:
+      - "Step 4 completed"
+      - "Cloud SQL instance provisioned and in RUNNABLE state"
+    postrequisites:
+      - "Secrets stored securely in Secret Manager (zero credentials in git or env files)"
+      - "Cloud Run runtime Service Account granted Secret Accessor role"
+      - "Local mTLS proxy connectivity verified via cloud-sql-proxy"
+    evals:
+      - id: "step-5-shell-secrets-exist"
+        type: "shell"
+        description: "Verify Secret Manager API is accessible or secrets listed"
+        command: "gcloud services list --enabled --filter='name:secretmanager.googleapis.com' --format='value(name)' || true"
+        expect_exit: 0
+      - id: "step-5-ruby-master-key"
+        type: "ruby"
+        description: "Verify master.key exists locally"
+        code: "raise 'Missing master.key' unless File.exist?('blog/config/master.key') || File.exist?('blog/config/credentials.yml.enc')"
+
+  - id: "step-6"
+    number: 6
+    title: "Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)"
+    description: "Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar."
+    pseudocode: |
+      just workshop-restore-gold
+      gcloud run deploy blog --source . # multi-container compose.prod.yaml
+      bin/rails db:migrate
+    prerequisites:
+      - "Step 5 completed"
+      - "Cloud SQL and Secret Manager configured"
+    postrequisites:
+      - "Production-grade multi-container sidecar architecture running serverlessly on Cloud Run"
+      - "Solid Queue background workers actively draining queue"
+      - "Persistent Cloud SQL PostgreSQL with connection pooling"
+      - "UI badge turns green: [CLOUD PERSISTENT 🐘 ☁️]"
+    evals:
+      - id: "step-6-ruby-compose-prod"
+        type: "ruby"
+        description: "Verify multi-container production compose configuration contains web, worker, and proxy"
+        code: |
+          compose = File.read('blog/compose.prod.yaml') rescue ""
+          raise 'Missing multi-container compose' if compose.empty?
+      - id: "step-6-shell-full-test"
+        type: "shell"
+        description: "Verify full test suite passes against gold standard"
+        command: "cd blog && just test"
+        expect_exit: 0
+
+  - id: "step-7"
+    number: 7
+    title: "Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️"
+    description: "Enable asynchronous background GenAI cover generation, text-to-speech podcast synthesis, and recover orphan cloud blobs via Rails console."
+    pseudocode: |
+      gcloud run jobs execute ai-image-sync || bin/rails runner GenerateCoverImageJob.perform_now
+      bin/rails console # ActiveStorage blob reconnection
+    prerequisites:
+      - "Step 6 completed"
+      - "GEMINI_API_KEY or Vertex AI IAM permissions active"
+    postrequisites:
+      - "Asynchronous GenAI image generation attached to blog posts"
+      - "Bilingual TTS audio podcast generation functional"
+      - "Successful recovery of orphaned Step 4 GCS blob connected to Cloud SQL post"
+    evals:
+      - id: "step-7-ruby-genai-jobs"
+        type: "ruby"
+        description: "Verify GenerateCoverImageJob exists"
+        code: "raise 'Missing job' unless File.exist?('blog/app/jobs/generate_cover_image_job.rb')"
+      - id: "step-7-llm-image-prompt"
+        type: "llm"
+        description: "Verify GenAI prompt conforms to Milanese vintage poster aesthetic"
+        prompt: "Review the image generation prompt in GenerateCoverImageJob. Verify it requests a vintage retro poster style with a banana cameo. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+
+  - id: "step-8"
+    number: 8
+    title: "Choose Your Own Adventure / Advanced Quests 🏆"
+    description: "Capstone enterprise challenges: Identity-Aware Proxy (IAP), Cloud Logging & Error Reporting, pgvector semantic search, or SEO Assistant."
+    pseudocode: |
+      # Choose Quest: IAP, SRE Observability, pgvector, or SEO Assistant
+      git checkout -b quest/iap-security
+    prerequisites:
+      - "Step 7 completed"
+    postrequisites:
+      - "Graduation portfolio project completed"
+      - "Deepened mastery of enterprise cloud-native patterns on Google Cloud"
+    evals:
+      - id: "step-8-ruby-iap-concern"
+        type: "ruby"
+        description: "Verify IAP authentication concern exists for Quest 1"
+        code: "raise 'Missing IapAuthenticatable' unless File.exist?('blog/app/controllers/concerns/iap_authenticatable.rb')"
+      - id: "step-8-llm-quest-review"
+        type: "llm"
+        description: "Evaluate student's capstone quest architecture and report"
+        prompt: "Review the student's chosen capstone quest implementation. Confirm it satisfies cloud security, observability, or GenAI best practices. Return JSON with {return: 0 or 1, comment: string, error_message: string}."

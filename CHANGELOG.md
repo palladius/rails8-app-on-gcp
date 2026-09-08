@@ -1,6 +1,16 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.29] - 2026-09-08
+### Added
+- 📐 **Declarative Workshop Skeleton & Hybrid/LLM Evaluation Engine (Fixes [#31](https://github.com/palladius/rails8-app-on-gcp/issues/31))**:
+  - Created `workshop/skeleton.yaml` as the canonical, structured Single Source of Truth for the entire 8-step workshop roadmap.
+  - Defined explicit schema per step: `title`, `description`, `pseudocode`, `prerequisites`, `postrequisites`, and heterogeneous `evals`.
+  - Implemented `workshop/visualizer/build_skeleton.rb` compiler to render `workshop/SKELETON.md` deterministically from YAML.
+  - Integrated `just build-skeleton` into `just build-ghpages` ensuring documentation consistency across CI and local visualizers.
+  - Implemented `bin/workshop_eval.rb` evaluation engine executing `shell`, `ruby`, and `llm` evaluations (with structured JSON feedback contract `{return, comment, error_message}`).
+  - Added recipe `just workshop-eval [step]` to validate student progress locally or via automated graders.
+
 ## [0.1.28] - 2026-09-08
 ### Added
 - 🚨 **Workshop Unified Alerts Hub & Admin Bootstrap Guard (Fixes [#21](https://github.com/palladius/rails8-app-on-gcp/issues/21))**:

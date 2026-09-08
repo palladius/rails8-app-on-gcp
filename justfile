@@ -81,8 +81,17 @@ conductor-status:
 terraform-apply:
 	cd iac && terraform apply
 
-# Generate static HTML for GitHub pages from CODELAB.md
+# compile workshop/SKELETON.md from workshop/skeleton.yaml
+build-skeleton:
+	ruby workshop/visualizer/build_skeleton.rb
+
+# run automated evaluations on workshop steps (default: step 0 or specify step)
+workshop-eval step="all":
+	ruby bin/workshop_eval.rb {{step}}
+
+# Generate static HTML for GitHub pages from CODELAB.md and SKELETON.md
 build-ghpages:
+	just build-skeleton
 	ruby workshop/visualizer/build_ghpages.rb
 
 # show registered users in a clean CLI table ordered by created_at DESC

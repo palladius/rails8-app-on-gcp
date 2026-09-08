@@ -1,4 +1,4 @@
-<!-- ⚠️ AGENT WARNING: This file (SKELETON.md) and CODELAB.md must be kept in sync at all times. A change to one requires a change to the other! -->
+<!-- ⚠️ AGENT WARNING: This file (SKELETON.md) is compiled from workshop/skeleton.yaml. DO NOT EDIT DIRECTLY! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
 # Workshop Skeleton
 
@@ -7,128 +7,204 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 ---
 
 ### Step 0: Prerequisites, Antigravity Setup & Billing Verification
-- **`needs`**: Google Cloud Account, installed CLIs (`gcloud`, `terraform`, `docker`, `ruby` 3.3+, `rails` 8), Google Antigravity IDE / extension.
-- **`does`**:
-  - Clone repository and authenticate: `gcloud auth login` and `gcloud auth application-default login`.
-  - Set active project: `gcloud config set project <PROJECT_ID>`.
-  - Mandatory guard gate: run `gcloud beta billing projects describe <PROJECT_ID>` to verify billing/credits are active (prevents cryptic mid-workshop failures).
-- **`wow`**: Antigravity connects directly to the codebase and verifies the local development environment in seconds!
-- **`creates`**: Verified environment, authenticated ADC, and confirmed billing foundation.
+- **`description`**: Verify local toolchain, Google Cloud authentication, project selection, and billing status before writing code.
+- **`prerequisites`**:
+  - Google Cloud Account with active credits or billing account
+  - Installed CLIs: gcloud, terraform, docker, ruby 3.3+, rails 8
+  - Google Antigravity IDE or Gemini CLI environment
+- **`pseudocode`**:
+  ```bash
+  gcloud auth login && gcloud auth application-default login
+  gcloud config set project $PROJECT_ID
+  gcloud beta billing projects describe $PROJECT_ID
+  ```
+- **`postrequisites`**:
+  - Authenticated gcloud and Application Default Credentials (ADC)
+  - Verified active billing account preventing mid-workshop quota failures
+  - Antigravity connected and paired with repository
+- **`evals`**:
+  - `[SHELL]` Verify gcloud CLI is installed and returns valid version
+  - `[SHELL]` Verify Application Default Credentials file exists or can print token
+  - `[RUBY]` Check Ruby version is 3.3 or higher
 
 ---
 
 ### Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics
-- **`needs`**: Step 0 completed.
-- **`does`**:
-  - Run the automated pre-flight diagnostics suite: `just workshop-test` 🧪 (verifies Gmail identity, billing state, ADC credentials, master key, and GCS canary status).
-  - Launch immutable infrastructure via Terraform (`cd iac && terraform apply` or `just terraform-apply`).
-  - Provisions: GCS bucket with IAM Credentials signing (`iam: true`), uploads the canary seed image (`seeds/gcs_dev_image.jpg`), and starts Cloud SQL PostgreSQL provisioning in the background (~10-12 mins).
-- **`wow`**: One command starts heavy Cloud SQL provisioning in the background while students continue developing locally without waiting!
-- **`creates`**: Background Cloud SQL build cooking in GCP, active private GCS bucket with canary asset.
+- **`description`**: Execute pre-flight diagnostics suite and kick off Terraform infrastructure in the background.
+- **`prerequisites`**:
+  - Step 0 completed and billing verified
+  - Terraform CLI 1.5+ installed
+- **`pseudocode`**:
+  ```bash
+  just workshop-test
+  cd iac && terraform init && terraform apply -auto-approve
+  ```
+- **`postrequisites`**:
+  - Passing pre-flight diagnostics suite (workshop-test)
+  - GCS bucket provisioned with IAM Credentials signing (iam: true)
+  - Canary seed image uploaded to GCS
+  - Cloud SQL PostgreSQL provisioning cooking in the background (~10-12 mins)
+- **`evals`**:
+  - `[SHELL]` Run automated pre-flight workshop diagnostics
+  - `[RUBY]` Verify Terraform main configuration file exists and has valid syntax
 
 ---
 
 ### Step 2: The Local Baseline, Mailpit & Admin Onboarding
-- **`needs`**: Step 1 launched. Working on `main` (baseline mode).
-- **`does`**:
-  - Launch local Docker Compose stack (`docker compose up` or `bin/dev`).
-  - Configure `ADMIN_EMAIL` with the student's email address (or let seeds default).
-  - Run `bin/rails db:seed` which triggers a welcome email via ActionMailer.
-  - Open **Mailpit UI** (`http://localhost:8025`) to catch the local email without sending external spam!
-  - Drop into `bin/rails console` to inspect `User.last` and practice password verification.
-  - Create a blog post, test rich-text editing with ActionText, and observe the `[EPHEMERAL DB / STORAGE]` badge in the UI.
-- **`wow`**: Instant local gratification: rich text editor, email interception in Mailpit, and interactive Rails console mastery in under 5 minutes!
-- **`creates`**: Verified local Rails 8 baseline and clear motivation for cloud persistence.
+- **`description`**: Run local Docker Compose stack, seed the database with admin identity, intercept welcome email in Mailpit, and inspect models.
+- **`prerequisites`**:
+  - Step 1 kicked off
+  - Local Docker engine running
+- **`pseudocode`**:
+  ```bash
+  cp .env.dist .env && vim .env # set ADMIN_EMAIL
+  docker compose up -d
+  bin/rails db:prepare db:seed
+  open http://localhost:8025 # Mailpit
+  ```
+- **`postrequisites`**:
+  - Running local Rails 8 application with SQLite/Docker Postgres
+  - Admin account bootstrapped from ADMIN_EMAIL
+  - Intercepted welcome/reset password email in local Mailpit
+  - Observed [EPHEMERAL DB / STORAGE] UI badge
+- **`evals`**:
+  - `[SHELL]` Verify local Rails test suite passes
+  - `[RUBY]` Verify db/seeds.rb enforces ADMIN_EMAIL presence
+  - `[LLM]` Evaluate student's first local blog post for creativity and workshop adherence
 
 ---
 
 ### Step 3: Deploy 1 — The Stateless Shock (Early WOW!)
-- **`needs`**: Step 2 completed.
-- **`does`**:
-  - Rewind local configuration to Stage 1: `just workshop-rewind 1` (SQLite on container disk, storage on local disk).
-  - Deploy single Puma container directly to Cloud Run: `gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated`.
-  - Bootstrap initial admin securely via server-side ENV variables (`ADMIN_EMAIL`, `ADMIN_PASSWORD` - Issue #21).
-  - Open public Cloud Run URL, create a post, upload a photo.
-  - **The Stateless Shock:** Force a container restart/revision. Reload the page: the SQLite post and local image are gone!
-- **`wow`**: Live public Cloud Run URL in under 3 minutes, with an unforgettable hands-on demonstration of serverless statelessness!
-- **`creates`**: First live Cloud Run deployment (D1) and visceral motivation for GCS and Cloud SQL.
+- **`description`**: Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart.
+- **`prerequisites`**:
+  - Step 2 completed
+  - Cloud Run API enabled in GCP project
+- **`pseudocode`**:
+  ```bash
+  just workshop-rewind 1
+  gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars ADMIN_EMAIL=$ADMIN_EMAIL
+  # Test restart & observe lost data
+  ```
+- **`postrequisites`**:
+  - First live public HTTPS URL on Cloud Run
+  - First-hand experience of container disk ephemeral resets (lost SQLite posts & images)
+  - Clear motivation for Google Cloud Storage and managed Cloud SQL
+- **`evals`**:
+  - `[SHELL]` Verify Cloud Run service exists and is responding (dry-run/check)
+  - `[RUBY]` Verify missing admin alert partial is present in views
 
 ---
 
 ### Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
-- **`needs`**: Step 3 completed, GCS bucket ready from Step 1.
-- **`does`**:
-  - Rewind/advance configuration to Stage 2: `just workshop-rewind 2` (SQLite still ephemeral, ActiveStorage pointed to GCS with `iam: true`).
-  - Redeploy to Cloud Run: `gcloud run deploy blog --source .`.
-  - Create a post with an uploaded image. Force another container restart: relational text resets, but the image survived on GCS!
-  - **⚠️ POLA Teachable Moment (Issue #22):** Background jobs banner (`_check_stuck_jobs`) appears in UI warning that jobs are queued without a worker container.
-- **`wow`**: Uploaded photos survive container restarts on Google Cloud Storage even while the database is still ephemeral!
-- **`creates`**: Second live Cloud Run deployment (D2), verified GCS IAM signing, and clear motivation for Cloud SQL + Solid Queue workers.
+- **`description`**: Point ActiveStorage to Google Cloud Storage with private IAM signing and observe the POLA stuck jobs warning banner.
+- **`prerequisites`**:
+  - Step 3 completed
+  - GCS bucket provisioned from Step 1
+- **`pseudocode`**:
+  ```bash
+  just workshop-rewind 2
+  gcloud run deploy blog --source . --set-env-vars GCS_BUCKET=$GCS_BUCKET
+  # Observe surviving images & stuck jobs banner
+  ```
+- **`postrequisites`**:
+  - Uploaded media survives container restarts in private GCS bucket
+  - Signed blob URLs functioning via IAM Credentials API
+  - Pedagogical stuck jobs warning (_check_stuck_jobs) visible in UI
+- **`evals`**:
+  - `[RUBY]` Verify storage.yml defines google service with IAM signing
+  - `[SHELL]` Verify integration test for stuck jobs banner passes
 
 ---
 
 ### Step 5: Cloud SQL Ready & Secret Manager CLI Injection
-- **`needs`**: Step 4 completed. Cloud SQL instance provisioned (~12 min timer completed).
-- **`does`**:
-  - Verify Cloud SQL instance is in `RUNNABLE` state.
-  - Upload application secrets to Google Cloud Secret Manager via CLI:
-    - `gcloud secrets create rails-master-key --data-file=config/master.key`
-    - `gcloud secrets create rails-db-password --data-file=<(echo -n "$DB_PASSWORD")`
-  - Grant `roles/secretmanager.secretAccessor` to the Cloud Run runtime Service Account.
-  - Test encrypted mTLS tunnel locally using `cloud-sql-proxy` on `127.0.0.1:5432`.
-- **`wow`**: Zero plain-text credentials in git or `.env` files; encrypted runtime injection directly from Secret Manager!
-- **`creates`**: Encrypted secrets in Secret Manager and verified Cloud SQL connectivity.
+- **`description`**: Verify Cloud SQL instance provisioning is finished and inject sensitive secrets into Google Cloud Secret Manager.
+- **`prerequisites`**:
+  - Step 4 completed
+  - Cloud SQL instance provisioned and in RUNNABLE state
+- **`pseudocode`**:
+  ```bash
+  gcloud sql instances describe rails-postgres --format='value(state)'
+  gcloud secrets create rails-master-key --data-file=blog/config/master.key
+  gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
+  ```
+- **`postrequisites`**:
+  - Secrets stored securely in Secret Manager (zero credentials in git or env files)
+  - Cloud Run runtime Service Account granted Secret Accessor role
+  - Local mTLS proxy connectivity verified via cloud-sql-proxy
+- **`evals`**:
+  - `[SHELL]` Verify Secret Manager API is accessible or secrets listed
+  - `[RUBY]` Verify master.key exists locally
 
 ---
 
 ### Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
-- **`needs`**: Step 5 completed.
-- **`does`**:
-  - Restore repository to Gold Standard: `just workshop-restore-gold` (returns to `main`).
-  - Review multi-container orchestration architecture (`compose.prod.yaml`):
-    1. `web`: Rails Puma server on port 8080.
-    2. `worker`: Solid Queue background processor.
-    3. `cloudsql-proxy`: Official Google sidecar container on `localhost:5432`.
-  - Deploy the multi-container configuration to Cloud Run with Secret Manager references.
-  - Run database migration job on Cloud SQL.
-  - UI badge turns green: `[CLOUD PERSISTENT 🐘 ☁️]`. The stuck jobs warning disappears as the worker container drains queued tasks!
-- **`wow`**: A production-grade multi-container sidecar architecture boots serverlessly on Cloud Run with full database persistence and active background workers!
-- **`creates`**: Third live Cloud Run deployment (D3) — the canonical enterprise Rails 8 architecture.
+- **`description`**: Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar.
+- **`prerequisites`**:
+  - Step 5 completed
+  - Cloud SQL and Secret Manager configured
+- **`pseudocode`**:
+  ```bash
+  just workshop-restore-gold
+  gcloud run deploy blog --source . # multi-container compose.prod.yaml
+  bin/rails db:migrate
+  ```
+- **`postrequisites`**:
+  - Production-grade multi-container sidecar architecture running serverlessly on Cloud Run
+  - Solid Queue background workers actively draining queue
+  - Persistent Cloud SQL PostgreSQL with connection pooling
+  - UI badge turns green: [CLOUD PERSISTENT 🐘 ☁️]
+- **`evals`**:
+  - `[RUBY]` Verify multi-container production compose configuration contains web, worker, and proxy
+  - `[SHELL]` Verify full test suite passes against gold standard
 
 ---
 
 ### Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
-- **`needs`**: Step 6 completed, `GEMINI_API_KEY` configured.
-- **`does`**:
-  - Test **NanoBanana Cover Generator** (`GenerateCoverImageJob`): posts published without a cover automatically receive a vintage 1960s Italian poster with a cameo banana via Imagen/Gemini.
-  - Test **Podcastifier** (bilingual audio synthesis): translates post to Italian and synthesizes `.mp3` audio using Google Cloud Text-to-Speech (see [ideas in docs/ideas/WORKSHOP_IDEAS.md](../docs/ideas/WORKSHOP_IDEAS.md)).
-  - **🏴‍☠️ The Orphan Blob Treasure Hunt:** Use `bin/rails console` on Cloud Run to find and reconnect the lonely image blob uploaded during Step 4 to a new Cloud SQL post!
-- **`wow`**: Live GenAI image generation and audio synthesis running asynchronously in background workers, plus recovering orphan cloud data via Rails console!
-- **`creates`**: Full showcase of modern AI integrations on top of serverless Rails 8.
+- **`description`**: Enable asynchronous background GenAI cover generation, text-to-speech podcast synthesis, and recover orphan cloud blobs via Rails console.
+- **`prerequisites`**:
+  - Step 6 completed
+  - GEMINI_API_KEY or Vertex AI IAM permissions active
+- **`pseudocode`**:
+  ```bash
+  gcloud run jobs execute ai-image-sync || bin/rails runner GenerateCoverImageJob.perform_now
+  bin/rails console # ActiveStorage blob reconnection
+  ```
+- **`postrequisites`**:
+  - Asynchronous GenAI image generation attached to blog posts
+  - Bilingual TTS audio podcast generation functional
+  - Successful recovery of orphaned Step 4 GCS blob connected to Cloud SQL post
+- **`evals`**:
+  - `[RUBY]` Verify GenerateCoverImageJob exists
+  - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
 
 ---
 
 ### Step 8: Choose Your Own Adventure / Advanced Quests 🏆
-- **`needs`**: Step 7 completed.
-- **`does`**:
-  - Open-ended capstone quests for students to explore advanced Google Cloud patterns:
-    - 🛡️ **Quest 1 (Enterprise Security - Identity-Aware Proxy)**: Configure Google Cloud IAP + Load Balancer using `IapAuthenticatable` concern and `iac/iap.tf`.
-    - 📊 **Quest 2 (SRE Observability)**: Structured JSON logging, trace correlation IDs, and Cloud Error Reporting.
-    - 🧠 **Quest 3 (GenAI Vector Search)**: Cloud SQL `pgvector` semantic embeddings search using Gemini `text-embedding-004`.
-    - 📝 **Quest 4 (SEO & Metadata Assistant)**: Automated Gemini summary, tag generation, and Fog readability index (see [`docs/ideas/WORKSHOP_IDEAS.md`](../docs/ideas/WORKSHOP_IDEAS.md)).
-- **`wow`**: Enterprise zero-trust security, deep SRE observability, or vector AI search running on the student's live cloud deployment!
-- **`creates`**: Graduation portfolio project and deep mastery of Rails 8 on Google Cloud.
+- **`description`**: Capstone enterprise challenges: Identity-Aware Proxy (IAP), Cloud Logging & Error Reporting, pgvector semantic search, or SEO Assistant.
+- **`prerequisites`**:
+  - Step 7 completed
+- **`pseudocode`**:
+  ```bash
+  # Choose Quest: IAP, SRE Observability, pgvector, or SEO Assistant
+  git checkout -b quest/iap-security
+  ```
+- **`postrequisites`**:
+  - Graduation portfolio project completed
+  - Deepened mastery of enterprise cloud-native patterns on Google Cloud
+- **`evals`**:
+  - `[RUBY]` Verify IAP authentication concern exists for Quest 1
+  - `[LLM]` Evaluate student's capstone quest architecture and report
 
 ---
 
 ## 🎯 Verification Checklist
 
-- [x] Step 0: Prerequisites & Billing Verification
-- [x] Step 1: Terraform Infrastructure & Diagnostics (`just workshop-test`)
-- [x] Step 2: Local Baseline & Mailpit Experience
-- [x] Step 3: Deploy 1 — Stateless Shock (Cloud Run Single Container)
-- [x] Step 4: Deploy 2 — GCS Storage Uplift & POLA Stuck Jobs Warning
-- [x] Step 5: Secret Manager & Cloud SQL Auth Proxy Setup
-- [x] Step 6: Deploy 3 — Multi-Container Sidecars (Web + Worker + Proxy)
-- [x] Step 7: GenAI Features, Podcastifier & GCS Treasure Hunt
-- [x] Step 8: Advanced Quests (IAP, SRE, pgvector, SEO Assistant)
+- [x] Step 0: Prerequisites, Antigravity Setup & Billing Verification
+- [x] Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics
+- [x] Step 2: The Local Baseline, Mailpit & Admin Onboarding
+- [x] Step 3: Deploy 1 — The Stateless Shock (Early WOW!)
+- [x] Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+- [x] Step 5: Cloud SQL Ready & Secret Manager CLI Injection
+- [x] Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
+- [x] Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
+- [x] Step 8: Choose Your Own Adventure / Advanced Quests 🏆
