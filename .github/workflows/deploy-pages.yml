@@ -39,21 +39,15 @@ jobs:
         run: |
           cd workshop
           
-          # 1. Build the SPA (Blue/Black)
-          ruby split_codelab.rb
-          
-          # 2. Build the Static HTML (White/Google)
+          # Build the Static HTML (Google Codelab style)
           ruby build_ghpages.rb
           
-          # 3. Assemble the deployment directory
+          # Assemble the deployment directory
           cd ..
           mkdir -p dist
           
-          # Put Blue/Black SPA at the root
-          cp -r workshop/render-app2/* dist/
-          
-          # Put White/Google version in a /static subfolder
-          cp -r workshop/build/ dist/static/
+          # Deploy the official Google Codelab workshop at root
+          cp -r workshop/build/* dist/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

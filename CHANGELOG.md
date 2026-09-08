@@ -1,6 +1,17 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [0.1.26] - 2026-09-08
+### Changed
+- 🎨 **Workshop Visualizer Standardization (Fixes [#30](https://github.com/palladius/rails8-app-on-gcp/issues/30))**:
+  - Selected the official Google Codelab (light/white) layout as the standard and sole workshop visualizer deployed to the root of GitHub Pages (`https://palladius.github.io/rails8-app-on-gcp/`).
+  - Removed the prototype dark Astro/Glassmorphism SPA (`workshop/render-app2/`) and the codelab splitting script (`workshop/split_codelab.rb`).
+  - Removed `/static/` routing from GitHub Pages deployment; static artifacts are now compiled directly into the root of `dist/` via `build_ghpages.rb`.
+  - Updated `README.md`, `justfile`, `AGENTS.md`, `workshop/AGENTS.md`, and `docs/USER_MANUAL.md` to reference the single canonical build pipeline and official URL.
+  - Recorded a demo video of the dark theme sliding transition (`black_theme_transition.mp4`) before retirement.
+  - Hardened parallel test execution in `blog/test/integration/new_article_script_test.rb` using isolated temporary filenames.
+
 ## [0.1.25] - 2026-09-07
 ### Added
 - 📊 **Workshop Kickoff Slides with Marp (Fixes [#20](https://github.com/palladius/rails8-app-on-gcp/issues/20))**:

@@ -9,7 +9,6 @@ worktrees/
 
 # Workshop build artifacts (compiled in CI by GitHub Actions)
 workshop/build/
-workshop/render-app2/pages/
 dist/
 slides/dist/
 log/

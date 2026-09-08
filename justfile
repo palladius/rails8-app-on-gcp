@@ -83,7 +83,6 @@ terraform-apply:
 
 # Generate static HTML for GitHub pages from CODELAB.md
 build-ghpages:
-	cd workshop && ruby split_codelab.rb
 	cd workshop && ruby build_ghpages.rb
 
 # show registered users in a clean CLI table ordered by created_at DESC

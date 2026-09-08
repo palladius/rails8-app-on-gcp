@@ -14,12 +14,11 @@ The process is going to look like:
 
 ## 🔗 Dependencies & Build Artifact Flow (DO NOT EDIT PRODUCED FILES)
 
-* **`CODELAB.md` (Source of Truth)** $\to$ `ruby split_codelab.rb` $\to$ produces `render-app2/pages/*.md` & `pages.json` *(PRODUCED)*
 * **`CODELAB.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/index.html` *(PRODUCED)*
-* **`UNTOUCHABLE-CONSTITUTION.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/skeleton.html` *(PRODUCED)*
+* **`UNTOUCHABLE-CONSTITUTION.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/constitution.html` *(PRODUCED)*
 * **`SKELETON.md` (Source of Truth)** $\to$ `ruby build_ghpages.rb` $\to$ produces `build/skeleton.html` *(PRODUCED)*
 * **`assets/*.jpg` (Source of Truth)** $\to$ copied to `../blog/app/assets/images/` and `build/assets/`
-* ⚠️ **RULE:** NEVER edit generated HTML (`build/*.html`) or split pages (`render-app2/pages/*`). Always modify the Markdown source of truth!
+* ⚠️ **RULE:** NEVER edit generated HTML (`build/*.html`). Always modify the Markdown source of truth!
 
 ---
 

@@ -62,10 +62,8 @@ just workshop-dev
 
 ## Workshop
 
-The workshop is nicely active on GitHUb Pages:
+The workshop is nicely active on GitHub Pages:
 
-* https://palladius.github.io/rails8-app-on-gcp/ (dark Astro look and feel)
-* https://palladius.github.io/rails8-app-on-gcp/static/ (light Google Codelab look n' feel)
+* https://palladius.github.io/rails8-app-on-gcp/ (official Google Codelab look n' feel)
 
-![dark mode](image.png)
-![light mode](image-1.png)
+![Workshop Preview](image-1.png)
