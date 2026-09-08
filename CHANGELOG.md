@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file.
     - **Stage 3 (Cloud SQL)**: `[CLOUD SQL PERSISTENT] 🐘 Connected to Google Cloud SQL!`.
   - Supports explicit override via `WORKSHOP_STEP=<N>` for automated graders.
   - Rewrote **Step 2: The Local Baseline, Mailpit & Admin Onboarding** in `workshop/CODELAB.md` to guide learners through Smart Seed, Mailpit, and interactive console debugging (relates to [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29)).
+### Changed
+- 👤 **Unified GCP & Admin Identity (`GCP_EMAIL`)**:
+  - Established `GCP_EMAIL` as the primary standard identity variable in `.env.dist` and across workshop tooling.
+  - The Rails blog administrator account in `blog/db/seeds.rb` now defaults strictly to `GCP_EMAIL` (with fallback to `ADMIN_EMAIL`).
+  - Added auto-discovery in `bin/workshop_diagnostics.rb` (`just workshop-test` / `just workshop-check`) to detect the logged-in Google account from `gcloud auth list` if omitted in `.env`.
+  - Added explicit pre-flight warnings if a non-Google account (`@gmail.com` or `@google.com`) is configured, highlighting the critical dependencies on GCP Billable resources, Terraform apply (`user:email` IAM policy bindings), and Identity-Aware Proxy (IAP) single sign-on.
 
 ## [0.1.33] - 2026-09-08
 ### Changed

@@ -64,6 +64,10 @@ test-slides:
 workshop-test:
     @./bin/workshop_diagnostics.rb
 
+# alias for workshop-test
+workshop-check:
+    @just workshop-test
+
 
 # show project status
 project-status:
