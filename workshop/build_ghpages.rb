@@ -80,7 +80,7 @@ FileUtils.mkdir_p(build_dir)
 
 docs_to_build = [
   { source: 'CODELAB.md', target: 'index.html', active: 'codelab' },
-  { source: 'UNTOUCHABLE-CONSTITUTION.md', target: 'constitution.html', active: 'constitution' },
+  { source: (File.exist?('../docs/CONSTITUTION.md') ? '../docs/CONSTITUTION.md' : 'UNTOUCHABLE-CONSTITUTION.md'), target: 'constitution.html', active: 'constitution' },
   { source: 'SKELETON.md', target: 'skeleton.html', active: 'skeleton' }
 ]
 

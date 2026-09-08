@@ -87,13 +87,10 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 
 * **`docs/CONSTITUTION.md` (SUPREME GOVERNING SOURCE OF TRUTH)**
   $\to$ The immutable meta-constitution governing this repository, `AGENTS.md`, and all workshop steps.
+  $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/constitution.html` *(PRODUCED — DO NOT EDIT)*
 
 * **`workshop/CODELAB.md` (SOURCE OF TRUTH)**
   $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/index.html` *(PRODUCED — DO NOT EDIT)*
-
-* **`workshop/UNTOUCHABLE-CONSTITUTION.md` (SOURCE OF TRUTH)**
-  $\to$ Workshop curriculum architectural blueprint.
-  $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/constitution.html` *(PRODUCED — DO NOT EDIT)*
 
 * **`workshop/SKELETON.md` (SOURCE OF TRUTH)**
   $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/skeleton.html` *(PRODUCED — DO NOT EDIT)*

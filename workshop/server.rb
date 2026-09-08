@@ -124,7 +124,7 @@ class CodelabServer < Sinatra::Base
       when 'codelab'
         candidate = File.join(settings.base_dir, 'CODELAB.md')
       when 'constitution'
-        candidate = File.join(settings.base_dir, 'UNTOUCHABLE-CONSTITUTION.md')
+        candidate = File.exist?(File.join(settings.base_dir, '..', 'docs', 'CONSTITUTION.md')) ? File.expand_path(File.join(settings.base_dir, '..', 'docs', 'CONSTITUTION.md')) : File.join(settings.base_dir, 'UNTOUCHABLE-CONSTITUTION.md')
       when 'skeleton'
         candidate = File.join(settings.base_dir, 'SKELETON.md')
       else
