@@ -133,20 +133,28 @@ just workshop-uat 1
 
 ✨ **The Wow Moment:** One command launches heavy enterprise infrastructure cooking in Google Cloud while you immediately proceed to local development without waiting!
 
-## Step 1: The Local Baseline, Seeds & Mailpit
+## Step 2: The Local Baseline, Mailpit & Admin Onboarding
 
-Our starting point is a clean Rails 8 blog application running with SQLite/PostgreSQL, Mailpit email interception, and disk-based ActiveStorage.
+Our starting point is a clean, modern Rails 8 blog application running on localhost with SQLite, Mailpit email interception, and disk-based ActiveStorage.
 
 ### 1. Boot the App Locally
 
 Start the local development stack:
-
 ```bash
 bundle install
 bin/rails db:setup
 ```
 
-Optionally set your personal Google email in `.env` (or pass it directly to `db:seed`):
+### 2. 🌱 Smart Seed Auto-Discovery & Admin Bootstrap (Issue #21 & #25)
+
+The database seed (`db/seeds.rb`) features **Smart Environment Auto-Discovery**:
+- It inspects your active database adapter (SQLite vs Postgres) and storage configuration.
+- It detects **Stage 0 (Localhost)** and automatically creates the initial admin user and seeds the pedagogical post:
+  - `[LOCAL BASELINE] Welcome to Rails 8 on Localhost!`
+  - Out-of-the-box local sad image attachment (`local_sad_image.png`) with watermark informing you that local disk storage is ephemeral.
+- It automatically triggers a password reset email via ActionMailer.
+
+Run seed with your admin email:
 ```bash
 ADMIN_EMAIL="myname@gmail.com" bin/rails db:seed
 ```
@@ -154,10 +162,10 @@ ADMIN_EMAIL="myname@gmail.com" bin/rails db:seed
 Boot the services:
 ```bash
 docker compose up
-# (Or run bin/dev if running outside Docker)
+# (Or run bin/dev if running directly on your host machine)
 ```
 
-### 2. The Mailpit Experience & Console Workout
+### 3. The Mailpit Experience & Console Workout
 
 1. **Catch Outgoing Emails**: Open `http://localhost:8025` in your browser. You will see **Mailpit** running locally. The initial seed or password reset dispatches an ActionMailer notification captured right here in the local inbox without touching real email servers!
 2. **Interactive `rails console`**: Test your Rails muscle memory by dropping into the console:
@@ -171,19 +179,24 @@ docker compose up
    exit
    ```
 3. **Log in to the Blog**: Open `http://localhost:3000` and log in with your updated admin credentials.
+4. **Observe the Telemetry Badges:** Check the footer and UI header:
+   - Notice the badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
+   - Notice the post watermark: *"Stored on ephemeral local disk: sad grayscale mode 💾 (ask AI why!)"*.
+
+### 4. Automated Step 2 Validation
+
+Verify your local baseline and admin setup:
+```bash
+just workshop-eval 2
+```
 
 ✨ **The Wow Moment:** Out-of-the-box rich-text editing, instant image drag-and-drop, email interception via Mailpit, and interactive Rails console mastery in under 5 minutes!
 
-### 3. Antigravity & Gemini Code Exploration
-
-Let's use Antigravity / Gemini to inspect our application structure:
-> *"Ask Gemini in Antigravity: Analyze our ActiveRecord models and generate a Mermaid diagram illustrating our Post, User, and ActiveStorage relationships."*
-
-### 4. The Catch: Stateless Containers
+### 5. The Catch: Stateless Containers
 
 Cloud Run containers are stateless and ephemeral. If we deploy our SQLite database and local `storage/` directory directly to Cloud Run, all posts and uploaded images will be permanently wiped out whenever a container scales to zero or restarts.
 
-We need cloud-native persistence: **Cloud Storage** for assets, and **Cloud SQL** for our relational data.
+In the next step, we will intentionally deploy this ephemeral configuration to Cloud Run to witness the **Stateless Shock** first-hand!
 
 
 ## Step 2: Cloud Storage

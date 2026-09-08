@@ -1,6 +1,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.34] - 2026-09-08
+### Added
+- 🌱 **Smart Seed Auto-Discovery & Narrative Storytelling Posts (Fixes [#25](https://github.com/palladius/rails8-app-on-gcp/issues/25))**:
+  - Implemented environment & stage auto-discovery in `blog/db/seeds.rb` based on database adapter (SQLite vs Postgres), runtime platform (Cloud Run vs Localhost), and ActiveStorage service (Disk vs GCS).
+  - Automatically seeds narrative posts tailored to the active stage:
+    - **Stage 0 (Localhost)**: `[LOCAL BASELINE] Welcome to Rails 8 on Localhost!` with `local_sad_image.png` and Mailpit instructions.
+    - **Stage 1 (Cloud Run Ephemeral)**: `[EPHEMERAL] ⚠️ Welcome to Cloud Run Single Container!` explaining container stateless resets.
+    - **Stage 2 (Cloud Run GCS)**: `[GCS PERSISTENT] ☁️ ActiveStorage Connected to Cloud Storage` with `gcs_dev_image.jpg`.
+    - **Stage 3 (Cloud SQL)**: `[CLOUD SQL PERSISTENT] 🐘 Connected to Google Cloud SQL!`.
+  - Supports explicit override via `WORKSHOP_STEP=<N>` for automated graders.
+  - Rewrote **Step 2: The Local Baseline, Mailpit & Admin Onboarding** in `workshop/CODELAB.md` to guide learners through Smart Seed, Mailpit, and interactive console debugging (relates to [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29)).
+
 ## [0.1.33] - 2026-09-08
 ### Changed
 - 📘 **Codelab v2.0.0alpha: Header, Introduction, Step 0 & Step 1 Rewrite (Issue [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29))**:
