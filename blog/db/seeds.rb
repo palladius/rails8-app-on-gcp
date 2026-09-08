@@ -10,15 +10,15 @@
 
 # --- Admin User Bootstrapping & Guard Gate (Issue #21 & #29) ---
 # Primary Google Cloud identity for IAM, billing, ADC, IAP, and blog administrator.
-admin_email = (ENV["GCP_EMAIL"] || ENV["ADMIN_EMAIL"])&.strip
+admin_email = (ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"] || ENV["GCP_EMAIL"] || ENV["ADMIN_EMAIL"])&.strip
 admin_password = ENV["ADMIN_PASSWORD"]&.strip
 
 # Strict Guard Gate: fail fast if account email is missing or placeholder
 if admin_email.blank? || admin_email == "your-email@gmail.com"
-  warn "\n❌ [db:seed ERROR] GCP_EMAIL (or ADMIN_EMAIL) is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] GCP_EMAIL (or ADMIN_EMAIL) is not set in environment!")
+  warn "\n❌ [db:seed ERROR] GOOGLE_CLOUD_ACCOUNT (or ADMIN_EMAIL) is not set in environment!".red rescue warn("\n❌ [db:seed ERROR] GOOGLE_CLOUD_ACCOUNT (or ADMIN_EMAIL) is not set in environment!")
   warn "   👉 You MUST set your Google account email address before seeding."
-  warn "   - In local development: set GCP_EMAIL=\"yourname@gmail.com\" in .env"
-  warn "   - On Google Cloud Run: deploy with --set-env-vars GCP_EMAIL=\"yourname@gmail.com\"\n"
+  warn "   - In local development: set GOOGLE_CLOUD_ACCOUNT=\"yourname@gmail.com\" in .env"
+  warn "   - On Google Cloud Run: deploy with --set-env-vars GOOGLE_CLOUD_ACCOUNT=\"yourname@gmail.com\"\n"
   exit 1
 end
 
