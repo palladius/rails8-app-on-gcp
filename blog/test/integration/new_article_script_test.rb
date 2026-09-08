@@ -4,7 +4,7 @@ require "open3"
 class NewArticleScriptTest < ActiveSupport::TestCase
   setup do
     @script_path = Rails.root.join("bin", "new_article.rb")
-    @dummy_md = Rails.root.join("tmp", "dummy_article.md")
+    @dummy_md = Rails.root.join("tmp", "dummy_article_#{SecureRandom.hex(6)}.md")
     File.write(@dummy_md, "# My Dummy Title\n\nDummy body.")
   end
 

@@ -89,7 +89,6 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
   $\to$ The immutable meta-constitution governing this repository, `AGENTS.md`, and all workshop steps.
 
 * **`workshop/CODELAB.md` (SOURCE OF TRUTH)**
-  $\to$ `ruby split_codelab.rb` $\to$ produces `workshop/render-app2/pages/*.md` & `pages.json` *(PRODUCED — DO NOT EDIT)*
   $\to$ `ruby build_ghpages.rb` $\to$ produces `workshop/build/index.html` *(PRODUCED — DO NOT EDIT)*
 
 * **`workshop/UNTOUCHABLE-CONSTITUTION.md` (SOURCE OF TRUTH)**
@@ -102,7 +101,7 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 * **`workshop/assets/*.jpg` (SOURCE OF TRUTH)**
   $\to$ copied to `blog/app/assets/images/` and `workshop/build/assets/` *(PRODUCED)*
 
-* **`workshop/build/` + `workshop/render-app2/`**
+* **`workshop/build/`**
   $\to$ `.github/workflows/deploy-pages.yml` (CI) $\to$ compiles and deploys `dist/` directly to GitHub Pages *(PRODUCED ON CI)*
 
 * **`VERSION` (SOURCE OF TRUTH)**
