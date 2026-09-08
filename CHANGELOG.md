@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
  
+## [0.1.24] - 2026-09-08
+### Changed
+- 🧹 **Workshop Documentation Reconciliation & Cleanup (Fixes [#27](https://github.com/palladius/rails8-app-on-gcp/issues/27))**:
+  - Ratified `docs/CONSTITUTION.md` v1.1.0: formalizes the Zero-Branch Time-Machine progression model (`workshop/time-machine/`) alongside hierarchical git branch namespaces (`workshop/step-<N>-<slug>`).
+  - Amalgamated `workshop/SKELETON.md` with the new canonical 8-Step master plan (3 Cloud Run deployments, pre-flight diagnostics, POLA stuck jobs warnings, GenAI pipelines, and capstone quests).
+  - Preserved `workshop/app/SPEC.md` into `~/git/respec/docs/tools/workshop-visualizer/SPEC.md` and safely deleted obsolete stub `workshop/app/`.
+  - Moved `workshop/IDEAS.md` to durable location `docs/ideas/WORKSHOP_IDEAS.md` and linked directly from `SKELETON.md`.
+  - Removed obsolete draft `workshop/UNTOUCHABLE-CONSTITUTION.md` and redundant stub `workshop/USER_MANUAL.md`.
+  - Updated `workshop/server.rb` and `workshop/build_ghpages.rb` to dynamically serve and compile `docs/CONSTITUTION.md` as the single source of truth.
+  - Filed follow-up issue [#28](https://github.com/palladius/rails8-app-on-gcp/issues/28) to merge `workshop/steps/` into `workshop/time-machine/` and [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29) to rewrite `workshop/CODELAB.md`.
+
 ## [0.1.23] - 2026-09-07
 ### Changed
 - 🔓 **Unauthenticated Access for Public Posts**: Configured `PostsController` to allow unauthenticated access to `index` and `show` (`allow_unauthenticated_access only: %i[ index show ]`), allowing visitors and automated health/UAT probes to view public posts directly without redirecting to `/session/new`.

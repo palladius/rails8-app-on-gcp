@@ -1,7 +1,7 @@
 # 📜 The Project Constitution
 
 <!--
-Current version: 1.0.1
+Current version: 1.1.0
 Ratified by: Riccardo 🦖, Emiliano 🏎️, Antigravity AI 🤖
 -->
 
@@ -28,8 +28,9 @@ The repository serves as the definitive, production-grade reference architecture
 ### 2. Workshop Presence & Future Migration Path
 A companion step-by-step workshop **MUST** be maintained alongside the application. It currently resides under `workshop/`, with a recognized migration path toward a dedicated public Google repository in the future.
 
-### 3. Deterministic Branch Naming via Git Namespaces
-Every workshop step **MUST** correspond to a deterministic branch name using Git directory-style slashes:
+### 3. Step Progression: Zero-Branch Time-Machine & Hierarchical Git Namespaces
+The workshop canonical progression uses **Zero-Branch Time-Machine overlays** (`workshop/time-machine/`), allowing students to rewind or advance the local configuration (`just workshop-rewind <N>`, `just workshop-restore-gold`) while staying comfortably on `main`.
+When dedicated Git branches are published or used as milestone checkpoints, they **MUST** adhere to deterministic directory-style slashes:
 `workshop/step-<N>-<slug>` (e.g., `workshop/step-0-setup`, `workshop/step-1-local-baseline`, `workshop/step-2-cloud-storage`).
 > **Best Practice Note on Slashes (`/`):** Using slashes creates a clean hierarchical namespace under `refs/heads/workshop/`. Git clients, GitHub, and GitLab automatically group these branches into a collapsible tree view, preventing workshop steps from cluttering the root branch list.
 
@@ -50,5 +51,5 @@ To maximize learning clarity, the application UI must provide instant, tangible 
 `docs/CONSTITUTION.md` is the supreme governing document of this repository. In case of any conflict:
 1. `docs/CONSTITUTION.md` (Supreme Meta-Constitution)
 2. `AGENTS.md` / `GEMINI.md` (Agent Operational Directives)
-3. `workshop/UNTOUCHABLE-CONSTITUTION.md` (Workshop Curriculum Specification)
+3. `workshop/SKELETON.md` & `workshop/CODELAB.md` (Workshop Curriculum Specification & Step Contracts)
 4. Derived artifacts, scripts, and documentation
