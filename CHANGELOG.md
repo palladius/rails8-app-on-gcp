@@ -1,6 +1,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.30] - 2026-09-08
+### Changed
+- ⏳ **Consolidate Workshop Steps into Zero-Branch Time-Machine (Fixes [#28](https://github.com/palladius/rails8-app-on-gcp/issues/28))**:
+  - Rescued and promoted legacy tests into the canonical test suite:
+    - Added [`blog/test/config/storage_config_test.rb`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/blog/test/config/storage_config_test.rb) guarding private IAM GCS signing and bucket namespacing.
+    - Added [`blog/test/integration/cloud_run_configuration_test.rb`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/blog/test/integration/cloud_run_configuration_test.rb) verifying multi-container sidecar compose configurations.
+  - Implemented the Zero-Branch Time-Machine engine [`bin/workshop_time_machine.rb`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/bin/workshop_time_machine.rb) and directory [`workshop/time-machine/`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/workshop/time-machine/):
+    - `workshop/time-machine/stage-1-stateless/`: pure SQLite and local Disk configuration overlays.
+    - `workshop/time-machine/stage-2-gcs/`: GCS IAM signing with ephemeral SQLite configuration overlays.
+  - Added convenient developer recipes in `justfile`: `just workshop-rewind <1|2>` and `just workshop-restore-gold`.
+  - Completely removed obsolete legacy directory `workshop/steps/`.
+
 ## [0.1.29] - 2026-09-08
 ### Added
 - 📐 **Declarative Workshop Skeleton & Hybrid/LLM Evaluation Engine (Fixes [#31](https://github.com/palladius/rails8-app-on-gcp/issues/31))**:

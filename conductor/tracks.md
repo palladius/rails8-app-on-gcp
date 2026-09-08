@@ -8,7 +8,7 @@
 
 ---
 
-- [~] **Track: Merge workshop/steps into time-machine while preserving legacy test resources (Issue #28)**
+- [x] **Track: Merge workshop/steps into time-machine while preserving legacy test resources (Issue #28)**
 *Link: [./tracks/merge_workshop_steps_time_machine_20260908/index.md](./tracks/merge_workshop_steps_time_machine_20260908/index.md)*
 
 ---

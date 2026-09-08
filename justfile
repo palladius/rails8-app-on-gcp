@@ -85,6 +85,14 @@ terraform-apply:
 build-skeleton:
 	ruby workshop/visualizer/build_skeleton.rb
 
+# rewind configuration to workshop stage (1: stateless SQLite, 2: GCS private storage)
+workshop-rewind stage="1":
+	ruby bin/workshop_time_machine.rb rewind {{stage}}
+
+# restore configuration to canonical gold standard (main)
+workshop-restore-gold:
+	ruby bin/workshop_time_machine.rb restore-gold
+
 # run automated evaluations on workshop steps (default: step 0 or specify step)
 workshop-eval step="all":
 	ruby bin/workshop_eval.rb {{step}}

@@ -21,14 +21,12 @@ test:
   adapter: sqlite3
   database: storage/test.sqlite3
 
-# Production uses DATABASE_URL (PostgreSQL on Cloud SQL) if available,
-# otherwise falls back to SQLite for local/docker testing.
+# Production uses SQLite for local/docker testing.
 production:
   primary:
     <<: *default
-    adapter: <%= ENV['DATABASE_URL'].present? ? 'postgresql' : 'sqlite3' %>
-    url: <%= ENV['DATABASE_URL'] %>
-    database: <%= ENV['DATABASE_URL'].present? ? nil : 'storage/production.sqlite3' %>
+    adapter: sqlite3
+    database: storage/production.sqlite3
   cache:
     <<: *default
     adapter: sqlite3
