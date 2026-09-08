@@ -111,7 +111,7 @@ A streamlined DevOps CI/CD pipeline infographic for Google Cloud Build. Shows a 
    - **Zero Language Friction:** Never let Ruby syntax or Rails idiosyncrasies block an attendee. Standardize commands (`docker compose up`, `bin/dev`, `bin/rails db:...`).
    - **Antigravity as Co-Pilot:** Use **Google Antigravity** as the universal pair programmer to inspect the codebase, explain architecture, generate Mermaid diagrams, and debug issues in real-time.
    - **Cloud-First Teachable Moments:** Focus on real cloud problems—statelessness, security anti-patterns (why `0.0.0.0/0` and public buckets are dangerous), IAM tunneling with Cloud SQL Auth Proxy, sidecar orchestration, and async AI workers.
-   - **Dual Track Flexibility:** Full Cloud Track (with billing & Cloud SQL) vs. **Zero-Billing Free Track** (SQLite on Cloud Run + Gemini Free Tier API Key).
+   - **Dual Track Flexibility:** Full Cloud Track (with billing & Cloud SQL) vs. **Zero-Billing Free Track** (SQLite on Cloud Run; AI covers via Vertex AI ADC, or the bundled fake cover without credentials).
 
 ### 🏷️ 2.3 Environmental Telemetry & UI Storytelling (Visual Pedagogical Clues)
 To guide candidates through each architectural evolution, the application UI and seeded content dynamically reflect the active persistence and storage tier:
@@ -159,14 +159,14 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 
 ## 🔹 Step 0: Setup & Async Cloud Provisioning (`workshop_0_setup`)
 - **`needs`**: 
-  - GCP project (Billing enabled for Cloud SQL track, or Free Tier for Zero-Billing track).
+  - GCP project (Billing enabled for Cloud SQL track; the Zero-Billing track skips Cloud SQL).
   - CLI tools: `gcloud`, `ruby` 3.3+, `gem install rails`, `terraform`, `docker`, and `cloud-sql-proxy`.
   - Google Antigravity IDE or VS Code Antigravity Extension.
 - **`does`**:
   - Clones the workshop repository.
   - Authenticates `gcloud auth login` and `gcloud auth application-default login`.
   - **IMMEDIATELY kicks off Cloud SQL & GCS provisioning** in the background (`./bin/provision-cloudsql.sh` or `cd iac && terraform apply`).
-  - *(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite on Cloud Run + Gemini Free Tier)*.
+  - *(Zero-Billing Track alternative: skips Cloud SQL provisioning and uses SQLite on Cloud Run; AI covers fall back to the bundled fake image without Vertex AI credentials)*.
 - **`antigravity`**: Prompt Antigravity:
   > *"Verify my GCP authentication status, active project ID, and whether gcloud ADC credentials are configured correctly for Terraform."*
 - **`wow`**: One command starts heavy cloud provisioning asynchronously in GCP without blocking the student's workflow!
@@ -281,15 +281,16 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 ---
 
 ## 🔹 Step 7: AI Features with Solid Queue & Gemini (`workshop_7_ai_features`)
-- **`needs`**: Step 5 (or Step 6) completed, `GEMINI_API_KEY` in Secret Manager, branch `workshop_7_ai_features`.
+- **`needs`**: Step 5 (or Step 6) completed, Vertex AI API enabled + `roles/aiplatform.user` on the Cloud Run service account (Terraform), ADC locally — no API keys — branch `workshop_7_ai_features`.
 - **`does`**:
   - Implements **NanoBanana Cover Generator** (`GenerateCoverImageJob`):
-    - Submits post content to Imagen/Gemini with the vintage Italian poster prompt ("must include a banana").
-    - Worker downloads generated image and attaches it via ActiveStorage.
+    - Submits post content to Nano Banana (`gemini-2.5-flash-image` on Vertex AI, ADC auth) with the vintage Italian poster prompt ("must include a banana", ruby gem shaped like an "8" top-right; Prog Metal in Modena for titles under 30 bytes or keyboard mash).
+    - Worker decodes the image, stamps its provenance (grayscale + house/`127.0.0.1` on local disk, colorful cloud on GCS) and attaches it via ActiveStorage.
+    - Without credentials the bundled "fake cover" is attached instead (Localhost Invariant).
   - (Optional / Bonus) Implements **Podcastifier**:
     - Translates post to Italian and synthesizes `.mp3` audio using Google Cloud Text-to-Speech.
 - **`antigravity`**: Prompt Antigravity:
-  > *"Help me customize the Imagen prompt template in app/jobs/generate_cover_image_job.rb to add custom art styles while preserving the background banana cameo."*
+  > *"Help me customize the Nano Banana prompt template in blog/lib/nanobanana.rb to add custom art styles while preserving the banana cameo and the ruby 8."*
 - **`wow`**: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in the background in real-time!
 - **`creates`**: 🏆 **The Complete 'main' Blueprint Architecture Achieved!**
 
@@ -313,7 +314,7 @@ $$\text{Step} = \langle \text{needs}, \text{does}, \text{antigravity}, \text{wow
 | Challenge | Fallback Mechanism |
 |---|---|
 | Non-Rubyist needs syntax explanation | Antigravity AI pair programmer provides instant analogies (e.g. ActiveRecord $\approx$ Prisma/Django ORM). |
-| No GCP Billing / Zero-Billing Track | Run SQLite mode on Cloud Run with volume mount + Gemini Free Tier API Key. |
+| No GCP Billing / Zero-Billing Track | Run SQLite mode on Cloud Run with volume mount; AI covers via Vertex AI ADC or the bundled fake cover. |
 | Cloud SQL provisioning fails or times out | Pre-warmed fallback project/instance connection string provided by instructors. |
 | Docker / Proxy networking issues locally | Direct connection with environment variable overrides (`DATABASE_URL` pointing to localhost or fallback). |
 | Cloud Run multi-container deploy fails | Single-container standard deploy script (`gcloud run deploy --image ...`). |

@@ -30,7 +30,7 @@ Before we begin, make sure you have:
 
 1. **A Google Cloud Project:**
    - **Full Track:** With billing enabled (for Cloud SQL and Cloud Storage).
-   - **Zero-Billing Track:** A Free Tier project using Gemini Free API Key (*ohne* Cloud SQL).
+   - **Zero-Billing Track:** A Free Tier project *ohne* Cloud SQL. AI features use Vertex AI via your own credentials (no API keys); without them the app attaches an honest "fake" cover image instead.
 2. **Google Cloud CLI:** Installed and authenticated:
    ```bash
    gcloud auth login
@@ -301,14 +301,17 @@ Rails 8's **Solid Queue** powers asynchronous background tasks without needing R
    git checkout workshop_7_ai_features
    ```
 
-2. When a post is saved without a cover image, `GenerateCoverImageJob` triggers:
-   - It sends the post title and summary to Google's Gemini / Imagen model with this prompt:
-     > *"Create a cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful vintage Italian cinematic aesthetic. Also, you MUST feature a banana somewhere in the scene."*
-   - The Solid Queue worker downloads the generated image and attaches it directly via ActiveStorage.
+2. When a post is saved without a cover image, `GenerateCoverImageJob` triggers (the logic lives in `blog/lib/nanobanana.rb`):
+   - It sends the post title and body to **Nano Banana** (`gemini-2.5-flash-image`) on **Vertex AI** with this prompt:
+     > *"The poster is the cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. You MUST feature a banana somewhere in the scene. You MUST place a shiny red ruby gem shaped like the digit "8" in the top-right corner of the image."*
+   - Too lazy to write a real title? Anything under 30 bytes or keyboard mash like `qwerty` gets a poster of an epic **Prog Metal concert in Modena** instead.
+   - Authentication is **Application Default Credentials only**: on Cloud Run the service account (Terraform grants `roles/aiplatform.user` and enables `aiplatform.googleapis.com`), on your laptop `gcloud auth application-default login`. No `GEMINI_API_KEY` anywhere.
+   - The Solid Queue worker decodes the returned image, **stamps its provenance** — grayscale with a little house and `127.0.0.1` when it is stored on the ephemeral local disk, a colorful cloud when it is stored on GCS — and attaches it via ActiveStorage.
+   - No credentials, no API, no network? The job attaches a bundled *"NO VERTEX AI CREDENTIALS — I'm a fake cover image, pretend I'm real"* poster. Nothing crashes, ever.
 
 3. Create a new post, leave the cover image empty, and publish.
 
-✨ **The Wow Moment:** In a few seconds, an AI-generated vintage Italian poster featuring a cameo banana appears automatically on your post, processed completely asynchronously by Solid Queue on Cloud Run!
+✨ **The Wow Moment:** In a few seconds, an AI-generated vintage Italian poster featuring a cameo banana and a ruby "8" appears automatically on your post, processed completely asynchronously by Solid Queue on Cloud Run — and the stamp in the corner tells you whether your storage is still ephemeral or already in the cloud! Covers you upload yourself follow the same rule: sad grayscale while on local disk, full color once on GCS.
 
 ## Step 8: Choose Your Own Adventure (The Quests 🏆)
 

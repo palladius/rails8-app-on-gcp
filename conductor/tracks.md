@@ -21,3 +21,7 @@
 - [x] **Track: Diagnostics Suite (`just workshop-test`) (Issue #24)**
 *Link: [./tracks/diagnostics_suite_issue_24_20260907/plan.md](./tracks/diagnostics_suite_issue_24_20260907/plan.md)*
 
+---
+
+- [x] **Track: Nano Banana Auto-Cover Generation on Vertex AI (Issue #18)**
+*Link: [./tracks/nanobanana_cover_issue_18_20260908/plan.md](./tracks/nanobanana_cover_issue_18_20260908/plan.md)*

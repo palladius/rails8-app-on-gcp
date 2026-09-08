@@ -410,6 +410,13 @@ a[href$="/posts/new"]:hover {
   display: block;
 }
 
+/* Asset provenance (issue #18): covers living on ephemeral local disk are shown
+   sad and gray. Presentation-only — the blob keeps its colors for the day it
+   moves to a GCS bucket. */
+.cover-image--local {
+  filter: grayscale(1);
+}
+
 .post-show__body-content {
   color: #cfd8dc;
   font-size: 1.05rem;

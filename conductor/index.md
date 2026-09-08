@@ -55,3 +55,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [~] **Track: Workshop Web App**
 *Link: [./tracks/workshop_webapp_20260821/](./tracks/workshop_webapp_20260821/)*
+
+---
+
+- [x] **Track: Nano Banana Auto-Cover Generation on Vertex AI (Issue #18)**
+*Link: [./tracks/nanobanana_cover_issue_18_20260908/plan.md](./tracks/nanobanana_cover_issue_18_20260908/plan.md)*

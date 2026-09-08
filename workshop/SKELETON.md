@@ -7,7 +7,7 @@ This is the high-level roadmap and step breakdown for the Rails 8 on Google Clou
 ---
 
 ### Step 0: Setup & Async Cloud Provisioning
-- **`needs`**: GCP Project (Billing enabled for Cloud SQL, or Free Tier for Zero-Billing track), installed CLIs (`gcloud`, `ruby` 3.3+, `rails` 8, `terraform`, `docker`, `cloud-sql-proxy`), Antigravity IDE / VS Code extension.
+- **`needs`**: GCP Project (Billing enabled for Cloud SQL; the Zero-Billing track skips Cloud SQL and lives with the fake AI cover), installed CLIs (`gcloud`, `ruby` 3.3+, `rails` 8, `terraform`, `docker`, `cloud-sql-proxy`), Antigravity IDE / VS Code extension.
 - **`does`**: Clone repo, authenticate with GCP (`gcloud auth login` & `gcloud auth application-default login`), verify billing, and immediately launch Cloud SQL + GCS provisioning in the background (`./bin/provision-cloudsql.sh` or `cd iac && terraform apply`). *(Zero-Billing track: skip Cloud SQL and use local/volume SQLite)*.
 - **`wow`**: One command starts heavy cloud provisioning in the background without freezing the terminal!
 - **`creates`**: Background infrastructure cooking in GCP (~10-12 mins) while students proceed immediately without blocking.
@@ -86,11 +86,12 @@ This is the high-level roadmap and step breakdown for the Rails 8 on Google Clou
 ---
 
 ### Step 7: `workshop_7_ai_features` (AI Background Jobs with Solid Queue & Gemini 🍌)
-- **`needs`**: Step 5 (or Step 6) completed, `GEMINI_API_KEY` in Secret Manager, branch `workshop_7_ai_features`.
+- **`needs`**: Step 5 (or Step 6) completed, Vertex AI API enabled + `roles/aiplatform.user` on the Cloud Run service account (Terraform does it; locally your own `gcloud auth application-default login` is enough — no API keys), branch `workshop_7_ai_features`.
 - **`does`**:
-  - Implement **NanoBanana Auto-Cover Generator** (`GenerateCoverImageJob`): generates vintage Italian poster art with a banana via Gemini/Imagen and attaches it via ActiveStorage.
+  - Implement **NanoBanana Auto-Cover Generator** (`GenerateCoverImageJob` + `lib/nanobanana.rb`): asks Nano Banana (`gemini-2.5-flash-image` on Vertex AI, via ADC) for a vintage Italian movie poster inspired by the post, with a cameo banana and a ruby gem shaped like an "8" top-right, and attaches it via ActiveStorage. Titles under 30 bytes or keyboard mash (`qwerty`) get a Prog Metal in Modena poster instead.
+  - **Asset provenance stamps**: the cover is grayscale with a little house / `127.0.0.1` when it lives on local disk, and gets a colorful cloud when it lives on GCS. No credentials? A bundled "I'm a fake image, pretend I'm real" cover is attached, so nothing ever crashes.
   - (Bonus) Implement **Podcastifier**: Translates post to Italian and synthesizes `.mp3` audio via Cloud Text-to-Speech.
-- **`wow`**: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in real-time!
+- **`wow`**: Publishing a post with no cover image automatically generates a custom 1960s Italian movie poster with a cameo banana in real-time — and the poster itself tells you whether it is stored locally or in the cloud!
 - **`creates`**: Intelligent, asynchronous AI features powered by Solid Queue workers.
 
 ---

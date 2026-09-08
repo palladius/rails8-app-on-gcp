@@ -37,7 +37,31 @@ class ApplicationHelperTest < ActionView::TestCase
     end
   end
 
+  test "storage tier is local under the test Disk service" do
+    assert_equal :local, storage_tier
+    assert_equal "cover-image--local", cover_image_classes
+    assert_equal "post-show__hero-img cover-image--local", cover_image_classes("post-show__hero-img")
+    assert_match(/grayscale/, cover_image_title)
+  end
+
+  test "storage tier is gcs for google services and covers keep their colors" do
+    with_storage_service(:google_test) do
+      assert_equal :gcs, storage_tier
+      assert_equal "", cover_image_classes
+      assert_equal "post-show__hero-img", cover_image_classes("post-show__hero-img")
+      assert_match(/Cloud Storage/, cover_image_title)
+    end
+  end
+
   private
+
+  def with_storage_service(name)
+    previous = Rails.configuration.active_storage.service
+    Rails.configuration.active_storage.service = name
+    yield
+  ensure
+    Rails.configuration.active_storage.service = previous
+  end
 
   def with_env(envs)
     old_envs = envs.keys.index_with { |k| ENV[k] }

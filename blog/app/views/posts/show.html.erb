@@ -27,7 +27,7 @@
   <div class="post-show__body-glass">
     <% if @post.cover_image.attached? %>
       <div class="post-show__hero-glass">
-          <%= image_tag @post.cover_image, class: "post-show__hero-img" %>
+          <%= image_tag @post.cover_image, class: cover_image_classes("post-show__hero-img"), title: cover_image_title %>
       </div>
     <% end %>
 

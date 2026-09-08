@@ -1,6 +1,21 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.26] - 2026-09-08
+### Added
+- 🍌 **Nano Banana Auto-Cover Generation on Vertex AI (Fixes [#18](https://github.com/palladius/rails8-app-on-gcp/issues/18))**:
+  - Added `blog/lib/nanobanana.rb`: builds the vintage 1960s Italian movie poster prompt from the post title + body (cameo banana, ruby gem shaped like an "8" top-right), falls back to a "Prog Metal in Modena" poster when the text is under 30 bytes or keyboard mash (`qwerty`), and calls `gemini-2.5-flash-image` on Vertex AI through `Net::HTTP` with Application Default Credentials only (no `GEMINI_API_KEY`, per #14).
+  - `GenerateCoverImageJob` now really generates and attaches the cover, then broadcasts a Turbo refresh so the poster appears live on the post page.
+  - **Localhost Invariant**: without project/ADC, on HTTP errors or timeouts, the job attaches the bundled `nanobanana_fake_cover.png` ("NO VERTEX AI CREDENTIALS — I'm a fake cover image. Pretend I'm real!") instead of failing.
+  - **Asset provenance stamps** (Constitution §5) via libvips: covers stored on local disk are made grayscale with a little house / `127.0.0.1` stamp bottom-right; covers stored on GCS get a colorful cloud. User-uploaded covers get the same grayscale treatment as a CSS filter while on local disk and stay untouched on GCS (`cover_image_classes` helper).
+  - Terraform (`iac/cloudrun.tf`): enables `aiplatform.googleapis.com`, grants `roles/aiplatform.user` to `rails-cloudrun-sa` and to every `developers` entry.
+  - Tests: `test/lib/nanobanana_test.rb`, `test/jobs/generate_cover_image_job_test.rb`, `test/models/post_test.rb`, helper tests; a tiny `stub_singleton` test helper replaces `minitest/mock` (not shipped with minitest 6).
+  - Conductor track `nanobanana_cover_issue_18_20260908`; workshop docs (SKELETON / CODELAB / UNTOUCHABLE-CONSTITUTION) now describe Vertex AI + ADC, the fake fallback and the provenance stamps.
+### Fixed
+- 🐛 `GenerateCoverImageJob` called the non-existent `post.content` (guaranteed `NoMethodError`); it now uses `post.body.to_plain_text`.
+- 🧪 The test environment used the real `google_test` GCS bucket; it now uses the local Disk service (`ACTIVE_STORAGE_SERVICE` overrides it), so `bin/rails test` runs offline in a few seconds.
+- 🖼️ `bin/new_article.rb --image` attaches the cover **before** saving, so the CLI no longer enqueues a useless generation job that races the manual attachment.
+
 ## [0.1.25] - 2026-09-07
 ### Added
 - 📊 **Workshop Kickoff Slides with Marp (Fixes [#20](https://github.com/palladius/rails8-app-on-gcp/issues/20))**:

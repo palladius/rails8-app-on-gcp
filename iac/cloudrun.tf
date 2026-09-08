@@ -12,9 +12,31 @@ module "service_account_cloud_run" {
     "${var.project_id}" = [
       "roles/storage.objectAdmin",
       "roles/secretmanager.secretAccessor",
-      "roles/cloudsql.client"
+      "roles/cloudsql.client",
+      "roles/aiplatform.user" # Nano Banana cover generation on Vertex AI (issue #18)
     ]
   }
+}
+
+# GenerateCoverImageJob asks Vertex AI (gemini-2.5-flash-image, "Nano Banana")
+# for a cover image whenever a post is saved without one. Authentication is
+# Application Default Credentials only — the Cloud Run service account above,
+# or the developer's own `gcloud auth application-default login` on a laptop —
+# so no API key ever lands in .env or Secret Manager. Without the API enabled
+# and roles/aiplatform.user, the app quietly attaches a bundled "fake" cover
+# instead of failing. See issue #18.
+resource "google_project_service" "aiplatform" {
+  project            = var.project_id
+  service            = "aiplatform.googleapis.com"
+  disable_on_destroy = false
+}
+
+# Let developers generate covers locally with their own ADC.
+resource "google_project_iam_member" "developer_vertex_user" {
+  for_each = toset(var.developers)
+  project  = var.project_id
+  role     = "roles/aiplatform.user"
+  member   = each.value
 }
 
 # ActiveStorage signs GCS blob URLs through the IAM Credentials signBlob API
