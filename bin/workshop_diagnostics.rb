@@ -123,19 +123,43 @@ if project_id.empty? || project_id == "(unset)"
 else
   puts "✅ Active GCP Project ID: #{project_id}".green
 
-  # Check gcloud authentication
+  # Check gcloud authentication & multi-account support
+  credentialed_accounts = `gcloud auth list --format="value(account)" 2>/dev/null`.strip.split("\n").map(&:strip).reject(&:empty?)
   active_account = `gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null`.strip
-  if active_account.empty?
-    puts "❌ [ERROR] No active gcloud account logged in!".red
+
+  if credentialed_accounts.empty?
+    puts "❌ [ERROR] No gcloud accounts logged in!".red
     puts "   👉 Run: gcloud auth login"
     errors_count += 1
   else
     puts "✅ gcloud logged in as: #{active_account}".green
+    if credentialed_accounts.size > 1
+      puts "ℹ️  Multi-login detected: #{credentialed_accounts.size} accounts available (#{credentialed_accounts.join(', ')})".cyan
+    end
+
+    # If GOOGLE_CLOUD_ACCOUNT is specified in .env, verify it matches active or is in credentialed list
+    if !gcp_account.to_s.strip.empty?
+      if active_account.downcase != gcp_account.downcase
+        if credentialed_accounts.map(&:downcase).include?(gcp_account.downcase)
+          puts "⚠️  [WARNING] gcloud active account is '#{active_account}', but .env specifies '#{gcp_account}'!".yellow
+          puts "   👉 To switch active gcloud account, run:"
+          puts "      gcloud config set account #{gcp_account}"
+          warnings_count += 1
+        else
+          puts "❌ [ERROR] .env specifies GOOGLE_CLOUD_ACCOUNT='#{gcp_account}', but it is NOT logged in via gcloud!".red
+          puts "   Available accounts: #{credentialed_accounts.join(', ')}"
+          puts "   👉 Run: gcloud auth login #{gcp_account}"
+          errors_count += 1
+        end
+      end
+    end
   end
 
   # Check Billing Enabled (MANDATORY GATE!)
   print "   🔍 Verifying GCP Billing status... "
-  billing_enabled, _stderr, status = Open3.capture3("gcloud beta billing projects describe #{project_id} --format='value(billingEnabled)' 2>/dev/null")
+  billing_account_flag = (!gcp_account.to_s.strip.empty? && credentialed_accounts.map(&:downcase).include?(gcp_account.downcase)) ? "--account=#{gcp_account}" : ""
+  billing_cmd = "gcloud beta billing projects describe #{project_id} #{billing_account_flag} --format='value(billingEnabled)' 2>/dev/null"
+  billing_enabled, _stderr, status = Open3.capture3(billing_cmd)
   billing_status = billing_enabled.strip.downcase
 
   if status.success? && billing_status == "true"
