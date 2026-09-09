@@ -49,6 +49,6 @@ marp slides/index.md --pdf -o slides/dist/slides.pdf
 1. **Welcome & Kickoff**: Intro by Riccardo & Emiliano.
 2. **Download & Install Antigravity**: Cross-platform binaries.
 3. **Launch & Connect**: Sign in with Google identity.
-4. **[Optional] Cloud Credits**: QR voucher redemption for hands-on GCP projects.
+4. **Reclaim Credits Now**: Redeem Google Cloud credits voucher for hands-on GCP projects.
 5. **Set the Mission**: Launch prompt pointing Antigravity to `workshop/landing-page/README.md`.
 6. **The Pedagogical Contract**: Socratic tutoring ("Guide me, don't do everything for me").

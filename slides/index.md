@@ -130,17 +130,31 @@ style: |
 
 ---
 
-## 3. [Optional] Reclaim Cloud Credits 💳
+## 3. Reclaim Credits Now 💳
 
-If this is a live in-person or virtual workshop, redeem your Google Cloud credits:
+<div style="display: flex; gap: 24px; align-items: flex-start; margin-top: 8px;">
+  <div style="flex: 1;">
+    <p>Redeem your Google Cloud credits for today's workshop:</p>
+    <div style="margin: 10px 0 14px 0;">
+      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" style="display: inline-block; background-color: #1a73e8; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
+        🎟️ Claim GCP Credits
+      </a>
+    </div>
+    <ul style="font-size: 0.85em;">
+      <li>🔗 <strong>Link:</strong> <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8">me.developers.google.com/...</a></li>
+      <li>☁️ Activate sandbox GCP Project & billing.</li>
+      <li>💵 Covers Cloud Run, Cloud SQL & GCS.</li>
+    </ul>
+  </div>
+  <div style="text-align: center;">
+    <img src="images/reclaim-credits-qr.png" style="width: 190px; height: 190px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);" alt="Scan QR Code to Claim Credits" />
+    <p style="font-size: 0.7em; color: #5f6368; margin-top: 4px;">📱 Scan with phone camera</p>
+  </div>
+</div>
 
-- 🎟️ **Scan the Workshop QR Code** or follow the event voucher link.
-- ☁️ Activate your sandbox GCP Project.
-- 💵 Ensure your active billing/voucher covers Cloud Run, Cloud SQL, and Cloud Storage.
+<div class="highlight" style="font-size: 0.8em; margin-top: 8px;">
 
-<div class="highlight">
-
-⚠️ **Localhost First!** Initial workshop steps run 100% locally on SQLite and Docker Compose before touching the cloud.
+⚠️ **Localhost First!** Initial steps run 100% locally on SQLite/Docker before touching the cloud.
 
 </div>
 
