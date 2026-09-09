@@ -32,7 +32,9 @@ class StatusesController < ApplicationController
       rails_version: Rails.version,
       rails_env: Rails.env,
       admin_users_count: (User.count rescue 0),
-      posts_count: (Post.count rescue 0)
+      posts_count: (Post.count rescue 0),
+      blobs_count: (ActiveStorage::Blob.count rescue 0),
+      attachments_count: (ActiveStorage::Attachment.count rescue 0)
     }
 
     respond_to do |format|
@@ -61,6 +63,8 @@ class StatusesController < ApplicationController
         badge: "☁️ Google Cloud Run",
         color: "#059669",
         is_cloud: true,
+        service_name: ENV["K_SERVICE"],
+        revision_name: ENV["K_REVISION"],
         details: "Serverless container running on Cloud Run (Service: #{ENV['K_SERVICE'] || 'custom'})"
       }
     elsif File.exist?("/.dockerenv") || ENV["DOCKER_CONTAINER"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("docker")
@@ -121,6 +125,7 @@ class StatusesController < ApplicationController
   def detect_storage_status
     service_name = Rails.configuration.active_storage.service.to_s
     tier = Nanobanana.storage_tier
+    blobs_count = (ActiveStorage::Blob.count rescue 0)
 
     if tier == :gcs
       {
@@ -129,6 +134,7 @@ class StatusesController < ApplicationController
         color: "#0d9488",
         service: service_name,
         persistent: true,
+        blobs_count: blobs_count,
         details: "Private GCS bucket with IAM Credentials blob signing (`iam: true`)"
       }
     else
@@ -138,6 +144,7 @@ class StatusesController < ApplicationController
         color: "#64748b",
         service: service_name,
         persistent: false,
+        blobs_count: blobs_count,
         details: "Local filesystem storage (covers rendered in sad grayscale mode)"
       }
     end

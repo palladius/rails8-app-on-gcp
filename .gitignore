@@ -15,3 +15,5 @@ log/
 
 .gprism/
 GEMINI.riccardo.md
+node_modules/
+.riccardo/

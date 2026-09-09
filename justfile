@@ -60,6 +60,19 @@ build-slides:
 test-slides:
     cd blog && bin/rails test test/integration/slides_presentation_test.rb
 
+# generate screenshots idempotently (skips already existing screenshots, use force="true" to overwrite)
+generate-screenshots filter="" *flags:
+    node workshop/screenshots/runner.js {{filter}} {{flags}}
+
+# capture or re-capture declarative screenshots (force overwrite by default or specify filter)
+screenshots filter="":
+    node workshop/screenshots/runner.js {{filter}} --force
+
+# test and validate all declarative screenshot declarations and scripts without needing server
+test-screenshots:
+    node workshop/screenshots/runner.js --dry-run
+    ruby test/test_workshop_screenshots.rb
+
 # run the workshop pre-flight diagnostics suite (validates Gmail identity, GCP billing, ADC, keys, canary asset)
 workshop-test:
     @./bin/workshop_diagnostics.rb
@@ -68,11 +81,25 @@ workshop-test:
 workshop-check:
     @just workshop-test
 
+# estimate live GCP incurred costs and remaining $5 GDP credits
+billing-estimate hours="6.0":
+    @./bin/rails8app-billing --hours {{hours}}
+
+# alias for billing-estimate
+billing hours="6.0":
+    @just billing-estimate {{hours}}
+
+
+
 
 # show project status
 project-status:
     cd iac && ./check_gcp_setup.sh
     cd blog && echo "\n=== 5️⃣ Checking DB Posts ===" && bundle exec rails runner 'puts "  📊 Posts in DB: #{Post.count rescue "No DB/Posts yet"}"' || true
+
+# check the live status of the Cloud Run deployment (infers URL from Terraform or gcloud)
+cloud-run-status url="":
+    @./bin/cloud_run_status.sh {{url}}
 
 seed:
 	cd blog && rake db:seed
@@ -114,6 +141,14 @@ build-ghpages:
 show-users:
 	cd blog && just show-users
 
+
+# run local Workshop Hive leaderboard server (default port: 8090)
+hive-dev port="8090":
+	PORT={{port}} workshop/hive/bin/dev
+
+# deploy Workshop Hive leaderboard to Cloud Run using workshop/hive/.env
+hive-deploy:
+	workshop/hive/bin/deploy
 
 list:
     @just --list

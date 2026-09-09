@@ -50,3 +50,13 @@
 
 - [x] **Track: Delete and Refresh Article Cover Image (Issue #34)**
 *Link: [tracks/delete_cover_image_issue_34_20260909/index.md](tracks/delete_cover_image_issue_34_20260909/index.md)*
+
+---
+
+- [x] **Track: Workshop Hive Leaderboard (Issue #47)**
+*Link: [tracks/workshop_hive_leaderboard_20260909/index.md](tracks/workshop_hive_leaderboard_20260909/index.md)*
+
+---
+
+- [x] **Track: Declarative Workshop Screenshots (Issue #42)**
+*Link: [tracks/declarative_screenshots_issue_42_20260909/index.md](tracks/declarative_screenshots_issue_42_20260909/index.md)*

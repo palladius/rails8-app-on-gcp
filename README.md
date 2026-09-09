@@ -4,6 +4,10 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 
 🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
 🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
+🐝 **Workshop Hive (Leaderboard)**: https://workshop-hive-x42ijqglgq-ew.a.run.app/ (or https://workshop-hive-272932496670.europe-west1.run.app/)
+
+🎶 **Official Workshop Anthem (Generated with Google Lyria 3 Pro)**:
+🎧 [Listen / Download "An energetic acoustic guitar song for Rubyists" (MP3, 3.4 MB)](https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3)
 
 ## 🚀 Quickstart: Starting the Apps & Services
 
@@ -59,6 +63,20 @@ just workshop-dev
 | 🚀 **1. Native Rails App** | `just dev` | • [http://localhost:3000](http://localhost:3000) | Rails 8 Puma Server + Tailwind CSS Watcher (SQLite) |
 | 🐳 **2. Docker Compose** | `just compose-up` | • [http://localhost:3000](http://localhost:3000)<br>• [http://localhost:8025](http://localhost:8025)<br>• [http://localhost:8081](http://localhost:8081)<br>• `localhost:5432` | • Rails 8 Web Server (`:3000`)<br>• Mailpit Email UI (`:8025`, SMTP `:1025`)<br>• Adminer DB GUI (`:8081`)<br>• PostgreSQL 16 DB (`:5432`)<br>• Solid Queue Worker (Background) |
 | 📖 **3. Workshop Web UI** | `just workshop-dev` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/constitution](http://localhost:8080/constitution)<br>• [http://localhost:8080/skeleton](http://localhost:8080/skeleton)<br>• [http://localhost:8080/a2ui](http://localhost:8080/a2ui) | • Interactive Codelab Visualizer (`CODELAB.md`)<br>• Untouchable Constitution<br>• Workshop Skeleton<br>• A2UI JSON API |
+
+## ☁️ Cloud Telemetry & Verification (`just cloud-run-status`)
+
+To inspect your live Google Cloud deployment with instant architecture and environmental telemetry (Issue [#45](https://github.com/palladius/rails8-app-on-gcp/issues/45)):
+
+```bash
+# Automatically infer Cloud Run endpoint via Terraform or gcloud and fetch status
+just cloud-run-status
+
+# Or pass a custom URL:
+just cloud-run-status https://my-service-xxx.europe-west1.run.app
+```
+
+See [`docs/WORKSHOP_TELEMETRY_AND_ALERTS.md`](docs/WORKSHOP_TELEMETRY_AND_ALERTS.md) for full telemetry specifications.
 
 ## 📖 Workshop
 

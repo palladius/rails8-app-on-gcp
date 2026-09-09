@@ -1,0 +1,15 @@
+{
+  "name": "workshop-screenshots",
+  "version": "1.0.0",
+  "description": "Declarative screenshot runner for Rails 8 on GCP workshop",
+  "scripts": {
+    "screenshots": "node screenshots/runner.js",
+    "test-screenshots": "node screenshots/runner.js --dry-run"
+  },
+  "dependencies": {
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

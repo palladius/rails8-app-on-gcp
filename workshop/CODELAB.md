@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.0.0alpha -->
+<!-- 🏷️ Codelab Version: 2.0.1alpha -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -9,7 +9,7 @@
 
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 
-Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.0alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
+Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.1alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
 This curriculum is structured around the **3 Progressive Cloud Run Deployments**, the **Zero-Branch Time-Machine** progression model, and AI pair programming with **Google Antigravity**:
 1. **Deploy 1 (Step 3 - The Stateless Shock):** Deploy a single container with local SQLite to experience serverless statelessness first-hand in under 3 minutes.
@@ -24,6 +24,11 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 - How to eliminate security anti-patterns: private GCS buckets (`iam: true`) and Cloud SQL Auth Proxy mTLS tunnels instead of opening `0.0.0.0/0`.
 - How to inject secrets directly from Google Cloud Secret Manager.
 - How to orchestrate asynchronous GenAI background jobs (NanoBanana cover generator, bilingual podcast synthesis) via Solid Queue.
+
+> 🐝 **Live Workshop Telemetry & Leaderboard**  
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)  
+> *(Puoi registrarti fin da subito o appena completi il primo deploy su Cloud Run nello Step 3!)*
 
 Let's get started!
 
@@ -214,6 +219,9 @@ docker compose up
 
 > 📸 **TODO(riccardo): add screenshot of the local blog homepage showing the yellow [EPHEMERAL DB / STORAGE] badge and the casetta stamp in the bottom-right of the cover image**
 
+<!-- workshop-screenshot: id="step-2-home-ephemeral" -->
+![Blog Homepage with Ephemeral DB Badge](assets/auto-screenshots/step-2-home-ephemeral.png)
+
 ### 4. Automated Step 2 Validation
 
 Verify your local baseline and admin setup:
@@ -280,6 +288,10 @@ Open the generated Cloud Run URL in your browser!
 5. Notice the visual telemetry:
    - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
    - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
+
+> 🐝 **Join the Live Workshop Hive Leaderboard!**  
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
 
@@ -421,7 +433,8 @@ Look at the top of your blog page: you will see a bright warning banner rendered
 > ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**  
 > *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
 
-> 📸 **TODO(riccardo): add screenshot of the blog UI showing the cloud provenance stamp on the cover image alongside the [POLA Warning: Background Jobs Queued with No Worker!] banner**
+<!-- workshop-screenshot: id="step-4-gcs-stuck-jobs-warning" -->
+![GCS ActiveStorage with Stuck Jobs Warning Banner](assets/auto-screenshots/step-4-gcs-stuck-jobs-warning.png)
 
 ### 6. Automated Step 4 Validation
 
