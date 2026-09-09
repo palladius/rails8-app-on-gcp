@@ -27,7 +27,7 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 
 > 🐝 **Live Workshop Telemetry & Leaderboard**  
 > Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
-> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://forms.gle/uc3xfXnWngi43ys86)  
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)  
 > *(Puoi registrarti fin da subito o appena completi il primo deploy su Cloud Run nello Step 3!)*
 
 Let's get started!
@@ -284,7 +284,7 @@ Open the generated Cloud Run URL in your browser!
 
 > 🐝 **Join the Live Workshop Hive Leaderboard!**  
 > Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
-> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://forms.gle/uc3xfXnWngi43ys86)
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
 
