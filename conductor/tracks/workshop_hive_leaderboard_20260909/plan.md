@@ -22,11 +22,12 @@
 
 
 
-## Phase 3: Frontend Reattivo, Vista Kanban e Blinking Lights
+## Phase 3: Frontend Reattivo, Vista Kanban e Blinking Lights [checkpoint: 8c6e02e]
 - [x] Task: Creare la struttura HTML/CSS (Tailwind o CSS vanilla moderno e giocoso) con colonna per ogni livello/step del workshop. [3b58c26]
 - [x] Task: Implementare logica client JS per il polling periodico di leaderboard e health status. [3b58c26]
 - [x] Task: Aggiungere gli indicatori visivi lampeggianti verdi/rossi per lo stato di ciascun partecipante e la visualizzazione a schede studente in Kanban. [3b58c26]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md).
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md). [8c6e02e]
+
 
 
 ## Phase 4: Containerizzazione, Documentazione & Deploy Ready
