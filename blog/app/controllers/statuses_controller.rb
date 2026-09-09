@@ -37,6 +37,9 @@ class StatusesController < ApplicationController
       attachments_count: (ActiveStorage::Attachment.count rescue 0)
     }
 
+    # Cache status response for 1 minute on proxy/browser to balance responsiveness and protect against hammering
+    expires_in 1.minute, public: true, stale_while_revalidate: 30.seconds
+
     respond_to do |format|
       format.html
       format.json do
