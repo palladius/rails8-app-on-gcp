@@ -172,40 +172,40 @@ function renderTable() {
 
     tr.innerHTML = `
       <!-- COLONNA 1: Live Dot + Sotto la latenza -->
-      <td class="py-3.5 px-4 text-center whitespace-nowrap align-middle">
-        <div class="flex flex-col items-center justify-center gap-1">
+      <td class="py-2 px-2.5 text-center whitespace-nowrap align-middle">
+        <div class="flex flex-col items-center justify-center gap-0.5">
           ${dotHtml}
           ${latencyBadge}
         </div>
       </td>
 
       <!-- COLONNA 2: HH:MM Nome a sx + eventuale Gmail icon + Step badge -->
-      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
-        <div class="flex items-center gap-3">
-          <div class="flex items-baseline gap-2">
-            <span class="text-xs font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
-            <span class="font-bold text-amber-400 text-base">${escapeHtml(nickname)}</span>
+      <td class="py-2 px-3 whitespace-nowrap align-middle">
+        <div class="flex items-center gap-2.5">
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
+            <span class="font-bold text-amber-400 text-sm">${escapeHtml(nickname)}</span>
             ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
                 <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
               </a>
             ` : ''}
           </div>
 
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
             <span>Step ${stepNum}</span>
-            <span class="text-[10px] text-amber-400/60">ℹ️</span>
+            <span class="text-[9px] text-amber-400/60">ℹ️</span>
           </span>
         </div>
       </td>
 
       <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
-      <td class="py-3.5 px-5 align-middle">
-        <div class="flex flex-col gap-1.5">
+      <td class="py-2 px-3 align-middle">
+        <div class="flex flex-col gap-1">
           <!-- Riga 1: URL largo + eventuale Cloud Run Runner badge -->
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
-              <span class="opacity-70 text-sm">🔗</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all max-w-2xl" title="${escapeHtml(student.url)}">
+              <span class="opacity-70 text-xs">🔗</span>
               <span class="font-medium">${escapeHtml(student.url)}</span>
             </a>
 
@@ -220,17 +220,17 @@ function renderTable() {
               }
 
               return `
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
                   <span>🏃</span>
                   <span class="font-semibold">${escapeHtml(service)}</span>
-                  ${shortRev ? `<span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-[9px] font-normal tracking-tight">@${escapeHtml(shortRev)}</span>` : ''}
+                  ${shortRev ? `<span class="px-1 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-[8.5px] font-normal tracking-tight">@${escapeHtml(shortRev)}</span>` : ''}
                 </span>
               `;
             })()}
           </div>
 
           <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="flex flex-wrap items-center gap-2.5">
             ${stackHtml}
             ${metricsHtml}
           </div>
