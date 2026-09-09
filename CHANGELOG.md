@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.8] - 2026-09-09
+### Fixed
+- 🛠️ **Terraform Provider 5.x & Virgin Project Hardening (FL-004)**:
+  - Fixed `iac/iap.tf`: In Google provider 5.x+, static `iap { enabled = true }` threw schema validation errors (`oauth2_client_id` and `oauth2_client_secret` required) even when `enable_iap = false`. Converted to optional `dynamic "iap"` block.
+  - Added `iap_client_id` and `iap_client_secret` (default `""`) to `iac/variables.tf`.
+  - Added `enable_cicd_trigger` (default `false`) to `iac/variables.tf` and conditioned `google_cloudbuild_trigger.deploy_on_push` in `iac/cicd.tf` to avoid BYOSA enforcement failures in clean attendee projects.
+  - Verified live Terraform execution on brand-new virgin project `rails8-workshop-fl04` with 20/20 evals passed.
+
 ## [0.2.7] - 2026-09-09
 ### Added
 - 📸 **Declarative Workshop Screenshots (Issue [#42](https://github.com/palladius/rails8-app-on-gcp/issues/42))**:
