@@ -5,6 +5,8 @@
 
 ## Introduction
 
+*Duration: 5 minutes*
+
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 
 Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.0alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
@@ -26,6 +28,8 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 Let's get started!
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
+
+*Duration: 10 minutes*
 
 > 💡 **The Scenario:** You and your team are building a mission-critical Rails 8 application. Before touching code or launching cloud resources, we must establish our toolchain, connect Google Antigravity, and verify our Google Cloud credentials and billing foundation.
 
@@ -89,6 +93,8 @@ just workshop-eval 0
 
 ## Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics
 
+*Duration: 5 minutes*
+
 > 💡 **The Strategy:** Managed databases like Google Cloud SQL PostgreSQL take approximately 10–12 minutes to provision. Rather than waiting idly later, we launch immutable infrastructure via Terraform **right now in the background** while we develop locally!
 
 ### 1. Run Automated Pre-Flight Diagnostics Suite
@@ -140,6 +146,8 @@ just workshop-uat 1
 ✨ **The Wow Moment:** One command launches heavy enterprise infrastructure cooking in Google Cloud while you immediately proceed to local development without waiting!
 
 ## Step 2: The Local Baseline, Mailpit & Admin Onboarding
+
+*Duration: 15 minutes*
 
 Our starting point is a clean, modern Rails 8 blog application running on localhost with SQLite, Mailpit email interception, and disk-based ActiveStorage.
 
@@ -207,6 +215,8 @@ In the next step, we will intentionally deploy this ephemeral configuration to C
 
 
 ## Step 3: Deploy 1 — The Stateless Shock (Early WOW in 3 Minutes!)
+
+*Duration: 10 minutes*
 
 Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** in under 3 minutes!
 
@@ -288,6 +298,8 @@ just workshop-eval 3
 
 
 ## Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+
+*Duration: 15 minutes*
 
 In this step, we decouple media and file storage from the container disk by switching ActiveStorage to **Google Cloud Storage (GCS)**, using short-lived signed URLs via the IAM Credentials API (`iam: true`).
 
@@ -381,6 +393,8 @@ just workshop-eval 4
 
 ## Step 5: Cloud SQL Ready & Secret Manager CLI Injection
 
+*Duration: 10 minutes*
+
 By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database and inject our secrets into **Google Cloud Secret Manager**.
 
 ### 1. Verifying Cloud SQL Instance
@@ -435,6 +449,8 @@ just workshop-eval 5
 
 
 ## Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
+
+*Duration: 20 minutes*
 
 Now we assemble the ultimate reference architecture: **Multi-Container Cloud Run**!
 
@@ -515,6 +531,8 @@ just workshop-eval 6
 
 ## Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
 
+*Duration: 15 minutes*
+
 ![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
 
 With Solid Queue running in a dedicated container and Google Cloud Storage active, we can unleash asynchronous Generative AI!
@@ -573,6 +591,8 @@ just workshop-eval 7
 
 
 ## Step 8: Choose Your Own Adventure / Advanced Quests 🏆
+
+*Duration: 30 minutes*
 
 Now that you have mastered the canonical reference architecture, choose your graduation quest!
 
@@ -635,6 +655,8 @@ Now that you have mastered the canonical reference architecture, choose your gra
 ---
 
 ## 🎓 Conclusion & Clean Up
+
+*Duration: 5 minutes*
 
 Congratulations! 🎉
 

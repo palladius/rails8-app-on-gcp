@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.43] - 2026-09-09
+### Added
+- ⏱️ **Page Duration Estimates in Codelab**:
+  - Added estimated completion duration in italic (*Duration: XX minutes*) to the top of all 11 pages/steps in `workshop/CODELAB.md`.
+  - Recompiled static multi-doc site (`workshop/build/`) for immediate GitHub Pages deployment.
+
+
 ## [0.1.42] - 2026-09-09
 ### Changed
 - 🎨 **Cover Image Header Layout**:
