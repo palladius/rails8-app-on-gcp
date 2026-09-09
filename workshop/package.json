@@ -7,7 +7,9 @@
     "test-screenshots": "node screenshots/runner.js --dry-run"
   },
   "dependencies": {
-    "playwright": "^1.49.0",
     "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
   }
 }

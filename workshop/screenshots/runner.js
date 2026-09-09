@@ -132,6 +132,37 @@ async function run() {
       console.error(`⚠️ Failed to capture screenshot ${shot.id} (exit code: ${result.status})`);
     } else {
       console.log(`✅ Saved: ${shot.output_path}`);
+
+      // Generate screenshot execution metadata
+      const os = require('os');
+      const gitCommit = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).stdout.trim() || 'unknown';
+      const gitBranch = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).stdout.trim() || 'unknown';
+      let version = 'unknown';
+      try {
+        version = fs.readFileSync(path.join(repoRoot, 'VERSION'), 'utf8').trim();
+      } catch (e) {}
+
+      const meta = {
+        id: shot.id,
+        step_id: shot.step_id,
+        title: shot.title || shot.id,
+        description: shot.description || '',
+        recorded_at: new Date().toISOString(),
+        computer_name: os.hostname(),
+        platform: `${os.type()} ${os.release()} (${os.arch()})`,
+        user: os.userInfo().username,
+        git_commit: gitCommit,
+        git_branch: gitBranch,
+        app_version: version,
+        rails_env: process.env.RAILS_ENV || 'development',
+        base_url: process.env.BASE_URL || 'http://localhost:3000',
+        output_file: shot.output_path,
+        viewport: shot.viewport || { width: 1280, height: 800 }
+      };
+
+      const metaPath = outputPath.replace(/\.[^.]+$/, '.json');
+      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+      console.log(`📋 Metadata: ${path.relative(repoRoot, metaPath)}`);
     }
   }
 }
