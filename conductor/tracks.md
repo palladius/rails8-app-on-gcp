@@ -47,3 +47,6 @@
 - [x] **Track: Nano Banana Auto-Cover Generation on Vertex AI (Issue #18)**
 *Link: [./tracks/nanobanana_cover_issue_18_20260908/plan.md](./tracks/nanobanana_cover_issue_18_20260908/plan.md)*
 
+
+- [ ] **Track: Delete and Refresh Article Cover Image (Issue #34)**
+*Link: [tracks/delete_cover_image_issue_34_20260909/index.md](tracks/delete_cover_image_issue_34_20260909/index.md)*
