@@ -180,12 +180,18 @@ else
 
   # Check Billing Enabled (MANDATORY GATE!)
   print "   🔍 Verifying GCP Billing status... "
-  billing_cmd = "gcloud beta billing projects describe #{project_id} #{gcloud_flags_str} --format='value(billingEnabled)' 2>/dev/null"
-  billing_enabled, _stderr, status = Open3.capture3(billing_cmd)
+  billing_cmd = "gcloud beta billing projects describe #{project_id} #{gcloud_flags_str} --format='value(billingEnabled)'"
+  billing_enabled, billing_err, status = Open3.capture3(billing_cmd)
   billing_status = billing_enabled.strip.downcase
 
   if status.success? && billing_status == "true"
     puts "ACTIVE (Billing is linked!)".green
+  elsif billing_err.include?("cloudbilling.googleapis.com") || billing_err.include?("API [cloudbilling.googleapis.com] not enabled")
+    puts "API DISABLED".yellow
+    puts "⚠️  [WARNING] 'cloudbilling.googleapis.com' API is not enabled on project '#{project_id}'!".yellow
+    puts "   👉 Run this command to enable it:"
+    puts "      gcloud services enable cloudbilling.googleapis.com --project=#{project_id}"
+    warnings_count += 1
   else
     puts "INACTIVE or ACCESS DENIED".red
     puts "❌ [ERROR] GCP Billing is NOT enabled on project '#{project_id}'!".red
