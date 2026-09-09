@@ -1,0 +1,1 @@
+Completed Phase 3: Added 'just screenshots' and 'just test-screenshots' recipes to root justfile, integrated screenshot validation into 'bin/workshop_diagnostics.rb' (just workshop-test), added usage docs to workshop/README.md and comment directives to workshop/CODELAB.md, and bumped version to 0.1.45.
