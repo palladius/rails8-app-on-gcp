@@ -53,7 +53,7 @@ async function fetchHealth() {
 
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
     document.getElementById("stat-healthy-apps").textContent = healthyCount;
-    document.getElementById("sync-timer").textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById("sync-timer").textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 
     renderTable();
   } catch (err) {
