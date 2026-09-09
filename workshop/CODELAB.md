@@ -130,6 +130,11 @@ cp .env.dist .env
 # Edit .env and configure GOOGLE_CLOUD_ACCOUNT with your Google/Gmail account
 ```
 
+> 💡 **Tip:** If `just workshop-test` reports that the billing API is disabled on your project, enable it quickly via:
+> ```bash
+> gcloud services enable cloudbilling.googleapis.com
+> ```
+
 ### 2. ⏱️ Launch Terraform Infrastructure Asynchronously
 
 Navigate to the `iac/` directory and initialize Terraform:
