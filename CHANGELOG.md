@@ -1,6 +1,10 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.1.36] - 2026-09-09
+### Added
+- 💳 **Workshop Slides**: Updated Slide 3 to "Reclaim Credits Now" with direct claim link button (`https://me.developers.google.com/benefits/claim/test-workshop-rails8`) and updated presentation outline.
+
 ## [0.1.35] - 2026-09-08
 ### Changed
 - 👤 **Unified Google Cloud & Admin Identity (`GOOGLE_CLOUD_ACCOUNT` & `APP_ADMIN_PASSWORD`)**:
