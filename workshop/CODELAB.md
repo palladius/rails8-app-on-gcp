@@ -63,15 +63,19 @@ gcloud config set compute/region europe-west1
 > 💡 **Why a Dedicated Configuration?**  
 > Using `gcloud config configurations create rails8-on-gcp-workshop` isolates all CLI settings (account, quota project, default region) specifically for this workshop. When you finish, you can switch back to your normal setup anytime with `gcloud config configurations activate default`.
 
+> 📸 **TODO(riccardo): add screenshot showing terminal output of gcloud config configurations list with active rails8-on-gcp-workshop configuration**
+
 ### 3. 🚨 Mandatory Guard Gate: GCP Billing Verification
 
 > ⚠️ **CRITICAL GUARD GATE:** Google Cloud SQL and Cloud Run deployments require an active linked billing account or valid workshop educational credits. Checking this now prevents cryptic quota or billing failures halfway through the lab!
 
 Run the billing verification check:
 ```bash
-gcloud beta billing projects describe $PROJECT_ID
+gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
 ```
 Ensure `billingEnabled: true` is returned. If billing is disabled, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
+
+> 📸 **TODO(riccardo): add screenshot showing Google Cloud Console Billing page with active linked billing account or workshop credits**
 
 ### 4. Clone the Repository & Pair with Antigravity
 
@@ -104,15 +108,17 @@ Before launching cloud infrastructure, run the comprehensive pre-flight test sui
 just workshop-test
 ```
 This script (`bin/workshop_diagnostics.rb`):
-- Verifies your `ADMIN_EMAIL` identity configuration.
+- Verifies your `GOOGLE_CLOUD_ACCOUNT` identity configuration.
 - Verifies active billing and project linkage.
 - Validates Application Default Credentials (ADC) for Vertex AI.
 - Confirms the ActiveStorage canary seed image (`blog/app/assets/images/gcs_dev_image.jpg`).
 
+> 📸 **TODO(riccardo): add screenshot of 'just workshop-test' running in terminal with all-green checkmarks**
+
 If `.env` is missing, copy it from the documented template:
 ```bash
 cp .env.dist .env
-# Edit .env and configure ADMIN_EMAIL with your Google/Gmail account
+# Edit .env and configure GOOGLE_CLOUD_ACCOUNT with your Google/Gmail account
 ```
 
 ### 2. ⏱️ Launch Terraform Infrastructure Asynchronously
@@ -130,6 +136,8 @@ cd ..
 - **Google Cloud Storage Bucket:** Created with private access and IAM Credentials signing (`iam: true`).
 - **Canary Test Image:** Uploads `gcs_dev_image.jpg` to the bucket to enable end-to-end blob verification.
 - **Google Cloud SQL PostgreSQL Instance:** Initiates background provisioning (~10-12 minutes).
+
+> 📸 **TODO(riccardo): add screenshot of Google Cloud SQL Console showing rails-postgres instance in state 'Creating' (cooking in background)**
 
 ### 3. Automated Step 1 Validation & Fast UAT
 
@@ -170,7 +178,7 @@ The database seed (`db/seeds.rb`) features **Smart Environment Auto-Discovery**:
 
 Run seed with your admin email:
 ```bash
-ADMIN_EMAIL="myname@gmail.com" bin/rails db:seed
+GOOGLE_CLOUD_ACCOUNT="myname@gmail.com" bin/rails db:seed
 ```
 
 Boot the services:
@@ -182,6 +190,9 @@ docker compose up
 ### 3. The Mailpit Experience & Console Workout
 
 1. **Catch Outgoing Emails**: Open `http://localhost:8025` in your browser. You will see **Mailpit** running locally. The initial seed or password reset dispatches an ActionMailer notification captured right here in the local inbox without touching real email servers!
+
+> 📸 **TODO(riccardo): add screenshot of Mailpit web UI (http://localhost:8025) displaying the intercepted admin password reset email**
+
 2. **Interactive `rails console`**: Test your Rails muscle memory by dropping into the console:
    ```bash
    bin/rails console
@@ -195,7 +206,9 @@ docker compose up
 3. **Log in to the Blog**: Open `http://localhost:3000` and log in with your updated admin credentials.
 4. **Observe the Telemetry Badges:** Check the footer and UI header:
    - Notice the badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
-   - Notice the post watermark: *"Stored on ephemeral local disk: sad grayscale mode 💾 (ask AI why!)"*.
+   - Notice the post watermark: The local casetta stamp (`nanobanana_stamp_local.png` in the bottom-right corner).
+
+> 📸 **TODO(riccardo): add screenshot of the local blog homepage showing the yellow [EPHEMERAL DB / STORAGE] badge and the casetta stamp in the bottom-right of the cover image**
 
 ### 4. Automated Step 2 Validation
 
@@ -264,6 +277,8 @@ Open the generated Cloud Run URL in your browser!
    - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
    - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
 
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
+
 ### 4. 💥 The Catch: The Stateless Shock
 
 Cloud Run is a **stateless, serverless platform**. When web traffic drops to zero, Cloud Run scales down to zero container instances to save money. When a new HTTP request arrives or a new container revision is deployed, Cloud Run starts a brand new, clean container image.
@@ -285,6 +300,8 @@ Now, go back to your browser and **refresh the page**:
 - You see the pedagogical in-app alert banner:
   > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**  
   > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
+
+> 📸 **TODO(riccardo): add screenshot of the live Cloud Run blog showing the [EPHEMERAL CONTAINER RESET DETECTED] alert banner after container restart**
 
 ### 5. Automated Step 3 Validation
 
@@ -323,6 +340,8 @@ google:
 
 > 💡 **Design Decision — Why `iam: true` instead of `public: true`?**  
 > Making a bucket public (`allUsers:objectViewer`) is a hazardous security anti-pattern. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
+
+![GCS IAM Signing Architecture](assets/images/gcs_iam_signing_diagram.jpg)
 
 ### 2. Granting IAM Storage & Signing Permissions
 
@@ -371,6 +390,8 @@ gcloud run deploy blog \
    gcloud storage ls gs://$GCS_BUCKET/
    ```
 
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Storage Console showing uploaded image blobs safely stored in the private bucket gs://$GCS_BUCKET**
+
 ### 5. ⚠️ The POLA Catch: Stuck Jobs Warning Banner
 
 When you uploaded the image, ActiveStorage enqueued an analysis job (`ActiveStorage::AnalyzeJob`) to extract dimensions and metadata.
@@ -381,6 +402,8 @@ Look at the top of your blog page: you will see a bright warning banner rendered
 
 > ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**  
 > *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
+
+> 📸 **TODO(riccardo): add screenshot of the blog UI showing the cloud provenance stamp on the cover image alongside the [POLA Warning: Background Jobs Queued with No Worker!] banner**
 
 ### 6. Automated Step 4 Validation
 
@@ -411,6 +434,8 @@ The output should be `RUNNABLE`.
 
 Never store plain-text database passwords, API keys, or Rails master keys in git or in container environment variables. We use **Google Cloud Secret Manager** for zero-trust runtime injection.
 
+![Secret Manager Workflow](assets/images/secret_manager_workflow.jpg)
+
 Store your secrets via the Google Cloud CLI:
 
 ```bash
@@ -425,6 +450,8 @@ echo -n "$DB_PASSWORD" | gcloud secrets create rails-db-password --data-file=- 2
   echo -n "$DB_PASSWORD" | gcloud secrets versions add rails-db-password --data-file=-
 ```
 
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Secret Manager Console listing rails-master-key and rails-db-password with Secret Accessor role bindings**
+
 ### 3. Granting Secret Accessor Permissions
 
 Grant the Cloud Run runtime service account permission to read these secrets:
@@ -438,6 +465,8 @@ gcloud secrets add-iam-policy-binding rails-db-password \
   --member="serviceAccount:$RUN_SA" \
   --role="roles/secretmanager.secretAccessor"
 ```
+
+![Cloud SQL Auth Proxy Security Comparison](assets/images/cloud_sql_proxy_comparison.jpg)
 
 ### 4. Automated Step 5 Validation
 
@@ -465,6 +494,8 @@ just workshop-restore-gold
 ### 2. Inspecting the 3-Container Production Blueprint
 
 Open `blog/compose.prod.yaml` and inspect the architecture:
+
+![Cloud Run Multi-Container Production Architecture](assets/images/cloud_run_multi_container_architecture.jpg)
 
 ```mermaid
 graph LR
@@ -511,6 +542,8 @@ gcloud run deploy blog \
   --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google
 ```
 
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**
+
 ### 5. ✨ The Wow Moment & Telemetry Validation
 
 Open your Cloud Run URL:
@@ -519,6 +552,8 @@ Open your Cloud Run URL:
    - The stuck jobs warning banner is **gone**, because the `worker` container is actively draining Solid Queue in the background!
 2. Create blog posts and comments.
 3. Restart or redeploy as many times as you like: your data, posts, comments, and assets survive forever in Cloud SQL and GCS!
+
+> 📸 **TODO(riccardo): add screenshot of the production blog showing the emerald green [CLOUD PERSISTENT 🐘 ☁️] badge with stuck jobs banner gone and permanent articles**
 
 ### 6. Automated Step 6 Validation
 
@@ -539,10 +574,14 @@ With Solid Queue running in a dedicated container and Google Cloud Storage activ
 
 ### 1. The NanoBanana Vintage Cover Generator
 
+![NanoBanana AI Image Generation Pipeline](assets/images/nanobanana_ai_image_pipeline.jpg)
+
 When an article is created without a cover image, `GenerateCoverImageJob` automatically triggers via Solid Queue:
 - It calls **Gemini 2.5 Flash Image / Imagen** on Vertex AI using **Application Default Credentials** (`roles/aiplatform.user`). Zero API keys required!
 - It generates a custom vintage 1960s Italian film poster (*"Locandina di un film 1960"*) with a cameo banana and a shiny ruby "8".
 - Test it: Create an article titled *"Serverless Architecture with Ruby on Rails"* and leave the cover image blank. Within seconds, the Solid Queue worker generates and attaches the poster!
+
+> 📸 **TODO(riccardo): add screenshot of a blog post with an AI-generated vintage 1960s Italian movie poster featuring a cameo banana and ruby 8**
 
 ### 2. The Bilingual Podcastifier (TTS Synthesis)
 
@@ -578,6 +617,8 @@ if orphan_blobs.any?
 end
 exit
 ```
+
+> 📸 **TODO(riccardo): add screenshot of the interactive Rails console executing the GCS Treasure Hunt snippet and rescuing orphaned ActiveStorage blobs**
 
 Refresh your blog: the photo uploaded during Step 4's Stateless Shock is resurrected and permanently attached to your Cloud SQL post!
 
@@ -624,6 +665,8 @@ Now that you have mastered the canonical reference architecture, choose your gra
      iap_allowed_users = [var.google_cloud_account]
      ```
 
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Identity-Aware Proxy (IAP) toggle and OAuth access screen**
+
 ---
 
 ### 📊 Quest 2: Production SRE Telemetry & Cloud Logging
@@ -632,6 +675,8 @@ Now that you have mastered the canonical reference architecture, choose your gra
 * **How it Works:**
   - Configure `blog/config/environments/production.rb` to emit structured JSON logs with GCP trace labels.
   - Trigger an intentional test exception and watch Google Cloud Error Reporting group and notify you instantly.
+
+> 📸 **TODO(riccardo): add screenshot of Google Cloud Error Reporting showing grouped production exceptions and Cloud Logging structured JSON payload with trace labels**
 
 ---
 
@@ -646,11 +691,15 @@ Now that you have mastered the canonical reference architecture, choose your gra
   - Add the `neighbor` gem to `blog/Gemfile` and generate text embeddings with Gemini (`text-embedding-004`) on `Post#after_save`.
   - Perform cosine distance queries (`<=>`) to power a semantic search bar with Turbo Streams!
 
+> 📸 **TODO(riccardo): add screenshot of the live blog semantic search bar returning conceptual matches with cosine similarity scores**
+
 ---
 
 ### ⚡ Quest 4: SEO & Performance Audit Assistant
 * **Difficulty:** Easy / Fun (Developer Experience)
 * **The Goal:** Audit Core Web Vitals, Largest Contentful Paint (LCP), and Flesch-Kincaid / Fog readability indices using Antigravity and Speedgrapher tools.
+
+> 📸 **TODO(riccardo): add screenshot of Speedgrapher / Lighthouse SEO and Core Web Vitals audit summary**
 
 ---
 

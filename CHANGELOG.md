@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-09-09
+### Added
+- 📸 **Visual Architecture Diagrams & Screenshot Placeholders**:
+  - Embedded canonical architectural diagrams across workshop steps: GCS IAM signing workflow, Secret Manager injection, Cloud SQL Auth Proxy security comparison, Cloud Run multi-container sidecars, and NanoBanana GenAI pipeline.
+  - Added 19 targeted `TODO(riccardo): add screenshot <why and for what>` callouts throughout `workshop/CODELAB.md` covering key pedagogical UI milestones (Billing console, Mailpit inbox, ephemeral container reset shock, GCS console, secret bindings, multi-container sidecars tab, AI vintage posters, and Rails console blob rescue).
+
+
 ## [0.2.0] - 2026-09-09
 ### 🎉 Major Milestone: Rails 8 on Google Cloud Workshop v0.2.0 (WOWOW)
 - 🚀 **Complete 8-Step, 3-Deployment Workshop Experience**:
