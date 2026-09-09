@@ -150,7 +150,7 @@ function renderTable() {
     tbody.innerHTML = `
       <tr>
         <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
-          Nessuna applicazione registrata finora.
+          No student submissions registered yet.
         </td>
       </tr>
     `;
@@ -247,42 +247,42 @@ function renderTable() {
       const isGcs = (t.storage_tier && (t.storage_tier.toString().includes("gcs") || t.storage_tier.toString().includes("Cloud Storage"))) || (t.storage_badge && t.storage_badge.includes("Cloud Storage"));
       const isVertex = (t.ai_badge && (t.ai_badge.includes("Vertex") || t.ai_badge.includes("ADC")));
 
-      // 1. Cloud SQL badge (Verde attivo se Cloud SQL, altrimenti spento/grayscale con X rossa)
+      // 1. Cloud SQL badge (Active green if Cloud SQL, else grayscale/crossed with red X)
       const sqlBadge = isCloudSql ? `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono" title="Google Cloud SQL (mTLS Proxy): ATTIVO">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono" title="Google Cloud SQL (mTLS Auth Proxy): ACTIVE">
           <span class="text-xs leading-none">🐘</span>
           <span class="font-bold text-[9px] tracking-tight">SQL</span>
         </span>
       ` : `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud SQL: NON ancora configurato (in uso SQLite locale)">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud SQL: Not configured yet (using ephemeral local SQLite)">
           <span class="text-xs leading-none filter grayscale">🐘</span>
           <span class="line-through text-[9px]">SQL</span>
           <span class="text-[8px] text-rose-500 font-bold">✕</span>
         </span>
       `;
 
-      // 2. GCS badge (Teal attivo se GCS, altrimenti spento/grayscale con X rossa)
+      // 2. GCS badge (Active teal if GCS, else grayscale/crossed with red X)
       const gcsBadge = isGcs ? `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-teal-500/40 bg-teal-500/10 text-teal-300 text-[10px] font-mono" title="Google Cloud Storage (iam: true): ATTIVO">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-teal-500/40 bg-teal-500/10 text-teal-300 text-[10px] font-mono" title="Google Cloud Storage (iam: true): ACTIVE">
           <span class="text-xs leading-none">☁️</span>
           <span class="font-bold text-[9px] tracking-tight">GCS</span>
         </span>
       ` : `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud Storage: NON ancora configurato (in uso disco locale effimero)">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud Storage: Not configured yet (using ephemeral local disk)">
           <span class="text-xs leading-none filter grayscale">☁️</span>
           <span class="line-through text-[9px]">GCS</span>
           <span class="text-[8px] text-rose-500 font-bold">✕</span>
         </span>
       `;
 
-      // 3. Vertex AI badge (Ambra/Verde attivo se Vertex AI, altrimenti spento/grayscale con X rossa)
+      // 3. Vertex AI badge (Active amber if Vertex AI, else grayscale/crossed with red X)
       const vertexBadge = isVertex ? `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px] font-mono" title="Vertex AI (Nano Banana / Imagen 3): ATTIVO">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px] font-mono" title="Vertex AI (Nano Banana / Imagen 3): ACTIVE">
           <span class="text-xs leading-none">🍌</span>
           <span class="font-bold text-[9px] tracking-tight">AI</span>
         </span>
       ` : `
-        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Vertex AI: NON attivo (in uso Google AI Studio o disabilitato)">
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Vertex AI: Inactive (using Google AI Studio or disabled)">
           <span class="text-xs leading-none filter grayscale">🍌</span>
           <span class="line-through text-[9px]">AI</span>
           <span class="text-[8px] text-rose-500 font-bold">✕</span>
@@ -320,7 +320,7 @@ function renderTable() {
     const statusJsonUrl = student.url.replace(/\/+$/, '') + '/status.json';
 
     const jobsBadge = (t.pending_jobs !== undefined)
-      ? `<span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Job in coda Solid Queue">⏳ <b class="text-amber-300 font-semibold">${t.pending_jobs}</b></span>`
+      ? `<span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Pending background jobs (Solid Queue)">⏳ <b class="text-amber-300 font-semibold">${t.pending_jobs}</b></span>`
       : "";
 
     // Calcolo della delta revision pura (es. "00013-l44")
@@ -336,7 +336,7 @@ function renderTable() {
 
       // Se la diff non esiste o è vuota, o coincide con l'intero service name, o non è una vera revisione -> o perfetto o niente!
       if (deltaRev && deltaRev !== service && deltaRev.length > 0 && deltaRev !== 'deployed') {
-        const hoverTitle = service ? `Servizio Cloud Run: ${service}\nRevisione completa: ${t.k_revision}` : `Revisione Cloud Run: ${t.k_revision}`;
+        const hoverTitle = service ? `Cloud Run Service: ${service}\nFull Revision: ${t.k_revision}` : `Cloud Run Revision: ${t.k_revision}`;
         deltaRevBadge = `
           <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
             <span class="text-xs leading-none">🏷️</span>
@@ -348,7 +348,7 @@ function renderTable() {
 
     // Failed jobs alert (se > 0, mostra badge rosso allarme!)
     const failedJobsBadge = (t.failed_jobs && t.failed_jobs > 0)
-      ? `<span class="bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40 text-rose-300 font-bold blink-down" title="Attenzione: ${t.failed_jobs} job falliti in Solid Queue!">💥 <b class="text-rose-200">${t.failed_jobs}</b></span>`
+      ? `<span class="bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40 text-rose-300 font-bold blink-down" title="Warning: ${t.failed_jobs} failed jobs in Solid Queue!">💥 <b class="text-rose-200">${t.failed_jobs}</b></span>`
       : "";
 
     // Git commit hash badge (se presente da Rails /status.json)
@@ -362,12 +362,12 @@ function renderTable() {
     if (t.posts_count !== undefined) {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Numero di post nel database">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Utenti admin registrati">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="File e immagini allegati">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
           ${jobsBadge}
           ${failedJobsBadge}
-          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
           ${deltaRevBadge}
@@ -379,7 +379,7 @@ function renderTable() {
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
           ${jobsBadge}
           ${failedJobsBadge}
-          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
           ${deltaRevBadge}
@@ -407,7 +407,7 @@ function renderTable() {
             <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
             <span class="font-bold text-amber-400 text-sm">${escapeHtml(nickname)}</span>
             ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ ADMIN_EMAIL esposto pubblicamente: ${escapeHtml(t.admin_email)} (Chiedi ad Antigravity come proteggerlo con Secret Manager!)">
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
                 <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
               </a>
             ` : ''}
@@ -450,14 +450,14 @@ function renderStagesDistribution() {
   // Counts per step (1 to 8)
   const stepCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
   const stepNames = {
-    1: "Baseline Locale",
+    1: "Local Baseline",
     2: "Mailpit & Admin",
     3: "Stateless Shock",
-    4: "Persistenza GCS",
+    4: "GCS Persistence",
     5: "Secret Manager",
-    6: "Sidecar Cloud SQL",
-    7: "Cover GenAI",
-    8: "Traguardo Finale 🏆"
+    6: "Cloud SQL Proxy",
+    7: "GenAI Cover",
+    8: "Final Quest 🏆"
   };
 
   cachedLeaderboard.forEach(student => {
