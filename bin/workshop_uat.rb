@@ -69,6 +69,11 @@ begin
     File.symlink(bundle_dir, target_bundle) rescue nil
   end
 
+  local_bundle_config = File.join(repo_root, "blog", ".bundle")
+  if Dir.exist?(local_bundle_config)
+    FileUtils.cp_r(local_bundle_config, File.join(tmp_dir, "blog", ".bundle"))
+  end
+
   # 3. Apply Step N configuration
   puts "⚙️  Applying Step #{target_step} configuration in sandbox...".cyan
   case target_step.to_s
