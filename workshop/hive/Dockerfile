@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Workshop Hive Leaderboard
+# Multi-stage Dockerfile for Workshop Hive Leaderboard (Cloud Run Ready)
 FROM ruby:3.3-slim AS base
 
 WORKDIR /app
@@ -16,4 +16,4 @@ ENV PORT=8080
 ENV RACK_ENV=production
 EXPOSE 8080
 
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "-p", "8080"]
+CMD ["bundle", "exec", "puma", "-p", "8080", "config.ru"]

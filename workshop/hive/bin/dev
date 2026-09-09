@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+PORT="${PORT:-8080}"
+echo "🐝 Starting Workshop Hive Leaderboard on http://localhost:${PORT}..."
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$DIR"
+
+bundle exec puma -p "$PORT" config.ru
