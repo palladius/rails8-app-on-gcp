@@ -24,7 +24,7 @@ variable "enable_iap" {
 variable "iap_allowed_users" {
   description = "List of Google accounts allowed to access the Cloud Run app through IAP."
   type        = list(string)
-  default     = [
+  default = [
     "ricc@google.com",
     "emiliano.dellacasa@gmail.com",
     "palladiusbonton@gmail.com",

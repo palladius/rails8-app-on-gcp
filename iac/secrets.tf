@@ -2,12 +2,20 @@
 # Secrets: Secret Manager for Rails app secrets
 ###############################################################################
 
+# Required GCP API for Secret Manager
+resource "google_project_service" "secretmanager" {
+  project            = var.project_id
+  service            = "secretmanager.googleapis.com"
+  disable_on_destroy = false
+}
+
 # DB Password
 resource "google_secret_manager_secret" "db_password" {
   secret_id = "rails-db-password"
   replication {
     auto {}
   }
+  depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "db_password" {
@@ -21,6 +29,7 @@ resource "google_secret_manager_secret" "rails_master_key" {
   replication {
     auto {}
   }
+  depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "rails_master_key" {
@@ -39,6 +48,7 @@ resource "google_secret_manager_secret" "admin_password" {
   replication {
     auto {}
   }
+  depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "admin_password" {
