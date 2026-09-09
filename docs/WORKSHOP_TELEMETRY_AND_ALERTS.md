@@ -127,14 +127,53 @@ All workshop alerts must follow these strict CSS design system principles:
 
 ## 🧭 The Professor & Developer Telemetry Dashboard (`/status`)
 
-To give instructors and developers complete situational awareness without poking around terminal variables, a dedicated endpoint is available at:
-* **HTML View:** [`/status`](http://localhost:3001/status) (linked in the navigation bar)
-* **JSON API:** [`/status.json`](http://localhost:3001/status.json)
+To give instructors, students, and developers complete situational awareness without poking around terminal variables, a dedicated endpoint is available on both localhost and live Cloud Run:
+* **HTML View:** [`/status`](http://localhost:8088/status)
+* **JSON API:** [`/status.json`](http://localhost:8088/status.json)
 
 ### Monitored Subsystems (All 0 ms in-memory checks):
 1. **Compute & Runtime:** Distinguishes Google Cloud Run (`K_SERVICE` / serverless), Docker Compose container (`/.dockerenv` / `DOCKER_CONTAINER`), and Native Host Ruby.
 2. **Database Persistence:** Identifies Google Cloud SQL (via Auth Proxy mTLS) vs Local PostgreSQL container vs Ephemeral local SQLite3.
-3. **ActiveStorage Blobs:** Inspects ActiveStorage service (`:google_prod` / `:google_dev` with IAM blob signing vs `:local` disk).
+3. **ActiveStorage Blobs:** Inspects ActiveStorage service (`:google_prod` / `:google_dev` with IAM blob signing vs `:local` disk) and returns `blobs_count` and `attachments_count` in 1ms.
 4. **Nano Banana AI Pipeline:** Confirms if live generation is active via Google AI Studio (`GEMINI_API_KEY`) or Vertex AI (ADC + project), or running in bundled fake cover fallback.
 5. **Background Queues:** Displays pending and failed jobs in Solid Queue.
-6. **Workshop Counters:** Instant tally of published articles and registered admin accounts.
+6. **Workshop Counters:** Instant tally of published articles, registered admin accounts, and durable media blobs.
+
+---
+
+## 🚀 CLI Telemetry: `just cloud-run-status` (Issue #45)
+
+To instantly inspect the live cloud deployment from your local workstation terminal, use:
+
+```bash
+just cloud-run-status
+```
+
+*(You can also pass a custom URL: `just cloud-run-status https://custom-url.run.app` or request raw JSON: `./bin/cloud_run_status.sh --json`)*
+
+### 🔍 Dynamic URL Inference Chain
+The CLI tool ([`bin/cloud_run_status.sh`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/bin/cloud_run_status.sh)) dynamically discovers the live endpoint without hardcoded project numbers:
+
+1. **CLI Argument Override:** Direct parameter if passed (`just cloud-run-status <URL>`).
+2. **Terraform Output:** Reads `cloud_run_url` computed attribute from `iac/` (`terraform output -raw cloud_run_url`).
+3. **gcloud Auto-Discovery:** Queries `gcloud run services describe "${PROJECT_ID}-rails-app"` or filters active services matching `rails`.
+4. **Environment Variable:** Fallback to `CLOUD_RUN_URL`.
+
+### 📊 Sample Output
+```text
+🌐 Cloud Run Live Status
+─────────────────────────────────────────────────────────────
+  🔗 URL:            https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app
+  🧭 Dashboard:      https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app/status
+  💚 Healthcheck:    https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app/up (200 OK)
+  🏷️  App Version:    v0.2.4 (Rails 8.1.3, Ruby 4.0.5)
+  🎯 Workshop Step:  Step 4 (Step 4: Durable Storage with Google Cloud Storage (iam: true))
+─────────────────────────────────────────────────────────────
+  ☁️ Google Cloud Run:    Serverless container running on Cloud Run (Service: test-rails8-workshop-rails-app)
+  🟡 Ephemeral SQLite:   Local SQLite file database (storage/production.sqlite3)
+  ☁️ Google Cloud Storage:    Private GCS bucket with IAM Credentials blob signing (`iam: true`)
+  🍌 Vertex AI (Enterprise ADC):      Vertex AI via Application Default Credentials (Project: test-rails8-workshop, Model: gemini-2.5-flash-image)
+  ⚠️ 17 Pending Jobs:       17 pending, 0 failed
+─────────────────────────────────────────────────────────────
+  📊 Content:        3 Posts · 3 Registered Users · 5 Media Blobs (GCS)
+```
