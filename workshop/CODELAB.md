@@ -32,6 +32,10 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 
 Let's get started!
 
+> 🦖 **DEV TELEMETRY & WORKSHOP TRACKING:**  
+> **Workshop Curriculum:** `v2.0.0alpha` (Release `v0.2.2`) | **Git Commit:** `f5a2e32`  
+> ⚠️ *Riccardo ricordati di toglierlo prima di Modena!* Segnatevi questo commit hash nel Friction Log per correlare i test.
+
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
 
 *Duration: 10min*
@@ -291,27 +295,38 @@ Open the generated Cloud Run URL in your browser!
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
 
-### 4. 💥 The Catch: The Stateless Shock
+### 4. 💥 The Catch: The Stateless Shock & The "Puma Workaround" Trap
 
 Cloud Run is a **stateless, serverless platform**. When web traffic drops to zero, Cloud Run scales down to zero container instances to save money. When a new HTTP request arrives or a new container revision is deployed, Cloud Run starts a brand new, clean container image.
 
-What happens to files stored on the container's ephemeral disk? Let's simulate a container restart or scale-to-zero event:
+#### The First Hint: Stuck Jobs Banner
+When you create a post or attach an image in a single-container deployment, Rails enqueues ActiveJob tasks (like image dimension analysis or metadata indexing). But since nobody is running a background worker, you will see the warning banner:
+> ⚠️ **Notice: background jobs currently pending execution.**  
+> *Solid Queue worker is not running in this single-container deployment.*
+
+#### The Tempting Fix: Running Solid Queue inside Puma
+A clever developer might say: *"Wait! In Rails 8, Puma has a plugin to run Solid Queue directly inside the web server process! Let's just turn on `SOLID_QUEUE_IN_PUMA=true`!"*
+
+Let's test this workaround on Cloud Run:
 
 ```bash
-# Force a revision update to restart the container
+# Force a revision update to enable Solid Queue inside Puma
 gcloud run services update blog \
   --region $GOOGLE_CLOUD_REGION \
-  --update-env-vars RESTART_TRIGGER=$(date +%s)
+  --update-env-vars SOLID_QUEUE_IN_PUMA=true
 ```
 
 Now, go back to your browser and **refresh the page**:
 
 💥 **The Stateless Shock:**  
-- The article you just wrote is **completely gone**!
-- The image you uploaded is **wiped out**!
-- You see the pedagogical in-app alert banner:
-  > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**  
-  > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
+1. **The Good News:** The Solid Queue worker is now active inside Puma! Any new jobs get drained immediately.
+2. **The Cold Shower (The Catch!):**  
+   - Because Cloud Run deployed a new revision, the previous container instance was replaced!
+   - The article you wrote and the SQLite database file on disk **were completely wiped out**!
+   - You see the pedagogical in-app alert banner:
+     > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**  
+     > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
+3. **The Architectural Lesson:** Running background workers inside Puma consumes precious web thread CPU/RAM, and *still does not solve persistence*.
 
 > 📸 **TODO(riccardo): add screenshot of the live Cloud Run blog showing the [EPHEMERAL CONTAINER RESET DETECTED] alert banner after container restart**
 
@@ -323,7 +338,10 @@ Verify your Cloud Run deployment and alert handling:
 just workshop-eval 3
 ```
 
-✨ **The Lesson:** An early deploy gives immediate gratification, but instantly proves *why* enterprise web architectures require decoupled cloud object storage (GCS) and managed relational databases (Cloud SQL).
+✨ **The Lesson:** Single-container workarounds like `SOLID_QUEUE_IN_PUMA` are handy for local development, but in modern cloud architecture:
+- Media files require **Google Cloud Storage (GCS)** (Step 4).
+- Relational data and job queues require managed **Google Cloud SQL** (Step 5).
+- Heavy background workers belong in a dedicated **sidecar container** (Step 6).
 
 
 ## Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
@@ -733,11 +751,21 @@ You have built and deployed a production-grade, enterprise-ready Rails 8 applica
 
 ### 🧹 Resource Clean Up
 
-To avoid ongoing charges after completing the workshop, destroy your Google Cloud resources:
+To avoid ongoing charges after completing the workshop, make sure to clean up your Google Cloud resources! Choose the approach that best fits your environment:
+
+#### Option 1: Terraform Teardown (Recommended / Default 🟢)
+> Use this option if you are using an existing or shared Google Cloud project where other resources or data live. It surgically destroys **only** the resources provisioned during this workshop (Cloud Run, Cloud SQL, Secret Manager, GCS buckets), leaving the rest of your project untouched.
 
 ```bash
 cd iac
 terraform destroy -auto-approve
+```
+
+#### Option 2: Total Project Deletion (Leave Zero Trace 🌪️)
+> Use this option if you created a dedicated workshop project (e.g., using workshop credits or a sandbox) and want to guarantee that **zero trace** remains—including logs, metadata, service accounts, and billing links.
+
+```bash
+gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 ```
 
 

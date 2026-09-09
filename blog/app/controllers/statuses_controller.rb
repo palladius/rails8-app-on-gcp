@@ -27,7 +27,7 @@ class StatusesController < ApplicationController
 
     # Overall system health
     @system_info = {
-      app_version: ENV.fetch("APP_VERSION") { File.read(Rails.root.join("../VERSION")).strip rescue "0.1.32" },
+      app_version: ENV.fetch("APP_VERSION") { (File.read(Rails.root.join("VERSION")).strip rescue nil) || (File.read(Rails.root.join("../VERSION")).strip rescue nil) || "0.2.2" },
       ruby_version: RUBY_VERSION,
       rails_version: Rails.version,
       rails_env: Rails.env,
@@ -256,6 +256,7 @@ class StatusesController < ApplicationController
       GOOGLE_CLOUD_PROJECT
       GOOGLE_CLOUD_REGION
       GOOGLE_CLOUD_LOCATION
+      GOOGLE_CLOUD_ACCOUNT
       NANOBANANA_MODEL
       ACTIVE_STORAGE_SERVICE
       CLOUDSQL_INSTANCE
