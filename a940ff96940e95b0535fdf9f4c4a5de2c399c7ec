@@ -1,0 +1,1 @@
+Completed Phase 1: Added schema validation tests in test/test_workshop_skeleton.rb, extended workshop/skeleton.yaml with declarative screenshots specs for step-2 and step-4, and confirmed visualizer asset pipeline compatibility.
