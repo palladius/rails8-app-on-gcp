@@ -197,11 +197,20 @@ function renderTable() {
       <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
       <td class="py-3.5 px-5 align-middle">
         <div class="flex flex-col gap-1.5">
-          <!-- Riga 1: URL largo -->
-          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
-            <span class="opacity-70 text-sm">🔗</span>
-            <span class="font-medium">${escapeHtml(student.url)}</span>
-          </a>
+          <!-- Riga 1: URL largo + eventuale Cloud Run Runner badge -->
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
+              <span class="opacity-70 text-sm">🔗</span>
+              <span class="font-medium">${escapeHtml(student.url)}</span>
+            </a>
+
+            ${(t.k_service || student.url.includes('.run.app')) ? `
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Cloud Run Revision: ${escapeHtml(t.k_revision || 'live')}">
+                <span>🏃</span>
+                <span class="font-semibold">${escapeHtml(t.k_service || student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') || 'cloud-run')}</span>
+              </span>
+            ` : ''}
+          </div>
 
           <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
           <div class="flex flex-wrap items-center gap-3">

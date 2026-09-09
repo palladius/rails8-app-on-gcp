@@ -40,6 +40,17 @@ module WorkshopHive
             db = parsed_json["database"] || {}
             storage = parsed_json["storage"] || {}
             ai = parsed_json["ai"] || {}
+            run_env = parsed_json["run_env"] || {}
+
+            # Infer K_SERVICE and K_REVISION either from run_env or safe_environment array
+            k_service = run_env["service_name"]
+            k_revision = run_env["revision_name"]
+            if (safe_env = parsed_json["safe_environment"]).is_a?(Array)
+              safe_env.each do |v|
+                k_service ||= v["value"] if v["key"] == "K_SERVICE" && v["value"] != "nil"
+                k_revision ||= v["value"] if v["key"] == "K_REVISION" && v["value"] != "nil"
+              end
+            end
 
             status_data = {
               app_version: sys["app_version"],
@@ -53,7 +64,9 @@ module WorkshopHive
               step_description: step["description"],
               db_tier: db["badge"],
               storage_tier: storage["badge"],
-              ai_badge: ai["badge"]
+              ai_badge: ai["badge"],
+              k_service: k_service,
+              k_revision: k_revision
             }
           rescue JSON::ParserError
             # Non è un json valido
