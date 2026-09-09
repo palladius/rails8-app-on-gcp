@@ -1,8 +1,7 @@
-// Workshop Hive Table Client Logic — Instant Local Cache + 5s Background Pings
+// Workshop Hive Table Client Logic — 3-Column Layout with Latency under Dot and Metrics next to Stack
 const CACHE_KEY_LEADERBOARD = "hive_cached_leaderboard";
 const CACHE_KEY_HEALTH = "hive_cached_health";
 
-// Inizializza istantaneamente con i dati salvati in localStorage (0ms rendering al reload!)
 let cachedLeaderboard = [];
 let cachedHealth = {};
 
@@ -84,7 +83,7 @@ function renderTable() {
   if (cachedLeaderboard.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="py-12 text-center text-slate-500 italic font-mono text-xs">
+        <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
           No student submissions registered yet.
         </td>
       </tr>
@@ -100,29 +99,32 @@ function renderTable() {
     const isDown = check.status === "down";
     const t = check.telemetry || {};
 
-    // 1. Indicator Dot a sinistra
+    // 1. Colonna 1: Spia rossa/verde + Sotto la latenza in ms (budget 2 righe)
     let dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-slate-700 inline-block"></span>`;
+    let latencyBadge = `<span class="font-mono text-[10px] text-slate-500">-</span>`;
+
     if (isUp) {
       dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-emerald-400 blink-up inline-block ring-2 ring-emerald-500/30" title="200 OK"></span>`;
+      latencyBadge = `<span class="font-mono text-[10px] text-emerald-400 font-medium">${check.latency_ms} ms</span>`;
     } else if (isDown) {
       dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30" title="DOWN"></span>`;
+      latencyBadge = `<span class="font-mono text-[10px] text-rose-400 font-medium">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`;
     }
 
-    // 2. Colonna Sinistra: HH:MM Nome (2 righe di budget)
+    // 2. Colonna 2: HH:MM Nome a sx + Step badge con hover
     const hhmm = formatHHMM(student.timestamp);
     const nickname = student.nickname || "Anonymous";
-
-    // 3. Step
     const stepNum = t.step_number || student.step_number || 1;
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
 
-    // 4. Sotto l'URL: Immagine logo Ruby + versione e logo Rails + versione
+    // 3. Colonna 3 (Riga 1): URL che occupa molto spazio
+    //    Colonna 3 (Riga 2): Loghi Ruby/Rails + Metriche (Posts / Users / Images) di fianco!
     const rubyVersion = t.ruby_version || "3.3.8";
     const railsVersion = t.rails_version || "8.1.3";
     const hasTelemetry = !!t.ruby_version;
 
     const stackHtml = hasTelemetry ? `
-      <div class="flex items-center gap-3 text-[11px] font-mono mt-1">
+      <div class="flex items-center gap-2 text-xs font-mono">
         <span class="inline-flex items-center gap-1 text-rose-300 font-medium">
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg" class="w-3.5 h-3.5 inline-block" alt="Ruby">
           <span>${rubyVersion}</span>
@@ -134,16 +136,14 @@ function renderTable() {
         </span>
       </div>
     ` : `
-      <div class="text-[11px] font-mono text-slate-500 italic mt-1">
-        Awaiting stack telemetry...
-      </div>
+      <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
     `;
 
-    // 5. Metrics (Posts / Users / Images)
-    let metricsHtml = `<span class="text-slate-600 text-xs italic font-mono">Awaiting /status</span>`;
+    // Metriche di fianco allo stack nella riga 2
+    let metricsHtml = "";
     if (t.posts_count !== undefined) {
       metricsHtml = `
-        <div class="flex items-center gap-2 text-xs font-mono">
+        <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
@@ -151,64 +151,53 @@ function renderTable() {
       `;
     }
 
-    // 6. Latency
-    const latencyBadge = isUp
-      ? `<span class="font-mono text-xs font-medium text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded border border-emerald-800/50 shadow-sm">${check.latency_ms} ms</span>`
-      : isDown
-      ? `<span class="font-mono text-xs font-medium text-rose-400 bg-rose-950/50 px-2.5 py-1 rounded border border-rose-800/50 shadow-sm">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`
-      : `<span class="font-mono text-xs text-slate-500">-</span>`;
-
     const tr = document.createElement("tr");
     tr.className = "hover:bg-slate-800/30 transition-colors";
 
     tr.innerHTML = `
-      <!-- Live Indicator (Left) -->
+      <!-- COLONNA 1: Live Dot + Sotto la latenza -->
       <td class="py-3.5 px-4 text-center whitespace-nowrap align-middle">
-        <div class="flex items-center justify-center">
+        <div class="flex flex-col items-center justify-center gap-1">
           ${dotHtml}
+          ${latencyBadge}
         </div>
       </td>
 
-      <!-- HH:MM & Nome a sx (2 righe di budget) -->
+      <!-- COLONNA 2: HH:MM Nome + Step badge -->
       <td class="py-3.5 px-5 whitespace-nowrap align-middle">
-        <div class="flex flex-col">
-          <div class="font-bold text-slate-100 text-base flex items-center gap-1.5">
-            <span class="text-amber-400">${escapeHtml(nickname)}</span>
+        <div class="flex items-center gap-3">
+          <div class="flex flex-col">
+            <div class="font-bold text-slate-100 text-base flex items-center gap-1.5">
+              <span class="text-amber-400">${escapeHtml(nickname)}</span>
+            </div>
+            <div class="text-xs font-mono text-slate-400 flex items-center gap-1 mt-0.5">
+              <span class="text-slate-500">🕒</span>
+              <span>${escapeHtml(hhmm)}</span>
+            </div>
           </div>
-          <div class="text-xs font-mono text-slate-400 flex items-center gap-1 mt-0.5">
-            <span class="text-slate-500">🕒</span>
-            <span>${escapeHtml(hhmm)}</span>
-          </div>
+
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
+            <span>Step ${stepNum}</span>
+            <span class="text-[10px] text-amber-400/60">ℹ️</span>
+          </span>
         </div>
       </td>
 
-      <!-- Step (Hover to see full description) -->
-      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help" title="${escapeHtml(stepText)}">
-          <span>Step ${stepNum}</span>
-          <span class="text-[10px] text-amber-400/60">ℹ️</span>
-        </span>
-      </td>
-
-      <!-- URL occupa molto spazio + Sotto logo Ruby & Rails con versioni (2 righe di budget) -->
+      <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
       <td class="py-3.5 px-5 align-middle">
-        <div class="flex flex-col">
-          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-xl" title="${escapeHtml(student.url)}">
+        <div class="flex flex-col gap-1.5">
+          <!-- Riga 1: URL largo -->
+          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
             <span class="opacity-70 text-sm">🔗</span>
             <span class="font-medium">${escapeHtml(student.url)}</span>
           </a>
-          ${stackHtml}
+
+          <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
+          <div class="flex flex-wrap items-center gap-3">
+            ${stackHtml}
+            ${metricsHtml}
+          </div>
         </div>
-      </td>
-
-      <!-- Metrics -->
-      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
-        ${metricsHtml}
-      </td>
-
-      <!-- Latency -->
-      <td class="py-3.5 px-5 whitespace-nowrap text-right align-middle">
-        ${latencyBadge}
       </td>
     `;
 

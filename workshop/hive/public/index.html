@@ -62,7 +62,7 @@
     </div>
   </header>
 
-  <!-- Table Section -->
+  <!-- Table Section: Exactly 3 Columns -->
   <main class="flex-1 p-8 max-w-7xl w-full mx-auto flex flex-col gap-4">
     <div class="flex items-center justify-between text-xs text-slate-400 px-1">
       <div class="flex items-center gap-2">
@@ -79,17 +79,17 @@
       <table class="w-full text-left border-collapse table-auto">
         <thead>
           <tr class="border-b border-slate-800/80 bg-slate-950/60 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-            <th class="py-3 px-4 w-12 text-center">Live</th>
-            <th class="py-3 px-5 font-semibold w-56">Student</th>
-            <th class="py-3 px-5 font-semibold w-40">Step</th>
-            <th class="py-3 px-5 font-semibold">App URL & Stack (Ruby / Rails)</th>
-            <th class="py-3 px-5 font-semibold w-64">Metrics</th>
-            <th class="py-3 px-5 font-semibold text-right w-28">Latency</th>
+            <!-- Colonna 1: Live & Latency (sinistra) -->
+            <th class="py-3 px-4 w-20 text-center">Status</th>
+            <!-- Colonna 2: Student & Step -->
+            <th class="py-3 px-5 font-semibold w-64">Student & Step</th>
+            <!-- Colonna 3: App URL, Stack & Metrics -->
+            <th class="py-3 px-5 font-semibold">App URL, Stack & Metrics</th>
           </tr>
         </thead>
         <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/50 text-sm">
           <tr>
-            <td colspan="6" class="py-12 text-center text-slate-500 italic font-mono text-xs">
+            <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
               Loading student telemetry...
             </td>
           </tr>
