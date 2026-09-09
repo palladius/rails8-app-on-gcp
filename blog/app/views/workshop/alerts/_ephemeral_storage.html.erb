@@ -1,0 +1,46 @@
+<%# 
+  Pedagogical helper for Workshop Steps 1-3 (Issue #21 & #22).
+  Warns the student when using ephemeral local disk storage instead of GCS.
+%>
+<% if storage_tier == :local %>
+  <div class="workshop-ephemeral-storage-alert" style="
+    background-color: #f8fafc;
+    border-left: 5px solid #64748b;
+    color: #334155;
+    padding: 10px 16px;
+    margin: 8px auto;
+    max-width: 1200px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.3rem;">💾</span>
+      <div>
+        <strong>Notice: Ephemeral Local Disk Storage Active</strong>
+        <div style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">
+          Cover images are displayed in sad grayscale mode and will vanish on container restart.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="#ephemeral-storage-modal" 
+         onclick="alert('💡 Why is this happening?\n\nActiveStorage is configured to use the local filesystem (`service: :local`).\n\nIn containerized environments (Docker Compose / Cloud Run), disk storage is ephemeral and lost when containers restart.\n\nIn Step 4, we will configure Google Cloud Storage (`service: :google_prod` with IAM Credentials) for durable, secure cloud storage!'); return false;"
+         style="
+           background-color: #f1f5f9;
+           border: 1px solid #94a3b8;
+           color: #334155;
+           padding: 5px 10px;
+           border-radius: 4px;
+           text-decoration: none;
+           font-size: 0.82rem;
+           font-weight: 600;">
+        Why? (Ask AI) 🤖
+      </a>
+    </div>
+  </div>
+<% end %>

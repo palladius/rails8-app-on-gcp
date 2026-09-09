@@ -1,0 +1,50 @@
+<%# 
+  Pedagogical helper for Workshop Steps 1-2 (Issue #21 & #22).
+  Warns the student when connected to an ephemeral database (SQLite or local Postgres)
+  instead of managed Google Cloud SQL.
+%>
+<% db_adapter = ActiveRecord::Base.connection_db_config.adapter.to_s rescue "unknown" %>
+<% is_cloudsql = ENV["CLOUDSQL_INSTANCE"].present? || ENV["DATABASE_URL"].to_s.include?("cloudsql") %>
+
+<% unless is_cloudsql %>
+  <div class="workshop-ephemeral-database-alert" style="
+    background-color: #fefce8;
+    border-left: 5px solid #eab308;
+    color: #854d0e;
+    padding: 10px 16px;
+    margin: 8px auto;
+    max-width: 1200px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.3rem;">🟡</span>
+      <div>
+        <strong>Notice: Ephemeral Database Active (<%= db_adapter.upcase %>)</strong>
+        <div style="font-size: 0.85rem; color: #a16207; margin-top: 2px;">
+          Connected to local database. Data is not synchronized across multi-region instances.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="#ephemeral-db-modal" 
+         onclick="alert('💡 Why is this happening?\n\nYour app is currently running against a local database adapter (<%= db_adapter %>).\n\nIn Step 3, we connect to managed Google Cloud SQL via Cloud SQL Auth Proxy sidecar container with automated mTLS encryption!'); return false;"
+         style="
+           background-color: #fef9c3;
+           border: 1px solid #eab308;
+           color: #713f12;
+           padding: 5px 10px;
+           border-radius: 4px;
+           text-decoration: none;
+           font-size: 0.82rem;
+           font-weight: 600;">
+        Why? (Ask AI) 🤖
+      </a>
+    </div>
+  </div>
+<% end %>

@@ -1,6 +1,24 @@
-# Changelog
-
 All notable changes to this project will be documented in this file.
+
+## [0.1.37] - 2026-09-09
+### Added
+- 🧭 **Secret `/status` Telemetry Dashboard (Resolves [#35](https://github.com/palladius/rails8-app-on-gcp/issues/35))**:
+  - Implemented unlinked, secret `/status` HTML dashboard and `/status.json` endpoint for professors and workshop instructors.
+  - **Workshop Step Auto-Inference**: Deduces the student's active step (Steps 1–8) in 0 ms based on live infrastructure telemetry (database adapter, ActiveStorage backend, Cloud Run vs Docker runtime, and AI availability), or via `ENV["WORKSHOP_STEP"]`.
+  - **Safe Environment Inspector**: Inspects non-sensitive configuration keys while strictly masking secrets (passwords, tokens, API keys) with 1 asterisk per character (`*` * strlen).
+  - 🍌 **Nano Banana Status Easter Egg**: Bundled collapsible vintage movie poster *"Il Professore dei Server"* in `blog/app/assets/images/status_easter_egg_professor.png`.
+- ⚠️ **Zero-Lag Educational Alert Banners in Workshop Alerts Hub**:
+  - Added `_ephemeral_database.html.erb`: warns when running against local SQLite or local Postgres containers instead of Cloud SQL.
+  - Added `_ephemeral_storage.html.erb`: warns when running on ephemeral local disk instead of GCS, explaining sad grayscale mode.
+  - Added `_ai_status.html.erb`: warns when Nano Banana is operating in bundled fake cover fallback mode.
+  - All banners feature a dedicated interactive **"Why? (Ask AI) 🤖"** explanation button.
+- 🍌 **Dual AI Provider Support for Nano Banana (`blog/lib/nanobanana.rb`)**:
+  - Added direct Google AI Studio support via `GEMINI_API_KEY` (`generativelanguage.googleapis.com`) alongside existing Vertex AI ADC authentication.
+- 🧪 **Automated 8-Permutation UAT Suite**:
+  - Added `blog/test/integration/nanobanana_uat_matrix_test.rb` and standalone CLI runner `blog/bin/uat_matrix_nanobanana.rb` validating all 8 combinations of (Local vs GCS) x (Working AI vs Fake AI) x (Uploaded vs Auto-generated).
+- 📜 **Documentation**:
+  - Created [`docs/WORKSHOP_TELEMETRY_AND_ALERTS.md`](file:///usr/local/google/home/ricc/git/rails8-app-on-gcp/docs/WORKSHOP_TELEMETRY_AND_ALERTS.md) detailing both functional and stylistic specifications.
+
 ## [0.1.36] - 2026-09-09
 ### Added
 - 💳 **Workshop Slides**: Updated Slide 3 to "Reclaim Credits Now" with direct claim link button (`https://me.developers.google.com/benefits/claim/test-workshop-rails8`) and updated presentation outline.

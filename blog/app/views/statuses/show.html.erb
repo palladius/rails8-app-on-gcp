@@ -1,0 +1,182 @@
+<div class="post-show" style="max-width: 1040px; margin: 2rem auto; padding: 0 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: #fff; margin: 0;">
+      🧭 System Telemetry & Workshop Status
+    </h1>
+    <span class="version-badge" style="background: #3b82f6; font-size: 0.9rem; padding: 6px 12px;">
+      v<%= @system_info[:app_version] %> · <%= @system_info[:rails_env] %>
+    </span>
+  </div>
+
+  <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.6;">
+    Real-time environment inspection for professors, workshop instructors, and developers.
+    Inspects persistence tiers, runtime containerization, and AI pipelines with <strong>zero network latency</strong>.
+  </p>
+
+  <!-- WORKSHOP STEP INFERENCE BANNER -->
+  <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(56, 189, 248, 0.3); border-left: 6px solid #38bdf8; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">
+    <div>
+      <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; font-weight: 700; margin-bottom: 4px;">
+        🎓 Inferred Workshop Progression
+      </div>
+      <div style="font-size: 1.25rem; font-weight: 700; color: #f8fafc;">
+        <%= @workshop_step[:description] %>
+      </div>
+      <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 4px;">
+        Source: <em><%= @workshop_step[:source] %></em>
+      </div>
+    </div>
+    <div>
+      <span class="version-badge" style="background: #0284c7; font-size: 1.1rem; padding: 8px 16px; font-weight: 700;">
+        Step <%= @workshop_step[:number] %>
+      </span>
+    </div>
+  </div>
+
+  <!-- 6 MAIN ARCHITECTURAL TILES -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+    
+    <!-- 1. RUN ENVIRONMENT -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">🚀 Compute & Runtime</span>
+        <span class="version-badge" style="background: <%= @run_env[:color] %>;"><%= @run_env[:badge] %></span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;"><%= @run_env[:details] %></p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        Ruby <%= @system_info[:ruby_version] %> · Rails <%= @system_info[:rails_version] %>
+      </div>
+    </div>
+
+    <!-- 2. DATABASE TIER -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">🐘 Database Persistence</span>
+        <span class="version-badge" style="background: <%= @db_status[:color] %>;"><%= @db_status[:badge] %></span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;"><%= @db_status[:details] %></p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        Adapter: <code><%= @db_status[:adapter] %></code> · Persistence: <%= @db_status[:persistent] ? "Persistent 🔒" : "Ephemeral ⚠️" %>
+      </div>
+    </div>
+
+    <!-- 3. STORAGE TIER -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">📦 ActiveStorage Blobs</span>
+        <span class="version-badge" style="background: <%= @storage_status[:color] %>;"><%= @storage_status[:badge] %></span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;"><%= @storage_status[:details] %></p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        Service: <code><%= @storage_status[:service] %></code> · Mode: <%= @storage_status[:persistent] ? "Cloud Blob" : "Local Gray" %>
+      </div>
+    </div>
+
+    <!-- 4. AI PIPELINE -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">🍌 Nano Banana AI Cover</span>
+        <span class="version-badge" style="background: <%= @ai_status[:color] %>;"><%= @ai_status[:badge] %></span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;"><%= @ai_status[:details] %></p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        Pipeline State: <%= @ai_status[:active] ? "Live GenAI Active 🎨" : "Fallback Mock 🎭" %>
+      </div>
+    </div>
+
+    <!-- 5. BACKGROUND JOBS -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">⚙️ Solid Queue Jobs</span>
+        <span class="version-badge" style="background: <%= @jobs_status[:color] %>;"><%= @jobs_status[:badge] %></span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;">
+        Pending executions: <strong><%= @jobs_status[:pending_count] %></strong><br>
+        Failed executions: <strong><%= @jobs_status[:failed_count] %></strong>
+      </p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        Worker Architecture: <%= ENV["K_SERVICE"].present? ? "Sidecar Container" : "In-process / Thread" %>
+      </div>
+    </div>
+
+    <!-- 6. DATA COUNTERS -->
+    <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <span style="font-size: 1.1rem; font-weight: 600; color: #e2e8f0;">📊 Workshop Data</span>
+        <span class="version-badge" style="background: #8b5cf6;">Telemetry</span>
+      </div>
+      <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;">
+        Posts published: <strong><%= @system_info[:posts_count] %></strong><br>
+        Registered Admins: <strong><%= @system_info[:admin_users_count] %></strong>
+      </p>
+      <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+        JSON API: <a href="/status.json" style="color: #38bdf8;">GET /status.json</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SAFE ENVIRONMENT INSPECTOR -->
+  <div style="background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 600; color: #e2e8f0; margin: 0;">
+        🔒 Safe Environment Inspection (Secrets Masked)
+      </h3>
+      <span style="font-size: 0.8rem; color: #94a3b8;">1 asterisk per character</span>
+    </div>
+    <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 1rem;">
+      Inspects active workshop and cloud deployment variables. Sensitive keys (passwords, api keys, tokens) are strictly masked preserving length.
+    </p>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; font-family: monospace;">
+        <thead>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-align: left;">
+            <th style="padding: 8px 12px;">VARIABLE</th>
+            <th style="padding: 8px 12px;">STATUS</th>
+            <th style="padding: 8px 12px;">VALUE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @env_inspection.each do |entry| %>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+              <td style="padding: 8px 12px; color: #38bdf8; font-weight: 600;"><%= entry[:key] %></td>
+              <td style="padding: 8px 12px;">
+                <% if entry[:is_set] %>
+                  <span style="color: #10b981;">SET</span>
+                <% else %>
+                  <span style="color: #64748b;">UNSET</span>
+                <% end %>
+              </td>
+              <td style="padding: 8px 12px; color: <%= entry[:is_secret] ? '#f59e0b' : '#e2e8f0' %>;">
+                <%= entry[:value] %>
+                <% if entry[:is_secret] && entry[:is_set] %>
+                  <span style="font-size: 0.75rem; color: #f59e0b; margin-left: 8px;">(masked)</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EASTER EGG: IL PROFESSORE DEI SERVER (COLLAPSIBLE / SECRET) -->
+  <div style="margin-top: 2rem; border-top: 1px dashed rgba(255, 255, 255, 0.1); padding-top: 1.5rem; text-align: center;">
+    <details style="display: inline-block; cursor: pointer; color: #64748b; font-size: 0.85rem;">
+      <summary style="user-select: none; outline: none; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.03);">
+        🤫 Professor's Secret Archive (Do Not Click)
+      </summary>
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.25); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); max-width: 480px; margin-left: auto; margin-right: auto;">
+        <%= image_tag "status_easter_egg_professor.png", alt: "Il Professore dei Server", style: "width: 100%; height: auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.5);" %>
+        <p style="color: #94a3b8; font-size: 0.82rem; margin-top: 0.75rem; font-style: italic;">
+          🍌 "Il Professore dei Server" — vintage 1960s Italian movie poster generated by Nano Banana for the secret status archive.
+        </p>
+      </div>
+    </details>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <%= link_to "← Back to Posts", posts_path, style: "color: #94a3b8; text-decoration: none; font-size: 0.95rem;" %>
+  </div>
+</div>
