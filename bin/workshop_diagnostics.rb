@@ -155,10 +155,15 @@ else
     end
   end
 
+  # Build standard flags for scoped gcloud execution
+  gcloud_scoped_flags = []
+  gcloud_scoped_flags << "--account=#{gcp_account}" if !gcp_account.to_s.strip.empty? && credentialed_accounts.map(&:downcase).include?(gcp_account.downcase)
+  gcloud_scoped_flags << "--billing-project=#{project_id}" if !project_id.to_s.strip.empty?
+  gcloud_flags_str = gcloud_scoped_flags.join(" ")
+
   # Check Billing Enabled (MANDATORY GATE!)
   print "   🔍 Verifying GCP Billing status... "
-  billing_account_flag = (!gcp_account.to_s.strip.empty? && credentialed_accounts.map(&:downcase).include?(gcp_account.downcase)) ? "--account=#{gcp_account}" : ""
-  billing_cmd = "gcloud beta billing projects describe #{project_id} #{billing_account_flag} --format='value(billingEnabled)' 2>/dev/null"
+  billing_cmd = "gcloud beta billing projects describe #{project_id} #{gcloud_flags_str} --format='value(billingEnabled)' 2>/dev/null"
   billing_enabled, _stderr, status = Open3.capture3(billing_cmd)
   billing_status = billing_enabled.strip.downcase
 
@@ -203,12 +208,13 @@ end
 puts "\n--- 🐤 4. Checking Storage & Canary Asset ---".bold
 if project_id && !project_id.empty? && project_id != "(unset)"
   bucket_dev = "#{project_id}-activestorage-dev"
-  _out, _err, b_status = Open3.capture3("gcloud storage buckets describe gs://#{bucket_dev} 2>/dev/null")
+  storage_flags = gcloud_flags_str || ""
+  _out, _err, b_status = Open3.capture3("gcloud storage buckets describe gs://#{bucket_dev} #{storage_flags} 2>/dev/null")
   if b_status.success?
     puts "✅ GCS Bucket gs://#{bucket_dev} exists".green
     # Check canary
     canary_path = "gs://#{bucket_dev}/seeds/gcs_dev_image.jpg"
-    _cout, _cerr, c_status = Open3.capture3("gcloud storage ls #{canary_path} 2>/dev/null")
+    _cout, _cerr, c_status = Open3.capture3("gcloud storage ls #{canary_path} #{storage_flags} 2>/dev/null")
     if c_status.success?
       puts "✅ Canary image found on GCS: #{canary_path}".green
     else
