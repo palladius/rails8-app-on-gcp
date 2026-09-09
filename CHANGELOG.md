@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-09-09
+### Added
+- 💰 **Real-Time Workshop Cost Estimator (`bin/rails8app-billing`, `just billing`)**:
+  - Implemented live Ruby FinOps cost calculator tailored for attendees operating on $5.00 GDP promotional credits.
+  - Bypasses the 6–24 hour Google Cloud Billing report delay by combining live resource discovery (Cloud SQL instance tier & SSD size, Cloud Run active status, GCS storage buckets) with Cloud Monitoring API telemetry for Vertex AI.
+  - Computes remaining credit budget, health indicator, and alert thresholds to avoid surprise billing.
+
 ## [0.2.2] - 2026-09-09
 ### Fixed
 - 🧪 **Workshop UAT Harness Sandbox Bundler Isolation (`bin/workshop_uat.rb`)**:
