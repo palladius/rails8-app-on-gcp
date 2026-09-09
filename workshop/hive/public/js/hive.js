@@ -204,12 +204,24 @@ function renderTable() {
               <span class="font-medium">${escapeHtml(student.url)}</span>
             </a>
 
-            ${(t.k_service || student.url.includes('.run.app')) ? `
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Cloud Run Revision: ${escapeHtml(t.k_revision || 'live')}">
-                <span>🏃</span>
-                <span class="font-semibold">${escapeHtml(t.k_service || student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') || 'cloud-run')}</span>
-              </span>
-            ` : ''}
+            ${(() => {
+              const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
+              if (!service) return '';
+
+              let shortRev = '';
+              if (t.k_revision) {
+                // Rimuovi il prefisso del service name (es. "test-rails8-workshop-rails-app-00012-ldj" -> "00012-ldj")
+                shortRev = t.k_revision.replace(new RegExp(`^${service}-?`), '');
+              }
+
+              return `
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
+                  <span>🏃</span>
+                  <span class="font-semibold">${escapeHtml(service)}</span>
+                  ${shortRev ? `<span class="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-[9px] font-normal tracking-tight">@${escapeHtml(shortRev)}</span>` : ''}
+                </span>
+              `;
+            })()}
           </div>
 
           <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
