@@ -1,5 +1,25 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-09-09
+### 🎉 Major Milestone: Rails 8 on Google Cloud Workshop v0.2.0 (WOWOW)
+- 🚀 **Complete 8-Step, 3-Deployment Workshop Experience**:
+  - **Deploy 1 (Step 3)**: The Stateless Shock — single-container Puma on Cloud Run in 3 minutes, proving the necessity of decoupled cloud persistence.
+  - **Deploy 2 (Step 4)**: Google Cloud Storage with private IAM Credentials blob signing (`iam: true`), provenance stamp watermarks, and POLA stuck jobs warning banner.
+  - **Deploy 3 (Step 6)**: Enterprise Multi-Container Sidecars — Puma web, Solid Queue worker, and Cloud SQL Auth Proxy mTLS sidecar on Cloud Run.
+- ⏳ **Zero-Branch Time-Machine Progression**:
+  - Developers stay comfortably on `main` using `just workshop-rewind 1`, `just workshop-rewind 2`, and `just workshop-restore-gold`.
+- ⚙️ **Dedicated `gcloud` Configuration**:
+  - Environment isolation via `rails8-on-gcp-workshop` named configuration, preventing collisions with corporate/personal setups.
+- 🍌 **Asynchronous GenAI & GCS Treasure Hunt**:
+  - NanoBanana 1960s vintage poster generator powered by Gemini 2.5 Flash on Vertex AI (with ADC), bilingual podcastifier TTS, and Rails console blob rescue.
+- ⏱️ **Compact Page Durations**:
+  - Estimated durations (*Duration: XXmin*) across all 11 pages of the codelab.
+- 🧪 **Comprehensive Evaluation Engine**:
+  - 100% passing automated evaluation suite (`just workshop-eval all` -> 20/20 evals passed).
+- 🌐 **Live GitHub Pages Publication**:
+  - Automatically compiled and deployed via GitHub Actions to https://palladius.github.io/rails8-app-on-gcp/.
+
+
 ## [0.1.44] - 2026-09-09
 ### Changed
 - ⏱️ **Compact Duration Format**:
