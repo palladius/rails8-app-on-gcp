@@ -1,0 +1,7 @@
+# Ignore credentials and local bundler data for Hive app
+.bundle/
+vendor/bundle/
+*.key
+*.json
+!metadata.json
+.env*
