@@ -76,5 +76,7 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 - [x] **Track: Workshop Hive Leaderboard (Issue #47)**
 *Link: [./tracks/workshop_hive_leaderboard_20260909/index.md](./tracks/workshop_hive_leaderboard_20260909/index.md)*
 
+---
 
-
+- [ ] **Track: Declarative Workshop Screenshots (Issue #42)**
+*Link: [./tracks/declarative_screenshots_issue_42_20260909/index.md](./tracks/declarative_screenshots_issue_42_20260909/index.md)*
