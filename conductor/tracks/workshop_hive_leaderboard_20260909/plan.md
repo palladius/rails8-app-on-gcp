@@ -30,8 +30,9 @@
 
 
 
-## Phase 4: Containerizzazione, Documentazione & Deploy Ready
+## Phase 4: Containerizzazione, Documentazione & Deploy Ready [checkpoint: d8e1ccf]
 - [x] Task: Creare `Dockerfile` multi-stage ottimizzato per Cloud Run e script `bin/dev` o `run.sh` locale. [cc760e1]
 - [x] Task: Redigere `workshop/hive/README.md` con spiegazione chiara di come configurare il Google Sheet, il Service Account e le variabili d'ambiente. [50f7550]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md).
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md). [d8e1ccf]
+
 
