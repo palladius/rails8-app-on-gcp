@@ -8,7 +8,7 @@ class WorkshopDiagnosticsTest < Minitest::Test
 
   def test_fails_when_gcp_account_and_gcloud_account_missing
     Dir.mktmpdir do |dir|
-      env = { "CLOUDSDK_CORE_ACCOUNT" => "", "GOOGLE_CLOUD_ACCOUNT" => "", "GCP_EMAIL" => "", "ADMIN_EMAIL" => "" }
+      env = { "CLOUDSDK_CORE_ACCOUNT" => "", "GOOGLE_CLOUD_ACCOUNT" => "", "ADMIN_EMAIL" => "" }
       stdout, _stderr, status = Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
       assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT"
     end
@@ -48,6 +48,36 @@ class WorkshopDiagnosticsTest < Minitest::Test
       stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
       assert_equal 1, status.exitstatus
       assert_includes stdout, "Found deprecated variable 'GCLOUD_USER'"
+      assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT"
+    end
+  end
+
+  def test_fails_when_banned_gcp_project_id_found_in_env
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nGCP_PROJECT_ID=dummy\n")
+      stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found deprecated variable 'GCP_PROJECT_ID'"
+      assert_includes stdout, "GOOGLE_CLOUD_PROJECT"
+    end
+  end
+
+  def test_fails_when_banned_gcp_region_found_in_env
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nGOOGLE_CLOUD_PROJECT=dummy\nGCP_REGION=us-central1\n")
+      stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found deprecated variable 'GCP_REGION'"
+      assert_includes stdout, "GOOGLE_CLOUD_REGION"
+    end
+  end
+
+  def test_fails_when_banned_gcp_email_found_in_env
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, ".env"), "GCP_EMAIL=ricc@google.com\nGOOGLE_CLOUD_PROJECT=dummy\n")
+      stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found deprecated variable 'GCP_EMAIL'"
       assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT"
     end
   end

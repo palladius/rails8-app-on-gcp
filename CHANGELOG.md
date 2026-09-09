@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.38] - 2026-09-09
+### Changed
+- 🌐 **Purged `GCP_PROJECT_ID` & Standardized Environment Variables**:
+  - Completely purged legacy `GCP_PROJECT_ID` across codebase, tests, scripts, and documentation in favor of canonical `GOOGLE_CLOUD_PROJECT`.
+  - Also purged deprecated `GCP_REGION` (replaced with `GOOGLE_CLOUD_REGION`) and `GCP_EMAIL` (replaced with `GOOGLE_CLOUD_ACCOUNT`).
+  - Added strict anti-legacy guards in `bin/workshop_diagnostics.rb` and automated regression tests in `test/test_workshop_diagnostics.rb` to fail fast if any `GCP_*` variables are present in `.env`.
+### Added
+- 📜 **Environment Variable Standard Specification**:
+  - Created [`docs/ENV_VAR_NAMES.md`](file:///docs/ENV_VAR_NAMES.md) documenting approved canonical variables, rationales, and the strict denylist of prohibited legacy prefixes.
+
 ## [0.1.37] - 2026-09-09
 ### Added
 - 🧭 **Secret `/status` Telemetry Dashboard (Resolves [#35](https://github.com/palladius/rails8-app-on-gcp/issues/35))**:

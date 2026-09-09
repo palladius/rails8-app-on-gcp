@@ -9,7 +9,7 @@ class GenerateCoverImageJobTest < ActiveJob::TestCase
   end
 
   test "attaches a stamped fake cover when Vertex AI is not available" do
-    with_env("GOOGLE_CLOUD_PROJECT" => nil, "GCP_PROJECT_ID" => nil) do
+    with_env("GOOGLE_CLOUD_PROJECT" => nil) do
       GenerateCoverImageJob.perform_now(@post.id)
     end
 
@@ -67,7 +67,7 @@ class GenerateCoverImageJobTest < ActiveJob::TestCase
   end
 
   test "broadcasts a refresh to the post stream" do
-    with_env("GOOGLE_CLOUD_PROJECT" => nil, "GCP_PROJECT_ID" => nil) do
+    with_env("GOOGLE_CLOUD_PROJECT" => nil) do
       assert_broadcasts(@post.to_gid_param, 1) do
         GenerateCoverImageJob.perform_now(@post.id)
       end

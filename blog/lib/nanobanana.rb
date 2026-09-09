@@ -84,7 +84,7 @@ module Nanobanana
   end
 
   def project_id
-    ENV["GOOGLE_CLOUD_PROJECT"].presence || ENV["GCP_PROJECT_ID"].presence
+    ENV["GOOGLE_CLOUD_PROJECT"].presence
   end
 
   # True when a Vertex AI call or Gemini API key call could plausibly succeed.

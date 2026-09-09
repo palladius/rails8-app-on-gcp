@@ -7,13 +7,13 @@ set -euo pipefail
 
 echo "🚀 [Workshop Step 0] Starting Background Cloud SQL Provisioning..."
 
-PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo '')}"
-REGION="${GCP_REGION:-us-central1}"
+PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null || echo '')}"
+REGION="${GOOGLE_CLOUD_REGION:-us-central1}"
 
 if [[ -z "$PROJECT_ID" || "$PROJECT_ID" == "(unset)" ]]; then
   echo "❌ Error: No Google Cloud Project ID detected."
   echo "Please set your project using: gcloud config set project <YOUR_PROJECT_ID>"
-  echo "Or run: export GCP_PROJECT_ID=<YOUR_PROJECT_ID>"
+  echo "Or run: export GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID>"
   exit 1
 fi
 
