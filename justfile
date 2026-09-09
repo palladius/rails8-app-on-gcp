@@ -60,6 +60,15 @@ build-slides:
 test-slides:
     cd blog && bin/rails test test/integration/slides_presentation_test.rb
 
+# capture declarative screenshots (optional filter: step or id, e.g. just screenshots step-2)
+screenshots filter="":
+    node workshop/screenshots/runner.js {{filter}}
+
+# test and validate all declarative screenshot declarations and scripts without needing server
+test-screenshots:
+    node workshop/screenshots/runner.js --dry-run
+    ruby test/test_workshop_screenshots.rb
+
 # run the workshop pre-flight diagnostics suite (validates Gmail identity, GCP billing, ADC, keys, canary asset)
 workshop-test:
     @./bin/workshop_diagnostics.rb

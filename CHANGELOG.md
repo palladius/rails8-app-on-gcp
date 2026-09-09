@@ -2,6 +2,15 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.7] - 2026-09-09
 ### Added
+- 📸 **Declarative Workshop Screenshots (Issue [#42](https://github.com/palladius/rails8-app-on-gcp/issues/42))**:
+  - Declarative screenshot specification integrated into `workshop/skeleton.yaml` under step declarations.
+  - Automated Playwright runner (`workshop/screenshots/runner.js`) with support for `--list`, `--dry-run`, and single step/id filters.
+  - Reference Playwright scripts:
+    - `workshop/screenshots/step2_home_ephemeral.playwright.js`
+    - `workshop/screenshots/step4_gcs_stuck_jobs.playwright.js`
+  - Integration with `justfile`: `just screenshots [filter]` and `just test-screenshots`.
+  - Diagnostics suite check added to `bin/workshop_diagnostics.rb` (`just workshop-test`).
+  - Markdown directives and documentation in `workshop/README.md` and `workshop/CODELAB.md`.
 - 🐝 **Workshop Hive Cloud Run Deployment (`workshop/hive/bin/deploy`, `workshop/hive/.env`)**:
   - Added dedicated one-click deployer script `workshop/hive/bin/deploy` that sources project configuration from local `workshop/hive/.env`.
   - Added `workshop/hive/.env.dist` blueprint template with `PROJECT_ID=palladius-genai`.
@@ -67,6 +76,7 @@ All notable changes to this project will be documented in this file.
   - 100% passing automated evaluation suite (`just workshop-eval all` -> 20/20 evals passed).
 - 🌐 **Live GitHub Pages Publication**:
   - Automatically compiled and deployed via GitHub Actions to https://palladius.github.io/rails8-app-on-gcp/.
+
 
 
 ## [0.1.44] - 2026-09-09
