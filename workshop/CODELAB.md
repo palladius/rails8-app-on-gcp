@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.0.0alpha -->
+<!-- 🏷️ Codelab Version: 2.0.1alpha -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -9,7 +9,7 @@
 
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 
-Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.0alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
+Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.1alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
 This curriculum is structured around the **3 Progressive Cloud Run Deployments**, the **Zero-Branch Time-Machine** progression model, and AI pair programming with **Google Antigravity**:
 1. **Deploy 1 (Step 3 - The Stateless Shock):** Deploy a single container with local SQLite to experience serverless statelessness first-hand in under 3 minutes.

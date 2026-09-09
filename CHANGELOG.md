@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2026-09-09
+### Added
+- 🐝 **Workshop Hive Leaderboard Registration Callout (`workshop/CODELAB.md`)**:
+  - Bumped Codelab curriculum version to `v2.0.1alpha`.
+  - Added direct registration Google Form link in Step 3 for workshop attendees to submit their Cloud Run URL and appear live on the proctor's Hive Leaderboard.
+
 ## [0.2.4] - 2026-09-09
 ### Added
 - 🪣 **Sub-Second Storage Objects Telemetry (`StatusesController` & `check_gcp_setup.sh`)**:
