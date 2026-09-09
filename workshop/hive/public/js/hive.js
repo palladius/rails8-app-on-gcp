@@ -142,12 +142,25 @@ function renderTable() {
 
     // Metriche di fianco allo stack nella riga 2
     let metricsHtml = "";
+    const statusJsonUrl = student.url.replace(/\/+$/, '') + '/status.json';
+
     if (t.posts_count !== undefined) {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 transition-colors flex items-center gap-1" title="Inspect raw telemetry JSON">
+            <span>{ json }</span>
+          </a>
+        </div>
+      `;
+    } else {
+      metricsHtml = `
+        <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 transition-colors flex items-center gap-1" title="Inspect raw telemetry JSON">
+            <span>{ json }</span>
+          </a>
         </div>
       `;
     }
@@ -182,17 +195,11 @@ function renderTable() {
       <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
       <td class="py-3.5 px-5 align-middle">
         <div class="flex flex-col gap-1.5">
-          <!-- Riga 1: URL largo + Link a status.json -->
-          <div class="flex items-center gap-3 flex-wrap">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
-              <span class="opacity-70 text-sm">🔗</span>
-              <span class="font-medium">${escapeHtml(student.url)}</span>
-            </a>
-            <a href="${escapeHtml(student.url.replace(/\/+$/, '') + '/status.json')}" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 transition-colors flex items-center gap-1" title="Inspect raw telemetry JSON">
-              <span>{ }</span>
-              <span>status.json</span>
-            </a>
-          </div>
+          <!-- Riga 1: URL largo -->
+          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
+            <span class="opacity-70 text-sm">🔗</span>
+            <span class="font-medium">${escapeHtml(student.url)}</span>
+          </a>
 
           <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
           <div class="flex flex-wrap items-center gap-3">
