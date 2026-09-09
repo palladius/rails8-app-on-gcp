@@ -28,6 +28,7 @@ class StatusesController < ApplicationController
     # Overall system health
     @system_info = {
       app_version: ENV.fetch("APP_VERSION") { File.read(Rails.root.join("../VERSION")).strip rescue "0.1.32" },
+      git_commit: detect_git_commit,
       ruby_version: RUBY_VERSION,
       rails_version: Rails.version,
       rails_env: Rails.env,
@@ -290,5 +291,21 @@ class StatusesController < ApplicationController
         is_secret: is_secret
       }
     end
+  end
+
+  def detect_git_commit
+    # Check Cloud Build / CI / Docker ARG env vars
+    sha = ENV["COMMIT_SHA"] || ENV["GIT_COMMIT"] || ENV["REVISION"]
+    return sha[0..6] if sha.present?
+
+    # Check file /rails/REVISION or root/REVISION
+    revision_file = [Rails.root.join("REVISION"), Rails.root.join("../REVISION")].find { |f| File.exist?(f) }
+    if revision_file
+      file_sha = File.read(revision_file).strip
+      return file_sha[0..6] if file_sha.present?
+    end
+
+    # In local development, query git directly (cached in bootsnap / sub-ms)
+    `git rev-parse --short HEAD 2>/dev/null`.strip.presence rescue nil
   end
 end

@@ -99,8 +99,20 @@ async function fetchHealth() {
   try {
     const res = await fetch("/api/healthchecks");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    cachedHealth = data.checks || {};
+    const newChecks = data.checks || {};
+    
+    // Preserva la telemetria precedente per ogni studente se il nuovo check è down/temporaneamente vuoto
+    Object.keys(newChecks).forEach(url => {
+      const incoming = newChecks[url];
+      const prev = cachedHealth[url];
+      if (prev && prev.telemetry && Object.keys(prev.telemetry).length > 0) {
+        if (!incoming.telemetry || Object.keys(incoming.telemetry).length === 0) {
+          incoming.telemetry = prev.telemetry;
+        }
+      }
+    });
+
+    cachedHealth = newChecks;
     try {
       localStorage.setItem(CACHE_KEY_HEALTH, JSON.stringify(cachedHealth));
     } catch {}
@@ -249,6 +261,19 @@ function renderTable() {
       }
     }
 
+    // Failed jobs alert (se > 0, mostra badge rosso allarme!)
+    const failedJobsBadge = (t.failed_jobs && t.failed_jobs > 0)
+      ? `<span class="bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40 text-rose-300 font-bold blink-down" title="Attenzione: ${t.failed_jobs} job falliti in Solid Queue!">💥 <b class="text-rose-200">${t.failed_jobs}</b></span>`
+      : "";
+
+    // Git commit hash badge (se presente da Rails /status.json)
+    const gitCommitBadge = t.git_commit
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-sky-500/15 text-sky-300 border border-sky-500/30 hover:bg-sky-500/25 transition-colors cursor-help" title="Git Commit Hash: ${escapeHtml(t.git_commit)}">
+          <span class="text-[10px]">⌥</span>
+          <span class="font-bold text-[9.5px] tracking-tight">${escapeHtml(t.git_commit)}</span>
+        </span>`
+      : "";
+
     if (t.posts_count !== undefined) {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
@@ -256,20 +281,24 @@ function renderTable() {
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Utenti admin registrati">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="File e immagini allegati">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
           ${jobsBadge}
+          ${failedJobsBadge}
           <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
           ${deltaRevBadge}
+          ${gitCommitBadge}
         </div>
       `;
     } else {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
           ${jobsBadge}
+          ${failedJobsBadge}
           <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
           ${deltaRevBadge}
+          ${gitCommitBadge}
         </div>
       `;
     }

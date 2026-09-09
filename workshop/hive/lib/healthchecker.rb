@@ -64,11 +64,15 @@ module WorkshopHive
               users_count: sys["admin_users_count"],
               blobs_count: sys["blobs_count"],
               attachments_count: sys["attachments_count"],
+              git_commit: sys["git_commit"],
               pending_jobs: parsed_json.dig("jobs", "pending_count") || 0,
+              failed_jobs: parsed_json.dig("jobs", "failed_count") || 0,
               step_number: step["number"],
               step_description: step["description"],
-              db_tier: db["badge"],
-              storage_tier: storage["badge"],
+              db_tier: db["tier"] || db["badge"],
+              db_badge: db["badge"],
+              storage_tier: storage["tier"] || storage["badge"],
+              storage_badge: storage["badge"],
               ai_badge: ai["badge"],
               k_service: k_service,
               k_revision: k_revision,
@@ -78,6 +82,13 @@ module WorkshopHive
             # Non è un json valido
           end
         end
+      end
+
+      # Se questo check non ha estratto telemetria (es. errore temporaneo, 500, timeout o down),
+      # preserva la telemetria precedentemente memorizzata in cache invece di azzerarla a {}!
+      if status_data.empty?
+        previous_telemetry = @cache_mutex.synchronize { @results_cache.dig(base_url.strip, :telemetry) }
+        status_data = previous_telemetry if previous_telemetry && !previous_telemetry.empty?
       end
 
       up_res.merge(telemetry: status_data)
