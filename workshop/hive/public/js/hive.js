@@ -99,17 +99,18 @@ function renderTable() {
     const isDown = check.status === "down";
     const t = check.telemetry || {};
 
-    // 1. Colonna 1: Spia rossa/verde + Sotto la latenza in ms (budget 2 righe)
+    // 1. Colonna 1: Spia rossa/verde + Sotto la latenza in ms (budget 2 righe, ultra compatta)
     let dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-slate-700 inline-block"></span>`;
-    let latencyBadge = `<span class="font-mono text-[10px] text-slate-500">-</span>`;
+    let latencyBadge = `<span class="font-mono text-[9px] text-slate-500 tracking-tight leading-none">-</span>`;
 
     if (isUp) {
       dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-emerald-400 blink-up inline-block ring-2 ring-emerald-500/30" title="200 OK"></span>`;
-      latencyBadge = `<span class="font-mono text-[10px] text-emerald-400 font-medium">${check.latency_ms} ms</span>`;
+      latencyBadge = `<span class="font-mono text-[9px] text-emerald-400/90 font-normal tracking-tight leading-none">${check.latency_ms}ms</span>`;
     } else if (isDown) {
       dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30" title="DOWN"></span>`;
-      latencyBadge = `<span class="font-mono text-[10px] text-rose-400 font-medium">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`;
+      latencyBadge = `<span class="font-mono text-[9px] text-rose-400/90 font-normal tracking-tight leading-none">${check.http_code ? 'H' + check.http_code : 'FAIL'}</span>`;
     }
+
 
     // 2. Colonna 2: HH:MM Nome a sx + Step badge con hover
     const hhmm = formatHHMM(student.timestamp);
