@@ -622,6 +622,10 @@ In this hands-on workshop exercise, you pair program with **Google Antigravity**
 - Add a **"🎙️ Generate Audio Podcast"** button to the post view and render an HTML5 `<audio controls>` player when attached.
 - When you click generate, Solid Queue executes the synthesis in the background without blocking web requests!
 
+> 💡 **Reference Implementation Branch:**  
+> If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:  
+> [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier) (`git checkout solutions/podcastifier`).
+
 ### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
 
 Remember that photo you uploaded back in Step 4 before the container restart wiped out the ephemeral SQLite database? That image file is still sitting safely in your private GCS bucket as an "orphaned blob"!
