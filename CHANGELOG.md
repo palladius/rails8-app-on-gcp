@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2026-09-09
+### Fixed
+- 🧪 **Workshop UAT Harness Sandbox Bundler Isolation (`bin/workshop_uat.rb`)**:
+  - Replicated `blog/.bundle` directory into temporary sandbox workspaces alongside `vendor/bundle` cache, ensuring isolated `just workshop-uat` runs find locally vendored gems without requiring network installations.
+  - Verified 100% passing automated evaluation and UAT test harness across all stages (`just workshop-eval all` -> 20/20 evals, `just workshop-uat 1/2/3/4/6`).
+
 ## [0.2.1] - 2026-09-09
 ### Added
 - 📸 **Visual Architecture Diagrams & Screenshot Placeholders**:
