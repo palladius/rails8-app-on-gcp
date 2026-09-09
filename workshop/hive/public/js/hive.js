@@ -179,12 +179,17 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome a sx + Step badge -->
+      <!-- COLONNA 2: HH:MM Nome a sx + eventuale Gmail icon + Step badge -->
       <td class="py-3.5 px-5 whitespace-nowrap align-middle">
         <div class="flex items-center gap-3">
           <div class="flex items-baseline gap-2">
             <span class="text-xs font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
             <span class="font-bold text-amber-400 text-base">${escapeHtml(nickname)}</span>
+            ${t.admin_email ? `
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+                <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
+              </a>
+            ` : ''}
           </div>
 
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
