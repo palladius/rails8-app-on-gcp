@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   allow_unauthenticated_access only: %i[ index show ]
-  before_action :set_post, only: %i[ show edit update destroy ]
+  before_action :set_post, only: %i[ show edit update destroy purge_cover_image ]
 
   # GET /posts or /posts.json
   def index
@@ -60,6 +60,17 @@ class PostsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to posts_path, notice: "Post was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
+    end
+  end
+
+  # DELETE /posts/1/purge_cover_image
+  def purge_cover_image
+    @post.cover_image.purge if @post.cover_image.attached?
+    GenerateCoverImageJob.perform_later(@post.id)
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("post-show__hero-#{@post.id}") }
+      format.html { redirect_to @post, notice: "Cover image deleted. Regenerating new cover...", status: :see_other }
     end
   end
 

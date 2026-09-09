@@ -89,4 +89,40 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to posts_url
   end
+
+  test "should delete cover image and enqueue cover regeneration job" do
+    @post.cover_image.attach(
+      io: StringIO.new("fake-image-bytes"),
+      filename: "test.png",
+      content_type: "image/png"
+    )
+    assert @post.cover_image.attached?
+
+    assert_enqueued_with(job: GenerateCoverImageJob, args: [@post.id]) do
+      delete purge_cover_image_post_url(@post)
+    end
+
+    assert_redirected_to post_url(@post)
+    assert_equal "Cover image deleted. Regenerating new cover...", flash[:notice]
+    @post.reload
+    assert_not @post.cover_image.attached?
+  end
+
+  test "should delete cover image via turbo stream" do
+    @post.cover_image.attach(
+      io: StringIO.new("fake-image-bytes"),
+      filename: "test.png",
+      content_type: "image/png"
+    )
+    assert @post.cover_image.attached?
+
+    assert_enqueued_with(job: GenerateCoverImageJob, args: [@post.id]) do
+      delete purge_cover_image_post_url(@post), as: :turbo_stream
+    end
+
+    assert_response :success
+    @post.reload
+    assert_not @post.cover_image.attached?
+  end
 end
+
