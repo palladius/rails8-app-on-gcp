@@ -6,100 +6,103 @@
   <title>🐝 Workshop Hive — Live Leaderboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes pulse-fast {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(1.35); }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    @keyframes pulse-ring-red {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
     }
     .blink-up {
-      animation: pulse-fast 1.2s infinite;
+      animation: pulse-ring 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     }
     .blink-down {
-      animation: pulse-fast 0.8s infinite;
+      animation: pulse-ring-red 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-[#0b1120] text-slate-200 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
 
-  <!-- Top Navigation / Header -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-[#0f172a]/90 backdrop-blur sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-md">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20">
         🐝
       </div>
       <div>
-        <h1 class="text-xl font-black tracking-tight text-white flex items-center gap-2">
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
           Workshop Hive Leaderboard
-          <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono font-medium">Live Telemetry</span>
+          <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono font-medium">Live Telemetry</span>
         </h1>
-        <p class="text-xs text-slate-400">Real-time inspection of Ruby, Rails, Workshop Step & App Metrics</p>
+        <p class="text-xs text-slate-400">Rails 8 on Google Cloud Workshop Attendance & Metrics</p>
       </div>
     </div>
 
-    <!-- Stats & Live Polling Status -->
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-4 text-sm bg-slate-950/80 px-4 py-2 rounded-lg border border-slate-800">
+    <!-- Quick Stats -->
+    <div class="flex items-center gap-5">
+      <div class="flex items-center gap-4 text-xs bg-slate-900 px-4 py-2 rounded-lg border border-slate-800">
         <div>
-          <span class="text-slate-500 text-xs block uppercase tracking-wider font-semibold">Total Students</span>
-          <span id="stat-total-students" class="font-bold text-amber-400 text-lg">0</span>
+          <span class="text-slate-500 uppercase font-semibold text-[10px] block">Students</span>
+          <span id="stat-total-students" class="font-bold text-amber-400 text-base">0</span>
         </div>
-        <div class="w-px h-8 bg-slate-800"></div>
+        <div class="w-px h-6 bg-slate-800"></div>
         <div>
-          <span class="text-slate-500 text-xs block uppercase tracking-wider font-semibold">Healthy (/up)</span>
-          <span id="stat-healthy-apps" class="font-bold text-emerald-400 text-lg">0</span>
+          <span class="text-slate-500 uppercase font-semibold text-[10px] block">Online (/up)</span>
+          <span id="stat-healthy-apps" class="font-bold text-emerald-400 text-base">0</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-mono bg-slate-900 px-3 py-1.5 rounded-md border border-slate-800">
-        <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 blink-up"></span>
-        <span id="sync-text" class="text-slate-400">Ping: <span id="sync-timer" class="text-slate-200">5s</span></span>
+      <div class="flex items-center gap-2 text-xs font-mono bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+        <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 blink-up"></span>
+        <span class="text-slate-400">Ping: <span id="sync-timer" class="text-slate-200">5s</span></span>
       </div>
     </div>
   </header>
 
-  <!-- Main Table Container -->
-  <main class="flex-1 p-6 max-w-[96rem] w-full mx-auto flex flex-col gap-4">
-    <!-- Legend & Info Bar -->
-    <div class="flex items-center justify-between text-xs text-slate-400 px-1">
-      <div>
-        Auto-probing student apps via <span class="font-mono text-slate-300">/up</span> and <span class="font-mono text-slate-300">/status</span> every 5 seconds.
+  <!-- Table Section -->
+  <main class="flex-1 p-8 max-w-7xl w-full mx-auto flex flex-col gap-4">
+    <div class="flex items-center justify-between text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span>Attivi in tempo reale su Google Cloud Run / Localhost</span>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> UP (200 OK)</span>
-        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> DOWN / Unreachable</span>
+      <div class="flex items-center gap-4 text-[11px]">
+        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> UP (200 OK)</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> DOWN / Unreachable</span>
       </div>
     </div>
 
-    <!-- The Master Table -->
-    <div class="bg-slate-900/90 rounded-xl border border-slate-800 overflow-hidden shadow-2xl">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-950/90 text-slate-400 uppercase font-mono text-[11px] border-b border-slate-800">
-            <tr>
-              <th scope="col" class="py-3.5 pl-5 pr-2 w-12 text-center">Live</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Student / Nickname</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Workshop Step</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Stack (Ruby / Rails)</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Metrics (Posts / Users / Images)</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold">Deployed App URL</th>
-              <th scope="col" class="py-3.5 px-4 font-semibold text-right pr-5">Latency</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/60 font-sans">
-            <tr>
-              <td colspan="7" class="py-12 text-center text-slate-500 italic">
-                Pinging student instances and gathering live telemetry...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Table Container -->
+    <div class="bg-[#0f172a] rounded-xl border border-slate-800 shadow-xl overflow-hidden">
+      <table class="w-full text-left border-collapse table-auto">
+        <thead>
+          <tr class="border-b border-slate-800/80 bg-slate-950/50 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+            <th class="py-3 px-4 w-12 text-center">Live</th>
+            <th class="py-3 px-5 font-semibold">Student</th>
+            <th class="py-3 px-5 font-semibold">Step</th>
+            <th class="py-3 px-5 font-semibold">Stack</th>
+            <th class="py-3 px-5 font-semibold">Metrics</th>
+            <th class="py-3 px-5 font-semibold">Cloud Run URL</th>
+            <th class="py-3 px-5 font-semibold text-right">Latency</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/50 text-sm">
+          <tr>
+            <td colspan="7" class="py-12 text-center text-slate-500 italic font-mono text-xs">
+              Loading student telemetry...
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-800/80 px-6 py-3 text-xs text-slate-500 flex items-center justify-between">
+  <footer class="border-t border-slate-800/80 px-8 py-3.5 text-xs text-slate-500 flex items-center justify-between">
     <div>Made with 🦖 & 🍝 by Riccardo & Emiliano — Rails 8 on GCP Workshop</div>
-    <div id="footer-last-updated">Auto-refresh active (5s health / 15s submissions)</div>
+    <div id="footer-last-updated" class="font-mono text-[11px]">Polling active (5s health / 15s submissions)</div>
   </footer>
 
   <script src="/js/hive.js"></script>

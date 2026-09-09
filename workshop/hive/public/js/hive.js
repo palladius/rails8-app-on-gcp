@@ -22,12 +22,10 @@ async function fetchHealth() {
     const data = await res.json();
     cachedHealth = data.checks || {};
 
-    // Calcola apps sane
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
     document.getElementById("stat-healthy-apps").textContent = healthyCount;
+    document.getElementById("sync-timer").textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-    // Aggiorna stato timestamp
-    document.getElementById("sync-timer").textContent = new Date().toLocaleTimeString();
     renderTable();
   } catch (err) {
     console.error("Error fetching health checks:", err);
@@ -41,7 +39,7 @@ function renderTable() {
   if (cachedLeaderboard.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="py-12 text-center text-slate-500 italic">
+        <td colspan="7" class="py-12 text-center text-slate-500 italic font-mono text-xs">
           No student submissions registered yet.
         </td>
       </tr>
@@ -57,106 +55,106 @@ function renderTable() {
     const isDown = check.status === "down";
     const t = check.telemetry || {};
 
-    // Indicatore status a sinistra: rosso/verde lampeggiante
-    let dotClass = "bg-slate-600";
-    let statusText = "PING...";
-    let statusBadge = "bg-slate-800 text-slate-400 border-slate-700";
-
+    // Indicator Dot (pill with glow)
+    let dotHtml = `<span class="w-3 h-3 rounded-full bg-slate-700 inline-block"></span>`;
     if (isUp) {
-      dotClass = "bg-emerald-400 blink-up shadow-lg shadow-emerald-500/50";
-      statusText = "UP";
-      statusBadge = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+      dotHtml = `<span class="w-3 h-3 rounded-full bg-emerald-400 blink-up inline-block ring-2 ring-emerald-500/30" title="200 OK"></span>`;
     } else if (isDown) {
-      dotClass = "bg-rose-500 blink-down shadow-lg shadow-rose-500/50";
-      statusText = "DOWN";
-      statusBadge = "bg-rose-500/10 text-rose-400 border-rose-500/30";
+      dotHtml = `<span class="w-3 h-3 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30" title="DOWN"></span>`;
     }
 
-    const latencyDisplay = check.latency_ms !== null && check.latency_ms !== undefined
-      ? `${check.latency_ms} ms`
-      : (check.http_code ? `HTTP ${check.http_code}` : "-");
+    // Step Badge
+    const stepNum = t.step_number || student.step_number || 1;
+    const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
 
-    // Workshop Step: usa la telemetria live di /status se disponibile, altrimenti fallback a quella dichiarata
-    const stepLabel = t.step_description || student.step || "Step 1: Local Baseline";
-    const stepNumber = t.step_number || student.step_number || 1;
-
-    // Stack: Ruby & Rails version
-    const rubyVer = t.ruby_version ? `💎 Ruby ${t.ruby_version}` : "";
-    const railsVer = t.rails_version ? `🛤️ Rails ${t.rails_version}` : "";
-    const stackDisplay = (rubyVer || railsVer)
-      ? `<div class="flex flex-col gap-0.5 font-mono text-xs">
-           <span class="text-rose-300 font-semibold">${rubyVer}</span>
-           <span class="text-red-400/90">${railsVer}</span>
-         </div>`
-      : `<span class="text-slate-600 font-mono text-xs italic">Unknown</span>`;
-
-    // Metrics: Posts, Users, Images
-    let metricsDisplay = "";
-    if (t.posts_count !== undefined) {
-      metricsDisplay = `
-        <div class="flex items-center gap-3 font-mono text-xs">
-          <span class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700" title="Posts count">📝 <b class="text-amber-300">${t.posts_count}</b></span>
-          <span class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700" title="Admin users count">👤 <b class="text-sky-300">${t.users_count || 0}</b></span>
-          <span class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700" title="ActiveStorage Blobs">🖼️ <b class="text-emerald-300">${t.blobs_count || 0}</b></span>
+    // Stack display
+    let stackHtml = `<span class="text-slate-500 text-xs italic font-mono">-</span>`;
+    if (t.ruby_version || t.rails_version) {
+      stackHtml = `
+        <div class="flex items-center gap-2 text-xs font-mono">
+          ${t.ruby_version ? `<span class="text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-800/40">💎 ${t.ruby_version}</span>` : ""}
+          ${t.rails_version ? `<span class="text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-800/40">🛤️ ${t.rails_version}</span>` : ""}
         </div>
       `;
-    } else {
-      metricsDisplay = `<span class="text-slate-600 font-mono text-xs italic">Awaiting /status</span>`;
     }
 
+    // Metrics display
+    let metricsHtml = `<span class="text-slate-600 text-xs italic font-mono">Awaiting /status</span>`;
+    if (t.posts_count !== undefined) {
+      metricsHtml = `
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
+        </div>
+      `;
+    }
+
+    // URL formatting - clean single line truncation
+    const cleanUrl = student.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    const urlDisplay = `
+      <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline max-w-[280px] truncate" title="${escapeHtml(student.url)}">
+        <span class="opacity-70">🔗</span>
+        <span class="truncate">${escapeHtml(cleanUrl)}</span>
+      </a>
+    `;
+
+    // Latency
+    const latencyBadge = isUp
+      ? `<span class="font-mono text-xs font-medium text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">${check.latency_ms} ms</span>`
+      : isDown
+      ? `<span class="font-mono text-xs font-medium text-rose-400 bg-rose-950/50 px-2 py-0.5 rounded border border-rose-800/50">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`
+      : `<span class="font-mono text-xs text-slate-500">-</span>`;
+
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-slate-800/40 transition-colors";
+    tr.className = "hover:bg-slate-800/30 transition-colors";
 
     tr.innerHTML = `
-      <!-- Status Blinking Dot on the Left -->
-      <td class="py-4 pl-5 pr-2 text-center whitespace-nowrap">
+      <!-- Live Indicator -->
+      <td class="py-3.5 px-4 text-center whitespace-nowrap">
         <div class="flex items-center justify-center">
-          <span class="w-3.5 h-3.5 rounded-full ${dotClass} inline-block" title="${statusText}: ${escapeHtml(student.url)}"></span>
+          ${dotHtml}
         </div>
       </td>
 
-      <!-- Nickname -->
-      <td class="py-4 px-4 whitespace-nowrap font-medium text-slate-100">
-        <div class="flex items-center gap-2">
-          <span class="text-base">👤</span>
-          <span class="font-bold text-amber-300 text-base">${escapeHtml(student.nickname || "Anonymous")}</span>
+      <!-- Nickname & Timestamp -->
+      <td class="py-3.5 px-5 whitespace-nowrap">
+        <div class="font-semibold text-slate-100 flex items-center gap-1.5">
+          <span class="text-amber-400">${escapeHtml(student.nickname || "Anonymous")}</span>
         </div>
         <div class="text-[10px] text-slate-500 font-mono mt-0.5">${escapeHtml(student.timestamp || "")}</div>
       </td>
 
-      <!-- Workshop Stage -->
-      <td class="py-4 px-4 whitespace-nowrap">
-        <div class="flex flex-col gap-1">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 w-max">
-            Step ${stepNumber}
+      <!-- Workshop Step -->
+      <td class="py-3.5 px-5 whitespace-nowrap">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+            Step ${stepNum}
           </span>
-          <span class="text-xs text-slate-300 font-medium">${escapeHtml(stepLabel)}</span>
+          <span class="text-xs text-slate-300 truncate max-w-[160px]" title="${escapeHtml(stepText)}">
+            ${escapeHtml(stepText)}
+          </span>
         </div>
       </td>
 
-      <!-- Stack (Ruby / Rails) -->
-      <td class="py-4 px-4 whitespace-nowrap">
-        ${stackDisplay}
+      <!-- Stack -->
+      <td class="py-3.5 px-5 whitespace-nowrap">
+        ${stackHtml}
       </td>
 
-      <!-- Metrics (Posts / Users / Images) -->
-      <td class="py-4 px-4 whitespace-nowrap">
-        ${metricsDisplay}
+      <!-- Metrics -->
+      <td class="py-3.5 px-5 whitespace-nowrap">
+        ${metricsHtml}
       </td>
 
-      <!-- Deployed App URL -->
-      <td class="py-4 px-4">
-        <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all">
-          <span>🔗</span>
-          <span>${escapeHtml(student.url)}</span>
-        </a>
+      <!-- URL (No vertical wrapping) -->
+      <td class="py-3.5 px-5 whitespace-nowrap">
+        ${urlDisplay}
       </td>
 
-      <!-- Last Ping / Latency -->
-      <td class="py-4 px-4 pr-5 whitespace-nowrap text-right font-mono text-xs">
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border ${statusBadge}">
-          ${statusText} ${latencyDisplay !== "-" ? `· ${latencyDisplay}` : ""}
-        </span>
+      <!-- Latency -->
+      <td class="py-3.5 px-5 whitespace-nowrap text-right">
+        ${latencyBadge}
       </td>
     `;
 
@@ -171,11 +169,11 @@ function escapeHtml(str) {
   });
 }
 
-// Initial fetch
+// Initial triggers
 fetchLeaderboard();
 fetchHealth();
 
-// Refresh health and rich telemetry every 5 seconds!
+// Refresh health every 5 seconds
 setInterval(fetchHealth, 5000);
 
 // Refresh submissions every 15 seconds
