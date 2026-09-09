@@ -79,36 +79,28 @@ module Nanobanana
     PROMPT
   end
 
+  def gemini_api_key
+    ENV["GEMINI_API_KEY"].presence
+  end
+
   def project_id
     ENV["GOOGLE_CLOUD_PROJECT"].presence || ENV["GCP_PROJECT_ID"].presence
   end
 
-  # True when a Vertex AI call could plausibly succeed. No network involved.
+  # True when a Vertex AI call or Gemini API key call could plausibly succeed.
   def available?
-    project_id.present? && !credentials.nil?
+    gemini_api_key.present? || (project_id.present? && !credentials.nil?)
   end
 
-  # Always returns a Result. Vertex AI when possible, the fake cover otherwise.
+  # Always returns a Result. Gemini API Key or Vertex AI when possible, fake cover otherwise.
   def generate_image(prompt)
-    return fake_cover("GOOGLE_CLOUD_PROJECT is not set") if project_id.blank?
-
-    response = post_generate_content(endpoint_uri, request_body(prompt), access_token!)
-    unless response.is_a?(Net::HTTPSuccess)
-      return fake_cover("Vertex AI answered HTTP #{response.code}: #{response.body.to_s.squish.truncate(200)}")
+    if gemini_api_key.present?
+      generate_via_gemini_api(prompt)
+    elsif project_id.present?
+      generate_via_vertex_ai(prompt)
+    else
+      fake_cover("Neither GEMINI_API_KEY nor GOOGLE_CLOUD_PROJECT is set")
     end
-
-    part = JSON.parse(response.body).dig("candidates", 0, "content", "parts")&.find { |p| p["inlineData"] }
-    return fake_cover("Vertex AI returned no image part") unless part
-
-    Rails.logger.info "🍌 Nano Banana: cover generated via Vertex AI (#{MODEL} @ #{LOCATION})"
-    Result.new(
-      data: Base64.decode64(part["inlineData"]["data"]),
-      content_type: part["inlineData"]["mimeType"].presence || "image/png",
-      source: :vertex
-    )
-  rescue Unavailable, Timeout::Error, SocketError, IOError, SystemCallError,
-         OpenSSL::SSL::SSLError, Net::ProtocolError, JSON::ParserError => e
-    fake_cover("#{e.class}: #{e.message.to_s.squish.truncate(200)}")
   end
 
   # :gcs when ActiveStorage points at a Google Cloud Storage service, :local
@@ -141,6 +133,47 @@ module Nanobanana
   end
 
   # --- internals (still callable, module_function makes them stubbable in tests)
+
+  def generate_via_gemini_api(prompt)
+    uri = URI("https://generativelanguage.googleapis.com/v1beta/models/#{MODEL}:generateContent?key=#{gemini_api_key}")
+    response = post_generate_content(uri, request_body(prompt), nil)
+    unless response.is_a?(Net::HTTPSuccess)
+      return fake_cover("Gemini API answered HTTP #{response.code}: #{response.body.to_s.squish.truncate(200)}")
+    end
+
+    part = JSON.parse(response.body).dig("candidates", 0, "content", "parts")&.find { |p| p["inlineData"] }
+    return fake_cover("Gemini API returned no image part") unless part
+
+    Rails.logger.info "🍌 Nano Banana: cover generated via Google AI Studio (#{MODEL})"
+    Result.new(
+      data: Base64.decode64(part["inlineData"]["data"]),
+      content_type: part["inlineData"]["mimeType"].presence || "image/png",
+      source: :vertex
+    )
+  rescue Unavailable, Timeout::Error, SocketError, IOError, SystemCallError,
+         OpenSSL::SSL::SSLError, Net::ProtocolError, JSON::ParserError => e
+    fake_cover("#{e.class}: #{e.message.to_s.squish.truncate(200)}")
+  end
+
+  def generate_via_vertex_ai(prompt)
+    response = post_generate_content(endpoint_uri, request_body(prompt), access_token!)
+    unless response.is_a?(Net::HTTPSuccess)
+      return fake_cover("Vertex AI answered HTTP #{response.code}: #{response.body.to_s.squish.truncate(200)}")
+    end
+
+    part = JSON.parse(response.body).dig("candidates", 0, "content", "parts")&.find { |p| p["inlineData"] }
+    return fake_cover("Vertex AI returned no image part") unless part
+
+    Rails.logger.info "🍌 Nano Banana: cover generated via Vertex AI (#{MODEL} @ #{LOCATION})"
+    Result.new(
+      data: Base64.decode64(part["inlineData"]["data"]),
+      content_type: part["inlineData"]["mimeType"].presence || "image/png",
+      source: :vertex
+    )
+  rescue Unavailable, Timeout::Error, SocketError, IOError, SystemCallError,
+         OpenSSL::SSL::SSLError, Net::ProtocolError, JSON::ParserError => e
+    fake_cover("#{e.class}: #{e.message.to_s.squish.truncate(200)}")
+  end
 
   def endpoint_uri
     host = LOCATION == "global" ? "aiplatform.googleapis.com" : "#{LOCATION}-aiplatform.googleapis.com"
@@ -175,7 +208,7 @@ module Nanobanana
   # The only method that touches the network; tests stub it.
   def post_generate_content(uri, body, token)
     request = Net::HTTP::Post.new(uri)
-    request["Authorization"] = "Bearer #{token}"
+    request["Authorization"] = "Bearer #{token}" if token
     request["Content-Type"]  = "application/json"
     request.body = JSON.generate(body)
 

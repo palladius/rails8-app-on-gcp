@@ -1,0 +1,50 @@
+<%# 
+  Pedagogical helper for Workshop Step 7 (Issue #18, #21 & #22).
+  Warns the student when Nano Banana AI cover generation is running in Fake Fallback mode
+  because neither GEMINI_API_KEY nor Vertex AI credentials are available.
+  Runs in 0ms without any slow network call.
+%>
+<% ai_available = Nanobanana.available? rescue false %>
+
+<% unless ai_available %>
+  <div class="workshop-ai-fallback-alert" style="
+    background-color: #fef2f2;
+    border-left: 5px solid #ef4444;
+    color: #991b1b;
+    padding: 10px 16px;
+    margin: 8px auto;
+    max-width: 1200px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.3rem;">🍌</span>
+      <div>
+        <strong>Notice: Nano Banana AI Cover in Fake Fallback Mode</strong>
+        <div style="font-size: 0.85rem; color: #b91c1c; margin-top: 2px;">
+          Neither <code>GEMINI_API_KEY</code> nor Vertex AI Application Default Credentials are configured.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="#ai-status-modal" 
+         onclick="alert('💡 Why is this happening?\n\nNano Banana generates vintage 1960s Italian movie posters for new posts.\n\nTo enable real live AI generation:\n1. Option A: set `GEMINI_API_KEY=\"AIza...\"` in your `.env` (Google AI Studio).\n2. Option B (Cloud-Native): run `gcloud auth application-default login` and set `GOOGLE_CLOUD_PROJECT` (Vertex AI).\n\nWithout either, the app gracefully falls back to the bundled fake cover image!'); return false;"
+         style="
+           background-color: #fee2e2;
+           border: 1px solid #ef4444;
+           color: #7f1d1d;
+           padding: 5px 10px;
+           border-radius: 4px;
+           text-decoration: none;
+           font-size: 0.82rem;
+           font-weight: 600;">
+        Why? (Ask AI) 🤖
+      </a>
+    </div>
+  </div>
+<% end %>

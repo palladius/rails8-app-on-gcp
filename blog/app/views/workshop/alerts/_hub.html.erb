@@ -7,6 +7,9 @@
 <% unless ENV["DISABLE_WORKSHOP_ALERTS"] == "true" %>
   <div class="workshop-alerts-hub" data-turbo-permanent="true">
     <%= render "workshop/alerts/missing_admin" %>
+    <%= render "workshop/alerts/ephemeral_database" %>
+    <%= render "workshop/alerts/ephemeral_storage" %>
+    <%= render "workshop/alerts/ai_status" %>
     <%= render "workshop/alerts/stuck_jobs" %>
   </div>
 <% end %>

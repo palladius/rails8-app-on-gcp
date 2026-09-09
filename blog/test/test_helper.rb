@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] ||= "test"
+ENV.delete("GEMINI_API_KEY") # Keep test suite offline and deterministic
 require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"
