@@ -347,7 +347,21 @@ a[href$="/posts/new"]:hover {
   position: relative;
 }
 
-/* --- Title: big gradient H1 above body card --- */
+/* --- Header: title/meta on the left, hero image on top right --- */
+.post-show__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.post-show__header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- Title: big gradient H1 --- */
 .post-show__title {
   font-size: 2.4rem;
   line-height: 1.2;
@@ -355,7 +369,7 @@ a[href$="/posts/new"]:hover {
   /* inherits the gradient text from global h1 */
 }
 
-/* --- Body content: glass card with floated hero image --- */
+/* --- Body content: glass card --- */
 .post-show__body-glass {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(14px);
@@ -365,12 +379,11 @@ a[href$="/posts/new"]:hover {
   border-top: none;
   border-bottom: none;
   border-radius: 20px;
-  padding: 0.8rem 1.5rem;
+  padding: 1.2rem 1.5rem;
   box-shadow:
     0 4px 24px rgba(0, 0, 0, 0.25);
   margin-bottom: 1rem;
   transition: box-shadow 0.3s ease;
-  overflow: hidden; /* contain the float */
 }
 
 .post-show__body-glass:hover {
@@ -379,19 +392,18 @@ a[href$="/posts/new"]:hover {
     0 0 12px rgba(171, 71, 188, 0.1);
 }
 
-/* Hero image: floated top-right, flush with body card edges */
+/* Hero image: top-right beside the title, rounded corners with glass glow */
 .post-show__hero-glass {
   position: relative;
-  float: right;
-  width: 160px;
-  /* negative margins cancel the card padding so image is flush top-right */
-  margin: -0.8rem -1.5rem 0.5rem 1rem;
+  flex-shrink: 0;
+  width: 170px;
+  margin: 0;
   padding: 0;
   background: none;
   border: none;
-  border-radius: 0 20px 0 14px; /* match card top-right corner */
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.35);
   transition:
     transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     box-shadow 0.45s ease;
@@ -531,8 +543,12 @@ a[href$="/posts/new"]:hover {
 
 /* --- Responsive: stack on narrow screens --- */
 @media (max-width: 640px) {
+  .post-show__header {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .post-show__hero-glass {
-    float: none;
     width: 60%;
     max-width: 200px;
     margin: 0 auto 1rem;
