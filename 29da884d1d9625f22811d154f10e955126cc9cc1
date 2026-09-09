@@ -1,0 +1,1 @@
+Completed Phase 2: Built Playwright screenshot runner workshop/screenshots/runner.js with support for --list, --dry-run, and automated dispatch. Implemented step2 and step4 reference scripts with graceful offline fallbacks and verified through test/test_workshop_screenshots.rb.
