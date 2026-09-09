@@ -220,10 +220,10 @@ function renderTable() {
               }
 
               return `
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
                   <span>🏃</span>
-                  <span class="font-semibold">${escapeHtml(service)}</span>
-                  ${shortRev ? `<span class="px-1 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-[8.5px] font-normal tracking-tight">@${escapeHtml(shortRev)}</span>` : ''}
+                  <span class="text-slate-300 font-medium">${escapeHtml(service)}</span>
+                  ${shortRev ? `<span class="px-1.5 py-0.5 rounded-md bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/40 text-[9.5px] tracking-tight shadow-sm">rev ${escapeHtml(shortRev)}</span>` : ''}
                 </span>
               `;
             })()}

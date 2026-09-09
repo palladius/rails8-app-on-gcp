@@ -29,7 +29,7 @@ module WorkshopHive
       status_data = {}
       if up_res[:status] == "up"
         status_uri = parsed_uri.dup
-        status_uri.path = "/status"
+        status_uri.path = "/status.json"
         status_raw = execute_http_get(status_uri, timeout_seconds, headers: { "Accept" => "application/json" })
 
         if status_raw[:status] == "up" && status_raw[:body]
