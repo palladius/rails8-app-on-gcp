@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.44] - 2026-09-09
+### Changed
+- ⏱️ **Compact Duration Format**:
+  - Formatted page completion estimates to compact italic style (*Duration: 15min*) across all pages in `workshop/CODELAB.md`.
+
+
 ## [0.1.43] - 2026-09-09
 ### Added
 - ⏱️ **Page Duration Estimates in Codelab**:
