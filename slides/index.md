@@ -177,21 +177,41 @@ and guide me step-by-step through the workshop!"
 # Thank You! 🎉
 ### Let's Build Rails 8 on Google Cloud 🚀
 
-<div style="text-align: center; margin: 8px 0;">
-  <img src="images/slide1-style3-flat-vector.png" style="max-height: 280px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+<div style="display: flex; gap: 20px; align-items: center; margin-top: 4px;">
+<div style="flex: 0 0 240px; text-align: center;">
+<img src="images/slide1-style3-flat-vector.png" style="max-height: 220px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
 </div>
-
-<p style="text-align: center; font-size: 0.8em; margin: 4px 0;">
-  🦖 <strong>Riccardo Carlesso:</strong> <a href="https://linkedin.com/in/riccardocarlesso">linkedin.com/in/riccardocarlesso</a> &nbsp;&middot;&nbsp; 
-  🏎️ <strong>Emiliano Della Casa:</strong> <a href="https://www.linkedin.com/in/emilianodellacasa">linkedin.com/in/emilianodellacasa</a>
+<div style="flex: 1; font-size: 0.78em;">
+<p style="margin: 0 0 6px 0;">
+🦖 <strong>Riccardo:</strong> <a href="https://linkedin.com/in/riccardocarlesso">linkedin.com/in/riccardocarlesso</a> &nbsp;&middot;&nbsp; 
+🏎️ <strong>Emiliano:</strong> <a href="https://www.linkedin.com/in/emilianodellacasa">linkedin.com/in/emilianodellacasa</a>
+</p>
+<p style="margin: 0 0 8px 0;">
+👉 Start hacking at <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md"><code>workshop/landing-page/README.md</code></a>
 </p>
 
-<p style="text-align: center; font-size: 0.8em; margin: 4px 0 0 0;">
-  👉 Head over to <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md"><code>workshop/landing-page/README.md</code></a> to start hacking!
+<div style="background-color: #f1f3f4; border: 1px solid #dadce0; border-radius: 8px; padding: 8px 12px; margin-top: 6px;">
+<p style="font-weight: bold; margin: 0 0 4px 0; color: #1a73e8; font-size: 0.95em;">
+🎵 Workshop Anthem (Lyria 3 Pro on Vertex AI)
 </p>
-
-<div style="position: absolute; bottom: 14px; left: 35px; display: flex; align-items: center; gap: 8px;">
-  <img src="images/riccardo-carlesso.webp" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #1a73e8; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Riccardo" />
-  <img src="images/emiliano-della-casa.png" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #188038; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Emiliano" />
+<p style="margin: 0 0 6px 0; font-size: 0.88em; color: #3c4043;">
+▶️ <em>Check this great song:</em>
+</p>
+<audio controls preload="none" style="width: 100%; height: 32px; margin-bottom: 4px;">
+<source src="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3" type="audio/mpeg">
+Your browser does not support audio playback.
+</audio>
+<div style="display: flex; gap: 12px; font-size: 0.82em; margin-top: 4px;">
+<span>⚡ <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-clip-preview.mp3">30s Short Clip</a></span>
+<span>🎸 <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3">Full 3m Song (3.4MB)</a></span>
 </div>
+</div>
+</div>
+</div>
+
+<div style="position: absolute; bottom: 12px; left: 35px; display: flex; align-items: center; gap: 8px;">
+  <img src="images/riccardo-carlesso.webp" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #1a73e8; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Riccardo" />
+  <img src="images/emiliano-della-casa.png" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #188038; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" alt="Emiliano" />
+</div>
+
 

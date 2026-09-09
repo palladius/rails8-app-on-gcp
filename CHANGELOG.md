@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.8] - 2026-09-09
+### Added
+- 🎶 **Workshop Anthem & Short Clip on Final Slide (`slides/index.md`, `slides/dist/index.html`)**:
+  - Added HTML5 audio player widget with "Check this great song" to the concluding presentation slide.
+  - Linked the 30-second Lyria 3 clip preview and the full-length 3-minute energetic acoustic guitar composition (Lyria 3 Pro on Vertex AI) generated for Rubyists.
+
 ## [0.2.7] - 2026-09-09
 ### Added
 - 📸 **Declarative Workshop Screenshots (Issue [#42](https://github.com/palladius/rails8-app-on-gcp/issues/42))**:
