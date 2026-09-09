@@ -5,6 +5,9 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
 🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
 
+🎶 **Official Workshop Anthem (Generated with Google Lyria 3 Pro)**:
+🎧 [Listen / Download "An energetic acoustic guitar song for Rubyists" (MP3, 3.4 MB)](https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3)
+
 ## 🚀 Quickstart: Starting the Apps & Services
 
 You can run the project in three different local modes depending on your development focus:
