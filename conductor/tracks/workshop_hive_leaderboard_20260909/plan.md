@@ -9,9 +9,9 @@
 - [x] Task: Inizializzare la struttura di `workshop/hive/` con `Gemfile`, `app.rb`, `config.ru` e Dockerfile di base. [6ad867c]
 - [x] Task: Scrivere test unitari per il modulo di autenticazione e caricamento credenziali Service Account da ENV (JSON o Base64). [ba67a30]
 - [x] Task: Implementare il client Google Sheets (`google-apis-sheets_v4`) con caching in memoria (TTL 30s) per leggere partecipanti e progressi. [901e001]
-- [~] Task: Implementare l'endpoint `GET /api/leaderboard` e verificarne il payload JSON.
+- [x] Task: Implementare l'endpoint `GET /api/leaderboard` e verificarne il payload JSON. [0d93d41]
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md).
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md).
 
 ## Phase 2: Live Healthchecker per le App Cloud Run
 - [ ] Task: Scrivere test per il worker/service che esegue il ping HTTP su `/up` degli URL Cloud Run registrati.
