@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.7] - 2026-09-09
+### Added
+- 🐝 **Workshop Hive Cloud Run Deployment (`workshop/hive/bin/deploy`, `workshop/hive/.env`)**:
+  - Added dedicated one-click deployer script `workshop/hive/bin/deploy` that sources project configuration from local `workshop/hive/.env`.
+  - Added `workshop/hive/.env.dist` blueprint template with `PROJECT_ID=palladius-genai`.
+  - Integrated official Cloud Run service icon, hover-based service names with clean revision tags, and Rails environment badges (`prod`, `dev`, `test`).
+
 ## [0.2.6] - 2026-09-09
 ### Added
 - 💰 **Real-Time Workshop Cost Estimator (`bin/rails8app-billing`, `just billing-estimate`)**:

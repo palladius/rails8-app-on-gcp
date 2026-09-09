@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Deploy Workshop Hive Leaderboard to Google Cloud Run
+set -e
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$DIR"
+
+# 1. Carica configurazione da .env se presente
+ENV_FILE="${DIR}/.env"
+if [ -f "$ENV_FILE" ]; then
+  echo "📄 Loading configuration from ${ENV_FILE}..."
+  set -a
+  source "$ENV_FILE"
+  set +a
+fi
+
+PROJECT_ID="${PROJECT_ID:-${GOOGLE_CLOUD_PROJECT:-palladius-genai}}"
+REGION="${REGION:-europe-west1}"
+SERVICE_NAME="${SERVICE_NAME:-workshop-hive}"
+ACCOUNT="${GCP_ACCOUNT:-${ACCOUNT:-}}"
+
+echo "🚀 Deploying ${SERVICE_NAME} to Google Cloud Run..."
+echo "   • Project: ${PROJECT_ID}"
+echo "   • Region:  ${REGION}"
+if [ -n "$ACCOUNT" ]; then
+  echo "   • Account: ${ACCOUNT}"
+fi
+
+# Build arguments array
+DEPLOY_CMD=(
+  gcloud run deploy "$SERVICE_NAME"
+  --source="$DIR"
+  --project="$PROJECT_ID"
+  --region="$REGION"
+  --allow-unauthenticated
+  --port=8080
+)
+
+if [ -n "$ACCOUNT" ]; then
+  DEPLOY_CMD+=(--account="$ACCOUNT")
+fi
+
+# Pass standard environment variables if defined
+ENV_VARS=()
+if [ -n "$HIVE_SPREADSHEET_ID" ]; then
+  ENV_VARS+=("HIVE_SPREADSHEET_ID=${HIVE_SPREADSHEET_ID}")
+fi
+if [ -n "$HIVE_SHEET_GID" ]; then
+  ENV_VARS+=("HIVE_SHEET_GID=${HIVE_SHEET_GID}")
+fi
+
+if [ ${#ENV_VARS[@]} -gt 0 ]; then
+  IFS=','
+  DEPLOY_CMD+=(--set-env-vars="${ENV_VARS[*]}")
+  unset IFS
+fi
+
+echo ""
+echo "Executing: ${DEPLOY_CMD[*]}"
+echo ""
+
+"${DEPLOY_CMD[@]}"
+
+echo ""
+echo "🎉 Workshop Hive successfully deployed to Cloud Run!"
+SERVICE_URL=$(gcloud run services describe "$SERVICE_NAME" --project="$PROJECT_ID" --region="$REGION" ${ACCOUNT:+--account="$ACCOUNT"} --format="value(status.url)")
+echo "👉 Live URL: ${SERVICE_URL}"
