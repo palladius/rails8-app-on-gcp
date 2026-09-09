@@ -58,6 +58,7 @@ module WorkshopHive
               app_version: sys["app_version"],
               ruby_version: sys["ruby_version"],
               rails_version: sys["rails_version"],
+              rails_env: sys["rails_env"],
               posts_count: sys["posts_count"],
               users_count: sys["admin_users_count"],
               blobs_count: sys["blobs_count"],
