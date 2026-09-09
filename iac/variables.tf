@@ -33,5 +33,24 @@ variable "iap_allowed_users" {
   ]
 }
 
+variable "iap_client_id" {
+  description = "OAuth2 Client ID for IAP (optional, required if enable_iap is true)."
+  type        = string
+  default     = ""
+}
+
+variable "iap_client_secret" {
+  description = "OAuth2 Client Secret for IAP (optional, required if enable_iap is true)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "enable_cicd_trigger" {
+  description = "Whether to provision the automated GitHub push Cloud Build trigger (requires GitHub App integration)."
+  type        = bool
+  default     = false
+}
+
 
 

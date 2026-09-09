@@ -113,6 +113,16 @@ resource "google_cloud_run_v2_service" "rails_app" {
         }
       }
 
+      env {
+        name  = "GOOGLE_CLOUD_ACCOUNT"
+        value = length(var.developers) > 0 ? replace(var.developers[0], "user:", "") : "rubycon.italy@gmail.com"
+      }
+
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
+      }
+
       volume_mounts {
         name       = "cloudsql"
         mount_path = "/cloudsql"

@@ -15,6 +15,7 @@ resource "google_artifact_registry_repository" "docker" {
 # Secrets (_RAILS_MASTER_KEY, _DATABASE_URL) are passed by bin/cloudbuild-submit
 # for local testing, and by the trigger config for auto-deploy.
 resource "google_cloudbuild_trigger" "deploy_on_push" {
+  count    = var.enable_cicd_trigger ? 1 : 0
   name     = "on-commit-build-rails8-app-on-gcp"
   location = "global"
 
