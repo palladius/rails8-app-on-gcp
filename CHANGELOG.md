@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.42] - 2026-09-09
+### Changed
+- 🎨 **Cover Image Header Layout**:
+  - Moved the "🔄 Regenerate Cover" button to the top header, positioned to the left of the cover image card in `posts#show`.
+  - Added clean `.post-show__header-cover-wrapper` and `.post-action-btn--compact` CSS styles with responsive mobile stacking.
+
 ## [0.1.41] - 2026-09-09
 ### Added
 - 🖼️ **Button to Delete & Regenerate Article Cover Image (Fixes [#34](https://github.com/palladius/rails8-app-on-gcp/issues/34))**:
