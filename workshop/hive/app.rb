@@ -60,3 +60,6 @@ module WorkshopHive
     end
   end
 end
+
+WorkshopHive::App.run! if __FILE__ == $PROGRAM_NAME
+
