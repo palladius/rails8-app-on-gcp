@@ -28,18 +28,31 @@ Every generated image is accompanied by an audit metadata JSON file recording:
 
 ## 🛠️ Commands
 
-- Validate all declarative screenshot scripts (dry-run, <0.05s):
-  ```bash
-  just test-screenshots
-  ```
+### Fast Validation (Dry-Run, <0.05s)
+```bash
+just test-screenshots
+# or via rake:
+cd blog && bin/rails screenshots:check
+```
 
-- Capture all declared screenshots:
-  ```bash
-  just screenshots
-  ```
+### Idempotent Generation (Skips already captured screenshots)
+```bash
+# Skips existing files, fast & safe
+just generate-screenshots
 
-- Capture a specific step or screenshot ID:
-  ```bash
-  just screenshots step-2
-  just screenshots step-2-home-ephemeral
-  ```
+# Or filter by step
+just generate-screenshots step-2
+```
+
+### Force Overwrite / Re-capture
+```bash
+# Force overwrite all screenshots
+just screenshots
+
+# Force overwrite specific step or screenshot ID
+just screenshots step-2
+just screenshots step-2-home-ephemeral
+
+# Or via Rake with environment flags:
+cd blog && FORCE=true bin/rails screenshots:generate FILTER=step-2
+```
