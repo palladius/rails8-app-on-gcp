@@ -214,6 +214,64 @@ function renderTable() {
       envBadge = `<span class="px-1.5 py-0.2 rounded border text-[10px] font-bold ${colorClasses}" title="Rails.env: ${escapeHtml(railsEnv)}">${escapeHtml(shortEnv)}</span>`;
     }
 
+    // Google Cloud Triad Detection (Cloud SQL, GCS, Vertex AI)
+    let gcpTriadHtml = "";
+    if (hasTelemetry) {
+      const isCloudSql = (t.db_tier && (t.db_tier.toString().includes("cloud_sql") || t.db_tier.toString().includes("Cloud SQL"))) || (t.db_badge && t.db_badge.includes("Cloud SQL"));
+      const isGcs = (t.storage_tier && (t.storage_tier.toString().includes("gcs") || t.storage_tier.toString().includes("Cloud Storage"))) || (t.storage_badge && t.storage_badge.includes("Cloud Storage"));
+      const isVertex = (t.ai_badge && (t.ai_badge.includes("Vertex") || t.ai_badge.includes("ADC")));
+
+      // 1. Cloud SQL badge (Verde attivo se Cloud SQL, altrimenti spento/grayscale con X rossa)
+      const sqlBadge = isCloudSql ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono" title="Google Cloud SQL (mTLS Proxy): ATTIVO">
+          <span class="text-xs leading-none">🐘</span>
+          <span class="font-bold text-[9px] tracking-tight">SQL</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud SQL: NON ancora configurato (in uso SQLite locale)">
+          <span class="text-xs leading-none filter grayscale">🐘</span>
+          <span class="line-through text-[9px]">SQL</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      // 2. GCS badge (Teal attivo se GCS, altrimenti spento/grayscale con X rossa)
+      const gcsBadge = isGcs ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-teal-500/40 bg-teal-500/10 text-teal-300 text-[10px] font-mono" title="Google Cloud Storage (iam: true): ATTIVO">
+          <span class="text-xs leading-none">☁️</span>
+          <span class="font-bold text-[9px] tracking-tight">GCS</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud Storage: NON ancora configurato (in uso disco locale effimero)">
+          <span class="text-xs leading-none filter grayscale">☁️</span>
+          <span class="line-through text-[9px]">GCS</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      // 3. Vertex AI badge (Ambra/Verde attivo se Vertex AI, altrimenti spento/grayscale con X rossa)
+      const vertexBadge = isVertex ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px] font-mono" title="Vertex AI (Nano Banana / Imagen 3): ATTIVO">
+          <span class="text-xs leading-none">🍌</span>
+          <span class="font-bold text-[9px] tracking-tight">AI</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Vertex AI: NON attivo (in uso Google AI Studio o disabilitato)">
+          <span class="text-xs leading-none filter grayscale">🍌</span>
+          <span class="line-through text-[9px]">AI</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      gcpTriadHtml = `
+        <div class="flex items-center gap-1.5 pl-2 border-l border-slate-700/60">
+          ${sqlBadge}
+          ${gcsBadge}
+          ${vertexBadge}
+        </div>
+      `;
+    }
+
     const stackHtml = hasTelemetry ? `
       <div class="flex items-center gap-2 text-xs font-mono">
         <span class="inline-flex items-center gap-1 text-rose-300 font-medium">
@@ -225,6 +283,7 @@ function renderTable() {
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3.5 h-3.5 inline-block" alt="Rails">
           <span>${railsVersion}</span>
         </span>
+        ${gcpTriadHtml}
       </div>
     ` : `
       <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
