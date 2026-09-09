@@ -43,6 +43,14 @@ if File.exist?(env_file)
     puts "   👉 Rinomina 'PROJECT_ID' in 'GOOGLE_CLOUD_PROJECT' nel tuo file .env!"
     errors_count += 1
   end
+
+  # Strict Anti-Legacy Check: GCLOUD_USER is forbidden, must use GOOGLE_CLOUD_ACCOUNT
+  if env_vars.key?("GCLOUD_USER")
+    puts "❌ [ERROR] Found deprecated variable 'GCLOUD_USER' in #{env_file}!".red
+    puts "   👉 'GCLOUD_USER' è deprecato. Lo standard ufficiale è 'GOOGLE_CLOUD_ACCOUNT'."
+    puts "   👉 Rinomina 'GCLOUD_USER' in 'GOOGLE_CLOUD_ACCOUNT' nel tuo file .env!"
+    errors_count += 1
+  end
 else
   puts "⚠️  [ENV] No .env file found at repository root!".yellow
   puts "   👉 Please run: cp .env.dist .env && vim .env"

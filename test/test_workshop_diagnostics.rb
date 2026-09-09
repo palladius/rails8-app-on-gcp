@@ -41,4 +41,14 @@ class WorkshopDiagnosticsTest < Minitest::Test
       assert_includes stdout, "GOOGLE_CLOUD_PROJECT"
     end
   end
+
+  def test_fails_when_deprecated_gcloud_user_found_in_env
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nGCLOUD_USER=ricc@google.com\nGOOGLE_CLOUD_PROJECT=dummy\n")
+      stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found deprecated variable 'GCLOUD_USER'"
+      assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT"
+    end
+  end
 end
