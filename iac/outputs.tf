@@ -72,3 +72,27 @@ resource "local_file" "readme_html" {
     </html>
   EOT
 }
+
+###############################################################################
+# Standard Terraform Outputs
+###############################################################################
+
+output "cloud_run_url" {
+  description = "The URL of the deployed Cloud Run service"
+  value       = google_cloud_run_v2_service.rails_app.uri
+}
+
+output "cloud_run_service_name" {
+  description = "The name of the Cloud Run service"
+  value       = google_cloud_run_v2_service.rails_app.name
+}
+
+output "project_id" {
+  description = "The GCP project ID"
+  value       = var.project_id
+}
+
+output "region" {
+  description = "The GCP region"
+  value       = var.region
+}
