@@ -274,8 +274,10 @@ steps:
         code: |
           routes = File.read('blog/config/routes.rb')
           controller = File.read('blog/app/controllers/posts_controller.rb')
+          tts_files = Dir.glob('blog/{app,lib}/**/*.{rb,erb}').select { |f| File.read(f).include?('it-IT-Wavenet-A') }
           raise 'generate_podcast should not be in routes' if routes.include?('generate_podcast')
           raise 'generate_podcast should not be in controller' if controller.include?('generate_podcast')
+          raise 'it-IT-Wavenet-A voice should not be pre-coded in base repository' unless tts_files.empty?
       - id: "step-7-llm-podcastifier-button-test"
         type: "llm"
         description: "Verify student implementation of Podcastifier via Antigravity if attempted"

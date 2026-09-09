@@ -19,5 +19,12 @@ class UncheckedInPodcastifierPedagogyTest < ActiveSupport::TestCase
     # 4. Ensure no dedicated cloud_tts_service is checked in to main
     assert_not File.exist?(Rails.root.join("lib/cloud_tts_service.rb")), "cloud_tts_service.rb must live in solutions/podcastifier branch, not main"
     assert_not File.exist?(Rails.root.join("app/services/cloud_tts_service.rb")), "app/services must stay empty"
+
+    # 5. Ensure the canonical TTS voice 'it-IT-Wavenet-A' is not hardcoded anywhere in app/ or lib/ on main
+    app_and_lib_files = Dir.glob(Rails.root.join("{app,lib}/**/*.{rb,erb}"))
+    app_and_lib_files.each do |f|
+      content = File.read(f)
+      assert_no_match(/it-IT-Wavenet-A/, content, "Canonical voice 'it-IT-Wavenet-A' must NOT be hardcoded in #{f}; students implement it in Step 7")
+    end
   end
 end
