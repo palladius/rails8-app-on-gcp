@@ -25,12 +25,66 @@ if (cachedLeaderboard.length > 0) {
   });
 }
 
+let previousStudentsCount = cachedLeaderboard.length;
+let audioContext = null;
+
+function playArrivalChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    if (!audioContext) {
+      audioContext = new AudioCtx();
+    }
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+
+    const now = audioContext.currentTime;
+
+    // Due note melodiche cristalline (Marimba / Celesta chime: Sol5 -> Do6, 784Hz -> 1046Hz)
+    [ { freq: 783.99, time: 0 }, { freq: 1046.50, time: 0.12 } ].forEach(note => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(note.freq, now + note.time);
+
+      gain.gain.setValueAtTime(0, now + note.time);
+      gain.gain.linearRampToValueAtTime(0.25, now + note.time + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + note.time + 0.45);
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start(now + note.time);
+      osc.stop(now + note.time + 0.5);
+    });
+  } catch (e) {
+    console.warn("Audio chime prevented by browser autoplay policy:", e);
+  }
+}
+
+// Unlock audio context on any user click anywhere on the page
+window.addEventListener("click", () => {
+  if (audioContext && audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+}, { once: true });
+
 async function fetchLeaderboard() {
   try {
     const res = await fetch("/api/leaderboard");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    cachedLeaderboard = data.entries || [];
+    const newEntries = data.entries || [];
+
+    // Suona il chime quando una nuova persona entra!
+    if (previousStudentsCount > 0 && newEntries.length > previousStudentsCount) {
+      playArrivalChime();
+    }
+    previousStudentsCount = newEntries.length;
+
+    cachedLeaderboard = newEntries;
     try {
       localStorage.setItem(CACHE_KEY_LEADERBOARD, JSON.stringify(cachedLeaderboard));
     } catch {}
