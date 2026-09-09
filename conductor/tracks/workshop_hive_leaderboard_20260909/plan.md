@@ -7,9 +7,9 @@
 
 ## Phase 1: Prototipo Backend Sinatra & Configurazione Auth
 - [x] Task: Inizializzare la struttura di `workshop/hive/` con `Gemfile`, `app.rb`, `config.ru` e Dockerfile di base. [6ad867c]
-- [~] Task: Scrivere test unitari per il modulo di autenticazione e caricamento credenziali Service Account da ENV (JSON o Base64).
+- [x] Task: Scrivere test unitari per il modulo di autenticazione e caricamento credenziali Service Account da ENV (JSON o Base64). [ba67a30]
+- [~] Task: Implementare il client Google Sheets (`google-apis-sheets_v4`) con caching in memoria (TTL 30s) per leggere partecipanti e progressi.
 
-- [ ] Task: Implementare il client Google Sheets (`google-apis-sheets_v4`) con caching in memoria (TTL 30s) per leggere partecipanti e progressi.
 - [ ] Task: Implementare l'endpoint `GET /api/leaderboard` e verificarne il payload JSON.
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md).
 
