@@ -126,6 +126,20 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Stage Progress Distribution (Horizontal Stages Addition) -->
+    <div class="mt-4 pt-4 border-t border-slate-800/80">
+      <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-3 px-1">
+        <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
+          <span>📊</span>
+          <span>Stage Distribution</span>
+        </span>
+        <span class="text-slate-500 text-[11px]">(Cloud Run unlocks at Step 3 — Steps 1 & 2 are ephemeral/local)</span>
+      </div>
+      <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
+        <!-- Rendered dynamically by hive.js -->
+      </div>
+    </div>
   </main>
 
   <!-- Footer -->

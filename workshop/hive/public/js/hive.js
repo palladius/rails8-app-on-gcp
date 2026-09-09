@@ -199,6 +199,80 @@ function renderTable() {
 
     tbody.appendChild(tr);
   });
+
+  renderStagesDistribution();
+}
+
+function renderStagesDistribution() {
+  const container = document.getElementById("stages-distribution");
+  if (!container) return;
+
+  // Counts per step (1 to 8)
+  const stepCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+  const stepNames = {
+    1: "Local Baseline",
+    2: "Mailpit & Admin",
+    3: "Stateless Shock",
+    4: "GCS Persistence",
+    5: "Secret Manager",
+    6: "Gold Sidecars",
+    7: "GenAI Cover",
+    8: "Final Quest 🏆"
+  };
+
+  cachedLeaderboard.forEach(student => {
+    const check = cachedHealth[student.url] || {};
+    const t = check.telemetry || {};
+    const stepNum = t.step_number || student.step_number || 3;
+    const clampedStep = Math.max(1, Math.min(8, stepNum));
+    stepCounts[clampedStep] = (stepCounts[clampedStep] || 0) + 1;
+  });
+
+  container.innerHTML = "";
+
+  for (let s = 1; s <= 8; s++) {
+    const count = stepCounts[s] || 0;
+    const isZero = count === 0;
+    const isUltimate = s === 8;
+
+    let cardClasses = "";
+    let numberBadgeClasses = "";
+    let labelClasses = "";
+
+    if (isZero) {
+      // Stadi nulli (compresi 1 e 2) trasparenti ed eterei
+      cardClasses = "border border-slate-800/40 bg-slate-900/20 opacity-35 hover:opacity-70 transition-opacity";
+      numberBadgeClasses = "text-slate-600";
+      labelClasses = "text-slate-600";
+    } else if (isUltimate) {
+      // Ultimo stadio con colore speciale celebrativo (Viola/Fucsia o Oro con glow)
+      cardClasses = "border-2 border-purple-500/60 bg-gradient-to-b from-purple-950/40 to-slate-900/90 shadow-lg shadow-purple-500/20";
+      numberBadgeClasses = "text-purple-300 font-extrabold text-lg";
+      labelClasses = "text-purple-300 font-bold";
+    } else {
+      // Stadi intermedi attivi (Ambra/Sky/Smeraldo)
+      cardClasses = "border border-amber-500/40 bg-slate-900/80 shadow-md shadow-amber-500/10";
+      numberBadgeClasses = "text-amber-400 font-bold text-lg";
+      labelClasses = "text-slate-300 font-medium";
+    }
+
+    const card = document.createElement("div");
+    card.className = `rounded-xl p-2.5 flex flex-col items-center justify-between text-center transition-all ${cardClasses}`;
+    card.innerHTML = `
+      <div class="flex items-center justify-between w-full text-[10px] font-mono mb-1">
+        <span class="${isZero ? 'text-slate-600' : 'text-slate-400 font-bold'}">Step ${s}</span>
+        ${isUltimate ? '<span class="text-xs">🏆</span>' : (s === 3 ? '<span class="text-[10px]" title="First Cloud Run deploy">☁️</span>' : '')}
+      </div>
+      <div class="my-1">
+        <span class="font-mono text-xl ${numberBadgeClasses}">${count}</span>
+      </div>
+      <div class="text-[10px] leading-tight truncate max-w-full ${labelClasses}" title="${stepNames[s]}">
+        ${stepNames[s]}
+      </div>
+    `;
+
+    container.appendChild(card);
+  }
 }
 
 function escapeHtml(str) {
