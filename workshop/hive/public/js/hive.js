@@ -1,4 +1,4 @@
-// Workshop Hive Table Client Logic — 5s Health & Telemetry Pings
+// Workshop Hive Table Client Logic — 2-line Budget Layout
 let cachedLeaderboard = [];
 let cachedHealth = {};
 
@@ -32,6 +32,23 @@ async function fetchHealth() {
   }
 }
 
+function formatHHMM(isoOrStr) {
+  if (!isoOrStr) return "--:--";
+  // Prova prima a parsare come Date valida
+  try {
+    const d = new Date(isoOrStr);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  } catch {}
+
+  // Se è formato '09/09/2026 15:03:48'
+  const match = isoOrStr.match(/(\d{1,2}:\d{2})/);
+  if (match) return match[1];
+
+  return "--:--";
+}
+
 function renderTable() {
   const tbody = document.getElementById("leaderboard-tbody");
   if (!tbody) return;
@@ -39,7 +56,7 @@ function renderTable() {
   if (cachedLeaderboard.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="py-12 text-center text-slate-500 italic font-mono text-xs">
+        <td colspan="6" class="py-12 text-center text-slate-500 italic font-mono text-xs">
           No student submissions registered yet.
         </td>
       </tr>
@@ -55,30 +72,49 @@ function renderTable() {
     const isDown = check.status === "down";
     const t = check.telemetry || {};
 
-    // Indicator Dot (pill with glow)
-    let dotHtml = `<span class="w-3 h-3 rounded-full bg-slate-700 inline-block"></span>`;
+    // 1. Indicator Dot a sinistra
+    let dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-slate-700 inline-block"></span>`;
     if (isUp) {
-      dotHtml = `<span class="w-3 h-3 rounded-full bg-emerald-400 blink-up inline-block ring-2 ring-emerald-500/30" title="200 OK"></span>`;
+      dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-emerald-400 blink-up inline-block ring-2 ring-emerald-500/30" title="200 OK"></span>`;
     } else if (isDown) {
-      dotHtml = `<span class="w-3 h-3 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30" title="DOWN"></span>`;
+      dotHtml = `<span class="w-3.5 h-3.5 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30" title="DOWN"></span>`;
     }
 
-    // Step Badge
+    // 2. Colonna Sinistra: HH:MM Nome (2 righe di budget)
+    const hhmm = formatHHMM(student.timestamp);
+    const nickname = student.nickname || "Anonymous";
+
+    // 3. Step
     const stepNum = t.step_number || student.step_number || 1;
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
 
-    // Stack display
-    let stackHtml = `<span class="text-slate-500 text-xs italic font-mono">-</span>`;
-    if (t.ruby_version || t.rails_version) {
-      stackHtml = `
-        <div class="flex items-center gap-2 text-xs font-mono">
-          ${t.ruby_version ? `<span class="text-rose-400 bg-rose-950/40 px-1.5 py-0.5 rounded border border-rose-800/40">💎 ${t.ruby_version}</span>` : ""}
-          ${t.rails_version ? `<span class="text-red-400 bg-red-950/40 px-1.5 py-0.5 rounded border border-red-800/40">🛤️ ${t.rails_version}</span>` : ""}
-        </div>
-      `;
-    }
+    // 4. Sotto l'URL: Immagine logo Ruby + versione e logo Rails + versione
+    const rubyLogoSvg = `<svg class="w-3.5 h-3.5 inline-block text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M19.78 6.44l-4.22-4.22c-.39-.39-1.02-.39-1.41 0L2.7 13.67c-.39.39-.39 1.02 0 1.41l4.22 4.22c.39.39 1.02.39 1.41 0l11.45-11.45c.39-.39.39-1.02 0-1.41z"/></svg>`;
+    const railsLogoSvg = `<svg class="w-3.5 h-3.5 inline-block text-rose-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>`;
 
-    // Metrics display
+    const rubyVersion = t.ruby_version || "3.3.8";
+    const railsVersion = t.rails_version || "8.1.3";
+    const hasTelemetry = !!t.ruby_version;
+
+    const stackHtml = hasTelemetry ? `
+      <div class="flex items-center gap-3 text-[11px] font-mono mt-1">
+        <span class="inline-flex items-center gap-1 text-rose-300 font-medium">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg" class="w-3.5 h-3.5 inline-block" alt="Ruby">
+          <span>${rubyVersion}</span>
+        </span>
+        <span class="text-slate-600">/</span>
+        <span class="inline-flex items-center gap-1 text-red-300 font-medium">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3.5 h-3.5 inline-block" alt="Rails">
+          <span>${railsVersion}</span>
+        </span>
+      </div>
+    ` : `
+      <div class="text-[11px] font-mono text-slate-500 italic mt-1">
+        Awaiting stack telemetry...
+      </div>
+    `;
+
+    // 5. Metrics (Posts / Users / Images)
     let metricsHtml = `<span class="text-slate-600 text-xs italic font-mono">Awaiting /status</span>`;
     if (t.posts_count !== undefined) {
       metricsHtml = `
@@ -90,70 +126,67 @@ function renderTable() {
       `;
     }
 
-    // URL formatting - clean single line truncation
-    const cleanUrl = student.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    const urlDisplay = `
-      <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline max-w-[280px] truncate" title="${escapeHtml(student.url)}">
-        <span class="opacity-70">🔗</span>
-        <span class="truncate">${escapeHtml(cleanUrl)}</span>
-      </a>
-    `;
-
-    // Latency
+    // 6. Latency
     const latencyBadge = isUp
-      ? `<span class="font-mono text-xs font-medium text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">${check.latency_ms} ms</span>`
+      ? `<span class="font-mono text-xs font-medium text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded border border-emerald-800/50 shadow-sm">${check.latency_ms} ms</span>`
       : isDown
-      ? `<span class="font-mono text-xs font-medium text-rose-400 bg-rose-950/50 px-2 py-0.5 rounded border border-rose-800/50">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`
+      ? `<span class="font-mono text-xs font-medium text-rose-400 bg-rose-950/50 px-2.5 py-1 rounded border border-rose-800/50 shadow-sm">${check.http_code ? 'HTTP ' + check.http_code : 'FAIL'}</span>`
       : `<span class="font-mono text-xs text-slate-500">-</span>`;
 
     const tr = document.createElement("tr");
     tr.className = "hover:bg-slate-800/30 transition-colors";
 
     tr.innerHTML = `
-      <!-- Live Indicator -->
-      <td class="py-3.5 px-4 text-center whitespace-nowrap">
+      <!-- Live Indicator (Left) -->
+      <td class="py-3.5 px-4 text-center whitespace-nowrap align-middle">
         <div class="flex items-center justify-center">
           ${dotHtml}
         </div>
       </td>
 
-      <!-- Nickname & Timestamp -->
-      <td class="py-3.5 px-5 whitespace-nowrap">
-        <div class="font-semibold text-slate-100 flex items-center gap-1.5">
-          <span class="text-amber-400">${escapeHtml(student.nickname || "Anonymous")}</span>
+      <!-- HH:MM & Nome a sx (2 righe di budget) -->
+      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
+        <div class="flex flex-col">
+          <div class="font-bold text-slate-100 text-base flex items-center gap-1.5">
+            <span class="text-amber-400">${escapeHtml(nickname)}</span>
+          </div>
+          <div class="text-xs font-mono text-slate-400 flex items-center gap-1 mt-0.5">
+            <span class="text-slate-500">🕒</span>
+            <span>${escapeHtml(hhmm)}</span>
+          </div>
         </div>
-        <div class="text-[10px] text-slate-500 font-mono mt-0.5">${escapeHtml(student.timestamp || "")}</div>
       </td>
 
-      <!-- Workshop Step -->
-      <td class="py-3.5 px-5 whitespace-nowrap">
-        <div class="flex items-center gap-2">
-          <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+      <!-- Step -->
+      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
+        <div class="flex flex-col gap-1">
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 w-max">
             Step ${stepNum}
           </span>
-          <span class="text-xs text-slate-300 truncate max-w-[160px]" title="${escapeHtml(stepText)}">
+          <span class="text-xs text-slate-300 truncate max-w-[140px]" title="${escapeHtml(stepText)}">
             ${escapeHtml(stepText)}
           </span>
         </div>
       </td>
 
-      <!-- Stack -->
-      <td class="py-3.5 px-5 whitespace-nowrap">
-        ${stackHtml}
+      <!-- URL occupa molto spazio + Sotto logo Ruby & Rails con versioni (2 righe di budget) -->
+      <td class="py-3.5 px-5 align-middle">
+        <div class="flex flex-col">
+          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-xl" title="${escapeHtml(student.url)}">
+            <span class="opacity-70 text-sm">🔗</span>
+            <span class="font-medium">${escapeHtml(student.url)}</span>
+          </a>
+          ${stackHtml}
+        </div>
       </td>
 
       <!-- Metrics -->
-      <td class="py-3.5 px-5 whitespace-nowrap">
+      <td class="py-3.5 px-5 whitespace-nowrap align-middle">
         ${metricsHtml}
       </td>
 
-      <!-- URL (No vertical wrapping) -->
-      <td class="py-3.5 px-5 whitespace-nowrap">
-        ${urlDisplay}
-      </td>
-
       <!-- Latency -->
-      <td class="py-3.5 px-5 whitespace-nowrap text-right">
+      <td class="py-3.5 px-5 whitespace-nowrap text-right align-middle">
         ${latencyBadge}
       </td>
     `;

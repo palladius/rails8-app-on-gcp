@@ -8,12 +8,12 @@
   <style>
     @keyframes pulse-ring {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
     }
     @keyframes pulse-ring-red {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(244, 63, 94, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
     }
     .blink-up {
@@ -64,7 +64,7 @@
 
   <!-- Table Section -->
   <main class="flex-1 p-8 max-w-7xl w-full mx-auto flex flex-col gap-4">
-    <div class="flex items-center justify-between text-xs text-slate-400">
+    <div class="flex items-center justify-between text-xs text-slate-400 px-1">
       <div class="flex items-center gap-2">
         <span>Attivi in tempo reale su Google Cloud Run / Localhost</span>
       </div>
@@ -78,19 +78,18 @@
     <div class="bg-[#0f172a] rounded-xl border border-slate-800 shadow-xl overflow-hidden">
       <table class="w-full text-left border-collapse table-auto">
         <thead>
-          <tr class="border-b border-slate-800/80 bg-slate-950/50 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+          <tr class="border-b border-slate-800/80 bg-slate-950/60 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
             <th class="py-3 px-4 w-12 text-center">Live</th>
-            <th class="py-3 px-5 font-semibold">Student</th>
-            <th class="py-3 px-5 font-semibold">Step</th>
-            <th class="py-3 px-5 font-semibold">Stack</th>
-            <th class="py-3 px-5 font-semibold">Metrics</th>
-            <th class="py-3 px-5 font-semibold">Cloud Run URL</th>
-            <th class="py-3 px-5 font-semibold text-right">Latency</th>
+            <th class="py-3 px-5 font-semibold w-56">Student</th>
+            <th class="py-3 px-5 font-semibold w-40">Step</th>
+            <th class="py-3 px-5 font-semibold">App URL & Stack (Ruby / Rails)</th>
+            <th class="py-3 px-5 font-semibold w-64">Metrics</th>
+            <th class="py-3 px-5 font-semibold text-right w-28">Latency</th>
           </tr>
         </thead>
         <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/50 text-sm">
           <tr>
-            <td colspan="7" class="py-12 text-center text-slate-500 italic font-mono text-xs">
+            <td colspan="6" class="py-12 text-center text-slate-500 italic font-mono text-xs">
               Loading student telemetry...
             </td>
           </tr>
