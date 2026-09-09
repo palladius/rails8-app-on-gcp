@@ -157,17 +157,14 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- Step -->
+      <!-- Step (Hover to see full description) -->
       <td class="py-3.5 px-5 whitespace-nowrap align-middle">
-        <div class="flex flex-col gap-1">
-          <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 w-max">
-            Step ${stepNum}
-          </span>
-          <span class="text-xs text-slate-300 truncate max-w-[140px]" title="${escapeHtml(stepText)}">
-            ${escapeHtml(stepText)}
-          </span>
-        </div>
+        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help" title="${escapeHtml(stepText)}">
+          <span>Step ${stepNum}</span>
+          <span class="text-[10px] text-amber-400/60">ℹ️</span>
+        </span>
       </td>
+
 
       <!-- URL occupa molto spazio + Sotto logo Ruby & Rails con versioni (2 righe di budget) -->
       <td class="py-3.5 px-5 align-middle">
