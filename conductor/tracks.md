@@ -53,6 +53,7 @@
 
 ---
 
-- [ ] **Track: Workshop Hive Leaderboard (Issue #47)**
+- [~] **Track: Workshop Hive Leaderboard (Issue #47)**
 *Link: [tracks/workshop_hive_leaderboard_20260909/index.md](tracks/workshop_hive_leaderboard_20260909/index.md)*
+
 
