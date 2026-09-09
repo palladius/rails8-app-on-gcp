@@ -180,11 +180,35 @@ function renderTable() {
     }
 
 
-    // 2. Colonna 2: HH:MM Nome a sx + Step badge con hover
+    // 2. Colonna 2: HH:MM Nome a sx + Visual Step Segmented Progress Bar con hover
     const hhmm = formatHHMM(student.timestamp);
     const nickname = student.nickname || "Anonymous";
-    const stepNum = t.step_number || student.step_number || 1;
+    const rawStep = t.step_number || student.step_number || 1;
+    const stepNum = Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
+
+    // Barra visiva a 8 segmenti orizzontali: ad es. [▮][▮][▮][▮][▯][▯][▯][▯] 4/8
+    let segmentsHtml = "";
+    for (let i = 1; i <= 8; i++) {
+      if (i <= stepNum) {
+        // Segmento completato / attivo
+        const color = (i === 8) ? 'bg-purple-400' : (i >= 5 ? 'bg-amber-400' : 'bg-emerald-400');
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm"></span>`;
+      } else {
+        // Segmento futuro / spento
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40"></span>`;
+      }
+    }
+
+    const stepBarHtml = `
+      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 hover:border-amber-500/50 transition-all cursor-help ml-auto group" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+        <span class="font-mono text-[10px] font-bold text-amber-300">${stepNum}<span class="text-slate-500 text-[9px]">/8</span></span>
+        <div class="flex items-center gap-0.5">
+          ${segmentsHtml}
+        </div>
+        ${stepNum === 8 ? '<span class="text-[11px] leading-none ml-0.5">🏆</span>' : ''}
+      </div>
+    `;
 
     // 3. Colonna 3 (Riga 1): URL che occupa molto spazio
     //    Colonna 3 (Riga 2): Loghi Ruby/Rails + Metriche (Posts / Users / Images) di fianco!
@@ -387,10 +411,7 @@ function renderTable() {
             ` : ''}
           </div>
 
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
-            <span>Step ${stepNum}</span>
-            <span class="text-[9px] text-amber-400/60">ℹ️</span>
-          </span>
+          ${stepBarHtml}
         </div>
       </td>
 
