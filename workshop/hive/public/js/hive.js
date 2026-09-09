@@ -138,7 +138,7 @@ function renderTable() {
     tbody.innerHTML = `
       <tr>
         <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
-          No student submissions registered yet.
+          Nessuna applicazione registrata finora.
         </td>
       </tr>
     `;
@@ -218,27 +218,58 @@ function renderTable() {
       <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
     `;
 
-    // Metriche di fianco allo stack nella riga 2
+    // Metriche e Delta Revision di fianco allo stack nella riga 2
     let metricsHtml = "";
     const statusJsonUrl = student.url.replace(/\/+$/, '') + '/status.json';
+
+    const jobsBadge = (t.pending_jobs !== undefined)
+      ? `<span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Job in coda Solid Queue">⏳ <b class="text-amber-300 font-semibold">${t.pending_jobs}</b></span>`
+      : "";
+
+    // Calcolo della delta revision pura (es. "00013-l44")
+    let deltaRevBadge = "";
+    if (t.k_revision) {
+      const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
+      let deltaRev = "";
+      if (service) {
+        deltaRev = t.k_revision.replace(new RegExp(`^${service}-?`), '');
+      } else {
+        deltaRev = t.k_revision;
+      }
+
+      // Se la diff non esiste o è vuota, o coincide con l'intero service name, o non è una vera revisione -> o perfetto o niente!
+      if (deltaRev && deltaRev !== service && deltaRev.length > 0 && deltaRev !== 'deployed') {
+        const hoverTitle = service ? `Servizio Cloud Run: ${service}\nRevisione completa: ${t.k_revision}` : `Revisione Cloud Run: ${t.k_revision}`;
+        deltaRevBadge = `
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
+            <span class="text-xs leading-none">🏷️</span>
+            <span class="font-bold text-[9.5px] tracking-tight text-emerald-200">${escapeHtml(deltaRev)}</span>
+          </span>
+        `;
+      }
+    }
 
     if (t.posts_count !== undefined) {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
-          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
-          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Numero di post nel database">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Utenti admin registrati">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
+          <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="File e immagini allegati">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
+          ${jobsBadge}
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
+          ${deltaRevBadge}
         </div>
       `;
     } else {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
-          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
+          ${jobsBadge}
+          <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Ispeziona JSON di telemetria (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
+          ${deltaRevBadge}
         </div>
       `;
     }
@@ -262,7 +293,7 @@ function renderTable() {
             <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
             <span class="font-bold text-amber-400 text-sm">${escapeHtml(nickname)}</span>
             ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ ADMIN_EMAIL esposto pubblicamente: ${escapeHtml(t.admin_email)} (Chiedi ad Antigravity come proteggerlo con Secret Manager!)">
                 <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
               </a>
             ` : ''}
@@ -275,39 +306,18 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
+      <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
       <td class="py-2 px-3 align-middle">
         <div class="flex flex-col gap-1">
-          <!-- Riga 1: URL largo + eventuale Cloud Run badge con icona ufficiale e hover -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all" title="${escapeHtml(student.url)}">
-              <span class="opacity-70 text-xs">🔗</span>
+          <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
+          <div class="flex items-center gap-2">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all" title="${escapeHtml(student.url)}">
+              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm flex-shrink-0" alt="Cloud Run" title="Google Cloud Run">
               <span class="font-medium">${escapeHtml(student.url)}</span>
             </a>
-
-            ${(() => {
-              const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
-              if (!service && !t.k_revision) return '';
-
-              let shortRev = '';
-              if (t.k_revision) {
-                // Rimuovi il prefisso del service name se presente (es. "test-rails8-workshop-rails-app-00012-ldj" -> "00012-ldj")
-                shortRev = service ? t.k_revision.replace(new RegExp(`^${service}-?`), '') : t.k_revision;
-              }
-
-              const displayLabel = shortRev || (t.k_revision ? t.k_revision : 'cloud-run');
-              const hoverTitle = service ? `Cloud Run Service: ${service}\nFull Revision: ${t.k_revision || service}` : `Cloud Run Revision: ${t.k_revision}`;
-
-              return `
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
-                  <img src="/cloud_run_icon.png" class="w-3.5 h-3.5 object-contain inline-block drop-shadow-sm" alt="Cloud Run">
-                  <span class="font-bold text-[9.5px] tracking-tight text-emerald-200">${escapeHtml(displayLabel)}</span>
-                </span>
-              `;
-            })()}
           </div>
 
-          <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
+          <!-- Riga 2: Stack Ruby/Rails, Metriche, JSON icon e Delta Revision affiancati -->
           <div class="flex flex-wrap items-center gap-2.5">
             ${stackHtml}
             ${metricsHtml}
@@ -329,14 +339,14 @@ function renderStagesDistribution() {
   // Counts per step (1 to 8)
   const stepCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
   const stepNames = {
-    1: "Local Baseline",
+    1: "Baseline Locale",
     2: "Mailpit & Admin",
     3: "Stateless Shock",
-    4: "GCS Persistence",
+    4: "Persistenza GCS",
     5: "Secret Manager",
-    6: "Gold Sidecars",
-    7: "GenAI Cover",
-    8: "Final Quest 🏆"
+    6: "Sidecar Cloud SQL",
+    7: "Cover GenAI",
+    8: "Traguardo Finale 🏆"
   };
 
   cachedLeaderboard.forEach(student => {

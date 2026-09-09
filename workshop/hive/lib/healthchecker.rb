@@ -4,6 +4,7 @@ require "net/http"
 require "uri"
 require "time"
 require "json"
+require "shellwords"
 
 module WorkshopHive
   class Healthchecker
@@ -63,6 +64,7 @@ module WorkshopHive
               users_count: sys["admin_users_count"],
               blobs_count: sys["blobs_count"],
               attachments_count: sys["attachments_count"],
+              pending_jobs: parsed_json.dig("jobs", "pending_count") || 0,
               step_number: step["number"],
               step_description: step["description"],
               db_tier: db["badge"],
@@ -83,41 +85,77 @@ module WorkshopHive
 
     def self.execute_http_get(uri, timeout_seconds, headers: {})
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = (uri.scheme == "https")
-      http.open_timeout = timeout_seconds
-      http.read_timeout = timeout_seconds
+      begin
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = (uri.scheme == "https")
+        http.open_timeout = timeout_seconds
+        http.read_timeout = timeout_seconds
 
-      request = Net::HTTP::Get.new(uri.request_uri)
-      request["User-Agent"] = "WorkshopHive-Telemetry/1.0"
-      headers.each { |k, v| request[k] = v }
+        request = Net::HTTP::Get.new(uri.request_uri)
+        request["User-Agent"] = "WorkshopHive-Telemetry/1.0"
+        request["Connection"] = "close"
+        headers.each { |k, v| request[k] = v }
 
-      response = http.request(request)
-      duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time) * 1000).round
+        response = http.request(request)
+        duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time) * 1000).round
 
-      if response.code.to_i == 200
-        {
-          status: "up",
-          http_code: 200,
-          latency_ms: duration_ms,
-          body: response.body,
-          checked_at: Time.now.utc.iso8601
-        }
-      else
+        if response.code.to_i == 200
+          return {
+            status: "up",
+            http_code: 200,
+            latency_ms: duration_ms,
+            body: response.body,
+            checked_at: Time.now.utc.iso8601
+          }
+        else
+          return {
+            status: "down",
+            http_code: response.code.to_i,
+            latency_ms: duration_ms,
+            checked_at: Time.now.utc.iso8601
+          }
+        end
+      rescue StandardError => net_err
+        # Fallback to curl: Cloud Run and Google Front End can occasionally hit Net::ReadTimeout in standard Ruby Net::HTTP
+        begin
+          header_args = headers.map { |k, v| "-H #{Shellwords.escape("#{k}: #{v}")}" }.join(" ")
+          cmd = "curl -s -k --max-time #{timeout_seconds.to_i} -w \"\\n%{http_code}\" #{header_args} #{Shellwords.escape(uri.to_s)}"
+          raw_output = `#{cmd}`
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - start_time) * 1000).round
+
+          if raw_output && !raw_output.empty?
+            lines = raw_output.split("\n")
+            http_code = lines.pop.to_i
+            body = lines.join("\n")
+
+            if http_code == 200
+              return {
+                status: "up",
+                http_code: 200,
+                latency_ms: duration_ms,
+                body: body,
+                checked_at: Time.now.utc.iso8601
+              }
+            elsif http_code > 0
+              return {
+                status: "down",
+                http_code: http_code,
+                latency_ms: duration_ms,
+                checked_at: Time.now.utc.iso8601
+              }
+            end
+          end
+        rescue StandardError => curl_err
+          # curl fallback also failed
+        end
+
         {
           status: "down",
-          http_code: response.code.to_i,
-          latency_ms: duration_ms,
+          http_code: nil,
+          error: net_err.message,
           checked_at: Time.now.utc.iso8601
         }
       end
-    rescue StandardError => e
-      {
-        status: "down",
-        http_code: nil,
-        error: e.message,
-        checked_at: Time.now.utc.iso8601
-      }
     end
 
     def self.check_all(urls, timeout_seconds: DEFAULT_TIMEOUT)

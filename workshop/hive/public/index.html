@@ -29,15 +29,22 @@
   <!-- Header -->
   <header class="border-b border-slate-800/80 bg-[#0f172a]/90 backdrop-blur sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-md">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20">
-        🐝
+      <div class="w-11 h-11 rounded-xl bg-purple-950/60 border border-purple-500/40 p-0.5 shadow-lg shadow-purple-500/20 overflow-hidden flex items-center justify-center">
+        <img src="/assets/zerg_ruby_logo.png" alt="Zerg Larva Ruby Mascot" class="w-full h-full object-cover rounded-lg">
       </div>
       <div>
         <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2.5">
-          Workshop Hive Leaderboard
-          <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono font-medium">Live Telemetry</span>
+          Leaderboard Workshop Hive
+          <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono font-medium">Telemetria Live</span>
         </h1>
-        <p class="text-xs text-slate-400">Rails 8 on Google Cloud Workshop Attendance & Metrics</p>
+        <p class="text-xs text-slate-400">
+          <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 hover:underline transition-colors inline-flex items-center gap-1.5" title="Vedi il repository del workshop Rails 8 su Google Cloud">
+            <span>Workshop Rails 8 su Google Cloud</span>
+            <span class="text-[10px] text-slate-500">↗</span>
+          </a>
+          <span class="text-slate-600">•</span>
+          <span>Presenze e Metriche</span>
+        </p>
       </div>
     </div>
 
@@ -45,7 +52,7 @@
     <div class="flex items-center gap-5">
       <div class="flex items-center gap-4 text-xs bg-slate-900 px-4 py-2 rounded-lg border border-slate-800">
         <div>
-          <span class="text-slate-500 uppercase font-semibold text-[10px] block">Students</span>
+          <span class="text-slate-500 uppercase font-semibold text-[10px] block">Studenti</span>
           <span id="stat-total-students" class="font-bold text-amber-400 text-base">0</span>
         </div>
         <div class="w-px h-6 bg-slate-800"></div>
@@ -60,18 +67,13 @@
         <span class="text-slate-400">Ping: <span id="sync-timer" class="text-slate-200">5s</span></span>
       </div>
 
-      <button onclick="playArrivalChime()" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Test arrival chime sound">
+      <button onclick="playArrivalChime()" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition-all shadow-sm cursor-pointer" title="Prova suono di arrivo">
         <span>🔔</span>
-      </button>
-
-      <button onclick="document.getElementById('qr-modal').classList.remove('hidden')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer" title="Scan QR Code to submit from your phone or screen">
-        <span>📱</span>
-        <span>QR Code</span>
       </button>
 
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
         <span>➕</span>
-        <span>Submit Your App</span>
+        <span>Invia la tua App</span>
       </a>
     </div>
   </header>
@@ -84,11 +86,11 @@
         📱
       </div>
       <div>
-        <h3 class="text-lg font-bold text-white">Scan to Submit Your App</h3>
-        <p class="text-xs text-slate-400 mt-1">Inquadra con il telefono per inviare il tuo Cloud Run URL alla Leaderboard</p>
+        <h3 class="text-lg font-bold text-white">Inquadra per inviare la tua App</h3>
+        <p class="text-xs text-slate-400 mt-1">Usa la fotocamera dello smartphone per registrare il tuo URL Cloud Run</p>
       </div>
       <div class="p-3 bg-white rounded-xl shadow-inner">
-        <img src="/submit_qr.png" alt="Submit Your App QR Code" class="w-56 h-56 block">
+        <img src="/submit_qr.png" alt="QR Code Invia la tua App" class="w-64 h-64 block">
       </div>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform" target="_blank" rel="noopener noreferrer" class="text-xs font-mono text-amber-400 hover:underline break-all">
         docs.google.com/forms/...
@@ -103,8 +105,8 @@
         <span>Attivi in tempo reale su Google Cloud Run / Localhost</span>
       </div>
       <div class="flex items-center gap-4 text-[11px]">
-        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> UP (200 OK)</span>
-        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> DOWN / Unreachable</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> ATTIVO (200 OK)</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> NON RAGGIUNGIBILE</span>
       </div>
     </div>
 
@@ -114,42 +116,84 @@
         <thead>
           <tr class="border-b border-slate-800/80 bg-slate-950/60 text-[10px] font-mono text-slate-400 uppercase tracking-wider">
             <!-- Colonna 1: Live & Latency (sinistra) -->
-            <th class="py-2 px-3 w-14 text-center">Status</th>
+            <th class="py-2 px-3 w-14 text-center">Stato</th>
             <!-- Colonna 2: Student & Step -->
-            <th class="py-2 px-3 font-semibold w-56">Student & Step</th>
+            <th class="py-2 px-3 font-semibold w-56">Studente & Step</th>
             <!-- Colonna 3: App URL, Stack & Metrics -->
-            <th class="py-2 px-3 font-semibold">App URL, Stack & Metrics</th>
+            <th class="py-2 px-3 font-semibold">URL App, Stack & Metriche</th>
           </tr>
         </thead>
         <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/50 text-sm">
           <tr>
             <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
-              Loading student telemetry...
+              Caricamento telemetria studenti...
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Stage Progress Distribution (Horizontal Stages Addition) -->
+    <!-- Stage Progress Distribution + Big Prominent Scan & Join QR Card -->
     <div class="mt-4 pt-4 border-t border-slate-800/80">
-      <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-3 px-1">
-        <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
-          <span>📊</span>
-          <span>Stage Distribution</span>
-        </span>
-        <span class="text-slate-500 text-[11px]">(Cloud Run unlocks at Step 3 — Steps 1 & 2 are ephemeral/local)</span>
-      </div>
-      <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
-        <!-- Rendered dynamically by hive.js -->
+      <div class="flex flex-col lg:flex-row gap-5 items-stretch">
+        
+        <!-- Big Prominent Scan & Join Card (4x4x più grande, posizionata ad hoc accanto a Stage Distribution) -->
+        <div class="flex-shrink-0 bg-slate-900/90 hover:bg-slate-850 p-3.5 rounded-2xl border-2 border-amber-500/50 shadow-xl flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer group" onclick="document.getElementById('qr-modal').classList.remove('hidden')" title="Clicca per ingrandire il QR Code a schermo intero">
+          <div class="p-2 bg-white rounded-xl shadow-lg group-hover:ring-4 group-hover:ring-amber-400/40 transition-all">
+            <img src="/submit_qr.png" alt="QR Code Invia la tua App" class="w-32 h-32 md:w-36 md:h-36 block">
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1">
+              <span>📱</span>
+              <span>Inquadra & Partecipa</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400">Invia la tua App Cloud Run</span>
+          </div>
+        </div>
+
+        <!-- Stage Distribution Grid -->
+        <div class="flex-1 flex flex-col justify-between">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2.5 px-1">
+            <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
+              <span>📊</span>
+              <span>Distribuzione degli Step</span>
+            </span>
+            <span class="text-slate-500 text-[11px]">(Cloud Run si attiva dallo Step 3 — Step 1 e 2 sono su ambiente locale)</span>
+          </div>
+          <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
+            <!-- Rendered dynamically by hive.js -->
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
 
+  <!-- Zerg Creep & Sparkling Rubies Ultra-Wide Panoramic Banner -->
+  <div class="relative w-full overflow-hidden border-t border-purple-900/40 bg-slate-950 group">
+    <img 
+      src="/assets/zerg_creep_rubies_footer.png" 
+      alt="Starcraft Zerg Creep with Gleaming Rubies" 
+      class="w-full h-24 md:h-28 object-cover object-center opacity-75 group-hover:opacity-100 transition-opacity duration-500 filter contrast-125 saturate-125 select-none pointer-events-none"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-[#0b1120] via-transparent to-transparent pointer-events-none"></div>
+    <div class="absolute bottom-2 left-8 text-[11px] font-mono text-purple-300/80 flex items-center gap-2 drop-shadow-md">
+      <span class="text-xs">👾</span>
+      <span class="font-semibold text-rose-300">You require more minerals...</span>
+      <span class="text-slate-400 text-[10px]">✨ (Gleaming Ruby crystals embedded in Zerg creep bio-slime)</span>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="border-t border-slate-800/80 px-8 py-3.5 text-xs text-slate-500 flex items-center justify-between">
-    <div>Made with 🦖 & 🍝 by Riccardo & Emiliano — Rails 8 on GCP Workshop</div>
-    <div id="footer-last-updated" class="font-mono text-[11px]">Polling active (5s health / 10s submissions)</div>
+    <div>
+      Fatto con 🦖 & 🍝 da Riccardo & Emiliano — 
+      <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-amber-300 hover:underline transition-colors inline-flex items-center gap-1 font-medium" title="GitHub Repository: palladius/rails8-app-on-gcp">
+        <span>Workshop Rails 8 su Google Cloud</span>
+        <svg class="w-3.5 h-3.5 inline-block opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+    </div>
+    <div id="footer-last-updated" class="font-mono text-[11px]">Aggiornamento attivo (5s health / 10s studenti)</div>
   </footer>
 
   <script src="/js/hive.js"></script>
