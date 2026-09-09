@@ -204,7 +204,7 @@ function renderTable() {
         <div class="flex flex-col gap-1">
           <!-- Riga 1: URL largo + eventuale Cloud Run Runner badge -->
           <div class="flex items-center gap-2 flex-wrap">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all max-w-2xl" title="${escapeHtml(student.url)}">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all" title="${escapeHtml(student.url)}">
               <span class="opacity-70 text-xs">🔗</span>
               <span class="font-medium">${escapeHtml(student.url)}</span>
             </a>
