@@ -63,6 +63,8 @@ class StatusesController < ApplicationController
         badge: "☁️ Google Cloud Run",
         color: "#059669",
         is_cloud: true,
+        service_name: ENV["K_SERVICE"],
+        revision_name: ENV["K_REVISION"],
         details: "Serverless container running on Cloud Run (Service: #{ENV['K_SERVICE'] || 'custom'})"
       }
     elsif File.exist?("/.dockerenv") || ENV["DOCKER_CONTAINER"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("docker")

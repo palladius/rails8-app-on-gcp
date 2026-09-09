@@ -68,6 +68,16 @@ workshop-test:
 workshop-check:
     @just workshop-test
 
+# estimate live GCP incurred costs and remaining $5 GDP credits
+billing-estimate hours="6.0":
+    @./bin/rails8app-billing --hours {{hours}}
+
+# alias for billing-estimate
+billing hours="6.0":
+    @just billing-estimate {{hours}}
+
+
+
 
 # show project status
 project-status:

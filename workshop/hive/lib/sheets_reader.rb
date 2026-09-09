@@ -40,13 +40,24 @@ module WorkshopHive
       }
     ].freeze
 
-    def self.fetch_entries(sheet_id: ENV["HIVE_SPREADSHEET_ID"], credentials: nil)
+    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil)
       now = Time.now.to_i
       if @cache && (now - @cache_timestamp < CACHE_TTL_SECONDS)
         return @cache
       end
 
-      # If local CSV data file exists (or ENV['HIVE_CSV_FILE']), use it!
+      # Priority 1: If HIVE_SPREADSHEET_ID (or HIVE_SHEET_CSV_URL) is provided
+      if sheet_id && !sheet_id.strip.empty?
+        # If public sheet or explicit CSV URL, attempt direct HTTP CSV export
+        entries = fetch_from_public_csv(sheet_id) || (credentials ? fetch_from_google_sheets(sheet_id, credentials) : nil)
+        if entries && !entries.empty?
+          @cache = entries
+          @cache_timestamp = now
+          return @cache
+        end
+      end
+
+      # Priority 2: If local CSV data file exists (or ENV['HIVE_CSV_FILE']), use it!
       csv_file = ENV.fetch("HIVE_CSV_FILE", File.join(__dir__, "..", "data", "leaderboard.csv"))
       if File.exist?(csv_file)
         require "csv"
@@ -57,16 +68,8 @@ module WorkshopHive
         return @cache
       end
 
-      # If sheet_id is not set, use the mock entries for local development & tests
-      if sheet_id.nil? || sheet_id.strip.empty?
-        @cache = MOCK_ENTRIES
-        @cache_timestamp = now
-        return @cache
-      end
-
-      # Live Google Sheets API integration
-      entries = fetch_from_google_sheets(sheet_id, credentials)
-      @cache = entries
+      # Priority 3: Fallback mock entries for local development & tests
+      @cache = MOCK_ENTRIES
       @cache_timestamp = now
       @cache
     rescue StandardError => e
@@ -114,6 +117,49 @@ module WorkshopHive
     end
 
 
+
+    DEFAULT_SPREADSHEET_ID = "195OYMjc_ib2nysltnZE6cNmBw7xtXQ5WRC8igi7_AtM"
+    DEFAULT_GID = "1095789823"
+
+    def self.fetch_from_public_csv(sheet_id_or_url)
+      require "net/http"
+      require "uri"
+      require "csv"
+
+      urls = []
+      if sheet_id_or_url.start_with?("http://") || sheet_id_or_url.start_with?("https://")
+        urls << sheet_id_or_url
+      else
+        gid = ENV.fetch("HIVE_SHEET_GID", DEFAULT_GID)
+        # Google Visualization API endpoint (ultra-reliable for public sheets)
+        urls << "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/gviz/tq?tqx=out:csv&gid=#{gid}"
+        urls << "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/export?format=csv&gid=#{gid}"
+      end
+
+      urls.each do |url_str|
+        uri = URI.parse(url_str)
+        res = Net::HTTP.get_response(uri)
+        # Follow up to 3 redirects if any
+        3.times do
+          break unless res.is_a?(Net::HTTPRedirection) && res["location"]
+          uri = URI.parse(res["location"])
+          res = Net::HTTP.get_response(uri)
+        end
+
+        next unless res.is_a?(Net::HTTPSuccess)
+        next if res.body.include?("<!DOCTYPE html>") # Login/auth page returned instead of CSV
+        next if res.body.strip.empty?
+
+        rows = CSV.parse(res.body)
+        parsed = parse_rows(rows)
+        return parsed if parsed && !parsed.empty?
+      end
+
+      nil
+    rescue StandardError => e
+      warn "[SheetsReader] Failed to fetch public CSV: #{e.message}"
+      nil
+    end
 
     def self.fetch_from_google_sheets(sheet_id, credentials)
       require "google/apis/sheets_v4"
