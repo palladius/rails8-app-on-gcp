@@ -2,16 +2,16 @@
 
 ## Phase 1: Declarative Schema & Visualizer Pipeline
 
-- [ ] Task: TDD - Add schema validation tests for declarative screenshots in `workshop/skeleton.yaml`
-    - [ ] Add unit test verifying parsing of `screenshots:` block in `test/test_workshop_skeleton.rb`
-    - [ ] Ensure test fails before schema update (Red)
-- [ ] Task: Extend `workshop/skeleton.yaml` with sample screenshot declarations
-    - [ ] Define initial screenshot specs for `step-2` (Home ephemeral badge) and `step-4` (New Post / Admin)
-    - [ ] Validate skeleton tests pass (Green)
-- [ ] Task: Update Visualizer & Asset Sync (`build_ghpages.rb` & `server.rb`)
-    - [ ] Ensure `workshop/assets/screenshots/` directory is automatically created and copied to `workshop/build/assets/screenshots/` during build
-    - [ ] Serve `/assets/screenshots/*` dynamically in `workshop/visualizer/server.rb`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: TDD - Add schema validation tests for declarative screenshots in `workshop/skeleton.yaml`
+    - [x] Add unit test verifying parsing of `screenshots:` block in `test/test_workshop_skeleton.rb`
+    - [x] Ensure test fails before schema update (Red)
+- [x] Task: Extend `workshop/skeleton.yaml` with sample screenshot declarations
+    - [x] Define initial screenshot specs for `step-2` (Home ephemeral badge) and `step-4` (New Post / Admin)
+    - [x] Validate skeleton tests pass (Green)
+- [x] Task: Update Visualizer & Asset Sync (`build_ghpages.rb` & `server.rb`)
+    - [x] Ensure `workshop/assets/screenshots/` directory is automatically created and copied to `workshop/build/assets/screenshots/` during build
+    - [x] Serve `/assets/screenshots/*` dynamically in `workshop/visualizer/server.rb`
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2: Playwright Runner & Script Architecture
 

@@ -94,6 +94,16 @@ steps:
         type: "llm"
         description: "Evaluate student's first local blog post for creativity and workshop adherence"
         prompt: "Check the student's blog post title and body. Verify it represents a valid greeting or technical note for a cloud workshop. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+    screenshots:
+      - id: "step-2-home-ephemeral"
+        title: "Blog Homepage with Ephemeral DB Badge"
+        description: "Shows localhost Rails blog with the yellow ephemeral DB & storage badge visible"
+        output_path: "workshop/assets/screenshots/step-2-home-ephemeral.png"
+        script: "workshop/screenshots/step2_home_ephemeral.playwright.js"
+        viewport:
+          width: 1280
+          height: 800
+        selector: "body"
 
   - id: "step-3"
     number: 3
@@ -148,6 +158,16 @@ steps:
         description: "Verify integration test for stuck jobs banner passes"
         command: "cd blog && bin/rails test test/integration/stuck_jobs_warning_test.rb"
         expect_exit: 0
+    screenshots:
+      - id: "step-4-gcs-stuck-jobs-warning"
+        title: "GCS ActiveStorage with Stuck Jobs Warning Banner"
+        description: "Shows Cloud Run UI with GCS private blob and the warning banner about background jobs needing Solid Queue worker"
+        output_path: "workshop/assets/screenshots/step-4-gcs-stuck-jobs-warning.png"
+        script: "workshop/screenshots/step4_gcs_stuck_jobs.playwright.js"
+        viewport:
+          width: 1280
+          height: 800
+        selector: "body"
 
   - id: "step-5"
     number: 5
