@@ -15,17 +15,17 @@
 
 ## Phase 2: Playwright Runner & Script Architecture
 
-- [ ] Task: TDD - Write automated runner unit test in `test/test_workshop_screenshots.rb`
-    - [ ] Test CLI parsing, script discovery, and dry-run validation
-    - [ ] Verify test fails initially (Red)
-- [ ] Task: Setup Playwright Runner Harness
-    - [ ] Create `workshop/package.json` with `@playwright/test` or lightweight Playwright runner script
-    - [ ] Implement `workshop/screenshots/runner.js` to parse `workshop/skeleton.yaml` or CLI arguments and trigger Playwright
-    - [ ] Support multi-language script dispatch (Node Playwright vs Ruby / Shell scripts)
-- [ ] Task: Create Reference Screenshot Scripts
-    - [ ] Implement `workshop/screenshots/step2_home_ephemeral.playwright.js` (navigates to localhost:3000, checks badge, captures 1280x800 desktop frame)
-    - [ ] Implement `workshop/screenshots/step4_admin_article.playwright.js` (logs in via HTTP auth / form, navigates to new post, captures form)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: TDD - Write automated runner unit test in `test/test_workshop_screenshots.rb`
+    - [x] Test CLI parsing, script discovery, and dry-run validation
+    - [x] Verify test fails initially (Red)
+- [x] Task: Setup Playwright Runner Harness
+    - [x] Create `workshop/package.json` with `@playwright/test` or lightweight Playwright runner script
+    - [x] Implement `workshop/screenshots/runner.js` to parse `workshop/skeleton.yaml` or CLI arguments and trigger Playwright
+    - [x] Support multi-language script dispatch (Node Playwright vs Ruby / Shell scripts)
+- [x] Task: Create Reference Screenshot Scripts
+    - [x] Implement `workshop/screenshots/step2_home_ephemeral.playwright.js` (navigates to localhost:3000, checks badge, captures 1280x800 desktop frame)
+    - [x] Implement `workshop/screenshots/step4_admin_article.playwright.js` (logs in via HTTP auth / form, navigates to new post, captures form)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Task Runner Integration & Diagnostics (`justfile`)
 
