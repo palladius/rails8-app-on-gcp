@@ -1,6 +1,30 @@
-// Workshop Hive Table Client Logic — 2-line Budget Layout
+// Workshop Hive Table Client Logic — Instant Local Cache + 5s Background Pings
+const CACHE_KEY_LEADERBOARD = "hive_cached_leaderboard";
+const CACHE_KEY_HEALTH = "hive_cached_health";
+
+// Inizializza istantaneamente con i dati salvati in localStorage (0ms rendering al reload!)
 let cachedLeaderboard = [];
 let cachedHealth = {};
+
+try {
+  const savedLd = localStorage.getItem(CACHE_KEY_LEADERBOARD);
+  if (savedLd) cachedLeaderboard = JSON.parse(savedLd);
+
+  const savedHl = localStorage.getItem(CACHE_KEY_HEALTH);
+  if (savedHl) cachedHealth = JSON.parse(savedHl);
+} catch (e) {
+  console.warn("Could not load from localStorage:", e);
+}
+
+// Render immediato prima ancora di fare qualsiasi fetch
+if (cachedLeaderboard.length > 0) {
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
+    const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
+    document.getElementById("stat-healthy-apps").textContent = healthyCount;
+    renderTable();
+  });
+}
 
 async function fetchLeaderboard() {
   try {
@@ -8,6 +32,9 @@ async function fetchLeaderboard() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     cachedLeaderboard = data.entries || [];
+    try {
+      localStorage.setItem(CACHE_KEY_LEADERBOARD, JSON.stringify(cachedLeaderboard));
+    } catch {}
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     renderTable();
   } catch (err) {
@@ -21,6 +48,9 @@ async function fetchHealth() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     cachedHealth = data.checks || {};
+    try {
+      localStorage.setItem(CACHE_KEY_HEALTH, JSON.stringify(cachedHealth));
+    } catch {}
 
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
     document.getElementById("stat-healthy-apps").textContent = healthyCount;
@@ -34,7 +64,6 @@ async function fetchHealth() {
 
 function formatHHMM(isoOrStr) {
   if (!isoOrStr) return "--:--";
-  // Prova prima a parsare come Date valida
   try {
     const d = new Date(isoOrStr);
     if (!isNaN(d.getTime())) {
@@ -42,7 +71,6 @@ function formatHHMM(isoOrStr) {
     }
   } catch {}
 
-  // Se è formato '09/09/2026 15:03:48'
   const match = isoOrStr.match(/(\d{1,2}:\d{2})/);
   if (match) return match[1];
 
@@ -89,9 +117,6 @@ function renderTable() {
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
 
     // 4. Sotto l'URL: Immagine logo Ruby + versione e logo Rails + versione
-    const rubyLogoSvg = `<svg class="w-3.5 h-3.5 inline-block text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M19.78 6.44l-4.22-4.22c-.39-.39-1.02-.39-1.41 0L2.7 13.67c-.39.39-.39 1.02 0 1.41l4.22 4.22c.39.39 1.02.39 1.41 0l11.45-11.45c.39-.39.39-1.02 0-1.41z"/></svg>`;
-    const railsLogoSvg = `<svg class="w-3.5 h-3.5 inline-block text-rose-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>`;
-
     const rubyVersion = t.ruby_version || "3.3.8";
     const railsVersion = t.rails_version || "8.1.3";
     const hasTelemetry = !!t.ruby_version;
@@ -165,7 +190,6 @@ function renderTable() {
         </span>
       </td>
 
-
       <!-- URL occupa molto spazio + Sotto logo Ruby & Rails con versioni (2 righe di budget) -->
       <td class="py-3.5 px-5 align-middle">
         <div class="flex flex-col">
@@ -199,7 +223,7 @@ function escapeHtml(str) {
   });
 }
 
-// Initial triggers
+// Initial fetch & instant render
 fetchLeaderboard();
 fetchHealth();
 

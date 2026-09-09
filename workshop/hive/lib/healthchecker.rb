@@ -7,20 +7,25 @@ require "json"
 
 module WorkshopHive
   class Healthchecker
-    DEFAULT_TIMEOUT = 2.5 # Secondi max per ping /up e /status
+    DEFAULT_TIMEOUT = 2.0 # Secondi max per ping /up e /status
 
     @results_cache = {}
     @cache_mutex = Mutex.new
+    @poller_thread = nil
+    @poller_mutex = Mutex.new
 
     def self.check(base_url, timeout_seconds: DEFAULT_TIMEOUT)
       parsed_uri = URI.parse(base_url.strip)
       
-      # 1. Ping /up
+      # 1. Ping /up (o path specificato se diverso da root)
       up_uri = parsed_uri.dup
-      up_uri.path = "/up"
+      if up_uri.path.nil? || up_uri.path.empty? || up_uri.path == "/"
+        up_uri.path = "/up"
+      end
       up_res = execute_http_get(up_uri, timeout_seconds)
 
-      # 2. Se /up risponde (o proviamo comunque), interroga /status per le metriche ricche (Ruby, Rails, Step, N posts, N users, ecc.)
+
+      # 2. Se /up risponde, interroga /status per le metriche ricche
       status_data = {}
       if up_res[:status] == "up"
         status_uri = parsed_uri.dup
@@ -51,7 +56,7 @@ module WorkshopHive
               ai_badge: ai["badge"]
             }
           rescue JSON::ParserError
-            # Non è un json valido, proseguiamo
+            # Non è un json valido
           end
         end
       end
@@ -119,8 +124,45 @@ module WorkshopHive
       results
     end
 
+    # Ritorna ISTANTANEAMENTE (0ms) i risultati in cache se presenti,
+    # e avvia un refresh in background in modo asincrono.
+    def self.get_or_refresh_async(urls)
+      current = cached_results
+
+      # Avvia aggiornamento asincrono senza bloccare la risposta HTTP
+      Thread.new do
+        check_all(urls)
+      end
+
+      # Se non abbiamo mai fatto un check, facciamo il primo run sincrono
+      if current.empty? && !urls.empty?
+        check_all(urls)
+      else
+        current
+      end
+    end
+
     def self.cached_results
       @cache_mutex.synchronize { @results_cache.dup }
+    end
+
+    # Background continuous poller (ogni 5 secondi per background worker)
+    def self.start_background_poller!(urls_proc, interval: 5)
+      @poller_mutex.synchronize do
+        return if @poller_thread&.alive?
+
+        @poller_thread = Thread.new do
+          loop do
+            begin
+              urls = urls_proc.call
+              check_all(urls) if urls && !urls.empty?
+            rescue StandardError => e
+              warn "[Healthchecker Background Poller] #{e.message}"
+            end
+            sleep interval
+          end
+        end
+      end
     end
   end
 end

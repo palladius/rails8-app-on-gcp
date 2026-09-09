@@ -48,9 +48,8 @@ module WorkshopHive
       entries = SheetsReader.fetch_entries(credentials: authorizer)
       urls = entries.map { |e| e[:url] }
 
-
-      # Esegui il check asincrono / parallelo via thread
-      checks = Healthchecker.check_all(urls)
+      # Ritorna SUBITO i dati cached e aggiorna in background (0ms latency al reload!)
+      checks = Healthchecker.get_or_refresh_async(urls)
 
       {
         status: "ok",
@@ -61,6 +60,7 @@ module WorkshopHive
     end
   end
 end
+
 
 WorkshopHive::App.run! if __FILE__ == $PROGRAM_NAME
 
