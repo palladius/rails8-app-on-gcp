@@ -384,5 +384,5 @@ fetchHealth();
 // Refresh health every 5 seconds
 setInterval(fetchHealth, 5000);
 
-// Refresh submissions every 15 seconds
-setInterval(fetchLeaderboard, 15000);
+// Refresh submissions every 10 seconds
+setInterval(fetchLeaderboard, 10000);
