@@ -40,4 +40,21 @@ class AppLeaderboardApiTest < Minitest::Test
     assert parsed["entries"].is_a?(Array)
     refute_empty parsed["entries"]
   end
+
+  def test_get_healthchecks_api
+    env = Rack::MockRequest.env_for("/api/healthchecks", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "application/json"
+
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+
+    assert parsed.is_a?(Hash)
+    assert parsed.key?("checks")
+    assert parsed.key?("timestamp")
+  end
 end
+

@@ -4,6 +4,7 @@ require "sinatra/base"
 require "json"
 require_relative "lib/service_account_loader"
 require_relative "lib/sheets_reader"
+require_relative "lib/healthchecker"
 
 module WorkshopHive
   class App < Sinatra::Base
@@ -36,6 +37,24 @@ module WorkshopHive
         status: "ok",
         total_students: entries.size,
         entries: entries,
+        timestamp: Time.now.utc.iso8601
+      }.to_json
+    end
+
+    get "/api/healthchecks" do
+      content_type :json
+      # Prendi gli URL correnti dagli entries registrati
+      creds = ServiceAccountLoader.load_credentials_hash
+      entries = SheetsReader.fetch_entries(credentials: creds)
+      urls = entries.map { |e| e[:url] }
+
+      # Esegui il check asincrono / parallelo via thread
+      checks = Healthchecker.check_all(urls)
+
+      {
+        status: "ok",
+        total_checked: checks.size,
+        checks: checks,
         timestamp: Time.now.utc.iso8601
       }.to_json
     end
