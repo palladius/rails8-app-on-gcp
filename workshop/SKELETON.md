@@ -181,7 +181,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[RUBY]` Verify GenerateCoverImageJob exists
   - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
-  - `[LLM]` TODO: AI robot verification of Podcastifier button press & audio synthesis
+  - `[RUBY]` Verify Podcastifier is an interactive exercise and NOT pre-committed into base codebase
+  - `[LLM]` Verify student implementation of Podcastifier via Antigravity if attempted
 
 ---
 

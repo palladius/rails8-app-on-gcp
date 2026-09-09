@@ -268,10 +268,18 @@ steps:
         type: "llm"
         description: "Verify GenAI prompt conforms to Milanese vintage poster aesthetic"
         prompt: "Review the image generation prompt in GenerateCoverImageJob. Verify it requests a vintage retro poster style with a banana cameo. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+      - id: "step-7-ruby-podcastifier-not-preloaded"
+        type: "ruby"
+        description: "Verify Podcastifier is an interactive exercise and NOT pre-committed into base codebase"
+        code: |
+          routes = File.read('blog/config/routes.rb')
+          controller = File.read('blog/app/controllers/posts_controller.rb')
+          raise 'generate_podcast should not be in routes' if routes.include?('generate_podcast')
+          raise 'generate_podcast should not be in controller' if controller.include?('generate_podcast')
       - id: "step-7-llm-podcastifier-button-test"
         type: "llm"
-        description: "TODO: AI robot verification of Podcastifier button press & audio synthesis"
-        prompt: "Check the deployed Cloud Run post view for the '🎙️ Generate Audio Podcast' button. Simulate or trigger the button press via HTTP POST to /posts/:id/generate_podcast and confirm that the podcast audio player renders with valid MP3 stream without 500 error. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+        description: "Verify student implementation of Podcastifier via Antigravity if attempted"
+        prompt: "Check the deployed Cloud Run post view for a podcast generation action or audio player (e.g. 'Generate Audio Podcast' button or <audio controls>). If present, confirm it renders without 500 error and points to an audio stream. If not yet attempted by student, report skipped/optional. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
 
   - id: "step-8"
     number: 8
