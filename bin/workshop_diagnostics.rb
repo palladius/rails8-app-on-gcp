@@ -242,6 +242,24 @@ if project_id && !project_id.empty? && project_id != "(unset)"
   end
 end
 
+puts "\n--- 📸 4b. Declarative Screenshots Verification ---".bold
+skeleton_yaml = File.expand_path("../workshop/skeleton.yaml", __dir__)
+if File.exist?(skeleton_yaml)
+  runner_path = File.expand_path("../workshop/screenshots/runner.js", __dir__)
+  if File.exist?(runner_path)
+    stdout, stderr, status = Open3.capture3("node", runner_path, "--dry-run")
+    if status.success?
+      puts "✅ Declarative screenshot specs and scripts verified".green
+    else
+      puts "❌ Screenshot verification failed:\n#{stderr}".red
+      errors_count += 1
+    end
+  else
+    puts "⚠️  workshop/screenshots/runner.js not found".yellow
+    warnings_count += 1
+  end
+end
+
 puts "\n--- 🧭 5. Current Architectural State Telemetry ---".bold
 storage_yml = File.expand_path("../blog/config/storage.yml", __dir__)
 database_yml = File.expand_path("../blog/config/database.yml", __dir__)

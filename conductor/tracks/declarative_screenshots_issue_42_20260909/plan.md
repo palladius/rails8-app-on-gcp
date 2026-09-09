@@ -29,12 +29,12 @@
 
 ## Phase 3: Task Runner Integration & Diagnostics (`justfile`)
 
-- [ ] Task: Add `just` recipes in root `justfile`
-    - [ ] Add `just screenshots [filter]` recipe
-    - [ ] Add `just test-screenshots` recipe for validation without requiring live server
-- [ ] Task: Integrate into `just workshop-test` Diagnostics
-    - [ ] Add diagnostic check confirming declarative screenshots are valid and asset links resolve
-- [ ] Task: Documentation & Codelab Markdown Directives
-    - [ ] Document usage in `workshop/README.md`
-    - [ ] Add example comment directives in `workshop/CODELAB.md`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Add `just` recipes in root `justfile`
+    - [x] Add `just screenshots [filter]` recipe
+    - [x] Add `just test-screenshots` recipe for validation without requiring live server
+- [x] Task: Integrate into `just workshop-test` Diagnostics
+    - [x] Add diagnostic check confirming declarative screenshots are valid and asset links resolve
+- [x] Task: Documentation & Codelab Markdown Directives
+    - [x] Document usage in `workshop/README.md`
+    - [x] Add example comment directives in `workshop/CODELAB.md`
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
