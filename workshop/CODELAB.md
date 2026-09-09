@@ -33,7 +33,7 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 Let's get started!
 
 > 🦖 **DEV TELEMETRY & WORKSHOP TRACKING:**  
-> **Workshop Curriculum:** `v2.0.0alpha` (Release `v0.2.3`) | **Git Branch:** `fl-repro-20260909-003`  
+> **Workshop Curriculum:** `v2.0.1alpha` (Release `v0.2.8`) | **Git Branch:** `fix-podcastifier-as-workshop-quest-v200`  
 > ⚠️ *Riccardo ricordati di toglierlo prima di Modena!* Segnatevi questo commit hash nel Friction Log per correlare i test.
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
