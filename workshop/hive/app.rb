@@ -2,6 +2,11 @@
 
 require "sinatra/base"
 require "json"
+
+begin
+  require "dotenv/load"
+rescue LoadError
+end
 require_relative "lib/service_account_loader"
 require_relative "lib/sheets_reader"
 require_relative "lib/healthchecker"

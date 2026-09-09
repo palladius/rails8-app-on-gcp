@@ -178,7 +178,29 @@ function renderTable() {
     //    Colonna 3 (Riga 2): Loghi Ruby/Rails + Metriche (Posts / Users / Images) di fianco!
     const rubyVersion = t.ruby_version || "3.3.8";
     const railsVersion = t.rails_version || "8.1.3";
+    const railsEnv = (t.rails_env || "").trim();
     const hasTelemetry = !!t.ruby_version;
+
+    // Colore per l'ambiente Rails: 'prod'/'production' verde, 'dev'/'development' giallo, 'test' rosso, altri grigio
+    let envBadge = "";
+    if (railsEnv) {
+      const lower = railsEnv.toLowerCase();
+      let colorClasses = "text-slate-400 bg-slate-800 border-slate-700"; // fallback verbatim
+      let shortEnv = railsEnv;
+
+      if (lower.startsWith("prod")) {
+        colorClasses = "text-emerald-400 bg-emerald-500/15 border-emerald-500/30";
+        shortEnv = "prod";
+      } else if (lower.startsWith("dev")) {
+        colorClasses = "text-yellow-400 bg-yellow-500/15 border-yellow-500/30";
+        shortEnv = "dev";
+      } else if (lower.startsWith("test")) {
+        colorClasses = "text-rose-400 bg-rose-500/15 border-rose-500/30";
+        shortEnv = "test";
+      }
+
+      envBadge = `<span class="px-1.5 py-0.2 rounded border text-[10px] font-bold ${colorClasses}" title="Rails.env: ${escapeHtml(railsEnv)}">${escapeHtml(shortEnv)}</span>`;
+    }
 
     const stackHtml = hasTelemetry ? `
       <div class="flex items-center gap-2 text-xs font-mono">
@@ -186,7 +208,7 @@ function renderTable() {
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg" class="w-3.5 h-3.5 inline-block" alt="Ruby">
           <span>${rubyVersion}</span>
         </span>
-        <span class="text-slate-600">/</span>
+        ${envBadge}
         <span class="inline-flex items-center gap-1 text-red-300 font-medium">
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3.5 h-3.5 inline-block" alt="Rails">
           <span>${railsVersion}</span>
@@ -256,7 +278,7 @@ function renderTable() {
       <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
       <td class="py-2 px-3 align-middle">
         <div class="flex flex-col gap-1">
-          <!-- Riga 1: URL largo + eventuale Cloud Run Runner badge -->
+          <!-- Riga 1: URL largo + eventuale Cloud Run badge con icona ufficiale e hover -->
           <div class="flex items-center gap-2 flex-wrap">
             <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all" title="${escapeHtml(student.url)}">
               <span class="opacity-70 text-xs">🔗</span>
@@ -265,19 +287,21 @@ function renderTable() {
 
             ${(() => {
               const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
-              if (!service) return '';
+              if (!service && !t.k_revision) return '';
 
               let shortRev = '';
               if (t.k_revision) {
-                // Rimuovi il prefisso del service name (es. "test-rails8-workshop-rails-app-00012-ldj" -> "00012-ldj")
-                shortRev = t.k_revision.replace(new RegExp(`^${service}-?`), '');
+                // Rimuovi il prefisso del service name se presente (es. "test-rails8-workshop-rails-app-00012-ldj" -> "00012-ldj")
+                shortRev = service ? t.k_revision.replace(new RegExp(`^${service}-?`), '') : t.k_revision;
               }
 
+              const displayLabel = shortRev || (t.k_revision ? t.k_revision : 'cloud-run');
+              const hoverTitle = service ? `Cloud Run Service: ${service}\nFull Revision: ${t.k_revision || service}` : `Cloud Run Revision: ${t.k_revision}`;
+
               return `
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Full Revision: ${escapeHtml(t.k_revision || service)}">
-                  <span>🏃</span>
-                  <span class="text-slate-300 font-medium">${escapeHtml(service)}</span>
-                  ${shortRev ? `<span class="px-1.5 py-0.5 rounded-md bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/40 text-[9.5px] tracking-tight shadow-sm">rev ${escapeHtml(shortRev)}</span>` : ''}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
+                  <img src="/cloud_run_icon.png" class="w-3.5 h-3.5 object-contain inline-block drop-shadow-sm" alt="Cloud Run">
+                  <span class="font-bold text-[9.5px] tracking-tight text-emerald-200">${escapeHtml(displayLabel)}</span>
                 </span>
               `;
             })()}

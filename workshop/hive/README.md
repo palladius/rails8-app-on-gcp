@@ -53,15 +53,21 @@ Share your Google Spreadsheet with the `client_email` of your Service Account wi
 
 ## ☁️ Deploying to Google Cloud Run
 
-To deploy the Hive to Cloud Run:
+To deploy the Hive to Cloud Run, simply configure `workshop/hive/.env` and run:
+
+```bash
+workshop/hive/bin/deploy
+```
+
+Or run manually:
 
 ```bash
 gcloud run deploy workshop-hive \
   --source=workshop/hive \
+  --project=palladius-genai \
   --region=europe-west1 \
   --allow-unauthenticated \
-  --set-env-vars="HIVE_SPREADSHEET_ID=YOUR_SHEET_ID" \
-  --set-secrets="HIVE_SERVICE_ACCOUNT_KEY_B64=hive-sa-key:latest"
+  --set-env-vars="HIVE_SPREADSHEET_ID=195OYMjc_ib2nysltnZE6cNmBw7xtXQ5WRC8igi7_AtM,HIVE_SHEET_GID=1095789823"
 ```
 
 ---

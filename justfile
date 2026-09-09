@@ -129,6 +129,14 @@ show-users:
 	cd blog && just show-users
 
 
+# run local Workshop Hive leaderboard server (default port: 8090)
+hive-dev port="8090":
+	PORT={{port}} workshop/hive/bin/dev
+
+# deploy Workshop Hive leaderboard to Cloud Run using workshop/hive/.env
+hive-deploy:
+	workshop/hive/bin/deploy
+
 list:
     @just --list
     gh issue list
