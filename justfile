@@ -74,6 +74,10 @@ project-status:
     cd iac && ./check_gcp_setup.sh
     cd blog && echo "\n=== 5️⃣ Checking DB Posts ===" && bundle exec rails runner 'puts "  📊 Posts in DB: #{Post.count rescue "No DB/Posts yet"}"' || true
 
+# check the live status of the Cloud Run deployment (infers URL from Terraform or gcloud)
+cloud-run-status url="":
+    @./bin/cloud_run_status.sh {{url}}
+
 seed:
 	cd blog && rake db:seed
 

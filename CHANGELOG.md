@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-09-09
+### Added
+- 🚀 **`just cloud-run-status` Recipe & Telemetry Inspector (`bin/cloud_run_status.sh`)**:
+  - Added `just cloud-run-status [url]` command to automatically infer the live Cloud Run endpoint via `terraform output -raw cloud_run_url` (or fallback via `gcloud run services describe`), fetch `/status.json`, and render a rich terminal telemetry dashboard.
+  - Added standard Terraform outputs in `iac/outputs.tf` (`cloud_run_url`, `cloud_run_service_name`, `project_id`, `region`).
+  - Supports `--json` and `--url-only` flags for scripting and CI/CD pipelines.
+
 ## [0.2.2] - 2026-09-09
 ### Fixed
 - 🧪 **Workshop UAT Harness Sandbox Bundler Isolation (`bin/workshop_uat.rb`)**:
