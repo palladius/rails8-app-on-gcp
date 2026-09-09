@@ -286,22 +286,31 @@ function renderTable() {
             </a>
 
             ${(() => {
-              const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
-              if (!service && !t.k_revision) return '';
+              const fullRev = (t.k_revision || '').trim();
+              const fullService = (t.k_service || '').trim();
+              const fallbackService = student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null;
+              const service = fullService || fallbackService;
 
-              let shortRev = '';
-              if (t.k_revision) {
-                // Rimuovi il prefisso del service name se presente (es. "test-rails8-workshop-rails-app-00012-ldj" -> "00012-ldj")
-                shortRev = service ? t.k_revision.replace(new RegExp(`^${service}-?`), '') : t.k_revision;
+              if (!service && !fullRev) return '';
+
+              // Estrai il delta di revisione (es. "test-rails8-workshop-rails-app-00013-l44" -> "00013-l44")
+              let deltaRev = '';
+              if (fullRev) {
+                if (service && fullRev.startsWith(service)) {
+                  deltaRev = fullRev.slice(service.length).replace(/^-/, '');
+                } else {
+                  const match = fullRev.match(/(\d{5}-[a-z0-9]+)$/i) || fullRev.match(/(\d{4,}-[a-z0-9]+)$/i);
+                  deltaRev = match ? match[1] : fullRev;
+                }
               }
 
-              const displayLabel = shortRev || (t.k_revision ? t.k_revision : 'cloud-run');
-              const hoverTitle = service ? `Cloud Run Service: ${service}\nFull Revision: ${t.k_revision || service}` : `Cloud Run Revision: ${t.k_revision}`;
+              const displayLabel = deltaRev ? `rev ${deltaRev}` : (fullRev || 'cloud-run');
+              const hoverTitle = `Cloud Run Service: ${service || 'unknown'}\nFull Revision: ${fullRev || service || 'N/A'}`;
 
               return `
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 hover:border-emerald-500/60 shadow-sm transition-all cursor-help" title="${escapeHtml(hoverTitle)}">
                   <img src="/cloud_run_icon.png" class="w-3.5 h-3.5 object-contain inline-block drop-shadow-sm" alt="Cloud Run">
-                  <span class="font-bold text-[9.5px] tracking-tight text-emerald-200">${escapeHtml(displayLabel)}</span>
+                  <span class="font-bold text-[10px] tracking-tight text-emerald-200 bg-emerald-950/60 px-1 rounded border border-emerald-500/30">${escapeHtml(displayLabel)}</span>
                 </span>
               `;
             })()}
