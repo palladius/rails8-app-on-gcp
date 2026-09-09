@@ -25,6 +25,11 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 - How to inject secrets directly from Google Cloud Secret Manager.
 - How to orchestrate asynchronous GenAI background jobs (NanoBanana cover generator, bilingual podcast synthesis) via Solid Queue.
 
+> 🐝 **Live Workshop Telemetry & Leaderboard**  
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSd3W_oqlZiOUbF6RtzMO8C1SkytvfHw59GI3H5UcR0r2Yx2Nw/viewform?usp=preview)  
+> *(Puoi registrarti fin da subito o appena completi il primo deploy su Cloud Run nello Step 3!)*
+
 Let's get started!
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
