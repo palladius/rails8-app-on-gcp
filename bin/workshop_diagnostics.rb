@@ -35,6 +35,14 @@ if File.exist?(env_file)
     env_vars[k.strip] = v.to_s.strip.gsub(/\A["']|["']\Z/, "") if k
   end
   puts "📄 [ENV] .env file found and parsed (#{env_vars.keys.count} vars)".green
+
+  # Strict Anti-Legacy Check: PROJECT_ID is forbidden, must use GOOGLE_CLOUD_PROJECT
+  if env_vars.key?("PROJECT_ID")
+    puts "❌ [ERROR] Found deprecated variable 'PROJECT_ID' in #{env_file}!".red
+    puts "   👉 Nei nuovi standard di Google Cloud / Terraform / Pulumi, 'PROJECT_ID' è deprecato."
+    puts "   👉 Rinomina 'PROJECT_ID' in 'GOOGLE_CLOUD_PROJECT' nel tuo file .env!"
+    errors_count += 1
+  end
 else
   puts "⚠️  [ENV] No .env file found at repository root!".yellow
   puts "   👉 Please run: cp .env.dist .env && vim .env"

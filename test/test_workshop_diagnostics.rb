@@ -31,4 +31,14 @@ class WorkshopDiagnosticsTest < Minitest::Test
       assert_includes stdout, "ADMIN_EMAIL (custom@gmail.com) and GOOGLE_CLOUD_ACCOUNT (ricc@google.com) differ!"
     end
   end
+
+  def test_fails_when_deprecated_project_id_found_in_env
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nPROJECT_ID=dummy-legacy-project\n")
+      stdout, _stderr, status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found deprecated variable 'PROJECT_ID'"
+      assert_includes stdout, "GOOGLE_CLOUD_PROJECT"
+    end
+  end
 end
