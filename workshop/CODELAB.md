@@ -205,203 +205,376 @@ Cloud Run containers are stateless and ephemeral. If we deploy our SQLite databa
 In the next step, we will intentionally deploy this ephemeral configuration to Cloud Run to witness the **Stateless Shock** first-hand!
 
 
-## Step 2: Cloud Storage
 
-Currently, uploaded images are saved locally in the `storage/` folder. We will migrate ActiveStorage to Google Cloud Storage (GCS) using short-lived signed URLs.
+## Step 3: Deploy 1 — The Stateless Shock (Early WOW in 3 Minutes!)
 
-1. Checkout the next branch:
-   ```bash
-   git checkout workshop_2_cloud_storage
-   ```
+Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** in under 3 minutes!
 
-2. Open `config/storage.yml` and inspect the `google` service definition:
-   ```yaml
-   google:
-     service: GCS
-     project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") %>
-     bucket: <%= ENV.fetch("GCS_BUCKET_NAME") %>
-     iam: true  # Sign URLs via IAM Credentials signBlob API (no private key JSON required!)
-   ```
+### 1. The Time-Machine Rewind
 
-3. Open `config/environments/production.rb` (and `development.rb` if testing remote storage locally) and set:
-   ```ruby
-   config.active_storage.service = :google
-   ```
+To guarantee that our starting configuration is 100% ephemeral (local SQLite database and local disk file storage), use the Zero-Branch Time-Machine engine:
+
+```bash
+just workshop-rewind 1
+```
+
+> 💡 **What just happened?**  
+> `workshop-rewind 1` applied the `stage-1-stateless` configuration overlay to `blog/config/` without leaving the `main` branch. Your app is configured with SQLite on container disk and ActiveStorage on local filesystem.
+
+### 2. Deploying Single-Container Puma to Cloud Run
+
+Deploy directly from source code to Cloud Run. Google Cloud automatically detects Rails 8, builds the container image with Google Cloud Buildpacks/Docker, and provisions a managed serverless service:
+
+```bash
+# Ensure default region is set
+export GOOGLE_CLOUD_REGION="europe-west1"
+
+# Deploy single-container service from source
+gcloud run deploy blog \
+  --source . \
+  --region $GOOGLE_CLOUD_REGION \
+  --allow-unauthenticated \
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,RAILS_MASTER_KEY=$(cat blog/config/master.key)
+```
+
+During deployment:
+1. Cloud Run builds your Rails container image.
+2. It assigns a public, secure TLS domain: `https://blog-[hash]-[region].a.run.app`.
+3. Traffic begins routing to Puma on port 8080.
+
+### 3. ✨ The Early WOW Moment
+
+Open the generated Cloud Run URL in your browser!
+
+1. Your modern Rails 8 application is live on Google Cloud!
+2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and `APP_ADMIN_PASSWORD`).
+3. Click **"New Post"**, write an article titled *"My First Cloud Run Post"*, attach a picture, and click **Create Post**.
+4. Your post is published with full formatting, and your image is rendered.
+5. Notice the visual telemetry:
+   - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
+   - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
+
+### 4. 💥 The Catch: The Stateless Shock
+
+Cloud Run is a **stateless, serverless platform**. When web traffic drops to zero, Cloud Run scales down to zero container instances to save money. When a new HTTP request arrives or a new container revision is deployed, Cloud Run starts a brand new, clean container image.
+
+What happens to files stored on the container's ephemeral disk? Let's simulate a container restart or scale-to-zero event:
+
+```bash
+# Force a revision update to restart the container
+gcloud run services update blog \
+  --region $GOOGLE_CLOUD_REGION \
+  --update-env-vars RESTART_TRIGGER=$(date +%s)
+```
+
+Now, go back to your browser and **refresh the page**:
+
+💥 **The Stateless Shock:**  
+- The article you just wrote is **completely gone**!
+- The image you uploaded is **wiped out**!
+- You see the pedagogical in-app alert banner:
+  > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**  
+  > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
+
+### 5. Automated Step 3 Validation
+
+Verify your Cloud Run deployment and alert handling:
+
+```bash
+just workshop-eval 3
+```
+
+✨ **The Lesson:** An early deploy gives immediate gratification, but instantly proves *why* enterprise web architectures require decoupled cloud object storage (GCS) and managed relational databases (Cloud SQL).
+
+
+## Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+
+In this step, we decouple media and file storage from the container disk by switching ActiveStorage to **Google Cloud Storage (GCS)**, using short-lived signed URLs via the IAM Credentials API (`iam: true`).
+
+### 1. The Time-Machine Rewind
+
+Advance the time machine to Stage 2:
+
+```bash
+just workshop-rewind 2
+```
+
+Inspect `blog/config/storage.yml`:
+
+```yaml
+google:
+  service: GCS
+  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") %>
+  bucket: <%= ENV.fetch("GCS_BUCKET") %>
+  iam: true  # Sign URLs via IAM Credentials signBlob API (zero private key JSON files required!)
+```
 
 > 💡 **Design Decision — Why `iam: true` instead of `public: true`?**  
-> Making a bucket public (`public: true` / `allUsers:objectViewer`) exposes every uploaded file to the entire internet forever. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
+> Making a bucket public (`allUsers:objectViewer`) is a hazardous security anti-pattern. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
 
-✨ **The Wow Moment:** Create or edit a post and drag-and-drop an image into the editor. Open your browser developer tools (Network tab) and Google Cloud Storage Console. You can see the image binary stream directly into your private GCS bucket, served back via an expiring secure signed URL!
+### 2. Granting IAM Storage & Signing Permissions
 
-## Step 3: Cloud SQL (From Naive Exposure to Auth Proxy)
+Ensure your Cloud Run runtime service account has permissions to sign URLs and upload objects:
 
-Check your terminal: by now, your Cloud SQL PostgreSQL instance has finished provisioning!
+```bash
+export PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
+export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-dev"
 
-Let's switch our application from SQLite to Cloud SQL.
+# Grant Storage Object Admin
+gcloud storage buckets add-iam-policy-binding gs://$GCS_BUCKET \
+  --member="serviceAccount:$RUN_SA" \
+  --role="roles/storage.objectAdmin"
 
-1. Checkout the next branch:
+# Grant Service Account Token Creator (required for IAM signed URLs)
+gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
+  --member="serviceAccount:$RUN_SA" \
+  --role="roles/iam.serviceAccountTokenCreator"
+```
+
+### 3. Deploy 2 to Cloud Run with GCS Attached
+
+Re-deploy our application with GCS enabled:
+
+```bash
+gcloud run deploy blog \
+  --source . \
+  --region $GOOGLE_CLOUD_REGION \
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google
+```
+
+### 4. ✨ The Surviving Image & The Cloud Stamp
+
+1. Refresh your blog URL.
+2. Create a new blog post titled *"Surviving the Cloud"* and upload a photo.
+3. Look at the bottom-right corner of the image:
+   - The casetta stamp is gone!
+   - It is replaced by the colorful **Cloud GCS Stamp** (`nanobanana_stamp_cloud.png`).
+4. Force another container restart:
    ```bash
-   git checkout workshop_3_cloud_sql
+   gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars RESTART_TRIGGER=$(date +%s)
+   ```
+5. Refresh the page: while the SQLite database reset, **the image binary is safe and sound in Google Cloud Storage**! Verify via CLI:
+   ```bash
+   gcloud storage ls gs://$GCS_BUCKET/
    ```
 
-### Phase 3A: The Naive Connection (The `0.0.0.0/0` Anti-Pattern)
+### 5. ⚠️ The POLA Catch: Stuck Jobs Warning Banner
 
-To demonstrate how traditional setups connected to databases, let's create a database user and open the firewall:
+When you uploaded the image, ActiveStorage enqueued an analysis job (`ActiveStorage::AnalyzeJob`) to extract dimensions and metadata.
 
-1. Create the database and user:
-   ```bash
-   gcloud sql databases create rails_production --instance=$CLOUDSQL_INSTANCE_NAME
-   gcloud sql users create rails_user --instance=$CLOUDSQL_INSTANCE_NAME --password=$DB_PASSWORD
-   ```
+However, Cloud Run is currently running only **one single web container** (`puma`). In Rails 8, **Solid Queue** stores background jobs in the database, but nobody is executing `bundle exec rails solid_queue:start`!
 
-2. Add an authorized network rule for `0.0.0.0/0`:
-   ```bash
-   gcloud sql instances patch $CLOUDSQL_INSTANCE_NAME --authorized-networks=0.0.0.0/0
-   ```
+Look at the top of your blog page: you will see a bright warning banner rendered by `blog/app/views/layouts/_check_stuck_jobs.html.erb`:
 
-3. Test direct public connection:
-   ```bash
-   psql -h $CLOUDSQL_PUBLIC_IP -U rails_user -d rails_production
-   ```
+> ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**  
+> *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
 
-> ⚠️ **CAUTION: The Security Anti-Pattern.**  
-> Exposing port `5432` to `0.0.0.0/0` on the public internet exposes your database to brute-force attacks, port scanning bots, and catastrophic leaks. We did this only to prove connectivity—now we immediately lock it down!
+### 6. Automated Step 4 Validation
 
-### Phase 3B: The Secure Solution — Cloud SQL Auth Proxy
+Verify your GCS configuration and stuck jobs telemetry:
 
-Let's remove the public network authorization and connect through the secure **Cloud SQL Auth Proxy**:
+```bash
+just workshop-eval 4
+```
 
-1. Remove `0.0.0.0/0` from authorized networks:
-   ```bash
-   gcloud sql instances patch $CLOUDSQL_INSTANCE_NAME --clear-authorized-networks
-   ```
 
-2. Start the Cloud SQL Auth Proxy locally on port 5432:
-   ```bash
-   cloud-sql-proxy --port 5432 $CLOUDSQL_INSTANCE_CONNECTION_NAME
-   ```
+## Step 5: Cloud SQL Ready & Secret Manager CLI Injection
 
-3. In another terminal, run your database migrations and seed through the secure local proxy:
-   ```bash
-   DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production bin/rails db:migrate db:seed
-   ```
+By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database and inject our secrets into **Google Cloud Secret Manager**.
 
-4. Start your Rails server:
-   ```bash
-   DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production bin/rails s
-   ```
+### 1. Verifying Cloud SQL Instance
 
-✨ **The Wow Moment:** Refresh `http://localhost:3000`! You will see a newly seeded welcome article: *"🐘 Welcome to Cloud SQL!"* loaded live from your managed PostgreSQL instance in the cloud via the secure IAM proxy tunnel without any open public firewall ports!
+Check the state of your Cloud SQL instance:
 
-## Step 4: Secret Manager
+```bash
+gcloud sql instances describe rails-postgres --format="value(state)"
+```
 
-Never store plain-text passwords or secret keys in source control or `.env` files. We use **Google Cloud Secret Manager** to securely manage credentials.
+The output should be `RUNNABLE`.
 
-1. Checkout the next branch:
-   ```bash
-   git checkout workshop_4_secret_manager
-   ```
+### 2. Google Cloud Secret Manager Injection
 
-2. Store your Rails master key and database password in Secret Manager:
-   ```bash
-   gcloud secrets create rails-master-key --data-file=config/master.key
-   gcloud secrets create rails-db-password --data-file=<(echo -n "$DB_PASSWORD")
-   ```
+Never store plain-text database passwords, API keys, or Rails master keys in git or in container environment variables. We use **Google Cloud Secret Manager** for zero-trust runtime injection.
 
-3. Verify secret storage and retrieval directly from the CLI:
-   ```bash
-   gcloud secrets versions access latest --secret=rails-master-key
-   ```
+Store your secrets via the Google Cloud CLI:
 
-4. Grant your Cloud Run service account permission to access the secrets:
-   ```bash
-   gcloud secrets add-iam-policy-binding rails-master-key \
-     --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
-     --role="roles/secretmanager.secretAccessor"
+```bash
+# 1. Store Rails Master Key
+gcloud secrets create rails-master-key --data-file=blog/config/master.key 2>/dev/null || \
+  gcloud secrets versions add rails-master-key --data-file=blog/config/master.key
 
-   gcloud secrets add-iam-policy-binding rails-db-password \
-     --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
-     --role="roles/secretmanager.secretAccessor"
-   ```
+# 2. Store Cloud SQL Database Password (from Step 1 Terraform output)
+export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "RailsWorkshopSecure2026!")
 
-✨ **The Wow Moment:** You can safely delete local `.env` and credential files; Cloud Run will automatically fetch and inject these secrets into your container environment at runtime.
+echo -n "$DB_PASSWORD" | gcloud secrets create rails-db-password --data-file=- 2>/dev/null || \
+  echo -n "$DB_PASSWORD" | gcloud secrets versions add rails-db-password --data-file=-
+```
 
-## Step 5: Multi-Container Cloud Run & Docker Compose
+### 3. Granting Secret Accessor Permissions
 
-In modern Rails 8 applications, background jobs are processed by **Solid Queue**. In production, we separate web traffic from background workers and attach the Cloud SQL Proxy as a sidecar container.
+Grant the Cloud Run runtime service account permission to read these secrets:
 
-1. Checkout the next branch:
-   ```bash
-   git checkout workshop_5_cloud_run_classic
-   ```
+```bash
+gcloud secrets add-iam-policy-binding rails-master-key \
+  --member="serviceAccount:$RUN_SA" \
+  --role="roles/secretmanager.secretAccessor"
 
-2. Inspect `compose.prod.yaml`:
-   - **`web`**: Serves HTTP requests on port 8080.
-   - **`worker`**: Runs Solid Queue (`bundle exec rails solid_queue:start`).
-   - **`cloudsql-proxy`**: Official proxy sidecar container (`gcr.io/cloud-sql-connectors/cloud-sql-proxy:2`) bound to `5432`.
+gcloud secrets add-iam-policy-binding rails-db-password \
+  --member="serviceAccount:$RUN_SA" \
+  --role="roles/secretmanager.secretAccessor"
+```
 
-3. Test the multi-container stack locally:
-   ```bash
-   docker compose -f compose.prod.yaml up
-   ```
+### 4. Automated Step 5 Validation
 
-4. Deploy the multi-container service to Cloud Run:
-   ```bash
-   gcloud run deploy rails-blog \
-     --source . \
-     --region us-central1 \
-     --allow-unauthenticated \
-     --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest"
-   ```
+Verify secret manager configuration:
 
-✨ **The Wow Moment:** The entire 3-container production stack (Web + Background Worker + Cloud SQL Proxy sidecar) boots locally with one Docker Compose command and deploys live to Cloud Run with zero architectural drift!
+```bash
+just workshop-eval 5
+```
 
-## Step 6: Automating with Cloud Build (Optional / Skippable)
 
-> 💡 **Note:** If you want to jump straight to building AI features, you can skip this step and proceed to Step 7!
+## Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
 
-Manual deployments from a developer laptop are error-prone. Let's automate the deployment with **Cloud Build**.
+Now we assemble the ultimate reference architecture: **Multi-Container Cloud Run**!
 
-1. Checkout the next branch:
-   ```bash
-   git checkout workshop_6_cloud_build_cicd
-   ```
+### 1. Restoring the Gold Standard
 
-2. Inspect `cloudbuild.yaml`. It defines 3 automated pipeline steps:
-   - **Build**: Compiles the production Docker image.
-   - **Migrate**: Runs `rails db:migrate` using a transient Cloud Run Job.
-   - **Deploy**: Updates the Cloud Run service with the newly built container image.
+Restore your repository configuration to the canonical `main` state:
 
-3. Connect your GitHub repository to Cloud Build using the GCP Console Triggers page.
+```bash
+just workshop-restore-gold
+```
 
-✨ **The Wow Moment:** Every `git push` to `main` triggers a fully automated build, test, migration, and deployment in Google Cloud!
+### 2. Inspecting the 3-Container Production Blueprint
 
-## Step 7: AI Features and Background Jobs
+Open `blog/compose.prod.yaml` and inspect the architecture:
+
+```mermaid
+graph LR
+  Client[Internet / HTTPS Client] -->|Port 8080| Web[Web Container: Puma]
+  Web -->|Localhost:5432| Proxy[Sidecar: Cloud SQL Auth Proxy]
+  Worker[Worker Container: Solid Queue] -->|Localhost:5432| Proxy
+  Proxy -->|IAM mTLS Tunnel| CloudSQL[(Google Cloud SQL PostgreSQL)]
+```
+
+The production deployment runs three coordinated containers sharing the same local network:
+1. **`web`**: Serves HTTP traffic on port 8080 via Puma.
+2. **`worker`**: Dedicated background processing container running `bundle exec rails solid_queue:start`.
+3. **`cloudsql-proxy`**: Official Google Cloud SQL Auth Proxy sidecar (`gcr.io/cloud-sql-connectors/cloud-sql-proxy:2`) bound to `127.0.0.1:5432`.
+
+### 3. Running Database Migrations via Cloud Run Job
+
+Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job:
+
+```bash
+# Create migration job
+gcloud run jobs create rails-migrate \
+  --source . \
+  --command "bin/rails" \
+  --args "db:migrate,db:seed" \
+  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
+  --set-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres" \
+  --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
+
+# Execute migration job
+gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
+```
+
+### 4. Deploy 3: Deploying Multi-Container Cloud Run
+
+Deploy the full multi-container service:
+
+```bash
+gcloud run deploy blog \
+  --source . \
+  --region $GOOGLE_CLOUD_REGION \
+  --allow-unauthenticated \
+  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
+  --add-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres" \
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google
+```
+
+### 5. ✨ The Wow Moment & Telemetry Validation
+
+Open your Cloud Run URL:
+1. Look at the telemetry badges:
+   - **`[CLOUD PERSISTENT 🐘 ☁️]`** turns emerald green!
+   - The stuck jobs warning banner is **gone**, because the `worker` container is actively draining Solid Queue in the background!
+2. Create blog posts and comments.
+3. Restart or redeploy as many times as you like: your data, posts, comments, and assets survive forever in Cloud SQL and GCS!
+
+### 6. Automated Step 6 Validation
+
+Verify the multi-container configuration:
+
+```bash
+just workshop-eval 6
+```
+
+
+## Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
 
 ![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
 
-Rails 8's **Solid Queue** powers asynchronous background tasks without needing Redis. Let's use it for an AI feature: **The "NanoBanana" Auto-Cover Generator**.
+With Solid Queue running in a dedicated container and Google Cloud Storage active, we can unleash asynchronous Generative AI!
 
-1. Checkout our final branch:
-   ```bash
-   git checkout workshop_7_ai_features
-   ```
+### 1. The NanoBanana Vintage Cover Generator
 
-2. When a post is saved without a cover image, `GenerateCoverImageJob` triggers (the logic lives in `blog/lib/nanobanana.rb`):
-   - It sends the post title and body to **Nano Banana** (`gemini-2.5-flash-image`) on **Vertex AI** with this prompt:
-     > *"The poster is the cover image for a blog post titled [Title]. The article contains the following text: [Text]. CRITICAL STYLE INSTRUCTION: The image MUST be rendered in the style of a 'Locandina di un film 1960' (a vintage 1960s Italian movie poster). Maintain a beautiful, cohesive vintage Italian cinematic aesthetic. You MUST feature a banana somewhere in the scene. You MUST place a shiny red ruby gem shaped like the digit "8" in the top-right corner of the image."*
-   - Too lazy to write a real title? Anything under 30 bytes or keyboard mash like `qwerty` gets a poster of an epic **Prog Metal concert in Modena** instead.
-   - Authentication is **Application Default Credentials only**: on Cloud Run the service account (Terraform grants `roles/aiplatform.user` and enables `aiplatform.googleapis.com`), on your laptop `gcloud auth application-default login`. No `GEMINI_API_KEY` anywhere.
-   - The Solid Queue worker decodes the returned image, **stamps its provenance** — grayscale with a little house and `127.0.0.1` when it is stored on the ephemeral local disk, a colorful cloud when it is stored on GCS — and attaches it via ActiveStorage.
-   - No credentials, no API, no network? The job attaches a bundled *"NO VERTEX AI CREDENTIALS — I'm a fake cover image, pretend I'm real"* poster. Nothing crashes, ever.
+When an article is created without a cover image, `GenerateCoverImageJob` automatically triggers via Solid Queue:
+- It calls **Gemini 2.5 Flash Image / Imagen** on Vertex AI using **Application Default Credentials** (`roles/aiplatform.user`). Zero API keys required!
+- It generates a custom vintage 1960s Italian film poster (*"Locandina di un film 1960"*) with a cameo banana and a shiny ruby "8".
+- Test it: Create an article titled *"Serverless Architecture with Ruby on Rails"* and leave the cover image blank. Within seconds, the Solid Queue worker generates and attaches the poster!
 
-3. Create a new post, leave the cover image empty, and publish.
+### 2. The Bilingual Podcastifier (TTS Synthesis)
 
-✨ **The Wow Moment:** In a few seconds, an AI-generated vintage Italian poster featuring a cameo banana and a ruby "8" appears automatically on your post, processed completely asynchronously by Solid Queue on Cloud Run — and the stamp in the corner tells you whether your storage is still ephemeral or already in the cloud! Covers you upload yourself follow the same rule: sad grayscale while on local disk, full color once on GCS.
+Click the **"Generate Audio Podcast"** button on any article:
+- Solid Queue invokes Google Cloud Text-to-Speech to generate a bilingual audio overview of the post.
+- An in-browser HTML5 audio player appears, allowing users to listen to your blog!
 
-## Step 8: Choose Your Own Adventure (The Quests 🏆)
+### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
 
-Now that you have deployed the canonical reference architecture to Cloud Run, the rest of the journey is open-ended! Choose one of the quests below based on your appetite:
+Remember that photo you uploaded back in Step 4 before the container restart wiped out the ephemeral SQLite database? That image file is still sitting safely in your private GCS bucket as an "orphaned blob"!
+
+Let's use the Rails console to rescue it and attach it to a Cloud SQL post:
+
+```bash
+# Connect to your production database via Rails console and Cloud SQL Proxy
+cloud-sql-proxy --port 5432 ${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres &
+DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production bin/rails c
+```
+
+Inside the Rails console:
+
+```ruby
+# 1. Search for orphaned GCS blobs in ActiveStorage
+orphan_blobs = ActiveStorage::Blob.where.missing(:attachments)
+puts "🏴‍☠️ Found #{orphan_blobs.count} orphaned GCS blobs!"
+
+# 2. Attach the surviving blob to your latest post
+if orphan_blobs.any?
+  post = Post.last
+  post.cover_image.attach(orphan_blobs.first)
+  post.save!
+  puts "🎉 Rescued blob #{orphan_blobs.first.filename} attached to '#{post.title}'!"
+end
+exit
+```
+
+Refresh your blog: the photo uploaded during Step 4's Stateless Shock is resurrected and permanently attached to your Cloud SQL post!
+
+### 4. Automated Step 7 Validation
+
+Verify GenAI jobs and assets:
+
+```bash
+just workshop-eval 7
+```
+
+
+## Step 8: Choose Your Own Adventure / Advanced Quests 🏆
+
+Now that you have mastered the canonical reference architecture, choose your graduation quest!
 
 ---
 
@@ -411,9 +584,8 @@ Now that you have deployed the canonical reference architecture to Cloud Run, th
 * **How it Works:**
   1. An External HTTPS Application Load Balancer terminates Google OAuth and verifies identity before traffic ever reaches Cloud Run.
   2. Google forwards verified identity headers (`X-Goog-Authenticated-User-Email`).
-  3. Rails automatically logs in the verified Google identity via a controller concern:
+  3. Rails automatically logs in the verified Google identity via `blog/app/controllers/concerns/iap_authenticatable.rb`:
      ```ruby
-     # app/controllers/concerns/iap_authenticatable.rb
      module IapAuthenticatable
        extend ActiveSupport::Concern
        included { before_action :authenticate_via_iap }
@@ -429,7 +601,7 @@ Now that you have deployed the canonical reference architecture to Cloud Run, th
      ```
   4. Enable the Terraform module in `iac/iap.tf` with `enable_iap = true` and specify your allowed Google accounts:
      ```hcl
-     iap_allowed_users = ["myemail@gmail.com", "teacher@gmail.com"]
+     iap_allowed_users = [var.google_cloud_account]
      ```
 
 ---
@@ -438,31 +610,50 @@ Now that you have deployed the canonical reference architecture to Cloud Run, th
 * **Difficulty:** Medium (Observability)
 * **The Goal:** Stream structured JSON application logs with trace correlation IDs directly to Google Cloud Logging and catch production exceptions in real-time with Cloud Error Reporting.
 * **How it Works:**
-  - Configure `config/environments/production.rb` to emit structured JSON logs.
+  - Configure `blog/config/environments/production.rb` to emit structured JSON logs with GCP trace labels.
   - Trigger an intentional test exception and watch Google Cloud Error Reporting group and notify you instantly.
 
 ---
 
-### 🧠 Quest 3: `pgvector` Semantic Search & Gemini RAG Boss Level
+### 🧠 Quest 3: `pgvector` Semantic Search & Gemini RAG
 * **Difficulty:** Hard (GenAI Capstone)
 * **The Goal:** Search articles conceptually using vector embeddings stored in PostgreSQL on Cloud SQL.
 * **How it Works:**
-  - Run `CREATE EXTENSION vector;` on your Cloud SQL PostgreSQL instance.
-  - Add the `neighbor` gem and generate text embeddings with Gemini (`text-embedding-004`) on `Post#after_save`.
+  - Enable the `vector` extension on your Cloud SQL PostgreSQL instance:
+    ```sql
+    CREATE EXTENSION IF NOT EXISTS vector;
+    ```
+  - Add the `neighbor` gem to `blog/Gemfile` and generate text embeddings with Gemini (`text-embedding-004`) on `Post#after_save`.
   - Perform cosine distance queries (`<=>`) to power a semantic search bar with Turbo Streams!
 
 ---
 
-## Conclusion
+### ⚡ Quest 4: SEO & Performance Audit Assistant
+* **Difficulty:** Easy / Fun (Developer Experience)
+* **The Goal:** Audit Core Web Vitals, Largest Contentful Paint (LCP), and Flesch-Kincaid / Fog readability indices using Antigravity and Speedgrapher tools.
+
+---
+
+## 🎓 Conclusion & Clean Up
 
 Congratulations! 🎉
 
-You have built and deployed a production-grade, enterprise-ready Rails 8 application on Google Cloud:
-- **Cloud Storage:** Scalable, private object storage with IAM blob signing.
-- **Cloud SQL:** Managed PostgreSQL secured with Cloud SQL Auth Proxy.
+You have built and deployed a production-grade, enterprise-ready Rails 8 application on Google Cloud Platform:
+- **Zero-Branch Progression:** Mastered modern workflows with Time-Machine overlays on `main`.
+- **Cloud Storage:** Scalable, private object storage with IAM blob signing (`iam: true`).
+- **Cloud SQL:** Managed PostgreSQL secured with Cloud SQL Auth Proxy mTLS tunnels.
 - **Secret Manager:** Zero plain-text credentials or `.env` file leaks.
-- **Cloud Run Multi-Container:** Isolated Puma web and Solid Queue worker containers with a proxy sidecar.
-- **Cloud Build:** Zero-touch automated CI/CD.
-- **Generative AI:** Contextual vintage poster generation with Gemini and Solid Queue.
+- **Cloud Run Multi-Container:** Isolated Puma web, Solid Queue worker, and proxy sidecars.
+- **Generative AI:** Asynchronous vintage poster generation and TTS podcast synthesis with Vertex AI.
 - **Quests:** Zero-Trust IAP, SRE Observability, and pgvector embeddings!
+
+### 🧹 Resource Clean Up
+
+To avoid ongoing charges after completing the workshop, destroy your Google Cloud resources:
+
+```bash
+cd iac
+terraform destroy -auto-approve
+```
+
 

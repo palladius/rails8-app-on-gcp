@@ -1,5 +1,18 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.40] - 2026-09-09
+### Changed
+- 📖 **Comprehensive Codelab Rewrite: Canonical 8 Steps & 3 Deployments (Fixes [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29))**:
+  - Fully rewritten `workshop/CODELAB.md` to align with `docs/CONSTITUTION.md` v1.1.0 and `workshop/skeleton.yaml`.
+  - **Step 3 (Deploy 1 — The Stateless Shock)**: Single-container Puma deploy to Cloud Run (`just workshop-rewind 1`), early WOW in 3 minutes, followed by container scale-to-zero restart and lost ephemeral SQLite data.
+  - **Step 4 (Deploy 2 — GCS Persistent Storage & POLA Warning)**: Private GCS ActiveStorage with IAM signed URLs (`just workshop-rewind 2`), cloud stamp provenance overlay, and pedagogical stuck jobs warning banner (`_check_stuck_jobs`).
+  - **Step 5 (Cloud SQL Ready & Secret Manager)**: CLI-based secret injection into Google Cloud Secret Manager (`rails-master-key`, `rails-db-password`) and runtime Service Account permissions.
+  - **Step 6 (Deploy 3 — Enterprise Multi-Container Sidecars)**: Restoring Gold Standard (`just workshop-restore-gold`), multi-container `compose.prod.yaml` (Puma web + Solid Queue worker + Cloud SQL Auth Proxy sidecar), and Cloud Run database migration jobs.
+  - **Step 7 (Generative AI Pipelines & GCS Treasure Hunt)**: Asynchronous NanoBanana cover generation on Vertex AI, bilingual TTS podcastifier, and recovering Step 4 orphaned blobs via Rails console.
+  - **Step 8 (Quests & Graduation)**: Zero-Trust IAP, SRE structured telemetry, and pgvector semantic search.
+  - Recompiled static HTML site (`workshop/build/index.html`, `skeleton.html`, `constitution.html`) via `just build-ghpages`.
+
+
 ## [0.1.39] - 2026-09-09
 ### Added
 - 🏠 **Resilient Storage Provenance Stamp Watermark UI Overlay (Issue [#18](https://github.com/palladius/rails8-app-on-gcp/issues/18))**:
