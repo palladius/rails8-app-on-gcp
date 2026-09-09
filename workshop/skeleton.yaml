@@ -268,16 +268,15 @@ steps:
         type: "llm"
         description: "Verify GenAI prompt conforms to Milanese vintage poster aesthetic"
         prompt: "Review the image generation prompt in GenerateCoverImageJob. Verify it requests a vintage retro poster style with a banana cameo. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
-      - id: "step-7-ruby-podcastifier-not-preloaded"
+      - id: "step-7-ruby-podcastifier-scaffold-check"
         type: "ruby"
-        description: "Verify Podcastifier is an interactive exercise and NOT pre-committed into base codebase"
+        description: "Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)"
         code: |
+          job = File.read('blog/app/jobs/podcastifier_job.rb')
           routes = File.read('blog/config/routes.rb')
-          controller = File.read('blog/app/controllers/posts_controller.rb')
-          tts_files = Dir.glob('blog/{app,lib}/**/*.{rb,erb}').select { |f| File.read(f).include?('it-IT-Wavenet-A') }
+          raise 'Missing COMPLETE_ME placeholder' unless job.include?('COMPLETE_ME')
+          raise 'Job should be an unfilled stub before student works on it' if job.lines.count > 10
           raise 'generate_podcast should not be in routes' if routes.include?('generate_podcast')
-          raise 'generate_podcast should not be in controller' if controller.include?('generate_podcast')
-          raise 'it-IT-Wavenet-A voice should not be pre-coded in base repository' unless tts_files.empty?
       - id: "step-7-llm-podcastifier-button-test"
         type: "llm"
         description: "Verify student implementation of Podcastifier via Antigravity if attempted"
