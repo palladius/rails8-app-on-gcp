@@ -43,6 +43,26 @@
     <% end %>
   </div>
 
+  <%# === Podcastifier Audio Player === %>
+  <% if @post.podcast_audio_it.attached? %>
+    <div class="post-show__podcast-glass" style="margin: 1.5rem 0; padding: 1.25rem 1.5rem; background: rgba(239, 246, 255, 0.85); border-radius: 12px; border: 1px solid #bfdbfe; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.5rem;">🎙️</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1rem; color: #1e3a8a;">AI Podcastifier (Italian Edition)</h3>
+            <span style="font-size: 0.8rem; color: #60a5fa;">Powered by Google Cloud Text-to-Speech & Solid Queue</span>
+          </div>
+        </div>
+        <span class="version-badge" style="background: #2563eb; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem;">🎧 Audio Ready</span>
+      </div>
+      <audio controls style="width: 100%; border-radius: 8px;">
+        <source src="<%= url_for(@post.podcast_audio_it) %>" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  <% end %>
+
   <%# === Body content in its own glass card === %>
   <div class="post-show__body-glass">
     <div class="post-show__body-content">
@@ -52,6 +72,7 @@
 </div>
 
 <div class="post-show__actions">
+  <%= button_to "🎙️ Generate Audio Podcast", generate_podcast_post_path(@post), method: :post, class: "post-action-btn", style: "background: #2563eb; color: white;" %>
   <%= link_to "✏️ Edit", edit_post_path(@post), class: "post-action-btn" %>
   <%= link_to "⬅️ Back", posts_path, class: "post-action-btn post-action-btn--secondary" %>
   <%= button_to "🗑️ Destroy", @post, method: :delete, class: "post-action-btn post-action-btn--danger",

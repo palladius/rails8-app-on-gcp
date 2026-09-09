@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   resources :posts do
     delete :purge_cover_image, on: :member
+    post :generate_podcast, on: :member
     resources :comments
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -84,7 +84,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   ```bash
   just workshop-rewind 1
   gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
-  # Test restart & observe lost data
+  # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
+  gcloud run services update blog --region us-central1 --update-env-vars SOLID_QUEUE_IN_PUMA=true
   ```
 - **`postrequisites`**:
   - First live public HTTPS URL on Cloud Run
@@ -93,6 +94,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[SHELL]` Verify Cloud Run service exists and is responding (dry-run/check)
   - `[RUBY]` Verify missing admin alert partial is present in views
+  - `[RUBY]` Verify docker-entrypoint automatically runs db:seed to bootstrap admin user
+  - `[LLM]` Verify that Cloud Run boot sequence creates admin and does NOT display missing admin alert
 
 ---
 
@@ -157,6 +160,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[RUBY]` Verify multi-container production compose configuration contains web, worker, and proxy
   - `[SHELL]` Verify full test suite passes against gold standard
+  - `[RUBY]` Verify that Solid Queue worker or supervisor is active and draining jobs
 
 ---
 
@@ -177,6 +181,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[RUBY]` Verify GenerateCoverImageJob exists
   - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
+  - `[LLM]` TODO: AI robot verification of Podcastifier button press & audio synthesis
 
 ---
 

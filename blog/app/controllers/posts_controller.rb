@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   allow_unauthenticated_access only: %i[ index show ]
-  before_action :set_post, only: %i[ show edit update destroy purge_cover_image ]
+  before_action :set_post, only: %i[ show edit update destroy purge_cover_image generate_podcast ]
 
   # GET /posts or /posts.json
   def index
@@ -71,6 +71,16 @@ class PostsController < ApplicationController
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove("post-show__hero-#{@post.id}") }
       format.html { redirect_to @post, notice: "Cover image deleted. Regenerating new cover...", status: :see_other }
+    end
+  end
+
+  # POST /posts/1/generate_podcast
+  def generate_podcast
+    @post.podcast_audio_it.purge if @post.podcast_audio_it.attached?
+    PodcastifierJob.perform_later(@post.id)
+
+    respond_to do |format|
+      format.html { redirect_to @post, notice: "🎙️ Generating AI podcast in background...", status: :see_other }
     end
   end
 
