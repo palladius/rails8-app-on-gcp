@@ -15,10 +15,11 @@
 
 
 ## Phase 2: Live Healthchecker per le App Cloud Run
-- [ ] Task: Scrivere test per il worker/service che esegue il ping HTTP su `/up` degli URL Cloud Run registrati.
-- [ ] Task: Implementare il runner periodico / asincrono di healthcheck con gestione di timeout brevi (< 3s) e tracking dello stato UP/DOWN.
-- [ ] Task: Esporre i risultati via `GET /api/healthchecks`.
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md).
+- [x] Task: Scrivere test per il worker/service che esegue il ping HTTP su `/up` degli URL Cloud Run registrati. [d0517a9]
+- [x] Task: Implementare il runner periodico / asincrono di healthcheck con gestione di timeout brevi (< 3s) e tracking dello stato UP/DOWN. [d0517a9]
+- [x] Task: Esporre i risultati via `GET /api/healthchecks`. [cca99b6]
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md).
+
 
 ## Phase 3: Frontend Reattivo, Vista Kanban e Blinking Lights
 - [ ] Task: Creare la struttura HTML/CSS (Tailwind o CSS vanilla moderno e giocoso) con colonna per ogni livello/step del workshop.
