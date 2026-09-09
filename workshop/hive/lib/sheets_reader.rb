@@ -46,7 +46,18 @@ module WorkshopHive
         return @cache
       end
 
-      # If local CSV data file exists (or ENV['HIVE_CSV_FILE']), use it!
+      # Priority 1: If HIVE_SPREADSHEET_ID (or HIVE_SHEET_CSV_URL) is provided
+      if sheet_id && !sheet_id.strip.empty?
+        # If public sheet or explicit CSV URL, attempt direct HTTP CSV export
+        entries = fetch_from_public_csv(sheet_id) || (credentials ? fetch_from_google_sheets(sheet_id, credentials) : nil)
+        if entries && !entries.empty?
+          @cache = entries
+          @cache_timestamp = now
+          return @cache
+        end
+      end
+
+      # Priority 2: If local CSV data file exists (or ENV['HIVE_CSV_FILE']), use it!
       csv_file = ENV.fetch("HIVE_CSV_FILE", File.join(__dir__, "..", "data", "leaderboard.csv"))
       if File.exist?(csv_file)
         require "csv"
@@ -57,16 +68,8 @@ module WorkshopHive
         return @cache
       end
 
-      # If sheet_id is not set, use the mock entries for local development & tests
-      if sheet_id.nil? || sheet_id.strip.empty?
-        @cache = MOCK_ENTRIES
-        @cache_timestamp = now
-        return @cache
-      end
-
-      # Live Google Sheets API integration
-      entries = fetch_from_google_sheets(sheet_id, credentials)
-      @cache = entries
+      # Priority 3: Fallback mock entries for local development & tests
+      @cache = MOCK_ENTRIES
       @cache_timestamp = now
       @cache
     rescue StandardError => e
@@ -114,6 +117,35 @@ module WorkshopHive
     end
 
 
+
+    def self.fetch_from_public_csv(sheet_id_or_url)
+      require "net/http"
+      require "uri"
+      require "csv"
+
+      url_str = if sheet_id_or_url.start_with?("http://") || sheet_id_or_url.start_with?("https://")
+                  sheet_id_or_url
+                else
+                  gid = ENV.fetch("HIVE_SHEET_GID", "0")
+                  "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/export?format=csv&gid=#{gid}"
+                end
+
+      uri = URI.parse(url_str)
+      res = Net::HTTP.get_response(uri)
+      # Follow redirect if Google Sheets 302/307
+      if res.is_a?(Net::HTTPRedirection) && res["location"]
+        res = Net::HTTP.get_response(URI.parse(res["location"]))
+      end
+
+      return nil unless res.is_a?(Net::HTTPSuccess)
+      return nil if res.body.include?("<!DOCTYPE html>") # Login/auth page returned instead of CSV
+
+      rows = CSV.parse(res.body)
+      parse_rows(rows)
+    rescue StandardError => e
+      warn "[SheetsReader] Failed to fetch public CSV: #{e.message}"
+      nil
+    end
 
     def self.fetch_from_google_sheets(sheet_id, credentials)
       require "google/apis/sheets_v4"
