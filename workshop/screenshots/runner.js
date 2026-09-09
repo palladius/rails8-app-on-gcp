@@ -102,11 +102,18 @@ async function run() {
     process.exit(0);
   }
 
-  console.log(`📸 Executing ${targetShots.length} screenshot capture task(s)...`);
+  const isForce = args.includes('--force');
+
+  console.log(`📸 Executing ${targetShots.length} screenshot capture task(s) (Force: ${isForce})...`);
   for (const shot of targetShots) {
     const scriptPath = path.join(repoRoot, shot.script);
     const outputPath = path.join(repoRoot, shot.output_path);
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
+    if (fs.existsSync(outputPath) && !isForce) {
+      console.log(`⏭️  Skipping [${shot.id}] (${shot.output_path} already exists, use --force to overwrite)`);
+      continue;
+    }
 
     console.log(`\n▶️ Capturing [${shot.id}] via ${shot.script}...`);
     const env = {

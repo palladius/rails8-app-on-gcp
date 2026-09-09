@@ -415,7 +415,8 @@ Look at the top of your blog page: you will see a bright warning banner rendered
 > ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**  
 > *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
 
-> 📸 **TODO(riccardo): add screenshot of the blog UI showing the cloud provenance stamp on the cover image alongside the [POLA Warning: Background Jobs Queued with No Worker!] banner**
+<!-- workshop-screenshot: id="step-4-gcs-stuck-jobs-warning" -->
+![GCS ActiveStorage with Stuck Jobs Warning Banner](assets/auto-screenshots/step-4-gcs-stuck-jobs-warning.png)
 
 ### 6. Automated Step 4 Validation
 
