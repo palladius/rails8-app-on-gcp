@@ -10,7 +10,7 @@
 Before executing any infrastructure command (`terraform apply`) or deploying to Google Cloud Run, students need an immediate, automated sanity check. 
 The **Diagnostics Suite (`just workshop-test`)** prevents blind execution and frustating errors by verifying:
 1. **User Identity & Admin Email**: Validates `ADMIN_EMAIL` in `.env`. Throws an error if missing; gives a warning if it's not a `@gmail.com` or `@google.com` address.
-2. **GCP Project & Billing Enabled**: Verifies that `GOOGLE_CLOUD_PROJECT` or `GCP_PROJECT_ID` is set, `gcloud` is logged in, and **GCP Billing is linked and active** via `gcloud beta billing projects describe`. Without billing, Terraform and Cloud SQL fail immediately.
+2. **GCP Project & Billing Enabled**: Verifies that `GOOGLE_CLOUD_PROJECT` is set, `gcloud` is logged in, and **GCP Billing is linked and active** via `gcloud beta billing projects describe`. Without billing, Terraform and Cloud SQL fail immediately.
 3. **Application Default Credentials (ADC)**: Validates that `gcloud auth application-default print-access-token` works (needed for Vertex AI GenAI calls).
 4. **Rails Secrets**: Verifies `config/master.key` on disk or `RAILS_MASTER_KEY` in environment.
 5. **GCS & Canary Check**: Checks GCS bucket connectivity and verifies if the canary seed image (`seeds/gcs_dev_image.jpg`) is present.

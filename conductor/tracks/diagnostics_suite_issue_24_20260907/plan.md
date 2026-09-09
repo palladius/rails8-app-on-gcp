@@ -8,7 +8,7 @@
 ### Task 1: Create standalone executable script `bin/workshop_diagnostics.rb`
 - [x] Parse `.env` file from root.
 - [x] Check `ADMIN_EMAIL` (Error if empty, Warning if non-Gmail).
-- [x] Check `GCP_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT`.
+- [x] Check `GOOGLE_CLOUD_PROJECT`.
 - [x] Check active `gcloud` account login.
 - [x] Check mandatory **GCP Billing Enabled** status via `gcloud beta billing projects describe`.
 - [x] Check ADC access token for Vertex AI (`gcloud auth application-default print-access-token`).

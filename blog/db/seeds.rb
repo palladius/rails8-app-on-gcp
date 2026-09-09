@@ -4,7 +4,7 @@
 
 # --- Admin User Bootstrapping & Guard Gate (Issue #21 & #29) ---
 # Primary Google Cloud identity for IAM, billing, ADC, IAP, and blog administrator.
-admin_email = (ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"] || ENV["GCP_EMAIL"] || ENV["ADMIN_EMAIL"])&.strip
+admin_email = (ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"] || ENV["ADMIN_EMAIL"])&.strip
 admin_password = (ENV["APP_ADMIN_PASSWORD"] || ENV["ADMIN_PASSWORD"])&.strip
 
 # Strict Guard Gate: fail fast if account email is missing or placeholder

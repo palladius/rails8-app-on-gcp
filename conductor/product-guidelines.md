@@ -9,5 +9,5 @@
 - **Readability First:** Favor explicit, readable code over overly clever or concise Ruby tricks. Workshop attendees should be able to parse the logic instantly.
 
 ## 3. Error Handling Philosophy
-- **Fail Fast & Loud:** In an educational context, silent failures are the enemy. If a critical environment variable is missing (e.g., `GCP_PROJECT_ID` or `DATABASE_URL`), the app should crash immediately with a loud, descriptive error message explaining exactly what the attendee missed. 
+- **Fail Fast & Loud:** In an educational context, silent failures are the enemy. If a critical environment variable is missing (e.g., `GOOGLE_CLOUD_PROJECT` or `DATABASE_URL`), the app should crash immediately with a loud, descriptive error message explaining exactly what the attendee missed. 
 - **No Graceful Degradation for Infrastructure:** Do not fall back to local disk if Cloud Storage fails in production, so the user knows exactly when they have successfully wired up GCP.

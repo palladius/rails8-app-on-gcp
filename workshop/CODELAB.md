@@ -212,7 +212,7 @@ Currently, uploaded images are saved locally in the `storage/` folder. We will m
    ```yaml
    google:
      service: GCS
-     project: <%= ENV.fetch("GCP_PROJECT_ID") %>
+     project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") %>
      bucket: <%= ENV.fetch("GCS_BUCKET_NAME") %>
      iam: true  # Sign URLs via IAM Credentials signBlob API (no private key JSON required!)
    ```

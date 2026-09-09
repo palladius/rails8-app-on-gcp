@@ -85,7 +85,7 @@ just workshop-test
 
 La suite diagnostica (`just workshop-test`) verifica in tempo reale:
 - 👤 **Identità & Admin Email**: Verifica `ADMIN_EMAIL` in `.env`.
-- ☁️ **Progetto GCP & Billing**: Valida `GCP_PROJECT_ID` e la **presenza obbligatoria del billing attivo** (`gcloud beta billing projects describe`).
+- ☁️ **Progetto GCP & Billing**: Valida `GOOGLE_CLOUD_PROJECT` e la **presenza obbligatoria del billing attivo** (`gcloud beta billing projects describe`).
 - 🔐 **Credenziali ADC**: Valida Application Default Credentials per Vertex AI senza API key.
 - 🔑 **Rails Master Key**: Controlla le chiavi locali di decifratura.
 - 🐤 **Storage Canary**: Controlla l'asset canary su Google Cloud Storage.

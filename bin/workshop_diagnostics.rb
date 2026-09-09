@@ -36,19 +36,29 @@ if File.exist?(env_file)
   end
   puts "📄 [ENV] .env file found and parsed (#{env_vars.keys.count} vars)".green
 
-  # Strict Anti-Legacy Check: PROJECT_ID is forbidden, must use GOOGLE_CLOUD_PROJECT
-  if env_vars.key?("PROJECT_ID")
-    puts "❌ [ERROR] Found deprecated variable 'PROJECT_ID' in #{env_file}!".red
-    puts "   👉 Nei nuovi standard di Google Cloud / Terraform / Pulumi, 'PROJECT_ID' è deprecato."
-    puts "   👉 Rinomina 'PROJECT_ID' in 'GOOGLE_CLOUD_PROJECT' nel tuo file .env!"
+  # Strict Anti-Legacy Check: PROJECT_ID and GCP_PROJECT_ID are forbidden, must use GOOGLE_CLOUD_PROJECT
+  if env_vars.key?("PROJECT_ID") || env_vars.key?("GCP_PROJECT_ID")
+    bad_key = env_vars.key?("GCP_PROJECT_ID") ? "GCP_PROJECT_ID" : "PROJECT_ID"
+    puts "❌ [ERROR] Found deprecated variable '#{bad_key}' in #{env_file}!".red
+    puts "   👉 Nei nuovi standard di Google Cloud / Terraform / Pulumi, '#{bad_key}' è deprecato."
+    puts "   👉 Rinomina '#{bad_key}' in 'GOOGLE_CLOUD_PROJECT' nel tuo file .env!"
     errors_count += 1
   end
 
-  # Strict Anti-Legacy Check: GCLOUD_USER is forbidden, must use GOOGLE_CLOUD_ACCOUNT
-  if env_vars.key?("GCLOUD_USER")
-    puts "❌ [ERROR] Found deprecated variable 'GCLOUD_USER' in #{env_file}!".red
-    puts "   👉 'GCLOUD_USER' è deprecato. Lo standard ufficiale è 'GOOGLE_CLOUD_ACCOUNT'."
-    puts "   👉 Rinomina 'GCLOUD_USER' in 'GOOGLE_CLOUD_ACCOUNT' nel tuo file .env!"
+  # Strict Anti-Legacy Check: GCP_REGION is forbidden, must use GOOGLE_CLOUD_REGION
+  if env_vars.key?("GCP_REGION")
+    puts "❌ [ERROR] Found deprecated variable 'GCP_REGION' in #{env_file}!".red
+    puts "   👉 Lo standard ufficiale Google Cloud è 'GOOGLE_CLOUD_REGION'."
+    puts "   👉 Rinomina 'GCP_REGION' in 'GOOGLE_CLOUD_REGION' nel tuo file .env!"
+    errors_count += 1
+  end
+
+  # Strict Anti-Legacy Check: GCLOUD_USER and GCP_EMAIL are forbidden, must use GOOGLE_CLOUD_ACCOUNT
+  if env_vars.key?("GCLOUD_USER") || env_vars.key?("GCP_EMAIL")
+    bad_email_key = env_vars.key?("GCP_EMAIL") ? "GCP_EMAIL" : "GCLOUD_USER"
+    puts "❌ [ERROR] Found deprecated variable '#{bad_email_key}' in #{env_file}!".red
+    puts "   👉 '#{bad_email_key}' è deprecato. Lo standard ufficiale è 'GOOGLE_CLOUD_ACCOUNT'."
+    puts "   👉 Rinomina '#{bad_email_key}' in 'GOOGLE_CLOUD_ACCOUNT' nel tuo file .env!"
     errors_count += 1
   end
 else
@@ -59,8 +69,8 @@ end
 
 puts "\n--- 👤 1. Checking Google Cloud & Admin Identity (GOOGLE_CLOUD_ACCOUNT) ---".bold
 # GOOGLE_CLOUD_ACCOUNT is primary for billing, terraform, IAM, ADC, and IAP; ADMIN_EMAIL defaults to it.
-gcp_account = env_vars["GOOGLE_CLOUD_ACCOUNT"] || env_vars["GOOGLE_CLOUD_EMAIL"] || env_vars["GCP_EMAIL"] ||
-              ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"] || ENV["GCP_EMAIL"]
+gcp_account = env_vars["GOOGLE_CLOUD_ACCOUNT"] || env_vars["GOOGLE_CLOUD_EMAIL"] ||
+              ENV["GOOGLE_CLOUD_ACCOUNT"] || ENV["GOOGLE_CLOUD_EMAIL"]
 admin_email = env_vars["ADMIN_EMAIL"] || ENV["ADMIN_EMAIL"]
 
 # Auto-discover GCP account from gcloud if omitted in .env
@@ -110,15 +120,15 @@ if !admin_email.to_s.strip.empty? && !gcp_account.to_s.strip.empty? && admin_ema
 end
 
 puts "\n--- ☁️  2. Checking Google Cloud Project & Billing ---".bold
-project_id = env_vars["GCP_PROJECT_ID"] || env_vars["GOOGLE_CLOUD_PROJECT"] || ENV["GCP_PROJECT_ID"] || ENV["GOOGLE_CLOUD_PROJECT"]
+project_id = env_vars["GOOGLE_CLOUD_PROJECT"] || ENV["GOOGLE_CLOUD_PROJECT"]
 if project_id.to_s.strip.empty? || project_id == "your-gcp-project-id"
   # Attempt to fetch from gcloud
   project_id = `gcloud config get-value project 2>/dev/null`.strip
 end
 
 if project_id.empty? || project_id == "(unset)"
-  puts "❌ [ERROR] GCP Project ID is not set in .env or gcloud!".red
-  puts "   👉 Set GCP_PROJECT_ID in .env or run: gcloud config set project <PROJECT_ID>"
+  puts "❌ [ERROR] Google Cloud Project ID is not set in .env or gcloud!".red
+  puts "   👉 Set GOOGLE_CLOUD_PROJECT in .env or run: gcloud config set project <PROJECT_ID>"
   errors_count += 1
 else
   puts "✅ Active GCP Project ID: #{project_id}".green

@@ -50,7 +50,7 @@ class NanobananaTest < ActiveSupport::TestCase
   # --- availability & generation ---------------------------------------------
 
   test "not available without a project id" do
-    with_env("GOOGLE_CLOUD_PROJECT" => nil, "GCP_PROJECT_ID" => nil) do
+    with_env("GOOGLE_CLOUD_PROJECT" => nil) do
       assert_not Nanobanana.available?
     end
   end
@@ -64,7 +64,7 @@ class NanobananaTest < ActiveSupport::TestCase
   end
 
   test "falls back to the fake cover when no project is configured" do
-    with_env("GOOGLE_CLOUD_PROJECT" => nil, "GCP_PROJECT_ID" => nil) do
+    with_env("GOOGLE_CLOUD_PROJECT" => nil) do
       result = Nanobanana.generate_image("anything")
       assert_equal :fake, result.source
       assert_equal "image/png", result.content_type

@@ -247,7 +247,6 @@ class StatusesController < ApplicationController
     # Inspection targets
     vars_of_interest = %w[
       GOOGLE_CLOUD_PROJECT
-      GCP_PROJECT_ID
       GOOGLE_CLOUD_REGION
       GOOGLE_CLOUD_LOCATION
       NANOBANANA_MODEL
