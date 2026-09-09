@@ -11,7 +11,7 @@ Screenshots for workshop steps and codelab walkthroughs are specified declarativ
 
 ```markdown
 <!-- workshop-screenshot: id="step-2-home-ephemeral" -->
-![Blog Homepage with Ephemeral DB Badge](assets/screenshots/step-2-home-ephemeral.png)
+![Blog Homepage with Ephemeral DB Badge](assets/auto-screenshots/step-2-home-ephemeral.png)
 ```
 
 Each screenshot references a Playwright runner script under `workshop/screenshots/` (e.g. `.playwright.js`).

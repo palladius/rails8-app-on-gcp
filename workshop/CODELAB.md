@@ -216,7 +216,7 @@ docker compose up
 > 📸 **TODO(riccardo): add screenshot of the local blog homepage showing the yellow [EPHEMERAL DB / STORAGE] badge and the casetta stamp in the bottom-right of the cover image**
 
 <!-- workshop-screenshot: id="step-2-home-ephemeral" -->
-![Blog Homepage with Ephemeral DB Badge](assets/screenshots/step-2-home-ephemeral.png)
+![Blog Homepage with Ephemeral DB Badge](assets/auto-screenshots/step-2-home-ephemeral.png)
 
 ### 4. Automated Step 2 Validation
 

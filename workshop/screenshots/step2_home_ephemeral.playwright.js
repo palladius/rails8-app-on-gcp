@@ -7,7 +7,7 @@ const fs = require('fs');
 
 async function capture() {
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-  const outputPath = process.env.SCREENSHOT_OUTPUT || path.resolve(__dirname, '../assets/screenshots/step-2-home-ephemeral.png');
+  const outputPath = process.env.SCREENSHOT_OUTPUT || path.resolve(__dirname, '../assets/auto-screenshots/step-2-home-ephemeral.png');
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
