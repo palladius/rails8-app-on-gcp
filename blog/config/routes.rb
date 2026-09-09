@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resource :profile, controller: "users", only: [:show]
   resources :passwords, param: :token
   resources :posts do
+    delete :purge_cover_image, on: :member
     resources :comments
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

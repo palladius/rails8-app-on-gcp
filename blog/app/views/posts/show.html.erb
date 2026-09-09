@@ -26,7 +26,7 @@
   <%# === Body + hero image together in one glass card === %>
   <div class="post-show__body-glass">
     <% if @post.cover_image.attached? %>
-      <div class="post-show__hero-glass">
+      <div id="post-show__hero-<%= @post.id %>" class="post-show__hero-glass">
         <%= image_tag @post.cover_image, class: cover_image_classes("post-show__hero-img"), title: cover_image_title %>
         <%= cover_image_stamp_tag("post-show__hero-stamp") %>
       </div>
@@ -40,6 +40,10 @@
 
 <div class="post-show__actions">
   <%= link_to "✏️ Edit", edit_post_path(@post), class: "post-action-btn" %>
+  <% if @post.cover_image.attached? %>
+    <%= button_to "🔄 Regenerate Cover", purge_cover_image_post_path(@post), method: :delete, class: "post-action-btn post-action-btn--secondary",
+        data: { turbo_confirm: "Delete current cover image and generate a new one?" } %>
+  <% end %>
   <%= link_to "⬅️ Back", posts_path, class: "post-action-btn post-action-btn--secondary" %>
   <%= button_to "🗑️ Destroy", @post, method: :delete, class: "post-action-btn post-action-btn--danger",
       data: { turbo_confirm: "Are you sure?" } %>

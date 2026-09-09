@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.41] - 2026-09-09
+### Added
+- 🖼️ **Button to Delete & Regenerate Article Cover Image (Fixes [#34](https://github.com/palladius/rails8-app-on-gcp/issues/34))**:
+  - Added member route `DELETE /posts/:id/purge_cover_image` to purge post cover image and re-enqueue `GenerateCoverImageJob` asynchronously.
+  - Added "🔄 Regenerate Cover" button on `posts#show` hero actions and "🗑️ Delete & Regenerate Cover" button with image preview in `posts#edit` form.
+  - Supports reactive Turbo Stream removal and broadcast updates via Turbo Streams.
+  - Comprehensive integration/controller tests with test execution under 5 seconds.
+
 ## [0.1.40] - 2026-09-09
 ### Changed
 - 📖 **Comprehensive Codelab Rewrite: Canonical 8 Steps & 3 Deployments (Fixes [#29](https://github.com/palladius/rails8-app-on-gcp/issues/29))**:

@@ -23,6 +23,13 @@
 
   <div>
     <%= form.label :cover_image, "Cover Image (GCS)", style: "display: block" %>
+    <% if post.persisted? && post.cover_image.attached? %>
+      <div style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem;">
+        <%= image_tag post.cover_image, class: cover_image_classes, style: "height: 60px; width: auto; border-radius: 8px;", title: cover_image_title %>
+        <%= button_to "🗑️ Delete & Regenerate Cover", purge_cover_image_post_path(post), method: :delete, class: "post-action-btn post-action-btn--secondary", style: "padding: 6px 14px; font-size: 0.85rem;",
+            data: { turbo_confirm: "Delete current cover image and generate a new one?" } %>
+      </div>
+    <% end %>
     <%= form.file_field :cover_image %>
   </div>
 
