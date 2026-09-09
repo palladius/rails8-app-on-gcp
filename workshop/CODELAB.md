@@ -614,11 +614,13 @@ When an article is created without a cover image, `GenerateCoverImageJob` automa
 
 > 📸 **TODO(riccardo): add screenshot of a blog post with an AI-generated vintage 1960s Italian movie poster featuring a cameo banana and ruby 8**
 
-### 2. The Bilingual Podcastifier (TTS Synthesis)
+### 2. The Bilingual Podcastifier Quest (TTS Synthesis Exercise)
 
-Click the **"Generate Audio Podcast"** button on any article:
-- Solid Queue invokes Google Cloud Text-to-Speech to generate a bilingual audio overview of the post.
-- An in-browser HTML5 audio player appears, allowing users to listen to your blog!
+In this hands-on workshop exercise, you pair program with **Google Antigravity** to implement audio podcasts for your articles:
+- Ask Antigravity: *"Help me implement a PodcastifierJob that uses Google Cloud Text-to-Speech to generate an Italian audio overview and attach it via ActiveStorage!"*
+- Connect `CloudTtsService` or call the Text-to-Speech API directly using Application Default Credentials (`it-IT-Wavenet-A`).
+- Add a **"🎙️ Generate Audio Podcast"** button to the post view and render an HTML5 `<audio controls>` player when attached.
+- When you click generate, Solid Queue executes the synthesis in the background without blocking web requests!
 
 ### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
 
