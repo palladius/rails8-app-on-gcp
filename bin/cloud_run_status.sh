@@ -136,6 +136,7 @@ ruby -rjson -e '
   puts "  #{ai["badge"] || "🍌 GenAI"}:      #{ai["details"]}"
   puts "  #{jobs["badge"] || "⚡ Jobs"}:       #{jobs["pending_count"].to_i} pending, #{jobs["failed_count"].to_i} failed"
   puts "─────────────────────────────────────────────────────────────"
-  puts "  📊 Content:        #{sys["posts_count"]} Posts · #{sys["admin_users_count"]} Registered Users"
+  blobs_count = sys["blobs_count"] || storage["blobs_count"] || 0
+  puts "  📊 Content:        #{sys["posts_count"]} Posts · #{sys["admin_users_count"]} Registered Users · #{blobs_count} Media Blobs"
   puts ""
 ' "$STATUS_JSON" "$CLOUD_RUN_URL"

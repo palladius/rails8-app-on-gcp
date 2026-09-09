@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2026-09-09
+### Added
+- 🪣 **Sub-Second Storage Objects Telemetry (`StatusesController` & `check_gcp_setup.sh`)**:
+  - Added `blobs_count` and `attachments_count` to `/status.json` and `StatusesController` (computed in ~1ms via ActiveStorage).
+  - Optimized `iac/check_gcp_setup.sh` to use direct `gcloud storage objects list` instead of slow recursive wildcard descent.
+  - Surfaced Media Blobs count directly in `just cloud-run-status` summary dashboard.
+
 ## [0.2.3] - 2026-09-09
 ### Added
 - 🚀 **`just cloud-run-status` Recipe & Telemetry Inspector (`bin/cloud_run_status.sh`)**:

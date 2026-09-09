@@ -25,9 +25,9 @@ echo -e "\n=== 1️⃣ Checking ActiveStorage GCS Buckets ==="
 for env in dev test prod; do
   BUCKET_NAME="${PROJECT_ID}-activestorage-${env}"
   if gcloud storage ls "gs://${BUCKET_NAME}" &>/dev/null; then
-    # Count media. We suppress errors and count lines.
-    COUNT=$(gcloud storage ls "gs://${BUCKET_NAME}/**" 2>/dev/null | wc -l | tr -d ' ')
-    echo "  ✅ Bucket gs://${BUCKET_NAME} exists (📊 $COUNT media)"
+    # Count media objects fast (< 1s per bucket)
+    COUNT=$(gcloud storage objects list "gs://${BUCKET_NAME}" --format="value(name)" 2>/dev/null | wc -l | tr -d ' ')
+    echo "  ✅ Bucket gs://${BUCKET_NAME} exists (📊 $COUNT media objects)"
   else
     echo "  ❌ Bucket gs://${BUCKET_NAME} DOES NOT exist or access denied!"
   fi
