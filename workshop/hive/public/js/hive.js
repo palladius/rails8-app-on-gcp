@@ -201,8 +201,10 @@ function renderTable() {
     }
 
     const stepBarHtml = `
-      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 hover:border-amber-500/50 transition-all cursor-help ml-auto group" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
-        <span class="font-mono text-[10px] font-bold text-amber-300">${stepNum}<span class="text-slate-500 text-[9px]">/8</span></span>
+      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 hover:border-amber-500/50 transition-all cursor-help ml-auto group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+        <span class="font-mono text-[11px] font-bold tracking-tight">
+          <span class="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+        </span>
         <div class="flex items-center gap-0.5">
           ${segmentsHtml}
         </div>
