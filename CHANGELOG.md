@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [0.1.39] - 2026-09-09
+### Added
+- 🏠 **Resilient Storage Provenance Stamp Watermark UI Overlay (Issue [#18](https://github.com/palladius/rails8-app-on-gcp/issues/18))**:
+  - Implemented `cover_image_stamp_tag` helper in `blog/app/helpers/application_helper.rb` and responsive glass CSS overlay in `blog/app/assets/stylesheets/application.css`.
+  - Stamps the bottom-right corner of cover images with `nanobanana_stamp_local.png` (the "casetta" / `127.0.0.1` ephemeral disk badge) when `storage_tier == :local`, and `nanobanana_stamp_cloud.png` when `storage_tier == :gcs`.
+  - Ensures the visual provenance cue is 100% visible across all platforms, on both user-uploaded and AI-generated covers, without requiring host C-dependencies (`libvips.so.42`).
+  - Added unit test coverage in `blog/test/helpers/application_helper_test.rb`.
+- ⚙️ **Dedicated `gcloud` Named Configuration & Multi-Account Isolation (Issue [#38](https://github.com/palladius/rails8-app-on-gcp/issues/38))**:
+  - Integrated `rails8-on-gcp-workshop` dedicated configuration in `workshop/CODELAB.md` and `workshop/skeleton.yaml` to isolate CLI properties from users' unrelated corporate or personal GCP projects.
+  - Enhanced `bin/workshop_diagnostics.rb` to display active gcloud configuration and inject `--account` and `--billing-project` flags to reliably support developers logged into multiple Google accounts.
+
 ## [0.1.38] - 2026-09-09
 ### Changed
 - 🌐 **Purged `GCP_PROJECT_ID` & Standardized Environment Variables**:

@@ -7,6 +7,7 @@ steps:
     title: "Prerequisites, Antigravity Setup & Billing Verification"
     description: "Verify local toolchain, Google Cloud authentication, project selection, and billing status before writing code."
     pseudocode: |
+      gcloud config configurations create rails8-on-gcp-workshop --activate 2>/dev/null || gcloud config configurations activate rails8-on-gcp-workshop
       gcloud auth login $GOOGLE_CLOUD_ACCOUNT && gcloud auth application-default login
       gcloud config set project $GOOGLE_CLOUD_PROJECT
       gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT

@@ -19,6 +19,11 @@ module ApplicationHelper
     end
   end
 
+  def cover_image_stamp_tag(extra_class = nil)
+    stamp_name = storage_tier == :gcs ? "nanobanana_stamp_cloud.png" : "nanobanana_stamp_local.png"
+    image_tag stamp_name, class: class_names("cover-image-stamp", extra_class), title: cover_image_title, alt: "Storage provenance stamp (#{storage_tier})"
+  end
+
   def launch_mode_info
     raw = ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.strip
 

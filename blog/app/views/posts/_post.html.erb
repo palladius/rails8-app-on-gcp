@@ -10,8 +10,9 @@
   </div>
 
   <% if post.cover_image.attached? %>
-    <div style="margin-top: 1em; max-width: 600px;">
-      <%= image_tag post.cover_image, class: cover_image_classes, style: "max-width: 100%; height: auto;", title: cover_image_title %>
+    <div class="post-card__hero" style="margin-top: 1em; max-width: 600px; position: relative; display: inline-block;">
+      <%= image_tag post.cover_image, class: cover_image_classes, style: "max-width: 100%; height: auto; display: block; border-radius: 8px;", title: cover_image_title %>
+      <%= cover_image_stamp_tag("post-card__stamp") %>
     </div>
   <% end %>
 

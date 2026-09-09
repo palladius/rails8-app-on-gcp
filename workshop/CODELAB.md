@@ -38,20 +38,26 @@ Before we begin, ensure you have the following tools available in your environme
 - **Ruby 3.3+ & Rails 8:** (`ruby -v`, `rails -v`).
 - **Google Antigravity IDE / Gemini CLI:** Your autonomous AI pair programming assistant ([Download Google Antigravity](https://antigravity.google/download)).
 
-### 2. Google Cloud Authentication & Project Selection
+### 2. Google Cloud Authentication, Dedicated Configuration & ADC
 
-Authenticate your user account and Application Default Credentials (ADC), which allows Google Antigravity, Vertex AI, and local test suites to communicate securely with Google Cloud:
+To prevent collisions with existing corporate, personal, or multi-account gcloud setups, we strongly recommend creating a dedicated named configuration for this workshop:
 
 ```bash
-gcloud auth login
+# 1. Create and activate dedicated workshop configuration (Fixes Issue #38)
+gcloud config configurations create rails8-on-gcp-workshop --activate 2>/dev/null || \
+  gcloud config configurations activate rails8-on-gcp-workshop
+
+# 2. Authenticate your account and Application Default Credentials (ADC)
+gcloud auth login $GOOGLE_CLOUD_ACCOUNT
 gcloud auth application-default login
+
+# 3. Configure active project and region
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+gcloud config set compute/region europe-west1
 ```
 
-Set your active Google Cloud Project ID:
-```bash
-export PROJECT_ID="your-project-id"
-gcloud config set project $PROJECT_ID
-```
+> 💡 **Why a Dedicated Configuration?**  
+> Using `gcloud config configurations create rails8-on-gcp-workshop` isolates all CLI settings (account, quota project, default region) specifically for this workshop. When you finish, you can switch back to your normal setup anytime with `gcloud config configurations activate default`.
 
 ### 3. 🚨 Mandatory Guard Gate: GCP Billing Verification
 

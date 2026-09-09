@@ -22,7 +22,10 @@
         </td>
         <td>
           <% if post.cover_image.attached? %>
-            <%= image_tag post.cover_image, class: cover_image_classes, style: "height: 30px; width: auto; vertical-align: middle; margin-right: 8px;", title: cover_image_title %>
+            <span style="position: relative; display: inline-block; vertical-align: middle; margin-right: 8px;">
+              <%= image_tag post.cover_image, class: cover_image_classes, style: "height: 30px; width: auto; vertical-align: middle; border-radius: 4px;", title: cover_image_title %>
+              <%= cover_image_stamp_tag("table-thumb__stamp") %>
+            </span>
           <% end %>
           <%= link_to post.title, post %>
         </td>

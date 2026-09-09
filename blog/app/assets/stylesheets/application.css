@@ -381,6 +381,7 @@ a[href$="/posts/new"]:hover {
 
 /* Hero image: floated top-right, flush with body card edges */
 .post-show__hero-glass {
+  position: relative;
   float: right;
   width: 160px;
   /* negative margins cancel the card padding so image is flush top-right */
@@ -415,6 +416,36 @@ a[href$="/posts/new"]:hover {
    moves to a GCS bucket. */
 .cover-image--local {
   filter: grayscale(1);
+}
+
+/* Provenance watermark stamp overlays (local casetta vs cloud) */
+.cover-image-stamp {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.7));
+  transition: transform 0.3s ease;
+}
+
+.post-show__hero-stamp {
+  bottom: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+}
+
+.post-card__stamp {
+  bottom: 6px;
+  right: 6px;
+  width: 36px;
+  height: 36px;
+}
+
+.table-thumb__stamp {
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
 }
 
 .post-show__body-content {

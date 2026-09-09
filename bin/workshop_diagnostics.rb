@@ -133,9 +133,16 @@ if project_id.empty? || project_id == "(unset)"
 else
   puts "✅ Active GCP Project ID: #{project_id}".green
 
-  # Check gcloud authentication & multi-account support
+  # Check gcloud configuration, authentication & multi-account support
+  active_config = `gcloud config configurations list --filter=IS_ACTIVE=true --format="value(name)" 2>/dev/null`.strip
   credentialed_accounts = `gcloud auth list --format="value(account)" 2>/dev/null`.strip.split("\n").map(&:strip).reject(&:empty?)
   active_account = `gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null`.strip
+
+  if active_config.empty?
+    puts "ℹ️  Active gcloud configuration: default".cyan
+  else
+    puts "ℹ️  Active gcloud configuration: #{active_config}".cyan
+  end
 
   if credentialed_accounts.empty?
     puts "❌ [ERROR] No gcloud accounts logged in!".red

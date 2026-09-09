@@ -14,6 +14,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Google Antigravity IDE or Gemini CLI environment
 - **`pseudocode`**:
   ```bash
+  gcloud config configurations create rails8-on-gcp-workshop --activate 2>/dev/null || gcloud config configurations activate rails8-on-gcp-workshop
   gcloud auth login $GOOGLE_CLOUD_ACCOUNT && gcloud auth application-default login
   gcloud config set project $GOOGLE_CLOUD_PROJECT
   gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT

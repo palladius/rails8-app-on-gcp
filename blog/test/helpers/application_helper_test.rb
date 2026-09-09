@@ -42,6 +42,11 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "cover-image--local", cover_image_classes
     assert_equal "post-show__hero-img cover-image--local", cover_image_classes("post-show__hero-img")
     assert_match(/grayscale/, cover_image_title)
+
+    stamp = cover_image_stamp_tag("post-show__hero-stamp")
+    assert_match(/nanobanana_stamp_local/, stamp)
+    assert_match(/cover-image-stamp post-show__hero-stamp/, stamp)
+    assert_match(/sad grayscale mode/, stamp)
   end
 
   test "storage tier is gcs for google services and covers keep their colors" do
@@ -50,6 +55,11 @@ class ApplicationHelperTest < ActionView::TestCase
       assert_equal "", cover_image_classes
       assert_equal "post-show__hero-img", cover_image_classes("post-show__hero-img")
       assert_match(/Cloud Storage/, cover_image_title)
+
+      stamp = cover_image_stamp_tag("post-show__hero-stamp")
+      assert_match(/nanobanana_stamp_cloud/, stamp)
+      assert_match(/cover-image-stamp post-show__hero-stamp/, stamp)
+      assert_match(/Cloud Storage/, stamp)
     end
   end
 
