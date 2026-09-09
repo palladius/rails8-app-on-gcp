@@ -30,8 +30,8 @@ module WorkshopHive
 
     get "/api/leaderboard" do
       content_type :json
-      creds = ServiceAccountLoader.load_credentials_hash
-      entries = SheetsReader.fetch_entries(credentials: creds)
+      authorizer = ServiceAccountLoader.load_authorizer
+      entries = SheetsReader.fetch_entries(credentials: authorizer)
 
       {
         status: "ok",
@@ -44,9 +44,10 @@ module WorkshopHive
     get "/api/healthchecks" do
       content_type :json
       # Prendi gli URL correnti dagli entries registrati
-      creds = ServiceAccountLoader.load_credentials_hash
-      entries = SheetsReader.fetch_entries(credentials: creds)
+      authorizer = ServiceAccountLoader.load_authorizer
+      entries = SheetsReader.fetch_entries(credentials: authorizer)
       urls = entries.map { |e| e[:url] }
+
 
       # Esegui il check asincrono / parallelo via thread
       checks = Healthchecker.check_all(urls)
