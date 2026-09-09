@@ -40,7 +40,7 @@ module WorkshopHive
       }
     ].freeze
 
-    def self.fetch_entries(sheet_id: ENV["HIVE_SPREADSHEET_ID"], credentials: nil)
+    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil)
       now = Time.now.to_i
       if @cache && (now - @cache_timestamp < CACHE_TTL_SECONDS)
         return @cache
@@ -118,30 +118,44 @@ module WorkshopHive
 
 
 
+    DEFAULT_SPREADSHEET_ID = "195OYMjc_ib2nysltnZE6cNmBw7xtXQ5WRC8igi7_AtM"
+    DEFAULT_GID = "1095789823"
+
     def self.fetch_from_public_csv(sheet_id_or_url)
       require "net/http"
       require "uri"
       require "csv"
 
-      url_str = if sheet_id_or_url.start_with?("http://") || sheet_id_or_url.start_with?("https://")
-                  sheet_id_or_url
-                else
-                  gid = ENV.fetch("HIVE_SHEET_GID", "0")
-                  "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/export?format=csv&gid=#{gid}"
-                end
-
-      uri = URI.parse(url_str)
-      res = Net::HTTP.get_response(uri)
-      # Follow redirect if Google Sheets 302/307
-      if res.is_a?(Net::HTTPRedirection) && res["location"]
-        res = Net::HTTP.get_response(URI.parse(res["location"]))
+      urls = []
+      if sheet_id_or_url.start_with?("http://") || sheet_id_or_url.start_with?("https://")
+        urls << sheet_id_or_url
+      else
+        gid = ENV.fetch("HIVE_SHEET_GID", DEFAULT_GID)
+        # Google Visualization API endpoint (ultra-reliable for public sheets)
+        urls << "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/gviz/tq?tqx=out:csv&gid=#{gid}"
+        urls << "https://docs.google.com/spreadsheets/d/#{sheet_id_or_url}/export?format=csv&gid=#{gid}"
       end
 
-      return nil unless res.is_a?(Net::HTTPSuccess)
-      return nil if res.body.include?("<!DOCTYPE html>") # Login/auth page returned instead of CSV
+      urls.each do |url_str|
+        uri = URI.parse(url_str)
+        res = Net::HTTP.get_response(uri)
+        # Follow up to 3 redirects if any
+        3.times do
+          break unless res.is_a?(Net::HTTPRedirection) && res["location"]
+          uri = URI.parse(res["location"])
+          res = Net::HTTP.get_response(uri)
+        end
 
-      rows = CSV.parse(res.body)
-      parse_rows(rows)
+        next unless res.is_a?(Net::HTTPSuccess)
+        next if res.body.include?("<!DOCTYPE html>") # Login/auth page returned instead of CSV
+        next if res.body.strip.empty?
+
+        rows = CSV.parse(res.body)
+        parsed = parse_rows(rows)
+        return parsed if parsed && !parsed.empty?
+      end
+
+      nil
     rescue StandardError => e
       warn "[SheetsReader] Failed to fetch public CSV: #{e.message}"
       nil
