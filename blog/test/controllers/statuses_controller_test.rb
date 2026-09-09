@@ -17,9 +17,12 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(response.body)
     assert json["system"].present?
+    assert_includes json["system"], "blobs_count"
+    assert_includes json["system"], "attachments_count"
     assert json["run_env"].present?
     assert json["database"].present?
     assert json["storage"].present?
+    assert_includes json["storage"], "blobs_count"
     assert json["ai"].present?
     assert json["jobs"].present?
   end
