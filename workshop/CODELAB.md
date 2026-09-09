@@ -33,7 +33,7 @@ This curriculum is structured around the **3 Progressive Cloud Run Deployments**
 Let's get started!
 
 > 🦖 **DEV TELEMETRY & WORKSHOP TRACKING:**  
-> **Workshop Curriculum:** `v2.0.1alpha` (Release `v0.2.8`) | **Git Branch:** `main`  
+> **Workshop Curriculum:** `v2.0.1alpha` (Release `v0.2.8`) | **Git Branch:** `fix-podcastifier-as-workshop-quest-v200`  
 > ⚠️ *Riccardo ricordati di toglierlo prima di Modena!* Segnatevi questo commit hash nel Friction Log per correlare i test.
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
@@ -614,11 +614,17 @@ When an article is created without a cover image, `GenerateCoverImageJob` automa
 
 > 📸 **TODO(riccardo): add screenshot of a blog post with an AI-generated vintage 1960s Italian movie poster featuring a cameo banana and ruby 8**
 
-### 2. The Bilingual Podcastifier (TTS Synthesis)
+### 2. The Bilingual Podcastifier Quest (TTS Synthesis Exercise)
 
-Click the **"Generate Audio Podcast"** button on any article:
-- Solid Queue invokes Google Cloud Text-to-Speech to generate a bilingual audio overview of the post.
-- An in-browser HTML5 audio player appears, allowing users to listen to your blog!
+In this hands-on workshop exercise, you pair program with **Google Antigravity** to implement audio podcasts for your articles:
+- Ask Antigravity: *"Help me implement a PodcastifierJob that uses Google Cloud Text-to-Speech with voice 'it-IT-Wavenet-A' to generate an Italian audio overview and attach it via ActiveStorage!"*
+- Ensure your synthesizer specifies the canonical Italian voice: `voice: "it-IT-Wavenet-A"` and language code: `it-IT` using Application Default Credentials.
+- Add a **"🎙️ Generate Audio Podcast"** button to the post view and render an HTML5 `<audio controls>` player when attached.
+- When you click generate, Solid Queue executes the synthesis in the background without blocking web requests!
+
+> 💡 **Reference Implementation Branch:**  
+> If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:  
+> [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier) (`git checkout solutions/podcastifier`).
 
 ### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
 
