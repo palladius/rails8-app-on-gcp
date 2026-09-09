@@ -3,22 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🐝 Workshop Hive Leaderboard</title>
+  <title>🐝 Workshop Hive — Live Leaderboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-fast {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+    .blink-up {
+      animation: pulse-fast 1.2s infinite;
+    }
+    .blink-down {
+      animation: pulse-fast 0.8s infinite;
+    }
+    /* Scrollbar sottile per la vista Kanban orizzontale */
+    .kanban-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+    .kanban-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-  <header class="p-6 border-b border-slate-800 flex items-center justify-between">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- Top Navigation / Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-3">
-      <span class="text-3xl">🐝</span>
-      <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Workshop Hive Leaderboard</h1>
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20">
+        🐝
+      </div>
+      <div>
+        <h1 class="text-xl font-black tracking-tight text-white flex items-center gap-2">
+          Workshop Hive Leaderboard
+          <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono font-medium">Cloud Run Live</span>
+        </h1>
+        <p class="text-xs text-slate-400">Rails 8 on GCP Workshop Gamification Hub</p>
+      </div>
     </div>
-    <div id="live-indicator" class="flex items-center gap-2 text-sm text-slate-400">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-      <span>Live Sync Active</span>
+
+    <!-- Stats & Live Polling Status -->
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-4 text-sm bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800">
+        <div>
+          <span class="text-slate-500 text-xs block uppercase tracking-wider font-semibold">Total Students</span>
+          <span id="stat-total-students" class="font-bold text-amber-400 text-lg">0</span>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div>
+          <span class="text-slate-500 text-xs block uppercase tracking-wider font-semibold">Healthy Apps (/up)</span>
+          <span id="stat-healthy-apps" class="font-bold text-emerald-400 text-lg">0</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs font-mono bg-slate-900 px-3 py-1.5 rounded-md border border-slate-800">
+        <span id="sync-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 blink-up"></span>
+        <span id="sync-text" class="text-slate-400">Sync: <span id="sync-timer" class="text-slate-200">Just now</span></span>
+      </div>
     </div>
   </header>
-  <main class="p-6">
-    <div class="text-slate-400">Initializing leaderboard...</div>
+
+  <!-- Main Kanban Board Container -->
+  <main class="flex-1 p-6 flex flex-col gap-6 overflow-hidden">
+    <!-- Filters / View switch -->
+    <div class="flex items-center justify-between">
+      <div class="text-sm text-slate-400">
+        Progression stages for <span class="text-slate-200 font-semibold">Rails 8 on Google Cloud</span>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> UP (200 OK)</span>
+        <span class="inline-flex items-center gap-1.5 ml-3"><span class="w-2 h-2 rounded-full bg-rose-500"></span> DOWN / Unreachable</span>
+      </div>
+    </div>
+
+    <!-- Horizontal Kanban Columns (Step 1 -> Step 7) -->
+    <div id="kanban-board" class="kanban-scroll flex-1 flex gap-4 overflow-x-auto pb-4 items-start">
+      <!-- Steps will be injected dynamically or template columns loaded -->
+    </div>
   </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 px-6 py-3 text-xs text-slate-500 flex items-center justify-between">
+    <div>Made with 🦖 & 🍝 by Riccardo & Emiliano — Rails 8 on GCP Workshop</div>
+    <div id="footer-last-updated">Auto-refreshing every 10s</div>
+  </footer>
+
+  <script src="/js/hive.js"></script>
 </body>
 </html>

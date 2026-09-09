@@ -56,5 +56,20 @@ class AppLeaderboardApiTest < Minitest::Test
     assert parsed.key?("checks")
     assert parsed.key?("timestamp")
   end
+
+  def test_serves_index_html_with_kanban
+    env = Rack::MockRequest.env_for("/", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "text/html"
+
+    body_str = ""
+    body.each { |part| body_str += part }
+    assert_includes body_str, "Workshop Hive Leaderboard"
+    assert_includes body_str, "kanban-board"
+    assert_includes body_str, "/js/hive.js"
+  end
 end
+
 
