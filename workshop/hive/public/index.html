@@ -64,10 +64,16 @@
         <span>🔔</span>
       </button>
 
-      <button onclick="document.getElementById('qr-modal').classList.remove('hidden')" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer" title="Scan QR Code to submit from your phone or screen">
-        <span>📱</span>
-        <span>QR Code</span>
-      </button>
+      <!-- Always-Visible Persistent QR Code Widget -->
+      <div class="flex items-center gap-2.5 bg-slate-900 hover:bg-slate-850 p-1.5 pr-3 rounded-xl border border-amber-500/40 shadow-sm cursor-pointer transition-all hover:scale-105" onclick="document.getElementById('qr-modal').classList.remove('hidden')" title="Click to enlarge QR code for projector/screen">
+        <div class="p-1 bg-white rounded-lg shadow-sm">
+          <img src="/submit_qr.png" alt="Submit QR Code" class="w-9 h-9 block">
+        </div>
+        <div class="flex flex-col text-left">
+          <span class="text-[10px] font-bold text-amber-300 leading-tight uppercase tracking-wider">Scan & Join</span>
+          <span class="text-[9px] font-mono text-slate-400 leading-tight">Submit App</span>
+        </div>
+      </div>
 
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
         <span>➕</span>
