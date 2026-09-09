@@ -277,6 +277,10 @@ Open the generated Cloud Run URL in your browser!
    - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
    - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
 
+> 🐝 **Join the Live Workshop Hive Leaderboard!**  
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSd3W_oqlZiOUbF6RtzMO8C1SkytvfHw59GI3H5UcR0r2Yx2Nw/viewform?usp=preview)
+
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
 
 ### 4. 💥 The Catch: The Stateless Shock
