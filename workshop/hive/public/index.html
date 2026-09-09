@@ -133,35 +133,49 @@
       </table>
     </div>
 
-    <!-- Stage Progress Distribution + Big Prominent Scan & Join QR Card -->
+    <!-- Sezione Inferiore: Distribuzione degli Step (75%) e Card Partecipa con QR Code (25%) -->
     <div class="mt-4 pt-4 border-t border-slate-800/80">
-      <div class="flex flex-col lg:flex-row gap-5 items-stretch">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         
-        <!-- Big Prominent Scan & Join Card (4x4x più grande, posizionata ad hoc accanto a Stage Distribution) -->
-        <div class="flex-shrink-0 bg-slate-900/90 hover:bg-slate-850 p-3.5 rounded-2xl border-2 border-amber-500/50 shadow-xl flex flex-col items-center justify-center text-center gap-2 transition-all hover:scale-[1.02] cursor-pointer group" onclick="document.getElementById('qr-modal').classList.remove('hidden')" title="Clicca per ingrandire il QR Code a schermo intero">
-          <div class="p-2 bg-white rounded-xl shadow-lg group-hover:ring-4 group-hover:ring-amber-400/40 transition-all">
-            <img src="/submit_qr.png" alt="QR Code Invia la tua App" class="w-32 h-32 md:w-36 md:h-36 block">
+        <!-- Colonna Sinistra (8 o 9 colonne su 12 ~ 70-75%): Distribuzione degli Step & Quick Guide -->
+        <div class="lg:col-span-9 flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2 px-1">
+              <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
+                <span>📊</span>
+                <span>Distribuzione degli Step</span>
+              </span>
+              <span class="text-slate-500 text-[11px]">(Cloud Run si attiva dallo Step 3 — Step 1 e 2 sono su ambiente locale)</span>
+            </div>
+            <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
+              <!-- Rendered dynamically by hive.js -->
+            </div>
           </div>
-          <div class="flex flex-col items-center">
-            <span class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1">
-              <span>📱</span>
-              <span>Inquadra & Partecipa</span>
-            </span>
-            <span class="text-[10px] font-mono text-slate-400">Invia la tua App Cloud Run</span>
+
+          <!-- Quick instructions strip -->
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl px-4 py-2.5 flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400">💡</span>
+              <span>Invia la tua app una sola volta: la telemetria si aggiorna da sola a ogni commit e deploy su Cloud Run!</span>
+            </div>
+            <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:text-amber-300 hover:underline font-mono text-[11px] flex items-center gap-1">
+              <span>docs/codelab</span>
+              <span>↗</span>
+            </a>
           </div>
         </div>
 
-        <!-- Stage Distribution Grid -->
-        <div class="flex-1 flex flex-col justify-between">
-          <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2.5 px-1">
-            <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
-              <span>📊</span>
-              <span>Distribuzione degli Step</span>
-            </span>
-            <span class="text-slate-500 text-[11px]">(Cloud Run si attiva dallo Step 3 — Step 1 e 2 sono su ambiente locale)</span>
+        <!-- Colonna Destra (3 o 4 colonne su 12 ~ 25-30%): QR Code compatto e proporzionato -->
+        <div class="lg:col-span-3 bg-slate-900/90 hover:bg-slate-850 p-4 rounded-2xl border-2 border-amber-500/40 shadow-xl flex flex-col items-center justify-center text-center gap-2.5 transition-all hover:scale-[1.02] cursor-pointer group" onclick="document.getElementById('qr-modal').classList.remove('hidden')" title="Clicca per ingrandire il QR Code a schermo intero">
+          <div class="p-2 bg-white rounded-xl shadow-lg group-hover:ring-4 group-hover:ring-amber-400/40 transition-all">
+            <img src="/submit_qr.png" alt="QR Code Invia la tua App" class="w-28 h-28 md:w-32 md:h-32 block">
           </div>
-          <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
-            <!-- Rendered dynamically by hive.js -->
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📱</span>
+              <span>Inquadra & Partecipa</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400 mt-0.5">Invia il tuo URL Cloud Run</span>
           </div>
         </div>
 
