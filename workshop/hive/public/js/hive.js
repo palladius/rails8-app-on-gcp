@@ -182,11 +182,17 @@ function renderTable() {
       <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
       <td class="py-3.5 px-5 align-middle">
         <div class="flex flex-col gap-1.5">
-          <!-- Riga 1: URL largo -->
-          <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
-            <span class="opacity-70 text-sm">🔗</span>
-            <span class="font-medium">${escapeHtml(student.url)}</span>
-          </a>
+          <!-- Riga 1: URL largo + Link a status.json -->
+          <div class="flex items-center gap-3 flex-wrap">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all max-w-2xl" title="${escapeHtml(student.url)}">
+              <span class="opacity-70 text-sm">🔗</span>
+              <span class="font-medium">${escapeHtml(student.url)}</span>
+            </a>
+            <a href="${escapeHtml(student.url.replace(/\/+$/, '') + '/status.json')}" target="_blank" rel="noopener noreferrer" class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border border-slate-700 hover:border-amber-500/40 transition-colors flex items-center gap-1" title="Inspect raw telemetry JSON">
+              <span>{ }</span>
+              <span>status.json</span>
+            </a>
+          </div>
 
           <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
           <div class="flex flex-wrap items-center gap-3">
