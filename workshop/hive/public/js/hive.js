@@ -66,7 +66,7 @@ function formatHHMM(isoOrStr) {
   try {
     const d = new Date(isoOrStr);
     if (!isNaN(d.getTime())) {
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     }
   } catch {}
 
@@ -164,17 +164,12 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome + Step badge -->
+      <!-- COLONNA 2: HH:MM Nome a sx + Step badge -->
       <td class="py-3.5 px-5 whitespace-nowrap align-middle">
         <div class="flex items-center gap-3">
-          <div class="flex flex-col">
-            <div class="font-bold text-slate-100 text-base flex items-center gap-1.5">
-              <span class="text-amber-400">${escapeHtml(nickname)}</span>
-            </div>
-            <div class="text-xs font-mono text-slate-400 flex items-center gap-1 mt-0.5">
-              <span class="text-slate-500">🕒</span>
-              <span>${escapeHtml(hhmm)}</span>
-            </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-xs font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
+            <span class="font-bold text-amber-400 text-base">${escapeHtml(nickname)}</span>
           </div>
 
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
