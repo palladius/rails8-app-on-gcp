@@ -1,0 +1,1 @@
+Phase 1 Complete: Scaffolded Sinatra Hive app in workshop/hive/, implemented ServiceAccountLoader (ENV JSON & Base64), SheetsReader with 30s cache & heuristics, and verified GET /api/leaderboard.
