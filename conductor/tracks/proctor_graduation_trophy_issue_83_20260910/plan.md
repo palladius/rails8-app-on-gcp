@@ -21,13 +21,13 @@
     - [x] Test GitHub API timeout or rate limit falls back gracefully to `:review_pending`
     - [x] Test in-memory 120s TTL caching
     - [x] Confirm tests fail (Red)
-- [~] Task: Implement `ProctorReviewer` in `workshop/hive/lib/proctor_reviewer.rb` (TDD Green)
-    - [ ] Parse `HIVE_PROCTORS` (default: `"palladius,emilianodellacasa,ricc"`)
-    - [ ] Build GitHub API comment fetcher using `Net::HTTP` with optional `GITHUB_TOKEN`
-    - [ ] Match case-insensitive `\bLGTM\b` from approved proctors
-    - [ ] Add in-memory thread-safe cache with 120s expiration
-    - [ ] Confirm `test_proctor_reviewer.rb` passes (Green)
-- [ ] Task: Integrate `ProctorReviewer` into `workshop/hive/lib/healthchecker.rb`
+- [x] Task: Implement `ProctorReviewer` in `workshop/hive/lib/proctor_reviewer.rb` (TDD Green) [1d71bac]
+    - [x] Parse `HIVE_PROCTORS` (default: `"palladius,emilianodellacasa,ricc"`)
+    - [x] Build GitHub API comment fetcher using `Net::HTTP` with optional `GITHUB_TOKEN`
+    - [x] Match case-insensitive `\bLGTM\b` from approved proctors
+    - [x] Add in-memory thread-safe cache with 120s expiration
+    - [x] Confirm `test_proctor_reviewer.rb` passes (Green)
+- [~] Task: Integrate `ProctorReviewer` into `workshop/hive/lib/healthchecker.rb`
     - [ ] Extract `quest` metadata from `/status.json`
     - [ ] When `ghi_issue` is present, invoke `ProctorReviewer.review(ghi_issue)`
     - [ ] Expose `quest` and `proctor_status` in telemetry payload
