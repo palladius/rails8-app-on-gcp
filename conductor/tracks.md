@@ -63,5 +63,5 @@
 
 ---
 
-- [ ] **Track: Cumulative Cascading Invariants for Workshop Steps (Issue #76)**
+- [~] **Track: Cumulative Cascading Invariants for Workshop Steps (Issue #76)**
 *Link: [tracks/cumulative_invariants_issue_76_20260910/index.md](tracks/cumulative_invariants_issue_76_20260910/index.md)*
