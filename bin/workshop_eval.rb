@@ -9,6 +9,7 @@ require 'yaml'
 require 'open3'
 require 'json'
 require 'optparse'
+require_relative '../lib/workshop_eval/invariant_checker'
 
 class String
   def red; "\e[31m#{self}\e[0m"; end
@@ -28,6 +29,8 @@ end
 
 data = YAML.load_file(yaml_path)
 steps = data['steps'] || []
+invariants = data['invariants'] || []
+checker = WorkshopEval::InvariantChecker.new(invariants: invariants, repo_root: File.expand_path('..', __dir__))
 
 if target_step != "all"
   target_num = target_step.to_s.gsub(/^step-?/, '')
@@ -130,6 +133,26 @@ steps.each do |step|
 
     else
       puts "SKIPPED (Unknown type: #{eval_type}) ⚠️".yellow
+    end
+  end
+
+  # Evaluate active cumulative cascading invariants for this step (one-way doors)
+  active_invariants = checker.invariants_for_step(step['number'])
+  if active_invariants.any?
+    puts "   🛡️  Verifying Cumulative Invariants (Active for Steps 1 -> #{step['number']}):".cyan.bold
+    active_invariants.each do |inv|
+      total_evals += 1
+      print "      - [INV: Step #{inv['from_step']}+] #{inv['title']}... "
+      result = checker.evaluate_invariant(inv)
+      if result.passed?
+        puts "PASSED ✅".green
+        passed_evals += 1
+      else
+        puts "FAILED ❌".red
+        puts "        🚨 REGRESSION ALERT: #{result.error_message}".red
+        puts "        💡 Milestone Step #{inv['from_step']} invariant violated: #{inv['description']}".yellow
+        failed_evals += 1
+      end
     end
   end
   puts ""

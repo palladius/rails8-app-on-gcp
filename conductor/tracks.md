@@ -63,5 +63,15 @@
 
 ---
 
+- [x] **Track: Cumulative Cascading Invariants for Workshop Steps (Issue #76)**
+*Link: [tracks/cumulative_invariants_issue_76_20260910/index.md](tracks/cumulative_invariants_issue_76_20260910/index.md)*
+
+---
+
+- [x] **Track: Hardening Workshop Evaluations: Semantic Checks, Negative Testing & Additional Monotonic Invariants (Issue #85)**
+*Link: [tracks/eval_hardening_issue_85_20260910/index.md](tracks/eval_hardening_issue_85_20260910/index.md)*
+
+---
+
 - [x] **Track: Proctor-Validated Graduation Trophy via GHI & LGTM Verification (Issue #83)**
 *Link: [tracks/proctor_graduation_trophy_issue_83_20260910/index.md](tracks/proctor_graduation_trophy_issue_83_20260910/index.md)*
