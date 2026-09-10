@@ -1,0 +1,4 @@
+Task: Integrate ProctorReviewer into workshop/hive/lib/healthchecker.rb
+Summary: Wired ProctorReviewer into Healthchecker.check so quest telemetry is inspected, proctor approval status is resolved, and student step_number is evaluated to 8 when LGTM approved. Added unit test in test_healthchecker.rb.
+Files: workshop/hive/lib/healthchecker.rb, workshop/hive/test/test_healthchecker.rb
+Why: Connects Rails status telemetry to Proctor review engine.
