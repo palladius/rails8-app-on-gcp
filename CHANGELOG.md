@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.11] - 2026-09-10
+### Added
+- 🎙️ **Step 7 Podcastifier Showcase Assets & Audio Links**:
+  - Embedded real screenshot of Podcastifier UI (`assets/auto-screenshots/step-7-podcastifier-ui.png`) showcasing dual audio players into Step 7 of `workshop/CODELAB.md`.
+  - Added direct links to authentic Google Cloud TTS audio samples (`assets/audio/podcastifier_italian_overview.mp3` with `it-IT-Wavenet-A` and `podcastifier_english_overview.mp3` with `en-US-Wavenet-D`).
+  - Attached assets and documentation to GitHub Issue [#72](https://github.com/palladius/rails8-app-on-gcp/issues/72).
+
 ## [0.2.10] - 2026-09-10
 ### Fixed
 - 🛠️ **Virgin Project Provisioning & Deploy 1 Robustness (Issue [#72](https://github.com/palladius/rails8-app-on-gcp/issues/72))**:
