@@ -1,0 +1,2 @@
+Task: Implement /boom Diagnostic Endpoint & STDERR Cloud Error Reporting (Green Phase)
+Added GET /boom route, BoomsController triggering deliberate RuntimeError, and CloudErrorReportingMiddleware logging unhandled errors to STDERR for Cloud Error Reporting.
