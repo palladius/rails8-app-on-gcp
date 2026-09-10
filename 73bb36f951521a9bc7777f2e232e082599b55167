@@ -1,0 +1,1 @@
+Phase 4: Declarative Evals & Invariants in workshop/skeleton.yaml. Added inv-toolchain-integrity, inv-database-migrations-current, inv-admin-user-seeded, and inv-three-tier-architecture; wired workshop_alerts_test.rb into step evals; removed permissive || true crutches.
