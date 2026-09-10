@@ -754,6 +754,43 @@ Now that you have mastered the canonical reference architecture, choose your gra
 
 ---
 
+### 🏆 Graduating on The Hive: Proctor-Validated Proof-of-Work
+
+Once you have completed your chosen quest, claim your **Step 8 Graduation Trophy 🏆** on **The Hive Leaderboard**:
+
+1. **Submit Your Quest on GitHub**:
+   - Open a new Issue on the official repository: [github.com/palladius/rails8-app-on-gcp/issues/new](https://github.com/palladius/rails8-app-on-gcp/issues/new)
+   - Title format: `🎓 [Step 8 Completed] <Your Name>: <Quest Name>`
+   - In the body, include a brief description of what you accomplished and a link to your live Cloud Run deployment.
+
+2. **Connect Your Cloud Run App to Your Issue**:
+   - Note your Issue number (e.g. `88` or the full URL `https://github.com/palladius/rails8-app-on-gcp/issues/88`).
+   - Inject the `STEP_8_GHI` environment variable into your Cloud Run service:
+     ```bash
+     gcloud run services update blog \
+       --region europe-west1 \
+       --update-env-vars STEP_8_GHI=<YOUR_ISSUE_NUMBER>
+     ```
+   - Verify that your `/status.json` endpoint now reports your quest:
+     ```bash
+     curl -s https://<YOUR_APP>.run.app/status.json | jq .quest
+     ```
+     You should see:
+     ```json
+     {
+       "step_8_completed": true,
+       "ghi_issue": 88,
+       "ghi_url": "https://github.com/palladius/rails8-app-on-gcp/issues/88"
+     }
+     ```
+
+3. **Get Your Proctor Review & Unlock the Golden Trophy**:
+   - Check **The Hive Leaderboard**: your row will now display an amber badge: `⏳ GHI #XX review pending`.
+   - Ask workshop proctors (**@palladius**, **@emilianodellacasa**, or **@ricc**) to inspect your deployment.
+   - As soon as a proctor comments **`LGTM`** on your issue, The Hive will automatically elevate your progress to **8/8 🏆** with a golden/purple glowing badge and a permanent trophy linking directly to your capstone issue!
+
+---
+
 ## 🎓 Conclusion & Clean Up
 
 *Duration: 5min*
