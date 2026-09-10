@@ -313,6 +313,41 @@ a[href$="/posts/new"]:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-top a {
+  color: #9e9e9e;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.footer-top a:hover {
+  color: #ce93d8;
+  text-decoration: underline;
+}
+
+.footer-link-hive {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.2s ease !important;
+}
+
+.footer-link-hive:hover {
+  background: rgba(245, 158, 11, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  color: #fde68a !important;
+  text-decoration: none !important;
+  transform: scale(1.05);
 }
 
 .footer-bottom {

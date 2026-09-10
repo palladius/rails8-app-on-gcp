@@ -46,8 +46,12 @@ resource "google_compute_backend_service" "iap_backend" {
     group = google_compute_region_network_endpoint_group.serverless_neg[0].id
   }
 
-  iap {
-    enabled = true
+  dynamic "iap" {
+    for_each = var.enable_iap && var.iap_client_id != "" ? [1] : []
+    content {
+      oauth2_client_id     = var.iap_client_id
+      oauth2_client_secret = var.iap_client_secret
+    }
   }
 
   depends_on = [google_project_service.iap_api]

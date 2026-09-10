@@ -26,3 +26,11 @@ This we need to fix
    - Quest 1: Zero-Trust Google IAP & HTTPS Load Balancer (`iac/iap.tf` + `IapAuthenticatable` concern). Tracked in [conductor/tracks/iap_zero_trust_auth_20260828/](conductor/tracks/iap_zero_trust_auth_20260828/).
    - Quest 2: Structured Cloud Logging & Error Reporting Alerting.
    - Quest 3: `pgvector` Semantic Search & Gemini Multimodal RAG on Cloud SQL.
+
+## 🦖 Friction Log 004 Learnings & Virgin Project Fixes (2026-09-09)
+
+* [x] **`iac/iap.tf`**: Provider 5.x schema validation required converting `iap { enabled = true }` into an optional `dynamic "iap"` block with `iap_client_id` / `iap_client_secret` defaults so `enable_iap = false` does not fail `terraform plan`/`apply`.
+* [x] **`iac/cicd.tf`**: Modern GCP projects require BYOSA on Cloud Build triggers. Made trigger opt-in with `enable_cicd_trigger = false` so attendees in virgin projects don't hit trigger creation errors.
+* [x] **`iac/cloudrun.tf`**: Injected `GOOGLE_CLOUD_ACCOUNT` and `GOOGLE_CLOUD_PROJECT` into Cloud Run container template so entrypoint `db:seed` does not crash with missing email error.
+* [x] **`StatusesController` HTTP Cache-Control**: Added 2-minute public Cache-Control with stale-while-revalidate to absorb high-frequency automated telemetry polling without hitting Cloud Run instance capacity limits.
+* [ ] **Automated API Enablement in Terraform**: Add explicit `google_project_service` resources in `iac/` for `secretmanager.googleapis.com` and `artifactregistry.googleapis.com` to guarantee unattended `terraform apply` works out of the box in virgin projects without manual `gcloud services enable`.

@@ -24,13 +24,32 @@ variable "enable_iap" {
 variable "iap_allowed_users" {
   description = "List of Google accounts allowed to access the Cloud Run app through IAP."
   type        = list(string)
-  default     = [
+  default = [
     "ricc@google.com",
     "emiliano.dellacasa@gmail.com",
     "palladiusbonton@gmail.com",
     "riccardo.and.kate@gmail.com",
     "riccardo.carlesso@gmail.com"
   ]
+}
+
+variable "iap_client_id" {
+  description = "OAuth2 Client ID for IAP (optional, required if enable_iap is true)."
+  type        = string
+  default     = ""
+}
+
+variable "iap_client_secret" {
+  description = "OAuth2 Client Secret for IAP (optional, required if enable_iap is true)."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "enable_cicd_trigger" {
+  description = "Whether to provision the automated GitHub push Cloud Build trigger (requires GitHub App integration)."
+  type        = bool
+  default     = false
 }
 
 

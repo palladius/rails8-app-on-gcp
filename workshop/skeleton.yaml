@@ -118,7 +118,8 @@ steps:
     pseudocode: |
       just workshop-rewind 1
       gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
-      # Test restart & observe lost data
+      # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
+      gcloud run services update blog --region us-central1 --update-env-vars SOLID_QUEUE_IN_PUMA=true
     prerequisites:
       - "Step 2 completed"
       - "Cloud Run API enabled in GCP project"
@@ -136,6 +137,16 @@ steps:
         type: "ruby"
         description: "Verify missing admin alert partial is present in views"
         code: "raise 'Missing alert' unless File.exist?('blog/app/views/workshop/alerts/_missing_admin.html.erb')"
+      - id: "step-3-ruby-docker-entrypoint-seed"
+        type: "ruby"
+        description: "Verify docker-entrypoint automatically runs db:seed to bootstrap admin user"
+        code: |
+          entrypoint = File.read('blog/bin/docker-entrypoint')
+          raise 'Missing db:seed invocation in docker-entrypoint' unless entrypoint.include?('db:seed')
+      - id: "step-3-llm-cloudrun-admin-bootstrapped"
+        type: "llm"
+        description: "Verify that Cloud Run boot sequence creates admin and does NOT display missing admin alert"
+        prompt: "Analyze the Cloud Run homepage HTML or curl response. Confirm that the application has bootstrapped successfully with db:seed and does NOT display 'Notice: No administrator user found in database!'. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
 
   - id: "step-4"
     number: 4
@@ -229,6 +240,16 @@ steps:
         description: "Verify full test suite passes against gold standard"
         command: "cd blog && just test"
         expect_exit: 0
+      - id: "step-6-ruby-solid-queue-active"
+        type: "ruby"
+        description: "Verify that Solid Queue worker or supervisor is active and draining jobs"
+        code: |
+          entrypoint = File.read('blog/bin/docker-entrypoint') rescue ""
+          puma_config = File.read('blog/config/puma.rb') rescue ""
+          compose_prod = File.read('blog/compose.prod.yaml') rescue ""
+          has_sidecar_worker = compose_prod.include?('solid_queue:start')
+          has_puma_plugin = puma_config.include?('plugin :solid_queue')
+          raise 'Solid Queue worker execution strategy missing' unless has_sidecar_worker || has_puma_plugin
 
   - id: "step-7"
     number: 7
@@ -253,6 +274,19 @@ steps:
         type: "llm"
         description: "Verify GenAI prompt conforms to Milanese vintage poster aesthetic"
         prompt: "Review the image generation prompt in GenerateCoverImageJob. Verify it requests a vintage retro poster style with a banana cameo. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+      - id: "step-7-ruby-podcastifier-scaffold-check"
+        type: "ruby"
+        description: "Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)"
+        code: |
+          job = File.read('blog/app/jobs/podcastifier_job.rb')
+          routes = File.read('blog/config/routes.rb')
+          raise 'Missing COMPLETE_ME placeholder' unless job.include?('COMPLETE_ME')
+          raise 'Job should be an unfilled stub before student works on it' if job.lines.count > 10
+          raise 'generate_podcast should not be in routes' if routes.include?('generate_podcast')
+      - id: "step-7-llm-podcastifier-button-test"
+        type: "llm"
+        description: "Verify student implementation of Podcastifier via Antigravity if attempted"
+        prompt: "Check the deployed Cloud Run post view for a podcast generation action or audio player (e.g. 'Generate Audio Podcast' button or <audio controls>). If present, confirm it renders without 500 error and points to an audio stream. If not yet attempted by student, report skipped/optional. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
 
   - id: "step-8"
     number: 8

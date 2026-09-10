@@ -60,9 +60,13 @@ build-slides:
 test-slides:
     ruby test/test_slides.rb
 
-# capture declarative screenshots (optional filter: step or id, e.g. just screenshots step-2)
+# generate screenshots idempotently (skips already existing screenshots, use force="true" to overwrite)
+generate-screenshots filter="" *flags:
+    node workshop/screenshots/runner.js {{filter}} {{flags}}
+
+# capture or re-capture declarative screenshots (force overwrite by default or specify filter)
 screenshots filter="":
-    node workshop/screenshots/runner.js {{filter}}
+    node workshop/screenshots/runner.js {{filter}} --force
 
 # test and validate all declarative screenshot declarations and scripts without needing server
 test-screenshots:
