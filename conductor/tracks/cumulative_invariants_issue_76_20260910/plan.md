@@ -28,10 +28,10 @@
 
 ## Phase 3: Visualizer, Tooling & End-to-End Verification
 
-- [ ] Task: Update visualizer compiler and verify tooling compatibility
-  - [ ] Update `workshop/visualizer/build_skeleton.rb` to render Cumulative Invariants in `workshop/SKELETON.md`
-  - [ ] Execute `just build-skeleton` and inspect generated `workshop/SKELETON.md`
-  - [ ] Verify `node workshop/screenshots/runner.js --dry-run` and `ruby test/test_workshop_screenshots.rb` pass cleanly
+- [x] Task: Update visualizer compiler and verify tooling compatibility (b3381fe)
+  - [x] Update `workshop/visualizer/build_skeleton.rb` to render Cumulative Invariants in `workshop/SKELETON.md`
+  - [x] Execute `just build-skeleton` and inspect generated `workshop/SKELETON.md`
+  - [x] Verify `node workshop/screenshots/runner.js --dry-run` and `ruby test/test_workshop_screenshots.rb` pass cleanly
 - [ ] Task: Full verification gate across the workshop
   - [ ] Run `bin/workshop_eval.rb 3` and verify Step 4+ and Step 6+ invariants do not run
   - [ ] Run `bin/workshop_eval.rb 7` and verify Step 4+ and Step 6+ invariants run and pass alongside the clean UI eval
