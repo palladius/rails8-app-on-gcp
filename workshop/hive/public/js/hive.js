@@ -230,7 +230,20 @@ function renderTable() {
     const hhmm = formatHHMM(student.timestamp);
     const nickname = student.nickname || "Anonymous";
     const rawStep = t.step_number || student.step_number || 1;
-    const stepNum = Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
+    let stepNum = Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
+
+    const isQuestSubmitted = !!(t.quest_ghi_issue);
+    const isProctorApproved = (t.proctor_status === 'lgtm_approved');
+    const isReviewPending = isQuestSubmitted && !isProctorApproved;
+
+    // Se approvato dal proctor, il gradino è ufficialmente 8/8
+    if (isProctorApproved) {
+      stepNum = 8;
+    } else if (isReviewPending && stepNum > 7) {
+      // Se è in attesa di review ma il container riportava step 8, visualizziamo 7/8 con badge pending
+      stepNum = 7;
+    }
+
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
 
     // Barra visiva a 8 segmenti orizzontali: ad es. [▮][▮][▮][▮][▯][▯][▯][▯] 4/8
@@ -246,15 +259,44 @@ function renderTable() {
       }
     }
 
+    const questUrl = t.quest_ghi_url || (t.quest_ghi_issue ? `https://github.com/palladius/rails8-app-on-gcp/issues/${t.quest_ghi_issue}` : null);
+
+    let trophyHtml = "";
+    let glowingBorderClass = "border-slate-700/60 hover:border-amber-500/50";
+    if (stepNum === 8 && isProctorApproved) {
+      glowingBorderClass = "border-purple-500/80 shadow-[0_0_12px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+      const reviewerText = t.proctor_reviewer ? ` by @${escapeHtml(t.proctor_reviewer)}` : "";
+      if (questUrl) {
+        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block ml-0.5" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-[12px] leading-none">🏆</span></a>`;
+      } else {
+        trophyHtml = `<span class="text-[12px] leading-none ml-0.5" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
+      }
+    } else if (stepNum === 8) {
+      trophyHtml = '<span class="text-[11px] leading-none ml-0.5">🏆</span>';
+    }
+
+    let pendingBadgeHtml = "";
+    if (isReviewPending && questUrl) {
+      pendingBadgeHtml = `
+        <a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 hover:border-amber-500/50 transition-colors" title="Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate">
+          <span class="text-xs leading-none animate-pulse">⏳</span>
+          <span class="font-bold text-[9.5px]">GHI #${escapeHtml(t.quest_ghi_issue)} review pending</span>
+        </a>
+      `;
+    }
+
     const stepBarHtml = `
-      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 hover:border-amber-500/50 transition-all cursor-help ml-auto group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
-        <span class="font-mono text-[11px] font-bold tracking-tight">
-          <span class="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
-        </span>
-        <div class="flex items-center gap-0.5">
-          ${segmentsHtml}
+      <div class="flex items-center gap-1.5 ml-auto">
+        ${pendingBadgeHtml}
+        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+          <span class="font-mono text-[11px] font-bold tracking-tight">
+            <span class="${stepNum === 8 ? 'text-purple-300' : 'text-amber-400'} drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+          </span>
+          <div class="flex items-center gap-0.5">
+            ${segmentsHtml}
+          </div>
+          ${trophyHtml}
         </div>
-        ${stepNum === 8 ? '<span class="text-[11px] leading-none ml-0.5">🏆</span>' : ''}
       </div>
     `;
 
