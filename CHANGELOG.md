@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
   - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
   - Added bilingual language switcher with 🇬🇧 EN and 🇮🇹 IT flags with static mirror (`index_it.html`).
   - Added visual thumbnail previews to the portal destination cards (Codelab step preview and Slide 1 artwork).
+  - Explicitly added `git` (2.30+) to workshop prerequisites checklist and evaluation specs (`CODELAB.md`, `skeleton.yaml`, `SKELETON.md`, and landing-page READMEs).
   - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
 
 ## [0.2.8] - 2026-09-09

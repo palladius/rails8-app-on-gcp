@@ -41,6 +41,7 @@ Let's get started!
 ### 1. Prerequisites Checklist
 
 Before we begin, ensure you have the following tools available in your environment:
+- **Git (2.30+):** (`git --version`) for version control, branching, and cloning the repository.
 - **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
 - **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
 - **Docker & Docker Compose:** Installed and running locally.

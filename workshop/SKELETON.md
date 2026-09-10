@@ -10,7 +10,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`description`**: Verify local toolchain, Google Cloud authentication, project selection, and billing status before writing code.
 - **`prerequisites`**:
   - Google Cloud Account with active credits or billing account
-  - Installed CLIs: gcloud, terraform, docker, ruby 3.3+, rails 8
+  - Git 2.30+ for cloning and branching repository
+  - Installed CLIs: git, gcloud, terraform, docker, ruby 3.3+, rails 8
   - Google Antigravity IDE or Gemini CLI environment
 - **`pseudocode`**:
   ```bash
@@ -24,6 +25,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Verified active billing account preventing mid-workshop quota failures
   - Antigravity connected and paired with repository
 - **`evals`**:
+  - `[SHELL]` Verify git CLI is installed and returns valid version
   - `[SHELL]` Verify gcloud CLI is installed and returns valid version
   - `[SHELL]` Verify Application Default Credentials file exists or can print token
   - `[RUBY]` Check Ruby version is 3.3 or higher
