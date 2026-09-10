@@ -24,7 +24,7 @@ The process is going to look like:
 
 Specific workshop editions and conference deliveries are organized under `workshop/events/YYYYMMDD-EVENT_NAME/`:
 - Contains event-specific readmes, schedules, links to live deployed slides, and conference retrospectives.
-- Premiere event: `workshop/events/20261002-devfest-modena/`.
+- Premiere event: `workshop/events/20261003-devfest-modena/`.
 
 ---
 

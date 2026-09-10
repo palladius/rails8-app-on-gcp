@@ -21,7 +21,7 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
 - `main` represents the fully assembled, editable end-state. Workshop steps are branches/checkpoints leading up to this blueprint.
 
 ### 2. The Universal Developer Workshop (Google Cloud & Antigravity for Everyone)
-- **The Reality:** While premiering at a Ruby conference (Oct 2), **~90% of future workshop attendees will have zero Ruby background**. They are here to learn Google Cloud, serverless architecture, secure IAM practices, and AI pair programming with **Google Antigravity**.
+- **The Reality:** While premiering at a tech conference (Oct 3), **~90% of future workshop attendees will have zero Ruby background**. They are here to learn Google Cloud, serverless architecture, secure IAM practices, and AI pair programming with **Google Antigravity**.
 - **Pedagogical Rule:** Never let Ruby syntax or Rails minutiae become a stumbling block. Keep application commands intuitive (`bin/dev`, `docker compose up`, `bin/rails db:...`), and use Antigravity / Gemini / Claude as the student's personal pair programmer to explain concepts, generate diagrams, and demystify the stack.
 - **Focus:** Cloud-native architecture, eliminating security anti-patterns (e.g., no public `0.0.0.0/0`, no world-readable buckets), container sidecars on Cloud Run, and real-world GenAI background pipelines.
 
