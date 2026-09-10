@@ -31,7 +31,12 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
                                                  • Zero-Branch "Time Machine" Progression
 ```
 
+> 📊 **Presentation Slides & Visual Pitch Decks:**
+> - **Workshop Kickoff Deck:** [`slides/index.md`](../slides/index.md) (`just slides`)
+> - **"Why is this workshop different?" Showcase Deck:** [`slides/why-different.md`](../slides/why-different.md)
+
 ---
+
 
 ## 🌟 Pillar 1: The Content — "Production-Grade Rails 8 on GCP Done RIGHT"
 
