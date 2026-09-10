@@ -17,31 +17,24 @@ In this workshop we don't just deploy an app — we execute an **opinionated, pr
 
 You start from the typical *"works on my machine"* local setup (ephemeral disk, embedded SQLite, in-process jobs) and progressively evolve it into an **enterprise, bulletproof cloud architecture** on Google Cloud:
 
-1. 🐘 **From Local SQLite → Enterprise Cloud SQL (PostgreSQL):**
-   Say goodbye to locked DB files and ephemeral container restarts. We graduate to fully managed PostgreSQL, secured with **Cloud SQL Auth Proxy** over mutual TLS (mTLS) — zero public IP exposure, zero firewall headaches, and IAM-authenticated database governance.
+1. 🐘 **From Local SQLite → Cloud SQL (PostgreSQL):** No more DB wiped on restarts. We move to managed PostgreSQL connected securely via [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) (mTLS, no public IPs).
+2. 🪣 **From Ephemeral Local Storage → Private GCS:** Serverless disk is temporary. We wire [**ActiveStorage**](https://guides.rubyonrails.org/active_storage_overview.html) to private [**Google Cloud Storage**](https://cloud.google.com/storage) using IAM [**signed URLs**](https://docs.cloud.google.com/storage/docs/access-control/signed-urls) (`iam: true`) — no public buckets, no leaked keys.
+3. 🚀 **From In-Process Jobs → Multi-Container Cloud Run:** We bridge the Rails monolith and serverless cloud! Using standard [**Docker Compose**](https://docs.docker.com/compose/), we run [**Solid Queue**](https://github.com/rails/solid_queue) as a dedicated worker container alongside Puma in a [**Cloud Run multi-container pod**](https://docs.cloud.google.com/run/docs/deploy-run-compose) — zero microservice sprawl, zero thread starvation, [**DHH**](https://en.wikipedia.org/wiki/David_Heinemeier_Hansson) would be proud!
 
-2. 🪣 **From Ephemeral Local Storage → Scalable, Private Google Cloud Storage (GCS):**
-   Local files vanish into thin air the moment a serverless container scales to zero. We migrate ActiveStorage to private, highly durable GCS buckets secured with **IAM Credential blob signing (`iam: true`)** — zero dangerous public buckets, zero leaked Service Account JSON keys!
 
-3. 🚀 **From Monolithic In-Process Jobs → Dedicated Multi-Container Sidecars on Cloud Run:**
-   Running background workers inside your web process steals valuable request threads. We elevate Rails 8 [**Solid Queue**](https://github.com/rails/solid_queue) into a dedicated worker container running alongside Puma in a [**Cloud Run multi-container pod**](https://docs.cloud.google.com/run/docs/deploy-run-compose) — seamless horizontal scaling, instant job processing, and zero web thread starvation!
+🍌 *And because we live in 2026, we supercharge the whole stack with [**Google Antigravity**](https://antigravity.google/download). This is not an after thought, we have prompts and [**skills**](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills) to guide your harness to better execute (and enjoy) this workshop!*
 
-🍌 *And because we live in 2026, we supercharge the whole stack with [**Google Antigravity**](https://antigravity.google/download) and Vertex AI GenAI pipelines running in the background!*
 
 ### What you'll learn
 - How to pair-program with [**Google Antigravity**](https://antigravity.google/download) to demystify Rails 8 and [**Google Cloud**](https://cloud.google.com/).
 - How to run automated pre-flight diagnostics (`just workshop-test`).
-- How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [google](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
+- How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [`google`](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
 - How to eliminate security anti-patterns: private [**GCS buckets**](https://cloud.google.com/storage) (`iam: true`) and [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) mTLS tunnels instead of opening `0.0.0.0/0`.
 - How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
 - How to orchestrate asynchronous GenAI [**background jobs**](https://guides.rubyonrails.org/active_job_basics.html) (NanoBanana cover generator, bilingual podcast synthesis) via [**Solid Queue**](https://github.com/rails/solid_queue).
 
-> 🐝 **Live Workshop Telemetry & Leaderboard**
-> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:
-> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
-> *(Puoi registrarti fin da subito o appena completi il primo deploy su Cloud Run nello Step 3!)*
-
 Let's get started!
+
 
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification

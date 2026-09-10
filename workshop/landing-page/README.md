@@ -12,6 +12,10 @@
 > 2. **DIAGNOSTICS FIRST:**
 >    - Your very first act is to verify the student's local environment by running or guiding them to run `just workshop-test`.
 >    - If any check fails (missing Ruby, missing gcloud ADC, missing Billing), prioritize unblocking the student before writing any code.
+> 3. **USE REPOSITORY SKILLS:**
+>    - Load and obey [`skills/rails8app-workshop/`](../../skills/rails8app-workshop/) for curriculum navigation and invariants.
+>    - If any deployment error, container crash, or billing issue occurs, load and follow [`skills/workshop-troubleshooting/`](../../skills/workshop-troubleshooting/).
+
 
 ---
 
@@ -110,6 +114,22 @@ Everything is orchestrated through [`justfile`](file:///justfile):
   - [`workshop/CODELAB.md`](file:///workshop/CODELAB.md): Extended narrative curriculum.
   - [`workshop/visualizer/`](file:///workshop/visualizer/): Isolated Sinatra Codelab viewer and GitHub Pages compiler.
 - 📁 [`iac/`](file:///iac/): Infrastructure as Code (Terraform Cloud SQL, GCS, Cloud Run).
+- 📁 [`skills/`](file:///skills/): Custom Google Antigravity pair-programming skills.
+
+---
+
+## 🤹 Repository Agent Skills: Your AI Superpowers
+
+This repository includes custom **Agent Skills** located in [`skills/`](../../skills/) to empower your AI pair programmer:
+
+- 💎 [**`skills/rails8app-workshop/`**](../../skills/rails8app-workshop/) **(The Tutor):**  
+  Guides Antigravity on how to teach you step-by-step, how to use the Zero-Branch Time-Machine (`just workshop-rewind`), and the pedagogical flow of each step.
+- 🩺 [**`skills/workshop-troubleshooting/`**](../../skills/workshop-troubleshooting/) **(The Doctor):**  
+  Equips Antigravity with verified recipes to diagnose Cloud Run crashes (`gcloud logging read`), billing suspensions (`BILLING_ISSUE`), multi-database queue migrations (`db:prepare:queue`), and local tooling friction.
+
+
+> 💡 **Tip:** If Antigravity ever seems stuck or if you encounter an unexpected error, simply prompt:  
+> *"Please use the `skills/workshop-troubleshooting` skill to diagnose this issue!"*
 
 ---
 
@@ -118,6 +138,7 @@ Everything is orchestrated through [`justfile`](file:///justfile):
 Once `just workshop-test` outputs a clean green report, tell Google Antigravity:
 
 > *"All pre-flight checks are green! Let's proceed to Step 1: configuring our .env and launching immutable Terraform infrastructure!"*
+
 
 ---
 
