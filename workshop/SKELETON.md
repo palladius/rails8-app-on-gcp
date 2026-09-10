@@ -72,6 +72,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Observed [EPHEMERAL DB / STORAGE] UI badge
 - **`evals`**:
   - `[SHELL]` Verify local Rails test suite passes
+  - `[SHELL]` Verify integration test suite for workshop header alerts (SQL, Storage, AI) passes
   - `[RUBY]` Verify db/seeds.rb enforces GOOGLE_CLOUD_ACCOUNT presence
   - `[LLM]` Evaluate student's first local blog post for creativity and workshop adherence
 
@@ -138,7 +139,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Cloud Run runtime Service Account granted Secret Accessor role
   - Local mTLS proxy connectivity verified via cloud-sql-proxy
 - **`evals`**:
-  - `[SHELL]` Verify Secret Manager API is accessible or secrets listed
+  - `[SHELL]` Verify Secret Manager API is accessible or offline environment check
   - `[RUBY]` Verify master.key exists locally
 
 ---
@@ -185,6 +186,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
   - `[RUBY]` Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)
   - `[LLM]` Verify student implementation of Podcastifier via Antigravity if attempted
+  - `[RUBY]` Verify deterministic absence of warning alerts, stuck jobs, and ephemeral badges via integration tests
   - `[LLM]` Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges
 
 ---
@@ -211,6 +213,15 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 
 Architectural milestones in the workshop are irreversible one-way doors. When running `just workshop-eval <N>`, all active cumulative invariants where `from_step <= N` are strictly enforced to eliminate ephemeral regressions:
 
+- **`[INV: Step 0+]` Toolchain Integrity Invariant (CLIs on PATH)** (`inv-toolchain-integrity`)
+  - *Description:* From Step 0 onward, essential workshop CLIs (git, gcloud, docker, terraform, ruby, just) must be available on PATH.
+  - *Check Rule:* `toolchain_integrity`
+- **`[INV: Step 2+]` Database Migration Currency Invariant** (`inv-database-migrations-current`)
+  - *Description:* From Step 2 onward, the database schema must be current with zero pending migrations.
+  - *Check Rule:* `database_migrations_current`
+- **`[INV: Step 2+]` Admin User Bootstrap Invariant** (`inv-admin-user-seeded`)
+  - *Description:* From Step 2 onward, the application database must contain at least one administrator user.
+  - *Check Rule:* `admin_user_seeded`
 - **`[INV: Step 4+]` GCS Persistent Storage Invariant (No Ephemeral Local Disk)** (`inv-persistent-gcs-storage`)
   - *Description:* From Step 4 onward, media storage cannot be :local; it must use Google Cloud Storage (:google_dev or :google_prod).
   - *Check Rule:* `no_local_storage`
@@ -220,6 +231,9 @@ Architectural milestones in the workshop are irreversible one-way doors. When ru
 - **`[INV: Step 6+]` Cloud SQL Production Persistence Invariant** (`inv-cloud-sql-connected`)
   - *Description:* From Step 6 onward, production deployment cannot use ephemeral SQLite containers and must include Cloud SQL Auth Proxy sidecar.
   - *Check Rule:* `compose_has_service`
+- **`[INV: Step 6+]` Three-Tier Multi-Container Topology Invariant** (`inv-three-tier-architecture`)
+  - *Description:* From Step 6 onward, production deployment must define the full multi-container sidecar topology (web, worker, cloudsql-proxy).
+  - *Check Rule:* `three_tier_architecture`
 
 ---
 

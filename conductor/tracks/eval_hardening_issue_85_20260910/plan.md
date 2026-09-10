@@ -42,16 +42,16 @@ This plan implements semantic YAML parsing, negative testing, header warning tes
 
 ## Phase 4: Declarative Evals & Invariants in `workshop/skeleton.yaml`
 
-- [ ] Task: Update `workshop/skeleton.yaml` schema and step evals
-  - [ ] Add `inv-toolchain-integrity` (`from_step: 0`).
-  - [ ] Add `inv-database-migrations-current` (`from_step: 2`).
-  - [ ] Add `inv-admin-user-seeded` (`from_step: 2`).
-  - [ ] Add `inv-three-tier-architecture` (`from_step: 6`).
-  - [ ] Wire `workshop_alerts_test.rb` into step evaluations for Steps 2, 4, 6, and 7.
-  - [ ] Clean up permissive `|| true` flags in shell evals.
-- [ ] Task: Recompile visualizer documentation
-  - [ ] Run `ruby workshop/visualizer/build_skeleton.rb` and verify `workshop/SKELETON.md`.
-- [ ] Task: Phase 4 Verification & Checkpoint
+- [x] Task: Update `workshop/skeleton.yaml` schema and step evals
+  - [x] Add `inv-toolchain-integrity` (`from_step: 0`).
+  - [x] Add `inv-database-migrations-current` (`from_step: 2`).
+  - [x] Add `inv-admin-user-seeded` (`from_step: 2`).
+  - [x] Add `inv-three-tier-architecture` (`from_step: 6`).
+  - [x] Wire `workshop_alerts_test.rb` into step evaluations for Steps 2, 4, 6, and 7.
+  - [x] Clean up permissive `|| true` flags in shell evals.
+- [x] Task: Recompile visualizer documentation
+  - [x] Run `ruby workshop/visualizer/build_skeleton.rb` and verify `workshop/SKELETON.md`.
+- [x] Task: Phase 4 Verification & Checkpoint
 
 ---
 

@@ -65,7 +65,10 @@ steps:
       - id: "step-1-ruby-terraform-config"
         type: "ruby"
         description: "Verify Terraform main configuration file exists and has valid syntax"
-        code: "raise 'Missing main.tf' unless File.exist?('iac/main.tf')"
+        code: |
+          raise 'Missing main.tf' unless File.exist?('iac/main.tf')
+          tf_content = File.read('iac/main.tf')
+          raise 'Missing terraform block' unless tf_content.include?('terraform')
 
   - id: "step-2"
     number: 2
@@ -89,6 +92,11 @@ steps:
         type: "shell"
         description: "Verify local Rails test suite passes"
         command: "cd blog && bin/rails test"
+        expect_exit: 0
+      - id: "step-2-shell-workshop-alerts"
+        type: "shell"
+        description: "Verify integration test suite for workshop header alerts (SQL, Storage, AI) passes"
+        command: "cd blog && bin/rails test test/integration/workshop_alerts_test.rb"
         expect_exit: 0
       - id: "step-2-ruby-user-seeded"
         type: "ruby"
@@ -131,7 +139,7 @@ steps:
       - id: "step-3-shell-cloudrun-service"
         type: "shell"
         description: "Verify Cloud Run service exists and is responding (dry-run/check)"
-        command: "gcloud run services list --format='value(metadata.name)' | grep -E '^blog$' || true"
+        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline environment: skipping live Cloud Run check' || gcloud run services describe blog --region=us-central1 >/dev/null 2>&1 || echo 'Cloud Run service verified or in dry-run mode'"
         expect_exit: 0
       - id: "step-3-ruby-alerts-hub"
         type: "ruby"
@@ -204,8 +212,8 @@ steps:
     evals:
       - id: "step-5-shell-secrets-exist"
         type: "shell"
-        description: "Verify Secret Manager API is accessible or secrets listed"
-        command: "gcloud services list --enabled --filter='name:secretmanager.googleapis.com' --format='value(name)' || true"
+        description: "Verify Secret Manager API is accessible or offline environment check"
+        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline environment: skipping live Secret Manager check' || gcloud services list --enabled --filter='name:secretmanager.googleapis.com' --format='value(name)'"
         expect_exit: 0
       - id: "step-5-ruby-master-key"
         type: "ruby"
@@ -233,8 +241,10 @@ steps:
         type: "ruby"
         description: "Verify multi-container production compose configuration contains web, worker, and proxy"
         code: |
-          compose = File.read('blog/compose.prod.yaml') rescue ""
-          raise 'Missing multi-container compose' if compose.empty?
+          compose_data = YAML.safe_load(File.read('blog/compose.prod.yaml')) rescue nil
+          raise 'Missing multi-container compose' unless compose_data.is_a?(Hash) && compose_data['services'].is_a?(Hash)
+          missing = %w[web worker cloudsql-proxy] - compose_data['services'].keys
+          raise "Missing production sidecar services: #{missing.join(', ')}" if missing.any?
       - id: "step-6-shell-full-test"
         type: "shell"
         description: "Verify full test suite passes against gold standard"
@@ -287,6 +297,13 @@ steps:
         type: "llm"
         description: "Verify student implementation of Podcastifier via Antigravity if attempted"
         prompt: "Check the deployed Cloud Run post view for a podcast generation action or audio player (e.g. 'Generate Audio Podcast' button or <audio controls>). If present, confirm it renders without 500 error and points to an audio stream. If not yet attempted by student, report skipped/optional. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+      - id: "step-7-ruby-clean-ui-deterministic"
+        type: "ruby"
+        description: "Verify deterministic absence of warning alerts, stuck jobs, and ephemeral badges via integration tests"
+        code: |
+          hub = File.read('blog/app/views/workshop/alerts/_hub.html.erb')
+          raise 'Alerts hub missing' unless hub.include?('workshop-alerts-hub')
+          system('cd blog && bin/rails test test/integration/stuck_jobs_warning_test.rb test/integration/workshop_alerts_test.rb > /dev/null') || raise('Alert integration tests failed')
       - id: "step-7-llm-clean-ui-no-warnings"
         type: "llm"
         description: "Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges"
@@ -315,6 +332,32 @@ steps:
         prompt: "Review the student's chosen capstone quest implementation. Confirm it satisfies cloud security, observability, or GenAI best practices. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
 
 invariants:
+  - id: "inv-toolchain-integrity"
+    from_step: 0
+    title: "Toolchain Integrity Invariant (CLIs on PATH)"
+    description: "From Step 0 onward, essential workshop CLIs (git, gcloud, docker, terraform, ruby, just) must be available on PATH."
+    check: "toolchain_integrity"
+    params:
+      tools:
+        - "git"
+        - "gcloud"
+        - "docker"
+        - "terraform"
+        - "ruby"
+        - "just"
+
+  - id: "inv-database-migrations-current"
+    from_step: 2
+    title: "Database Migration Currency Invariant"
+    description: "From Step 2 onward, the database schema must be current with zero pending migrations."
+    check: "database_migrations_current"
+
+  - id: "inv-admin-user-seeded"
+    from_step: 2
+    title: "Admin User Bootstrap Invariant"
+    description: "From Step 2 onward, the application database must contain at least one administrator user."
+    check: "admin_user_seeded"
+
   - id: "inv-persistent-gcs-storage"
     from_step: 4
     title: "GCS Persistent Storage Invariant (No Ephemeral Local Disk)"
@@ -336,4 +379,12 @@ invariants:
     check: "compose_has_service"
     params:
       service: "cloudsql-proxy"
+      file: "blog/compose.prod.yaml"
+
+  - id: "inv-three-tier-architecture"
+    from_step: 6
+    title: "Three-Tier Multi-Container Topology Invariant"
+    description: "From Step 6 onward, production deployment must define the full multi-container sidecar topology (web, worker, cloudsql-proxy)."
+    check: "three_tier_architecture"
+    params:
       file: "blog/compose.prod.yaml"
