@@ -90,10 +90,15 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
 ### 2. Autonomous Friction Logging Loop & Virgin Project Verification
 - **Beyond Manual Quality Checks:** Instead of hoping students don't get stuck, we run autonomous subagents using the [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab) skill (`SKILL.md`).
 - **The Virgin Project Loop:** The agent provisions a temporary 3-day GCP project, follows [CODELAB.md](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB.md) step-by-step as an inexperienced attendee, logs empirical friction points (with sentiment emojis 🟢/🟡/🔴), and automatically authors PR fixes:
-  - **FL-003 Iteration ([PR #51](https://github.com/palladius/rails8-app-on-gcp/pull/51)):** Caught multi-database migration gaps in the Docker entrypoint (`db:prepare:queue`, `db:prepare:cache`) and isolated Solid Queue execution. Resolved in release `v0.2.3`.
-  - **FL-004 Iteration ([PR #54](https://github.com/palladius/rails8-app-on-gcp/pull/54), [PR #56](https://github.com/palladius/rails8-app-on-gcp/pull/56), [PR #57](https://github.com/palladius/rails8-app-on-gcp/pull/57), [PR #58](https://github.com/palladius/rails8-app-on-gcp/pull/58)):** Executed on virgin project `rails8-workshop-fl04`. Caught Terraform Google Provider 5.x dynamic IAP schema requirements, disabled Cloud Billing API enablement traps, and Cloud Run BYOSA permission enforcement. Fixed in `v0.2.8` with **20/20 evals passing** via `just workshop-eval all`.
+  - **FL-003 Iteration ([Issue #54](https://github.com/palladius/rails8-app-on-gcp/issues/54), [PR #51](https://github.com/palladius/rails8-app-on-gcp/pull/51)):** Caught multi-database migration gaps in the Docker entrypoint (`db:prepare:queue`, `db:prepare:cache`) and isolated Solid Queue execution. Resolved in release `v0.2.3`.
+  - **FL-004 Iteration ([Issue #55](https://github.com/palladius/rails8-app-on-gcp/issues/55), [PR #54](https://github.com/palladius/rails8-app-on-gcp/pull/54), [PR #56](https://github.com/palladius/rails8-app-on-gcp/pull/56), [PR #57](https://github.com/palladius/rails8-app-on-gcp/pull/57), [PR #58](https://github.com/palladius/rails8-app-on-gcp/pull/58)):** Executed on virgin project `rails8-workshop-fl04`. Caught Terraform Google Provider 5.x dynamic IAP schema requirements, disabled Cloud Billing API enablement traps, and Cloud Run BYOSA permission enforcement. Fixed in `v0.2.8` with **20/20 evals passing** via `just workshop-eval all`.
+  - **FL-005 Iteration ([Issue #72](https://github.com/palladius/rails8-app-on-gcp/issues/72), [PR #73](https://github.com/palladius/rails8-app-on-gcp/pull/73)):** Executed on virgin project `rails8-workshop-fl05`. Caught missing `run.googleapis.com` and `sqladmin.googleapis.com` service dependencies causing mysterious Cloud Run "Internal Error code 7", and Default Compute SA permission blocks on recent GCP projects.
+- **Tracked via GitHub Issues**: All automated friction-logging bug reports and PRs are publicly auditable and tagged under the dedicated label:  
+  👉 [**GitHub Issues labeled `friction-logging-bugfix`**](https://github.com/palladius/rails8-app-on-gcp/issues?q=label%3A%22friction-logging-bugfix%22)
 
-### 2. 100% Declarative Automated Screenshots via Playwright
+![Automated Friction Logging GitHub Issues Tracker](../workshop/assets/images/automated_friction_logging_issues.png)
+
+### 3. 100% Declarative Automated Screenshots via Playwright
 - **The Problem:** Documentation screenshots rot after every minor UI or CSS change, requiring hours of manual recaptures.
 - **The Innovation ([Issue #42](https://github.com/palladius/rails8-app-on-gcp/issues/42), [PR #49](https://github.com/palladius/rails8-app-on-gcp/pull/49), [PR #50](https://github.com/palladius/rails8-app-on-gcp/pull/50), [PR #53](https://github.com/palladius/rails8-app-on-gcp/pull/53)):**
   - Screenshots are declared as code directly in [`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml).
@@ -102,7 +107,7 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
   - Stores machine provenance JSON metadata (Git commit, app version, viewport, timestamp, Rails environment) alongside each PNG.
   - Validated in CI via `just test-screenshots`.
 
-### 3. Live Proctor Observability: The Workshop Hive Leaderboard
+### 4. Live Proctor Observability: The Workshop Hive Leaderboard
 - **The Problem:** In a classroom of 30+ attendees, instructors are blind to who is stuck, who has deployed, or whose database failed to migrate.
 - **The Solution ([Issue #47](https://github.com/palladius/rails8-app-on-gcp/issues/47), [PR #48](https://github.com/palladius/rails8-app-on-gcp/pull/48)):**
   - Built a real-time proctor dashboard under [`workshop/hive/`](https://github.com/palladius/rails8-app-on-gcp/tree/main/workshop/hive) deployed to Cloud Run.
@@ -117,11 +122,11 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
       5. **Operational Telemetry**: Ruby/Rails version, posts/users count, media blobs count, Cloud Run revision delta tag (`00007-m7d`), and live HTTP health ping (UP 200 OK vs DOWN/Unreachable).
     - **Instructors see the entire room's progress update live on the dashboard without students having to manually report anything!**
 
-![Workshop Hive Leaderboard in Action](workshop/assets/images/hive_leaderboard_screenshot.png)
+![Workshop Hive Leaderboard in Action](../workshop/assets/images/hive_leaderboard_screenshot.png)
 
 *Zoom-in: Live telemetry row showing attendee step detection, Cloud Run revision tag, and granular infrastructure badges (`Rubycon FL003` at Step 4/8 vs `Rubycon FL004` at Step 7/8):*
 
-![Student Row Telemetry Detail](workshop/assets/images/hive_student_row_telemetry.png)
+![Student Row Telemetry Detail](../workshop/assets/images/hive_student_row_telemetry.png)
 
 ### 5. The Declarative SKELETON: Actionable Pre/Post-Requisites & Automated Step Evals
 - **The Problem:** Most workshops describe steps with vague prose. If a student's step fails, neither the student nor an AI agent knows whether prerequisites were met or if the post-state is actually valid.
