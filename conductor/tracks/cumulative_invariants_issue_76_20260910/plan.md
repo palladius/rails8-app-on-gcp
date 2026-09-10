@@ -32,9 +32,9 @@
   - [x] Update `workshop/visualizer/build_skeleton.rb` to render Cumulative Invariants in `workshop/SKELETON.md`
   - [x] Execute `just build-skeleton` and inspect generated `workshop/SKELETON.md`
   - [x] Verify `node workshop/screenshots/runner.js --dry-run` and `ruby test/test_workshop_screenshots.rb` pass cleanly
-- [ ] Task: Full verification gate across the workshop
-  - [ ] Run `bin/workshop_eval.rb 3` and verify Step 4+ and Step 6+ invariants do not run
-  - [ ] Run `bin/workshop_eval.rb 7` and verify Step 4+ and Step 6+ invariants run and pass alongside the clean UI eval
-  - [ ] Run `bin/workshop_eval.rb all` and verify full workshop evaluation
-  - [ ] Run root `just test` (Rails test suite + ArchSpec) and all unit tests in `test/`
+- [x] Task: Full verification gate across the workshop (70ecb52)
+  - [x] Run `bin/workshop_eval.rb 3` and verify Step 4+ and Step 6+ invariants do not run
+  - [x] Run `bin/workshop_eval.rb 7` and verify Step 4+ and Step 6+ invariants run and pass alongside the clean UI eval
+  - [x] Run `bin/workshop_eval.rb all` and verify full workshop evaluation
+  - [x] Run root `just test` (Rails test suite + ArchSpec) and all unit tests in `test/`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
