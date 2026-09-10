@@ -44,4 +44,11 @@ class ArchitectureDiagramTest < Minitest::Test
     slides_content = File.read(SLIDES_PATH)
     assert_includes slides_content, "arch_diagram", "slides/index.md must reference architecture diagram"
   end
+
+  def test_nanobanana_prompts_and_assets_exist
+    assert File.exist?(File.join(DIAGRAMS_DIR, "NANOBANANA_PROMPT.md")), "NANOBANANA_PROMPT.md must exist"
+    assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_flat.png")), "nanobanana_arch_flat.png must exist"
+    assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_isometric.png")), "nanobanana_arch_isometric.png must exist"
+    assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_blueprint.png")), "nanobanana_arch_blueprint.png must exist"
+  end
 end

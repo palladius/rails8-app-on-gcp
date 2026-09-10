@@ -1,0 +1,7 @@
+Sleek 3D isometric tech infographic showing a modern Google Cloud serverless architecture.
+The central focus is a floating glass and aluminum platform representing a Google Cloud Run service. On this platform, three distinct modular server pods are stacked vertically in a sleek rack: top pod glowing cyan labeled "rails_app", middle pod glowing amber labeled "solid_queue", bottom pod glowing emerald green labeled "cloud_sql_proxy".
+Glowing fiber-optic data tubes and holographic directional arrows connect the central platform to surrounding floating cloud infrastructure nodes:
+- Left: incoming glowing blue data streams from users, and an elevated vault node representing Google Cloud Secret Manager.
+- Right: a secure glowing blue database cylinder representing Google Cloud SQL PostgreSQL connected via a green laser tunnel, and a floating blue repository node representing Google Cloud Storage (GCS).
+- Bottom: an iridescent purple prism node representing Google Cloud Vertex AI connected to the worker pod.
+Clean minimalist studio lighting, light gray aesthetic background, high tech data visualization, photorealistic 3D render, 2k resolution, crisp technical typography.

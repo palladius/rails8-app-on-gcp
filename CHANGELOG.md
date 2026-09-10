@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.14] - 2026-09-10
+### Added
+- 🍌 **Nano Banana AI Architecture Diagrams Gallery & Prompts**:
+  - Authored canonical prompt engineering specification in `diagrams/NANOBANANA_PROMPT.md` and saved raw prompt text files under `diagrams/prompts/` (`flat_vector.txt`, `isometric_3d.txt`, `dark_blueprint.txt`).
+  - Generated 3 distinct visual variants using Gemini 3 Pro Image (Nano Banana Pro / Imagen 3):
+    - `assets/nanobanana_arch_flat.png`: Clean Flat Vector Enterprise Architecture.
+    - `assets/nanobanana_arch_isometric.png`: Modern Isometric 3D Cloud Infographic.
+    - `assets/nanobanana_arch_blueprint.png`: High-contrast Dark Cyber Blueprint.
+  - Mirrored assets to `workshop/assets/images/` and `slides/images/`.
+  - Added CLI recipe `just nanobanana variant="..."` to `justfile` and added automated test assertion in `test/test_architecture_diagram.rb`.
+
 ## [0.2.13] - 2026-09-10
 ### Added
 - 📐 **Deterministic GCP Architecture Diagram & Evolution Animation (Issue [#66](https://github.com/palladius/rails8-app-on-gcp/issues/66))**:

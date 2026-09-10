@@ -1,0 +1,11 @@
+Technical software architecture blueprint on a deep navy-blue matte background (#0B132B) with faint grid lines.
+At the center, a clearly outlined rectangular module representing "Google Cloud Run (Serverless Multi-Container)".
+Inside, three horizontally aligned rows forming a vertical stack of containers in clean monospace font:
+- [ rails_app | Puma HTTP :8080 ]
+- [ solid_queue | Background Worker ]
+- [ cloud_sql_proxy | mTLS Sidecar :5432 ]
+Glowing circuit-style vector schematic lines with directional arrows connect to outer nodes:
+- Left: [ Secret Manager ] injecting secrets via dotted red circuit trace.
+- Right: [ Cloud SQL Postgres ] connected via shielded green conduit; [ Cloud Storage GCS ] connected via bright cyan data bus.
+- Bottom: [ Vertex AI GenAI Pipeline ] linked directly to the worker container.
+Precision engineering schematic, clean typography, neon accent colors (cyan, lime green, amber, electric blue), high contrast, zero blur, professional developer reference poster, 2k resolution.
