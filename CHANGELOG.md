@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.12] - 2026-09-10
+### Added
+- 🛡️ **Cumulative Cascading Invariants Engine (Issue [#76](https://github.com/palladius/rails8-app-on-gcp/issues/76))**:
+  - Implemented monotonic architectural state checks ("one-way doors") in `workshop/skeleton.yaml` and `bin/workshop_eval.rb` to eliminate regressions across workshop steps (Friction Log FL005).
+  - Created `WorkshopEval::InvariantChecker` (`lib/workshop_eval/invariant_checker.rb`) with declarative rule handlers (`no_local_storage`, `zero_stuck_jobs`, `compose_has_service`, `ruby_code`).
+  - Defined milestone invariants for GCS Persistent Storage (Step 4+), Zero Stuck Jobs / Worker Active (Step 6+), and Cloud SQL Auth Proxy Connected (Step 6+).
+  - Wired automated evaluation of all active cumulative invariants (`from_step <= current_step_number`) into `bin/workshop_eval.rb` with dedicated visual banners and regression alerts.
+  - Added `step-7-llm-clean-ui-no-warnings` evaluation to Step 7 verifying rendered UI and screenshots are clean without alert banners.
+  - Updated visualizer compiler `workshop/visualizer/build_skeleton.rb` to document Cumulative Invariants in `workshop/SKELETON.md`.
+  - Added unit test suite `test/test_workshop_invariants.rb` and extended `test/test_workshop_skeleton.rb`.
+
 ## [0.2.11] - 2026-09-10
 ### Added
 - 🎙️ **Step 7 Podcastifier Showcase Assets & Audio Links**:
