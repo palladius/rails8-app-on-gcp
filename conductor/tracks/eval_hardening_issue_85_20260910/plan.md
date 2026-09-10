@@ -6,11 +6,11 @@ This plan implements semantic YAML parsing, negative testing, header warning tes
 
 ## Phase 1: Header Workshop Alerts Integration Test Suite
 
-- [ ] Task: Create integration test for header alerts (Red Phase)
-  - [ ] Write `blog/test/integration/workshop_alerts_test.rb` asserting behavior of `_ephemeral_database`, `_ephemeral_storage`, and `_ai_status`.
-- [ ] Task: Verify integration test passes against baseline (Green Phase)
-  - [ ] Run `cd blog && bin/rails test test/integration/workshop_alerts_test.rb`.
-- [ ] Task: Phase 1 Verification & Checkpoint
+- [x] Task: Create integration test for header alerts (Red Phase)
+  - [x] Write `blog/test/integration/workshop_alerts_test.rb` asserting behavior of `_ephemeral_database`, `_ephemeral_storage`, and `_ai_status`.
+- [x] Task: Verify integration test passes against baseline (Green Phase)
+  - [x] Run `cd blog && bin/rails test test/integration/workshop_alerts_test.rb`.
+- [x] Task: Phase 1 Verification & Checkpoint
 
 ---
 
