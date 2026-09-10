@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.17] - 2026-09-10
+### Added
+- 📐 **Deterministic GCP Architecture Diagrams & Nano Banana Visual Reference (Issue [#66](https://github.com/palladius/rails8-app-on-gcp/issues/66))**:
+  - Implemented deterministic Python `diagrams` & `uv` pipeline (`diagrams/generate_diagrams.py`) generating canonical GCP architecture graphics (`assets/arch_diagram.png`) with official icons and compact vertical multi-container Cloud Run layout.
+  - Added progressive architecture evolution animated GIF (`assets/arch_evolution.gif`) tracking the Step 1 $\to$ Step 7 modernization path.
+  - Integrated Gemini 3 Pro Image (Nano Banana Pro) architecture diagrams: Variant 1 (Flat Vector Enterprise `assets/nanobanana_arch_flat.png`) as Page 1 hero visual in Codelab and Skeleton, and Variant 2 (Isometric 3D `assets/nanobanana_arch_isometric.png`).
+  - Added `just diagrams`, `just diagram`, `just diagram-evolution`, `just nanobanana`, and `just test-diagrams` (`test/test_architecture_diagram.rb`).
+
 ## [0.2.16] - 2026-09-10
 ### Added
 - 🪵 **Native Google Cloud Structured JSON Logging & STDERR Error Reporting (Issue [#82](https://github.com/palladius/rails8-app-on-gcp/issues/82))**:

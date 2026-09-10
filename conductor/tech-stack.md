@@ -17,3 +17,6 @@
 - **Observability & SRE:** Native Google Cloud Structured JSON Logging (GoogleJsonFormatter) & Google Cloud Error Reporting (zero-gem STDERR streaming)
 - **Secrets Management:** Google Secret Manager (planned for v2)
 - **Task Runner:** `just` (via justfile)
+
+## Tooling & Architecture Visualization
+- **Architecture Diagrams as Code:** Python `diagrams` (`mingrammer/diagrams`) via `uv` with official Google Cloud icons, and Pillow for evolutionary GIF rendering.

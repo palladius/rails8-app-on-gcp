@@ -4,6 +4,10 @@
 
 This is the canonical high-level roadmap and step breakdown for the Rails 8 on Google Cloud workshop, designed around the **3 Progressive Cloud Run Deployments**, **Zero-Branch Time-Machine overlays**, and **Google Antigravity pair programming**:
 
+### 🏛️ Target Reference Architecture
+
+![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/nanobanana_arch_flat.png)
+
 ---
 
 ### Step 0: Prerequisites, Antigravity Setup & Billing Verification

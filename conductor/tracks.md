@@ -63,6 +63,11 @@
 
 ---
 
+- [x] **Track: Deterministic GCP Architecture Diagram & Evolution GIF (Issue #66)**
+*Link: [tracks/gcp_architecture_diagram_issue_66_20260910/index.md](tracks/gcp_architecture_diagram_issue_66_20260910/index.md)*
+
+---
+
 - [x] **Track: Cumulative Cascading Invariants for Workshop Steps (Issue #76)**
 *Link: [tracks/cumulative_invariants_issue_76_20260910/index.md](tracks/cumulative_invariants_issue_76_20260910/index.md)*
 

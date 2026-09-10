@@ -75,6 +75,31 @@ build-slides:
 test-slides:
     ruby test/test_slides.rb
 
+# generate canonical GCP architecture diagram (assets/arch_diagram.png)
+diagram:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --canonical
+
+# generate progressive workshop architecture evolution frames and GIF (assets/arch_evolution.gif)
+diagram-evolution:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --evolution
+
+# generate both canonical GCP architecture diagram and evolution GIF
+diagrams:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --all
+
+# run automated tests on architecture diagrams
+test-diagrams:
+    ruby test/test_architecture_diagram.rb
+
+# generate Nano Banana AI architecture diagrams (variant="flat" or "isometric")
+nanobanana variant="flat":
+    #!/usr/bin/env bash
+    PROMPT_FILE="diagrams/prompts/flat_vector.txt"
+    if [ "{{variant}}" = "isometric" ]; then
+        PROMPT_FILE="diagrams/prompts/isometric_3d.txt"
+    fi
+    UV_INDEX_URL="https://pypi.org/simple" NANOBANANA_OUTPUT_FOLDER="assets" uv run /usr/local/google/home/ricc/.gemini/config/skills/nano-banana-ricc/scripts/generate_image.py --prompt "$$(cat $$PROMPT_FILE)" --filename "nanobanana_arch_{{variant}}.png" --resolution 2K
+
 # capture declarative screenshots idempotently (skips already existing screenshots)
 screenshots filter="" *flags:
     node workshop/screenshots/runner.js {{filter}} {{flags}}

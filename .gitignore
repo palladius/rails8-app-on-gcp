@@ -19,3 +19,6 @@ node_modules/
 .riccardo/
 *.tmp
 .tmp
+.venv/
+__pycache__/
+diagrams/output/
