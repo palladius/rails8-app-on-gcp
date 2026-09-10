@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
   - Added bilingual language switcher with 🇬🇧 EN and 🇮🇹 IT flags with static mirror (`index_it.html`).
   - Added visual thumbnail previews to the portal destination cards (Codelab step preview and Slide 1 artwork).
   - Explicitly added `git` (2.30+) to workshop prerequisites checklist and evaluation specs (`CODELAB.md`, `skeleton.yaml`, `SKELETON.md`, and landing-page READMEs).
+  - Added dedicated standalone slide verification test suite (`test/test_slides.rb`, `just test-slides`) testing against HTML/div escaping leaks, overflow, and image rendering.
+  - Improved Slide 2 (Antigravity download) with gray down arrow ⬇️, standalone button, and small URL caption.
+  - Polished Slide 5 with CSS class-based prompt styling and copy button.
+  - Enhanced final Slide 6 with author avatars alongside LinkedIn links and compact workshop anthem audio player.
   - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
 
 ## [0.2.8] - 2026-09-09

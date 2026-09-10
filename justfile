@@ -58,7 +58,7 @@ build-slides:
 
 # run visual and structural unit tests on Marp slides
 test-slides:
-    cd blog && bin/rails test test/integration/slides_presentation_test.rb
+    ruby test/test_slides.rb
 
 # capture declarative screenshots (optional filter: step or id, e.g. just screenshots step-2)
 screenshots filter="":
