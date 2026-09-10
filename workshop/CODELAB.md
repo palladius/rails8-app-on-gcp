@@ -628,6 +628,13 @@ In this hands-on workshop exercise, you pair program with **Google Antigravity**
 - Add a **"🎙️ Generate Audio Podcast"** button to the post view and render an HTML5 `<audio controls>` player when attached.
 - When you click generate, Solid Queue executes the synthesis in the background without blocking web requests!
 
+<!-- workshop-screenshot: id="step-7-podcastifier-ui" -->
+![Podcastifier Bilingual UI with Dual Audio Players](assets/auto-screenshots/step-7-podcastifier-ui.png)
+
+> 🎧 **Listen to Real Podcastifier Outputs Generated via Cloud TTS:**
+> - 🇮🇹 [Italian Overview (`it-IT-Wavenet-A`)](assets/audio/podcastifier_italian_overview.mp3)
+> - 🇬🇧 [English Overview (`en-US-Wavenet-D`)](assets/audio/podcastifier_english_overview.mp3)
+
 > 💡 **Reference Implementation Branch:**  
 > If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:  
 > [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier) (`git checkout solutions/podcastifier`).
