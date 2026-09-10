@@ -2,7 +2,9 @@
 
 - **Date:** October 2–4, 2026 (Workshop premiere: Oct 2)
 - **Venue:** Fondazione San Carlo, Modena 🇮🇹
-- **Event Link:** [devfest.modena.it](https://devfest.modena.it)
+- **Room / Hall:** **Sala 40**
+- **Official Website:** [https://devfest.modena.it](https://devfest.modena.it/)
+- **Sessionize Event Details:** [https://sessionize.com/app/speaker/event/details/24156](https://sessionize.com/app/speaker/event/details/24156)
 - **Speakers:** Riccardo Carlesso 🦖 & Emiliano Della Casa 🍝🏎️
 - **Format:** 120-minute hands-on lab / workshop
 - **Live Codelab:** [https://palladius.github.io/rails8-app-on-gcp/codelab/](https://palladius.github.io/rails8-app-on-gcp/codelab/)
@@ -13,6 +15,8 @@
 Premiere delivery of the *Rails 8 on Google Cloud: From Zero to AI* workshop. Attendees learn how to vibe-code with Google Antigravity, move through ephemeral local containers up to production Cloud Run with Cloud SQL and GCS, and generate assets with Vertex AI Gemini & Imagen.
 
 ## Resources & Links
+- Official Website: [https://devfest.modena.it](https://devfest.modena.it/)
+- Sessionize Speaker Portal: [https://sessionize.com/app/speaker/event/details/24156](https://sessionize.com/app/speaker/event/details/24156)
 - CFP (Italian): `../../cfp/CFP.it.md`
 - CFP (English): `../../cfp/CFP.en.md`
 - Workshop Anthem: Lyria 3 Pro preview track on Vertex AI
