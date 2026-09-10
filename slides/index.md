@@ -167,14 +167,31 @@ style: |
 
 ## 4. Launch Antigravity & Set The Mission 🎯
 
-Open Antigravity and paste the following prompt in the chat:
+<div style="display: flex; gap: 24px; align-items: flex-start; margin-top: 6px;">
+  <div style="flex: 1;">
+    <ol style="font-size: 0.85em; margin: 0 0 10px 0; padding-left: 20px;">
+      <li><strong>Open Antigravity</strong> on your computer.</li>
+      <li><strong>Choose the path to your repo</strong> (if you have already cloned it).</li>
+      <li>Send this mission prompt to start your pair-programming journey:</li>
+    </ol>
 
-<div class="prompt-box">
+    <div style="position: relative; margin-top: 6px;">
+      <div id="mission-prompt" class="prompt-box" style="margin: 0; padding: 10px 14px; font-size: 0.72em; background-color: #202124; color: #f8f9fa; border-radius: 8px;">
 "I am attending the Rails 8 on Google Cloud workshop.<br/>
 Please inspect:<br/>
 https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md<br/>
 (or workshop/landing-page/README.it.md if you prefer Italian)<br/>
 and guide me step-by-step through the workshop!"
+      </div>
+      <button onclick="navigator.clipboard.writeText('I am attending the Rails 8 on Google Cloud workshop.\nPlease inspect:\nhttps://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md\n(or workshop/landing-page/README.it.md if you prefer Italian)\nand guide me step-by-step through the workshop!'); this.innerText='✅ Copied!'; setTimeout(() => this.innerText='📋 Copy Prompt', 2000)" style="margin-top: 8px; background-color: #1a73e8; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.72em; font-weight: bold; display: inline-flex; align-items: center; gap: 4px;">
+        📋 Copy Prompt
+      </button>
+    </div>
+  </div>
+
+  <div style="flex: 0 0 460px; text-align: center;">
+    <img src="images/antigravity-prompt-screenshot.png" style="width: 100%; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 14px rgba(0,0,0,0.15);" alt="Antigravity Mission Prompt Screenshot" />
+  </div>
 </div>
 
 ---
