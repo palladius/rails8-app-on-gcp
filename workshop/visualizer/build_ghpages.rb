@@ -122,19 +122,29 @@ docs_to_build.each do |doc|
   puts "   📄 Rendered #{File.basename(doc[:source])} -> workshop/build/#{doc[:target]}"
 end
 
-# Render the minimal root portal page at index.html
+# Render the minimal root portal page at index.html (EN) and index_it.html (IT)
 portal_template_string = server_code.split("@@portal\n").last.split("@@").first
-portal_renderer = ERB.new(portal_template_string)
-portal_html = portal_renderer.result(binding)
-# Adjust links for static output in root index.html
-portal_html.gsub!('href="/workshop/"', 'href="workshop/index.html"')
-portal_html.gsub!('href="/codelab"', 'href="workshop/index.html"')
-portal_html.gsub!('href="/slides/"', 'href="slides/index.html"')
-portal_html.gsub!('href="/constitution"', 'href="constitution.html"')
-portal_html.gsub!('href="/skeleton"', 'href="skeleton.html"')
 
-File.write(File.join(build_dir, 'index.html'), portal_html)
-puts "   📄 Rendered Landing Portal -> workshop/build/index.html"
+[
+  { lang: 'en', filename: 'index.html' },
+  { lang: 'it', filename: 'index_it.html' }
+].each do |target|
+  @lang = target[:lang]
+  portal_renderer = ERB.new(portal_template_string)
+  portal_html = portal_renderer.result(binding)
+  # Adjust links for static output in root
+  portal_html.gsub!('href="?lang=en"', 'href="index.html"')
+  portal_html.gsub!('href="?lang=it"', 'href="index_it.html"')
+  portal_html.gsub!('href="/workshop/"', 'href="workshop/index.html"')
+  portal_html.gsub!('href="/codelab"', 'href="workshop/index.html"')
+  portal_html.gsub!('href="/slides/"', 'href="slides/index.html"')
+  portal_html.gsub!('href="/constitution"', 'href="constitution.html"')
+  portal_html.gsub!('href="/skeleton"', 'href="skeleton.html"')
+  portal_html.gsub!('src="/assets/', 'src="assets/')
+
+  File.write(File.join(build_dir, target[:filename]), portal_html)
+  puts "   📄 Rendered Landing Portal (#{target[:lang].upcase}) -> workshop/build/#{target[:filename]}"
+end
 
 # Copy workshop assets to build/assets, build/workshop/assets, and build/codelab/assets
 assets_dir = File.join(workshop_dir, 'assets')

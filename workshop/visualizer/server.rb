@@ -168,6 +168,7 @@ class CodelabServer < Sinatra::Base
   
   # Root Landing Portal
   get '/' do
+    @lang = (params[:lang] || 'en').to_s.downcase == 'it' ? 'it' : 'en'
     erb :portal
   end
 
@@ -1037,30 +1038,70 @@ __END__
       background: #ffffff;
       border: 1px solid #dadce0;
       border-radius: 12px;
-      max-width: 680px;
+      max-width: 760px;
       width: 100%;
-      padding: 40px;
+      padding: 36px 40px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+    .portal-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 3px 6px;
+      border-radius: 16px;
+    }
+    .lang-btn {
+      text-decoration: none;
+      font-size: 16px;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      opacity: 0.55;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .lang-btn:hover {
+      opacity: 0.9;
+    }
+    .lang-btn.active {
+      opacity: 1;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .lang-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #3c4043;
     }
     h1 {
       font-size: 26px;
       font-weight: 600;
       color: #1a73e8;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .tagline {
-      font-size: 15px;
-      line-height: 1.6;
+      font-size: 14.5px;
+      line-height: 1.55;
       color: #5f6368;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     .destinations {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 20px;
       margin-bottom: 28px;
     }
-    @media (max-width: 580px) {
+    @media (max-width: 620px) {
       .destinations {
         grid-template-columns: 1fr;
       }
@@ -1068,17 +1109,30 @@ __END__
     .btn-dest {
       display: flex;
       flex-direction: column;
-      padding: 20px;
       border: 1px solid #dadce0;
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
       transition: all 0.2s ease;
       background: #ffffff;
+      overflow: hidden;
     }
     .btn-dest:hover {
       border-color: #1a73e8;
-      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.12);
+      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.12);
       transform: translateY(-2px);
+    }
+    .dest-thumb {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: #e8eaed;
+      border-bottom: 1px solid #dadce0;
+    }
+    .dest-body {
+      padding: 16px 18px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
     .dest-title {
       font-size: 16px;
@@ -1089,7 +1143,7 @@ __END__
     .dest-desc {
       font-size: 13px;
       color: #5f6368;
-      line-height: 1.4;
+      line-height: 1.45;
     }
     .secondary-links {
       border-top: 1px solid #f1f3f4;
@@ -1122,21 +1176,41 @@ __END__
   </style>
 </head>
 <body>
+  <% is_it = (@lang == 'it') %>
   <div class="portal-card">
-    <h1>Rails 8 on Google Cloud</h1>
+    <div class="portal-topbar">
+      <h1>Rails 8 on Google Cloud</h1>
+      <div class="lang-switcher">
+        <a href="?lang=en" class="lang-btn <%= !is_it ? 'active' : '' %>" title="English">
+          <span>🇬🇧</span>
+          <span class="lang-text">EN</span>
+        </a>
+        <a href="?lang=it" class="lang-btn <%= is_it ? 'active' : '' %>" title="Italiano">
+          <span>🇮🇹</span>
+          <span class="lang-text">IT</span>
+        </a>
+      </div>
+    </div>
+
     <p class="tagline">
-      A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI.
+      <%= is_it ? "Architettura di riferimento cloud-native e workshop interattivo per rilasciare Ruby on Rails 8 su Google Cloud Platform con Cloud Run, Cloud SQL e Gemini AI." : "A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI." %>
     </p>
 
     <div class="destinations">
       <a href="/workshop/" class="btn-dest">
-        <span class="dest-title">Se cercavi il workshop QUI &rarr;</span>
-        <span class="dest-desc">Interactive step-by-step Codelab guide with terminal commands, checkpoints, and architecture notes.</span>
+        <img src="/assets/codelab-preview.png" alt="Workshop Codelab Preview" class="dest-thumb" onerror="this.style.display='none'" />
+        <div class="dest-body">
+          <span class="dest-title"><%= is_it ? "Se cercavi il workshop QUI &rarr;" : "Workshop Codelab &rarr;" %></span>
+          <span class="dest-desc"><%= is_it ? "Guida interattiva passo dopo passo con comandi da terminale, checkpoint architetturali e telemetria live." : "Interactive step-by-step Codelab guide with terminal commands, checkpoints, and live telemetry." %></span>
+        </div>
       </a>
 
       <a href="/slides/" class="btn-dest">
-        <span class="dest-title">Se cercavi le slides QUI &rarr;</span>
-        <span class="dest-desc">Marp presentation slide deck with kickoff visuals, concepts, and workshop anthem.</span>
+        <img src="/assets/slide1-preview.png" alt="Slide 1 Preview" class="dest-thumb" onerror="this.style.display='none'" />
+        <div class="dest-body">
+          <span class="dest-title"><%= is_it ? "Se cercavi le slides QUI &rarr;" : "Presentation Slides &rarr;" %></span>
+          <span class="dest-desc"><%= is_it ? "Slide deck Marp con visual di apertura, concetti chiave, self-QR code e l'inno musicale del workshop." : "Marp presentation slide deck with kickoff visuals, concepts, self-QR code, and workshop anthem." %></span>
+        </div>
       </a>
     </div>
 
@@ -1147,4 +1221,5 @@ __END__
   </div>
 </body>
 </html>
+
 
