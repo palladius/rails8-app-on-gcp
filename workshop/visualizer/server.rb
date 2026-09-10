@@ -1238,7 +1238,7 @@ __END__
             <span><%= is_it ? "Se cercavi le slides QUI" : "Presentation Slides" %></span>
             <span>&rarr;</span>
           </span>
-          <span class="dest-desc"><%= is_it ? "Slide deck Marp con visual di apertura, concetti chiave, self-QR code e l'inno musicale del workshop." : "Marp presentation slide deck with kickoff visuals, concepts, self-QR code, and workshop anthem." %></span>
+          <span class="dest-desc"><%= is_it ? "Punto di partenza del workshop: kickoff, architettura concettuale e pair-programming con Google Antigravity." : "Workshop kickoff & visual entrypoint: core concepts, cloud architecture, and pair-programming with Google Antigravity." %></span>
         </div>
       </a>
     </section>
