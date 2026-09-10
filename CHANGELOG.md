@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.19] - 2026-09-10
+### Added
+- 🛡️ **Dedicated Cloud Build Service Account for CI/CD (Issue [#59](https://github.com/palladius/rails8-app-on-gcp/issues/59))**:
+  - Implemented dedicated Bring-Your-Own-Service-Account (`rails-cloudbuild-sa`) in `iac/cicd.tf` following the Principle of Least Privilege (POLA).
+  - Attached scoped roles: `roles/logging.logWriter`, `roles/artifactregistry.writer`, `roles/run.developer`, and `roles/iam.serviceAccountUser` acting on the Cloud Run runtime SA.
+
 ## [0.2.18] - 2026-09-10
 ### Added
 - 🇮🇹 **DevFest Modena 2026 Premiere Date & Landing Portal Event Badge**:
