@@ -47,6 +47,8 @@ A curated index of authoritative upstream documentation, architectural reference
   https://rubyonrails.org/2024/11/7/rails-8-no-paas-required
 - 📦 **Rails 8 Release Notes**:  
   https://guides.rubyonrails.org/8_0_release_notes.html
+- 💼 **Active Job Basics Guide**:  
+  https://guides.rubyonrails.org/active_job_basics.html
 - ⚡ **Solid Queue (Database-backed ActiveJob runner)**:  
   https://github.com/rails/solid_queue
 - 🗄️ **Solid Cache (Database-backed Cache store)**:  
