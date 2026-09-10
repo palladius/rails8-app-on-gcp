@@ -28,7 +28,8 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
  • Private GCS via IAM Credential Blob Signing   • Automated Bug & PR Synthesis
  • Zero-Trust Cloud SQL Auth Proxy + Secrets     • 100% Declarative Playwright Screenshots
  • Native Rails 8 Solid Queue + Vertex AI GenAI  • Real-Time Proctor Observability (Hive)
- • Localhost Invariant + Educational Telemetry   • Zero-Branch "Time Machine" Progression
+ • Localhost Invariant + Educational Telemetry   • Declarative SKELETON & Executable Step Evals
+                                                 • Zero-Branch "Time Machine" Progression
 ```
 
 ---
@@ -96,7 +97,17 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 
 ![Student Row Telemetry Detail](workshop/assets/images/hive_student_row_telemetry.png)
 
-### 4. The Zero-Branch Time Machine
+### 4. The Declarative SKELETON: Actionable Pre/Post-Requisites & Automated Step Evals
+- **The Problem:** Most workshops describe steps with vague prose. If a student's step fails, neither the student nor an AI agent knows whether prerequisites were met or if the post-state is actually valid.
+- **The Innovation ([`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`workshop/SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md)):**
+  - **Single Source of Truth**: The workshop curriculum is formally specified in a machine-readable schema (`workshop/skeleton.yaml`) and compiled into human-readable markdown (`SKELETON.md`).
+  - **Strict Contracts**: Every single step declares actionable **`prerequisites`**, **`pseudocode`**, and **`postrequisites`**.
+  - **Executable Step Evals in Code (`bin/workshop_eval.rb`)**:
+    - Every step is backed by automated evaluations executed directly in code (both **Shell** commands and **Ruby** assertions).
+    - Students and AI agents can test any individual step or the whole curriculum via `just workshop-eval <step>` or `just workshop-eval all` (20/20 evals passed).
+    - If a step passes its evals, both human and AI know with mathematical certainty that the step's environment and infrastructure are green before proceeding!
+
+### 5. The Zero-Branch Time Machine
 - **No Git Merge Hell:** Attendees never juggle 10 conflicting git branches.
 - **The Engine ([`bin/workshop_time_machine.rb`](https://github.com/palladius/rails8-app-on-gcp/blob/main/bin/workshop_time_machine.rb)):**
   - Keeps students on `main`.
@@ -119,4 +130,4 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 
 ### Perché questo workshop è unico?
 1. **Il Contenuto di Livello Enterprise**: Dimostriamo come far girare un vero monolite Rails 8 in produzione su Google Cloud sfruttando i **Multi-Container Sidecars di Cloud Run** (Puma web + Solid Queue worker + Cloud SQL proxy mTLS con Docker Compose). Niente bucket pubblici o database aperti a `0.0.0.0/0`: usiamo ActiveStorage con **Google Cloud Storage e firma IAM short-lived (`iam: true`)**, Secret Manager per i segreti a runtime, e worker asincroni Solid Queue collegati a Vertex AI (Gemini + Imagen 3 + Text-to-Speech italiano).
-2. **L'Ingegneria dei Metadati e l'Automazione**: Abbiamo automatizzato il **Friction Logging** attraverso la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab): agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**). Abbiamo persino screenshot Playwright 100% dichiarativi come codice e la **Hive Leaderboard** in tempo reale: grazie a un **semplice Google Form pubblico** in cui lo studente inserisce solo nickname e URL di Cloud Run, il nostro poller interroga `/status.json` in background, deducendo automaticamente e live lo step raggiunto (es. `4/8` o `7/8`), lo stato di persistenza DB, storage GCS e AI senza che nessuno debba compilare o comunicare nulla a mano!
+2. **L'Ingegneria dei Metadati e l'Automazione**: Abbiamo automatizzato il **Friction Logging** attraverso la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab): agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**). Il curriculum è formalmente dichiarato in un file machine-readable ([`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md)) con prerequisiti, post-requisiti azionabili ed **evaluation eseguibili direttamente in codice** (comandi Shell e asserzioni Ruby tramite `bin/workshop_eval.rb`, 20/20 test verdi!). Infine, abbiamo screenshot Playwright 100% dichiarativi come codice e la **Hive Leaderboard** in tempo reale: grazie a un **semplice Google Form pubblico** in cui lo studente inserisce solo nickname e URL di Cloud Run, il nostro poller interroga `/status.json` in background, deducendo automaticamente e live lo step raggiunto (es. `4/8` o `7/8`), lo stato di persistenza DB, storage GCS e AI senza che nessuno debba compilare o comunicare nulla a mano!
