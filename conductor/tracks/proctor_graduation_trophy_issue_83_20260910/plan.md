@@ -14,14 +14,14 @@
 - [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md) [6d2a649]
 
 ## Phase 2: Hive Backend Proctor Reviewer Engine (`workshop/hive/`)
-- [~] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red)
-    - [ ] Test proctor comment with "LGTM" returns `:lgtm_approved` and reviewer username
-    - [ ] Test non-proctor comment with "LGTM" returns `:review_pending`
-    - [ ] Test missing LGTM comment returns `:review_pending`
-    - [ ] Test GitHub API timeout or rate limit falls back gracefully to `:review_pending`
-    - [ ] Test in-memory 120s TTL caching
-    - [ ] Confirm tests fail (Red)
-- [ ] Task: Implement `ProctorReviewer` in `workshop/hive/lib/proctor_reviewer.rb` (TDD Green)
+- [x] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red) [bbea952]
+    - [x] Test proctor comment with "LGTM" returns `:lgtm_approved` and reviewer username
+    - [x] Test non-proctor comment with "LGTM" returns `:review_pending`
+    - [x] Test missing LGTM comment returns `:review_pending`
+    - [x] Test GitHub API timeout or rate limit falls back gracefully to `:review_pending`
+    - [x] Test in-memory 120s TTL caching
+    - [x] Confirm tests fail (Red)
+- [~] Task: Implement `ProctorReviewer` in `workshop/hive/lib/proctor_reviewer.rb` (TDD Green)
     - [ ] Parse `HIVE_PROCTORS` (default: `"palladius,emilianodellacasa,ricc"`)
     - [ ] Build GitHub API comment fetcher using `Net::HTTP` with optional `GITHUB_TOKEN`
     - [ ] Match case-insensitive `\bLGTM\b` from approved proctors
