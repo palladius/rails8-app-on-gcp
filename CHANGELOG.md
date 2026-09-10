@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
   - Improved Slide 2 (Antigravity download) with gray down arrow ⬇️, standalone button, and small URL caption.
   - Polished Slide 5 with CSS class-based prompt styling and copy button.
   - Enhanced final Slide 6 with author avatars alongside LinkedIn links and compact workshop anthem audio player.
-  - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
+  - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261003-devfest-modena/`.
 - 🏆 **Workshop BRAG Document & Autonomous Engineering Architecture (PR [#61](https://github.com/palladius/rails8-app-on-gcp/pull/61), PR [#62](https://github.com/palladius/rails8-app-on-gcp/pull/62), Fixes [#60](https://github.com/palladius/rails8-app-on-gcp/issues/60))**:
   - Published comprehensive Workshop BRAG document [`docs/WORKSHOP_BRAG_DOCUMENT.md`](docs/WORKSHOP_BRAG_DOCUMENT.md) detailing both Pillar 1 (Enterprise Multi-Container Serverless Architecture) and Pillar 2 (Agent-First Autonomous Engineering & Self-Healing Metamodel).
   - Documented the **Agent-First Native Architecture**: Antigravity landing page guidance, custom repository skills (`skills/rails8app-workshop`, `skills/cloud-run-troubleshooting`), and in-app diagnostics.

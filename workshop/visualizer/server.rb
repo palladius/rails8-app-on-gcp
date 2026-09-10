@@ -1261,9 +1261,9 @@ __END__
 
     <main class="hero">
       <div class="event-badge">
-        <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/events/20261002-devfest-modena/README.md" target="_blank" rel="noopener" class="event-link">
+        <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/events/20261003-devfest-modena/README.md" target="_blank" rel="noopener" class="event-link">
           <span class="event-flag">🇮🇹</span>
-          <span class="event-date">2026-10-02 Modena</span> &middot; <span class="event-title">DevFest Modena 2026 (Sala 40)</span>
+          <span class="event-date">Sat 3 Oct 2026 &middot; Modena</span> &middot; <span class="event-title">DevFest Modena (Sala 40, 10:30-13:30)</span>
           <span class="event-arrow">&rarr;</span>
         </a>
       </div>
