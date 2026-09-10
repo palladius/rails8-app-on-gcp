@@ -1,0 +1,4 @@
+Task: Implement ProctorReviewer in workshop/hive/lib/proctor_reviewer.rb (TDD Green)
+Summary: Built ProctorReviewer with HIVE_PROCTORS allowlist, GitHub API comments fetcher, case-insensitive LGTM detection, and 120s thread-safe in-memory cache.
+Files: workshop/hive/lib/proctor_reviewer.rb
+Why: Core verification engine for Issue #83.
