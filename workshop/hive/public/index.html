@@ -81,7 +81,6 @@
           <span class="text-[9px] font-mono text-slate-400 leading-tight">Submit App</span>
         </div>
       </div>
-
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
         <span>➕</span>
         <span>Submit Your App</span>
@@ -98,10 +97,10 @@
       </div>
       <div>
         <h3 class="text-lg font-bold text-white">Scan to Submit Your App</h3>
-        <p class="text-xs text-slate-400 mt-1">Inquadra con il telefono per inviare il tuo Cloud Run URL alla Leaderboard</p>
+        <p class="text-xs text-slate-400 mt-1">Scan with your smartphone to register your Cloud Run URL</p>
       </div>
       <div class="p-3 bg-white rounded-xl shadow-inner">
-        <img src="/submit_qr.png" alt="Submit Your App QR Code" class="w-56 h-56 block">
+        <img src="/submit_qr.png" alt="Submit Your App QR Code" class="w-64 h-64 block">
       </div>
       <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform" target="_blank" rel="noopener noreferrer" class="text-xs font-mono text-amber-400 hover:underline break-all">
         docs.google.com/forms/...
@@ -111,10 +110,36 @@
 
   <!-- Table Section: Exactly 3 Columns, Full 100% Width -->
   <main class="flex-1 py-6 px-8 w-full flex flex-col gap-3">
-    <div class="flex items-center justify-between text-xs text-slate-400 px-1">
-      <div class="flex items-center gap-2">
-        <span>Attivi in tempo reale su Google Cloud Run / Localhost</span>
+    <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 px-1">
+      <!-- Left: Subtitle & Time Filters -->
+      <div class="flex flex-wrap items-center gap-3">
+        <span>Active in real time on Google Cloud Run / Localhost</span>
+        <span class="text-slate-700">|</span>
+        <!-- Time Filter Pills -->
+        <div id="time-filter-container" class="inline-flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800 text-[11px] font-mono">
+          <span class="text-slate-500 px-1.5 flex items-center gap-1">
+            <span>⏱️</span>
+            <span>Window:</span>
+          </span>
+          <button type="button" data-filter="all" onclick="setTimeFilter('all')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
+            All
+          </button>
+          <button type="button" data-filter="24h" onclick="setTimeFilter('24h')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
+            24h
+          </button>
+          <button type="button" data-filter="2d" onclick="setTimeFilter('2d')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
+            2d
+          </button>
+          <button type="button" data-filter="7d" onclick="setTimeFilter('7d')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
+            7d
+          </button>
+          <button type="button" data-filter="1mo" onclick="setTimeFilter('1mo')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
+            1mo
+          </button>
+        </div>
       </div>
+
+      <!-- Right: Legend UP/DOWN -->
       <div class="flex items-center gap-4 text-[11px]">
         <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> UP (200 OK)</span>
         <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> DOWN / Unreachable</span>
@@ -144,17 +169,52 @@
       </table>
     </div>
 
-    <!-- Stage Progress Distribution (Horizontal Stages Addition) -->
+    <!-- Bottom Section: Stage Distribution (75%) and Scan & Join QR Card (25%) -->
     <div class="mt-4 pt-4 border-t border-slate-800/80">
-      <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-3 px-1">
-        <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
-          <span>📊</span>
-          <span>Stage Distribution</span>
-        </span>
-        <span class="text-slate-500 text-[11px]">(Cloud Run unlocks at Step 3 — Steps 1 & 2 are ephemeral/local)</span>
-      </div>
-      <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
-        <!-- Rendered dynamically by hive.js -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        
+        <!-- Left Column (~75%): Stage Progress Distribution & Tips -->
+        <div class="lg:col-span-9 flex flex-col justify-between gap-3">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-2 px-1">
+              <span class="flex items-center gap-1.5 uppercase tracking-wider font-semibold text-[11px] text-slate-300">
+                <span>📊</span>
+                <span>Stage Distribution</span>
+              </span>
+              <span class="text-slate-500 text-[11px]">(Cloud Run unlocks at Step 3 — Steps 1 & 2 run locally)</span>
+            </div>
+            <div id="stages-distribution" class="grid grid-cols-4 md:grid-cols-8 gap-2.5">
+              <!-- Rendered dynamically by hive.js -->
+            </div>
+          </div>
+
+          <!-- Quick instructions strip -->
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl px-4 py-2.5 flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400">💡</span>
+              <span>Submit your app once: telemetry updates automatically on every commit and Cloud Run deploy!</span>
+            </div>
+            <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:text-amber-300 hover:underline font-mono text-[11px] flex items-center gap-1">
+              <span>docs/codelab</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Column (~25%): Compact Scan & Join QR Code Card -->
+        <div class="lg:col-span-3 bg-slate-900/90 hover:bg-slate-850 p-4 rounded-2xl border-2 border-amber-500/40 shadow-xl flex flex-col items-center justify-center text-center gap-2.5 transition-all hover:scale-[1.02] cursor-pointer group" onclick="document.getElementById('qr-modal').classList.remove('hidden')" title="Click to enlarge QR Code to full screen">
+          <div class="p-2 bg-white rounded-xl shadow-lg group-hover:ring-4 group-hover:ring-amber-400/40 transition-all">
+            <img src="/submit_qr.png" alt="Submit Your App QR Code" class="w-28 h-28 md:w-32 md:h-32 block">
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📱</span>
+              <span>Scan & Join</span>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400 mt-0.5">Submit your Cloud Run URL</span>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -175,15 +235,31 @@
   </div>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-800/80 px-8 py-3.5 text-xs text-slate-500 flex items-center justify-between">
-    <div>
-      Made with 🦖 & 🍝 by Riccardo & Emiliano — 
-      <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-amber-300 hover:underline transition-colors inline-flex items-center gap-1 font-medium" title="GitHub Repository: palladius/rails8-app-on-gcp">
-        <span>Rails 8 on GCP Workshop</span>
-        <svg class="w-3.5 h-3.5 inline-block opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-      </a>
+  <footer class="border-t border-slate-800/80 px-8 py-3.5 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4 flex-wrap">
+      <div>
+        Crafted with 🦖 & 🍝 by Riccardo & Emiliano — 
+        <a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-amber-300 hover:underline transition-colors inline-flex items-center gap-1 font-medium" title="GitHub Repository: palladius/rails8-app-on-gcp">
+          <span>Rails 8 on Google Cloud Workshop</span>
+          <svg class="w-3.5 h-3.5 inline-block opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+      </div>
+      <span class="text-slate-700 hidden md:inline">|</span>
+      <!-- Quick max_age links for direct URL sharing or zero-effort switching -->
+      <div class="inline-flex items-center gap-2 font-mono text-[11px] text-slate-400">
+        <span class="text-slate-500">Quick view:</span>
+        <a href="?max_age=24h" class="hover:text-amber-300 hover:underline">?max_age=24h</a>
+        <span class="text-slate-700">•</span>
+        <a href="?max_age=2d" class="hover:text-amber-300 hover:underline">?max_age=2d</a>
+        <span class="text-slate-700">•</span>
+        <a href="?max_age=7d" class="hover:text-amber-300 hover:underline">?max_age=7d</a>
+        <span class="text-slate-700">•</span>
+        <a href="?max_age=1mo" class="hover:text-amber-300 hover:underline">?max_age=1mo</a>
+        <span class="text-slate-700">•</span>
+        <a href="/" class="text-slate-500 hover:text-slate-300 hover:underline">Reset (All)</a>
+      </div>
     </div>
-    <div id="footer-last-updated" class="font-mono text-[11px]">Polling active (5s health / 10s submissions)</div>
+    <div id="footer-last-updated" class="font-mono text-[11px]">Polling active (5s health / 10s students)</div>
   </footer>
 
   <script src="/js/hive.js"></script>

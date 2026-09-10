@@ -4,6 +4,9 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 
 🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
 🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
+🌐 **Workshop Portal**: https://palladius.github.io/rails8-app-on-gcp/
+🚀 **Presentation Slides**: https://palladius.github.io/rails8-app-on-gcp/slides/
+📖 **Workshop Codelab**: https://palladius.github.io/rails8-app-on-gcp/codelab/
 🐝 **Workshop Hive (Leaderboard)**: https://workshop-hive-x42ijqglgq-ew.a.run.app/ (or https://workshop-hive-272932496670.europe-west1.run.app/)
 
 🎶 **Official Workshop Anthem (Generated with Google Lyria 3 Pro)**:
@@ -38,18 +41,21 @@ just compose-logs
 just compose-down
 ```
 
-### 3️⃣ Mode 3: Local Workshop Codelab Server (`just workshop-dev`)
-Sinatra-based interactive Codelab visualizer with hot-reloading (includes built-in document switcher for Codelab, Constitution, and Skeleton).
+### 3️⃣ Mode 3: Local Workshop & Slides Servers
+Interactive workshop portal, Codelab visualizer, and Marp presentation slides.
 ```bash
-# Start the workshop server on port 8080
+# Start the workshop server on port 8080 (serves portal at /, codelab at /codelab/)
 just workshop-dev
 # (or: ruby workshop/visualizer/server.rb --port 8080)
 
-# Direct document URLs:
-# • Codelab:      http://localhost:8080/codelab
-# • Constitution: http://localhost:8080/constitution
-# • Skeleton:     http://localhost:8080/skeleton
-# • A2UI JSON:    http://localhost:8080/a2ui
+# Start Marp presentation slides server on port 8082
+just slides
+# (or: marp --server slides --html)
+
+# Local document URLs:
+# • Workshop Portal:    http://localhost:8080/
+# • Presentation Slides: http://localhost:8080/slides/ (or http://localhost:8082/)
+# • Workshop Codelab:   http://localhost:8080/codelab/
 ```
 
 ---
@@ -62,7 +68,7 @@ just workshop-dev
 | :--- | :--- | :--- | :--- |
 | 🚀 **1. Native Rails App** | `just dev` | • [http://localhost:3000](http://localhost:3000) | Rails 8 Puma Server + Tailwind CSS Watcher (SQLite) |
 | 🐳 **2. Docker Compose** | `just compose-up` | • [http://localhost:3000](http://localhost:3000)<br>• [http://localhost:8025](http://localhost:8025)<br>• [http://localhost:8081](http://localhost:8081)<br>• `localhost:5432` | • Rails 8 Web Server (`:3000`)<br>• Mailpit Email UI (`:8025`, SMTP `:1025`)<br>• Adminer DB GUI (`:8081`)<br>• PostgreSQL 16 DB (`:5432`)<br>• Solid Queue Worker (Background) |
-| 📖 **3. Workshop Web UI** | `just workshop-dev` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/constitution](http://localhost:8080/constitution)<br>• [http://localhost:8080/skeleton](http://localhost:8080/skeleton)<br>• [http://localhost:8080/a2ui](http://localhost:8080/a2ui) | • Interactive Codelab Visualizer (`CODELAB.md`)<br>• Untouchable Constitution<br>• Workshop Skeleton<br>• A2UI JSON API |
+| 📖 **3. Workshop & Slides** | `just workshop-dev`<br>`just slides` | • [http://localhost:8080](http://localhost:8080)<br>• [http://localhost:8080/slides/](http://localhost:8080/slides/)<br>• [http://localhost:8080/codelab/](http://localhost:8080/codelab/) | • Workshop Portal (`/`)<br>• Presentation Slides (`/slides/`)<br>• Interactive Codelab (`/codelab/`) |
 
 ## ☁️ Cloud Telemetry & Verification (`just cloud-run-status`)
 
@@ -80,10 +86,12 @@ See [`docs/WORKSHOP_TELEMETRY_AND_ALERTS.md`](docs/WORKSHOP_TELEMETRY_AND_ALERTS
 
 ## 📖 Workshop
 
-The workshop is published on GitHub Pages:
+The workshop and presentation materials are published on GitHub Pages:
 
-* 🌐 **Live Codelab:** [https://palladius.github.io/rails8-app-on-gcp/](https://palladius.github.io/rails8-app-on-gcp/) (official Google Codelab visualizer)
-* 📜 **Constitution:** [https://palladius.github.io/rails8-app-on-gcp/constitution.html](https://palladius.github.io/rails8-app-on-gcp/constitution.html)
-* 🦴 **Skeleton:** [https://palladius.github.io/rails8-app-on-gcp/skeleton.html](https://palladius.github.io/rails8-app-on-gcp/skeleton.html)
+* 🌐 **Workshop Portal:** [https://palladius.github.io/rails8-app-on-gcp/](https://palladius.github.io/rails8-app-on-gcp/) (Landing entrypoint with bilingual switcher)
+* 🚀 **Presentation Slides:** [https://palladius.github.io/rails8-app-on-gcp/slides/](https://palladius.github.io/rails8-app-on-gcp/slides/) (Kickoff, Antigravity setup, GCP credits)
+* 🛠️ **Workshop Codelab:** [https://palladius.github.io/rails8-app-on-gcp/codelab/](https://palladius.github.io/rails8-app-on-gcp/codelab/) (Interactive step-by-step guide)
+
+> 💡 *Want to know more about how this workshop was conceived, architected, and tested? Delve into the [Developer's Guide](docs/DEVELOPERS_GUIDE.md).*
 
 ![Workshop Preview](assets/workshop_preview.png)

@@ -13,13 +13,19 @@ steps:
       gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
     prerequisites:
       - "Google Cloud Account with active credits or billing account"
-      - "Installed CLIs: gcloud, terraform, docker, ruby 3.3+, rails 8"
+      - "Git 2.30+ for cloning and branching repository"
+      - "Installed CLIs: git, gcloud, terraform, docker, ruby 3.3+, rails 8"
       - "Google Antigravity IDE or Gemini CLI environment"
     postrequisites:
       - "Authenticated gcloud and Application Default Credentials (ADC)"
       - "Verified active billing account preventing mid-workshop quota failures"
       - "Antigravity connected and paired with repository"
     evals:
+      - id: "step-0-shell-git"
+        type: "shell"
+        description: "Verify git CLI is installed and returns valid version"
+        command: "git --version"
+        expect_exit: 0
       - id: "step-0-shell-gcloud"
         type: "shell"
         description: "Verify gcloud CLI is installed and returns valid version"

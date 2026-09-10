@@ -1,6 +1,34 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-09-10
+### Added
+- 🌐 **Workshop Landing Portal & Slides on GitHub Pages (`/slides/`, `/codelab/`)**:
+  - Implemented clean, minimal landing portal page at root (`/` / `index.html`) offering direct navigation between Workshop Codelab and Presentation Slides.
+  - Isolated multi-doc Google Codelab guide under `/codelab/`.
+  - Added slide build and deployment into GitHub Pages (`workshop/build/slides/`, `.github/workflows/deploy-pages.yml`).
+  - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
+  - Added bilingual language switcher with 🇬🇧 EN and 🇮🇹 IT flags with static mirror (`index_it.html`).
+  - Added visual thumbnail previews to the portal destination cards with enlarged 420px previews (filling ~70% of card height) and compact typography.
+  - Reordered portal navigation cards: **1. Presentation Slides** ("Get started with Antigravity, get credits and THEN start the workshop!") and **2. Workshop Codelab** ("When you have Antigravity installed and Billing enabled for GCP, you can start this codelab!").
+  - Explicitly added `git` (2.30+) to workshop prerequisites checklist and evaluation specs (`CODELAB.md`, `skeleton.yaml`, `SKELETON.md`, and landing-page READMEs).
+  - Added dedicated standalone slide verification test suite (`test/test_slides.rb`, `just test-slides`) testing against HTML/div escaping leaks, overflow, and image rendering.
+  - Improved Slide 2 (Antigravity download) with gray down arrow ⬇️, standalone button, and small URL caption.
+  - Polished Slide 5 with CSS class-based prompt styling and copy button.
+  - Enhanced final Slide 6 with author avatars alongside LinkedIn links and compact workshop anthem audio player.
+  - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
+- 🏆 **Workshop BRAG Document & Autonomous Engineering Architecture (PR [#61](https://github.com/palladius/rails8-app-on-gcp/pull/61), PR [#62](https://github.com/palladius/rails8-app-on-gcp/pull/62), Fixes [#60](https://github.com/palladius/rails8-app-on-gcp/issues/60))**:
+  - Published comprehensive Workshop BRAG document [`docs/WORKSHOP_BRAG_DOCUMENT.md`](docs/WORKSHOP_BRAG_DOCUMENT.md) detailing both Pillar 1 (Enterprise Multi-Container Serverless Architecture) and Pillar 2 (Agent-First Autonomous Engineering & Self-Healing Metamodel).
+  - Documented the **Agent-First Native Architecture**: Antigravity landing page guidance, custom repository skills (`skills/rails8app-workshop`, `skills/cloud-run-troubleshooting`), and in-app diagnostics.
+  - Documented the **Declarative SKELETON**: Machine-readable specification (`workshop/skeleton.yaml` $\to$ `workshop/SKELETON.md`) with actionable contracts (`prerequisites`, `pseudocode`, `postrequisites`) and 3-tier executable step evals (`[SHELL]`, `[RUBY]`, `[LLM]`).
+  - Documented **Constitutional Invariants** (`docs/CONSTITUTION.md`), Zero-Branch Time Machine progression, and Hive real-time classroom observability with visual telemetry badges.
+  - Added dual English architecture narrative and Italian community summary for Modena Ruby Day & meetups.
+
 ## [0.2.8] - 2026-09-09
+### Added
+- 🎶 **Workshop Anthem & Short Clip on Final Slide (`slides/index.md`, `slides/dist/index.html`)**:
+  - Added HTML5 audio player widget with "Check this great song" to the concluding presentation slide.
+  - Linked the 30-second Lyria 3 clip preview and the full-length 3-minute energetic acoustic guitar composition (Lyria 3 Pro on Vertex AI) generated for Rubyists.
+
 ### Fixed
 - 🛠️ **Terraform Provider 5.x & Virgin Project Hardening (FL-004)**:
   - Fixed `iac/iap.tf`: In Google provider 5.x+, static `iap { enabled = true }` threw schema validation errors (`oauth2_client_id` and `oauth2_client_secret` required) even when `enable_iap = false`. Converted to optional `dynamic "iap"` block.

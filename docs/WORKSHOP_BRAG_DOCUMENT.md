@@ -27,7 +27,6 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
  • Enterprise Cloud Run Multi-Container Sidecars • Autonomous Friction Logging Loop (FL-001..004)
  • Private GCS via IAM Credential Blob Signing   • Automated Bug & PR Synthesis
  • Zero-Trust Cloud SQL Auth Proxy + Secrets     • 100% Declarative Playwright Screenshots
- • Native Rails 8 Solid Queue + Vertex AI GenAI  • Real-Time Proctor Observability (Hive)
  • Localhost Invariant + Educational Telemetry   • Declarative SKELETON & Executable Step Evals
                                                  • Zero-Branch "Time Machine" Progression
 ```
@@ -124,7 +123,7 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
 
 ![Student Row Telemetry Detail](workshop/assets/images/hive_student_row_telemetry.png)
 
-### 4. The Declarative SKELETON: Actionable Pre/Post-Requisites & Automated Step Evals
+### 5. The Declarative SKELETON: Actionable Pre/Post-Requisites & Automated Step Evals
 - **The Problem:** Most workshops describe steps with vague prose. If a student's step fails, neither the student nor an AI agent knows whether prerequisites were met or if the post-state is actually valid.
 - **The Innovation ([`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`workshop/SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md)):**
   - **Single Source of Truth**: The workshop curriculum is formally specified in a machine-readable schema (`workshop/skeleton.yaml`) and compiled into human-readable markdown (`SKELETON.md`).
@@ -137,7 +136,14 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
     - Students and AI agents can test any individual step or the whole curriculum via `just workshop-eval <step>` or `just workshop-eval all` (**25/25 evaluations passed**).
     - If a step passes its evals, both human and AI know with mathematical certainty that the step's environment, infrastructure, and code contracts are green before proceeding!
 
-### 6. The Project Constitution: Inviolable Architectural Invariants
+### 6. The Zero-Branch Time Machine
+- **No Git Merge Hell:** Attendees never juggle 10 conflicting git branches.
+- **The Engine ([`bin/workshop_time_machine.rb`](https://github.com/palladius/rails8-app-on-gcp/blob/main/bin/workshop_time_machine.rb)):**
+  - Keeps students on `main`.
+  - Enables instant checkpoint rewinds or restorations via `just workshop-rewind <N>` and `just workshop-restore-gold`.
+  - Validated by isolated UAT sandbox runner [`bin/workshop_uat.rb`](https://github.com/palladius/rails8-app-on-gcp/blob/main/bin/workshop_uat.rb) (`just workshop-uat`).
+
+### 7. The Project Constitution: Inviolable Architectural Invariants
 - **The Problem:** In fast-moving projects and AI-assisted workflows, codebases suffer from drift, hacky shortcuts, or accidental regressions (e.g. committing `.env` files, breaking offline execution, or deploying unencrypted public databases).
 - **The Governing Authority ([`docs/CONSTITUTION.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/docs/CONSTITUTION.md)):**
   - **Supreme Hierarchy**: `CONSTITUTION.md` sits above all agent instructions (`AGENTS.md`), developer guides, and curriculum files. Any constitutional change requires a **2/3 supermajority agreement** between **Riccardo 🦖**, **Emiliano 🏎️**, and **AI 🤖**.
@@ -171,3 +177,4 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
    - **Friction Logging Loop autonomo**: tramite la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab), agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**).
    - **Curriculum e Step Evals**: formalmente dichiarato in [`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md) con evaluation a 3 livelli (Shell, Ruby e LLM-as-a-judge).
    - **Screenshot Playwright 100% dichiarativi** e **Hive Leaderboard** in tempo reale via Google Form.
+

@@ -58,7 +58,7 @@ build-slides:
 
 # run visual and structural unit tests on Marp slides
 test-slides:
-    cd blog && bin/rails test test/integration/slides_presentation_test.rb
+    ruby test/test_slides.rb
 
 # generate screenshots idempotently (skips already existing screenshots, use force="true" to overwrite)
 generate-screenshots filter="" *flags:
