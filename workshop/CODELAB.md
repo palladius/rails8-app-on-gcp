@@ -33,6 +33,17 @@ You start from the typical *"works on my machine"* local setup (ephemeral disk, 
 - How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
 - How to orchestrate asynchronous GenAI [**background jobs**](https://guides.rubyonrails.org/active_job_basics.html) (NanoBanana cover generator, bilingual podcast synthesis) via [**Solid Queue**](https://github.com/rails/solid_queue).
 
+### 🏛️ Target Reference Architecture
+
+Here is the canonical, deterministic Google Cloud reference architecture you will build and deploy, highlighting **all Google Cloud products** connected in our production blueprint:
+
+![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/arch_diagram.png)
+
+#### 🎞️ The Architectural Evolution: From Zero to Cloud-Native
+Watch our stack progressively modernize from an ephemeral single-machine baseline to a fully managed Google Cloud blueprint across each workshop milestone:
+
+![Workshop Architectural Evolution](assets/images/arch_evolution.gif)
+
 Let's get started!
 
 

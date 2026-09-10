@@ -29,6 +29,7 @@ from PIL import Image
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSETS_DIR = REPO_ROOT / "assets"
 WORKSHOP_IMAGES_DIR = REPO_ROOT / "workshop" / "assets" / "images"
+SLIDES_IMAGES_DIR = REPO_ROOT / "slides" / "images"
 OUTPUT_TMP_DIR = Path(__file__).resolve().parent / "output"
 
 GRAPH_ATTRS = {
@@ -54,6 +55,7 @@ EDGE_ATTRS = {
 def ensure_dirs():
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)
     WORKSHOP_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+    SLIDES_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
     OUTPUT_TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -142,9 +144,11 @@ def generate_canonical():
 
     dest_repo = ASSETS_DIR / "arch_diagram.png"
     dest_workshop = WORKSHOP_IMAGES_DIR / "arch_diagram.png"
+    dest_slides = SLIDES_IMAGES_DIR / "arch_diagram.png"
     shutil.copyfile(generated_png, dest_repo)
     shutil.copyfile(generated_png, dest_workshop)
-    print(f"✅ Canonical diagram saved to:\n   - {dest_repo}\n   - {dest_workshop}")
+    shutil.copyfile(generated_png, dest_slides)
+    print(f"✅ Canonical diagram saved to:\n   - {dest_repo}\n   - {dest_workshop}\n   - {dest_slides}")
 
 
 def generate_evolution():

@@ -230,6 +230,18 @@ and guide me step-by-step through the workshop!"
 
 ---
 
+## 5. Canonical Architecture Blueprint 🏛️
+
+<div style="text-align: center; margin: 4px 0;">
+  <img src="images/arch_diagram.png" style="max-height: 320px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); border: 1px solid #dadce0;" alt="Rails 8 on GCP Architecture Diagram" />
+</div>
+
+<p style="font-size: 0.72em; color: #5f6368; text-align: center; margin: 4px 0 0 0;">
+  ☁️ <strong>Full Production Reference Architecture:</strong> Cloud Run multi-container pod &middot; Cloud SQL PostgreSQL &middot; Private GCS &middot; Secret Manager &middot; Vertex AI
+</p>
+
+---
+
 # Thank You! 🎉
 ### Let's Build Rails 8 on Google Cloud 🚀
 
