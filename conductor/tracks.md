@@ -63,5 +63,5 @@
 
 ---
 
-- [ ] **Track: Native Google Cloud Structured JSON Logging, Error Reporting via STDERR & Before/After Error UI Screenshots (Issue #82)**
+- [~] **Track: Native Google Cloud Structured JSON Logging, Error Reporting via STDERR & Before/After Error UI Screenshots (Issue #82)**
 *Link: [tracks/structured_logging_error_reporting_issue_82_20260910/index.md](tracks/structured_logging_error_reporting_issue_82_20260910/index.md)*
