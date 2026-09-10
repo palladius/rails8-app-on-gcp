@@ -6,13 +6,13 @@
   - [x] Update `test/test_workshop_skeleton.rb` to assert that `workshop/skeleton.yaml` contains `invariants` list with required fields (`id`, `from_step`, `title`, `description`, `check`)
   - [x] Create `test/test_workshop_invariants.rb` with tests covering invariant step filtering (`from_step <= N`), execution isolation, and regression alert triggering
   - [x] Verify that new tests fail initially (TDD Red phase)
-- [ ] Task: Extend `workshop/skeleton.yaml` with declarative invariants and Step 7 LLM eval
-  - [ ] Define root-level `invariants:` list in `workshop/skeleton.yaml`
-  - [ ] Add `inv-persistent-gcs-storage` (`from_step: 4`, `check: no_local_storage`)
-  - [ ] Add `inv-zero-stuck-background-jobs` (`from_step: 6`, `check: zero_stuck_jobs`)
-  - [ ] Add `inv-cloud-sql-connected` (`from_step: 6`, `check: compose_has_service`, params: `service: cloudsql-proxy`)
-  - [ ] Add `step-7-llm-clean-ui-no-warnings` to Step 7 `evals:` list
-  - [ ] Verify `test/test_workshop_skeleton.rb` passes (TDD Green phase)
+- [x] Task: Extend `workshop/skeleton.yaml` with declarative invariants and Step 7 LLM eval (eba5e7c)
+  - [x] Define root-level `invariants:` list in `workshop/skeleton.yaml`
+  - [x] Add `inv-persistent-gcs-storage` (`from_step: 4`, `check: no_local_storage`)
+  - [x] Add `inv-zero-stuck-background-jobs` (`from_step: 6`, `check: zero_stuck_jobs`)
+  - [x] Add `inv-cloud-sql-connected` (`from_step: 6`, `check: compose_has_service`, params: `service: cloudsql-proxy`)
+  - [x] Add `step-7-llm-clean-ui-no-warnings` to Step 7 `evals:` list
+  - [x] Verify `test/test_workshop_skeleton.rb` passes (TDD Green phase)
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2: Ruby Invariant Engine Implementation (`bin/workshop_eval.rb`)
