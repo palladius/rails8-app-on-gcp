@@ -34,7 +34,7 @@ You start from the typical *"works on my machine"* local setup (ephemeral disk, 
 - How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [google](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
 - How to eliminate security anti-patterns: private [**GCS buckets**](https://cloud.google.com/storage) (`iam: true`) and [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) mTLS tunnels instead of opening `0.0.0.0/0`.
 - How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
-- How to orchestrate asynchronous GenAI background jobs (NanoBanana cover generator, bilingual podcast synthesis) via Solid Queue.
+- How to orchestrate asynchronous GenAI [**background jobs**](https://guides.rubyonrails.org/active_job_basics.html) (NanoBanana cover generator, bilingual podcast synthesis) via [**Solid Queue**](https://github.com/rails/solid_queue).
 
 > 🐝 **Live Workshop Telemetry & Leaderboard**
 > Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:
