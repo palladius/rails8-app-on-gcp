@@ -1,12 +1,12 @@
 # Implementation Plan: Native Google Cloud Structured JSON Logging & Error Reporting (Issue #82)
 
-## Phase 1: Automated Baseline & "Before" Error UI Capture
+## Phase 1: Automated Baseline & "Before" Error UI Capture [checkpoint: 48e9500]
 
 - [x] Task: Capture Baseline Error UI (Red/Playwright) [954ce27]
     - [x] Create `workshop/screenshots/issue82_error_before.playwright.js` to capture the existing generic Rails `public/500.html` error UI
     - [x] Save "Before" screenshot to `workshop/assets/screenshots/issue-82-error-before.png`
     - [x] Register declarative screenshot in `workshop/skeleton.yaml`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [48e9500]
 
 ## Phase 2: Native Google Cloud JSON Logging Formatter
 
