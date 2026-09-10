@@ -63,4 +63,40 @@ class HealthcheckerTest < Minitest::Test
     assert_equal "up", results["http://127.0.0.1:#{@port}"][:status]
     assert_equal "down", results["http://127.0.0.1:#{@port}/down"][:status]
   end
+
+  def test_check_url_parses_quest_telemetry_and_evaluates_proctor
+    @server.mount_proc "/status.json" do |_req, res|
+      res.status = 200
+      res.content_type = "application/json"
+      res.body = {
+        system: { app_version: "0.2.12" },
+        workshop_step: { number: 7, description: "Step 7: Generative AI Pipelines" },
+        quest: {
+          step_8_completed: true,
+          ghi_issue: 83,
+          ghi_url: "https://github.com/palladius/rails8-app-on-gcp/issues/83"
+        }
+      }.to_json
+    end
+
+    # Mock ProctorReviewer.review
+    original_review = WorkshopHive::ProctorReviewer.method(:review)
+    WorkshopHive::ProctorReviewer.define_singleton_method(:review) do |id|
+      { status: :lgtm_approved, reviewer: "palladius", approved_at: "2026-09-10T12:00:00Z" }
+    end
+
+    begin
+      res = WorkshopHive::Healthchecker.check("http://127.0.0.1:#{@port}")
+      assert_equal "up", res[:status]
+      t = res[:telemetry]
+      assert_equal true, t[:quest_step_8_completed]
+      assert_equal 83, t[:quest_ghi_issue]
+      assert_equal "https://github.com/palladius/rails8-app-on-gcp/issues/83", t[:quest_ghi_url]
+      assert_equal :lgtm_approved, t[:proctor_status]
+      assert_equal "palladius", t[:proctor_reviewer]
+      assert_equal 8, t[:step_number]
+    ensure
+      WorkshopHive::ProctorReviewer.define_singleton_method(:review, original_review)
+    end
+  end
 end

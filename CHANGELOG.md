@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.15] - 2026-09-10
+### Added
+- 🏆 **Step 8 Proctor-Validated Graduation Trophy (Issue [#83](https://github.com/palladius/rails8-app-on-gcp/issues/83))**:
+  - **Rails Telemetry (`StatusesController`)**: Added `detect_quest_status` to parse `ENV['STEP_8_GHI']` (numeric string or GitHub issue URL) and expose structured `quest` object in `/status.json`. Added `STEP_8_GHI` to `safe_env_inspection`.
+  - **The Hive Backend (`workshop/hive/`)**: Created `WorkshopHive::ProctorReviewer` to verify GitHub issue comments from authorized proctors (`HIVE_PROCTORS="palladius,emilianodellacasa,ricc"`) containing case-insensitive `LGTM`, with in-memory 120s TTL caching and `Healthchecker` integration.
+  - **The Hive Frontend (`public/js/hive.js`)**: Rendered 8/8 progress bar with purple/gold glowing effect and clickable golden trophy 🏆 linking to the approved GitHub issue. When awaiting review, displays `⏳ GHI #XX review pending` link badge.
+  - **Codelab Instructions (`workshop/CODELAB.md`)**: Documented the 3-step proof-of-work graduation workflow at the conclusion of Step 8 and rebuilt static documentation via `just build-ghpages`.
+
 ## [0.2.14] - 2026-09-10
 ### Added
 - 🛡️ **Hardened Workshop Evaluations, Negative Testing & Header Warning Mappings (Issue [#85](https://github.com/palladius/rails8-app-on-gcp/issues/85))**:

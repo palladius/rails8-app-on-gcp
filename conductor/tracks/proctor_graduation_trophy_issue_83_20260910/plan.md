@@ -1,0 +1,57 @@
+# Implementation Plan: Proctor-Validated Step 8 Graduation Trophy via GHI & LGTM Verification
+
+## Phase 1: Rails Telemetry (`StatusesController` & `STEP_8_GHI` Quest Object) [checkpoint: 6d2a649]
+- [x] Task: Write failing tests for `STEP_8_GHI` in `blog/test/controllers/statuses_controller_test.rb` (TDD Red) [6d5ea91]
+    - [x] Add test for `STEP_8_GHI="83"` emitting integer `83` and canonical issue URL
+    - [x] Add test for `STEP_8_GHI="https://github.com/palladius/rails8-app-on-gcp/issues/83"` parsing correctly
+    - [x] Add test for missing / nil `STEP_8_GHI` emitting `step_8_completed: false`
+    - [x] Confirm tests fail (Red)
+- [x] Task: Implement `detect_quest_status` in `blog/app/controllers/statuses_controller.rb` (TDD Green) [1221e91]
+    - [x] Parse `ENV['STEP_8_GHI']` for integer ID or regex match against github issue URL
+    - [x] Expose `quest` object in `/status.json` with `step_8_completed`, `ghi_issue`, `ghi_url`
+    - [x] Add `STEP_8_GHI` to `safe_env_inspection` list
+    - [x] Confirm all controller tests pass (Green)
+- [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md) [6d2a649]
+
+## Phase 2: Hive Backend Proctor Reviewer Engine (`workshop/hive/`) [checkpoint: a6fbf61]
+- [x] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red) [bbea952]
+    - [x] Test proctor comment with "LGTM" returns `:lgtm_approved` and reviewer username
+    - [x] Test non-proctor comment with "LGTM" returns `:review_pending`
+    - [x] Test missing LGTM comment returns `:review_pending`
+    - [x] Test GitHub API timeout or rate limit falls back gracefully to `:review_pending`
+    - [x] Test in-memory 120s TTL caching
+    - [x] Confirm tests fail (Red)
+- [x] Task: Implement `ProctorReviewer` in `workshop/hive/lib/proctor_reviewer.rb` (TDD Green) [1d71bac]
+    - [x] Parse `HIVE_PROCTORS` (default: `"palladius,emilianodellacasa,ricc"`)
+    - [x] Build GitHub API comment fetcher using `Net::HTTP` with optional `GITHUB_TOKEN`
+    - [x] Match case-insensitive `\bLGTM\b` from approved proctors
+    - [x] Add in-memory thread-safe cache with 120s expiration
+    - [x] Confirm `test_proctor_reviewer.rb` passes (Green)
+- [x] Task: Integrate `ProctorReviewer` into `workshop/hive/lib/healthchecker.rb` [d231477]
+    - [x] Extract `quest` metadata from `/status.json`
+    - [x] When `ghi_issue` is present, invoke `ProctorReviewer.review(ghi_issue)`
+    - [x] Expose `quest` and `proctor_status` in telemetry payload
+    - [x] Update existing `test_healthchecker.rb` and `test_api_leaderboard.rb`
+- [x] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md) [a6fbf61]
+
+## Phase 3: Hive Frontend Visualization (`workshop/hive/public/js/hive.js`) [checkpoint: 5ebab13]
+- [x] Task: Update Hive student row rendering in `workshop/hive/public/js/hive.js` [19f08c8]
+    - [x] Check `quest` telemetry and `proctor_status`
+    - [x] When `lgtm_approved`: render progress bar as `8/8` with purple/gold glowing bar and clickable trophy 🏆 linking to `quest.ghi_url`
+    - [x] When `review_pending`: render progress bar as `7/8` with a badge `⏳ GHI #XX pending proctor review` linking to `quest.ghi_url`
+    - [x] Ensure non-quest students render steps 1–7 normally
+- [x] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md) [5ebab13]
+
+## Phase 4: Workshop Curriculum & Codelab Instructions (`workshop/CODELAB.md`) [checkpoint: 838233d]
+- [x] Task: Document Step 8 graduation flow in `workshop/CODELAB.md` [84a4683]
+    - [x] Explain how to complete a quest and submit a GitHub issue with title `🎓 [Step 8 Completed] <Name>: <Quest>`
+    - [x] Explain how to configure `STEP_8_GHI` on Cloud Run via `gcloud run services update`
+    - [x] Explain how proctors review and comment LGTM to unlock the 8/8 trophy on The Hive
+- [x] Task: Rebuild Codelab HTML via `ruby workshop/visualizer/build_ghpages.rb` [84a4683]
+- [x] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md) [838233d]
+
+## Phase 5: End-to-End Verification & Quality Gate [checkpoint: 9e1c802]
+- [x] Task: Run full automated test suites (`cd blog && bin/rails test`, `cd workshop/hive && bundle exec rake test`) [77cda98]
+- [x] Task: Run `just test` (per project standard) [77cda98]
+- [x] Task: Update `VERSION` and `CHANGELOG.md` [77cda98]
+- [x] Task: Phase 5 Verification & Checkpoint (Refer to workflow.md) [9e1c802]
