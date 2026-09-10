@@ -42,16 +42,16 @@
     - [x] Ensure non-quest students render steps 1–7 normally
 - [x] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md) [5ebab13]
 
-## Phase 4: Workshop Curriculum & Codelab Instructions (`workshop/CODELAB.md`)
-- [~] Task: Document Step 8 graduation flow in `workshop/CODELAB.md`
-    - [ ] Explain how to complete a quest and submit a GitHub issue with title `🎓 [Step 8 Completed] <Name>: <Quest>`
-    - [ ] Explain how to configure `STEP_8_GHI` on Cloud Run via `gcloud run services update`
-    - [ ] Explain how proctors review and comment LGTM to unlock the 8/8 trophy on The Hive
-- [ ] Task: Rebuild Codelab HTML via `ruby workshop/visualizer/build_ghpages.rb`
-- [ ] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md)
+## Phase 4: Workshop Curriculum & Codelab Instructions (`workshop/CODELAB.md`) [checkpoint: 838233d]
+- [x] Task: Document Step 8 graduation flow in `workshop/CODELAB.md` [84a4683]
+    - [x] Explain how to complete a quest and submit a GitHub issue with title `🎓 [Step 8 Completed] <Name>: <Quest>`
+    - [x] Explain how to configure `STEP_8_GHI` on Cloud Run via `gcloud run services update`
+    - [x] Explain how proctors review and comment LGTM to unlock the 8/8 trophy on The Hive
+- [x] Task: Rebuild Codelab HTML via `ruby workshop/visualizer/build_ghpages.rb` [84a4683]
+- [x] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md) [838233d]
 
 ## Phase 5: End-to-End Verification & Quality Gate
-- [ ] Task: Run full automated test suites (`cd blog && bin/rails test`, `cd workshop/hive && bundle exec rake test`)
+- [~] Task: Run full automated test suites (`cd blog && bin/rails test`, `cd workshop/hive && bundle exec rake test`)
 - [ ] Task: Run `just test` (per project standard)
 - [ ] Task: Update `VERSION` and `CHANGELOG.md`
 - [ ] Task: Phase 5 Verification & Checkpoint (Refer to workflow.md)
