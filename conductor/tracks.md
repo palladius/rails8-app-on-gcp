@@ -60,3 +60,8 @@
 
 - [x] **Track: Declarative Workshop Screenshots (Issue #42)**
 *Link: [tracks/declarative_screenshots_issue_42_20260909/index.md](tracks/declarative_screenshots_issue_42_20260909/index.md)*
+
+---
+
+- [ ] **Track: Deterministic GCP Architecture Diagram & Evolution GIF (Issue #66)**
+*Link: [tracks/gcp_architecture_diagram_issue_66_20260910/index.md](tracks/gcp_architecture_diagram_issue_66_20260910/index.md)*
