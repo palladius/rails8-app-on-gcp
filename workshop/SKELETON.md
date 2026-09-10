@@ -6,7 +6,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 
 ### 🏛️ Target Reference Architecture
 
-![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/arch_diagram.png)
+![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/nanobanana_arch_flat.png)
 
 ---
 

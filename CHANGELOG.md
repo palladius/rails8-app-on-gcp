@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.15] - 2026-09-10
+### Added
+- 🍌 **Codelab Page 1 Reference Architecture Upgrade**:
+  - Embedded Nano Banana Variant 1 (`assets/images/nanobanana_arch_flat.png`) as the primary target reference architecture in Page 1 of `workshop/CODELAB.md` and `workshop/SKELETON.md`.
+  - Linked to both Variant 2 Isometric 3D (`assets/images/nanobanana_arch_isometric.png`) and deterministic Graphviz (`assets/images/arch_diagram.png`) versions.
+  - Rebuilt static website and verified test suite.
+
 ## [0.2.14] - 2026-09-10
 ### Added
 - 🍌 **Nano Banana AI Architecture Diagrams Gallery & Prompts**:

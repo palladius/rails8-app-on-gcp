@@ -36,10 +36,10 @@ class ArchitectureDiagramTest < Minitest::Test
 
   def test_workshop_and_slides_reference_diagram
     codelab_content = File.read(CODELAB_PATH)
-    assert_includes codelab_content, "arch_diagram.png", "CODELAB.md must reference arch_diagram.png"
+    assert codelab_content.include?("nanobanana_arch_flat.png") || codelab_content.include?("arch_diagram.png"), "CODELAB.md must reference architecture diagram"
 
     skeleton_content = File.read(SKELETON_PATH)
-    assert_includes skeleton_content, "arch_diagram.png", "SKELETON.md must reference arch_diagram.png"
+    assert skeleton_content.include?("nanobanana_arch_flat.png") || skeleton_content.include?("arch_diagram.png"), "SKELETON.md must reference architecture diagram"
 
     slides_content = File.read(SLIDES_PATH)
     assert_includes slides_content, "arch_diagram", "slides/index.md must reference architecture diagram"

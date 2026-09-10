@@ -27,7 +27,7 @@ lines << "This is the canonical high-level roadmap and step breakdown for the Ra
 lines << ""
 lines << "### 🏛️ Target Reference Architecture"
 lines << ""
-lines << "![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/arch_diagram.png)"
+lines << "![Rails 8 on Google Cloud: Production Reference Architecture](assets/images/nanobanana_arch_flat.png)"
 lines << ""
 lines << "---"
 lines << ""
