@@ -1,0 +1,1 @@
+Task: Update visualizer compiler and verify tooling compatibility. Updated build_skeleton.rb to output Cumulative Invariants section in SKELETON.md and verified screenshot runner.
