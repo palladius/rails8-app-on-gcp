@@ -21,8 +21,8 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :google_prod
+  # Store uploaded files on the local file system or cloud (see config/storage.yml for options).
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "google_prod").to_sym
 
   # Serve blobs via proxy instead of signed URL redirect.
   # Cloud Run Workload Identity can't sign GCS URLs (no private key),

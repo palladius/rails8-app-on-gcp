@@ -60,14 +60,19 @@ google_test:
   iam: true
   gsa_email: <%= gcs_signer_sa %>
 
-google_prod:
+google_prod: &google_prod
   service: GCS
   project: <%= gcp_project %>
   bucket: <%= gcp_project %>-activestorage-prod
   iam: true
   gsa_email: <%= gcs_signer_sa %>
 
+# Convenience alias for workshop codelab instructions specifying ACTIVE_STORAGE_SERVICE=google
+google:
+  <<: *google_prod
+
 # mirror:
 #   service: Mirror
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
+
