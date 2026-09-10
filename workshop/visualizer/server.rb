@@ -147,11 +147,22 @@ class CodelabServer < Sinatra::Base
       base = File.basename(file_path).downcase
       if base.include?('constitution')
         'constitution'
-      elsif base.include?('skeleton')
-        'skeleton'
       else
         'codelab'
       end
+    end
+
+    def serve_codelab
+      target_file = if params[:doc]
+                      resolve_doc_path(params[:doc])
+                    elsif params[:file]
+                      resolve_doc_path(params[:file])
+                    else
+                      resolve_doc_path('codelab')
+                    end
+      @active_doc = current_doc_type(target_file)
+      @codelab = parse_markdown(target_file)
+      erb :index
     end
   end
   
@@ -161,16 +172,11 @@ class CodelabServer < Sinatra::Base
   end
 
   get '/codelab' do
-    target_file = if params[:doc]
-                    resolve_doc_path(params[:doc])
-                  elsif params[:file]
-                    resolve_doc_path(params[:file])
-                  else
-                    resolve_doc_path('codelab')
-                  end
-    @active_doc = current_doc_type(target_file)
-    @codelab = parse_markdown(target_file)
-    erb :index
+    serve_codelab
+  end
+
+  get '/workshop/?' do
+    serve_codelab
   end
 
   get '/constitution' do
@@ -1123,7 +1129,7 @@ __END__
     </p>
 
     <div class="destinations">
-      <a href="/codelab" class="btn-dest">
+      <a href="/workshop/" class="btn-dest">
         <span class="dest-title">Se cercavi il workshop QUI &rarr;</span>
         <span class="dest-desc">Interactive step-by-step Codelab guide with terminal commands, checkpoints, and architecture notes.</span>
       </a>

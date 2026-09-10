@@ -85,6 +85,7 @@ build_dir = File.join(workshop_dir, 'build')
 FileUtils.mkdir_p(build_dir)
 
 docs_to_build = [
+  { source: File.join(workshop_dir, 'CODELAB.md'), target: 'workshop/index.html', active: 'codelab', base_prefix: '../' },
   { source: File.join(workshop_dir, 'CODELAB.md'), target: 'codelab/index.html', active: 'codelab', base_prefix: '../' },
   { source: File.join(workshop_dir, 'CODELAB.md'), target: 'codelab.html', active: 'codelab', base_prefix: '' },
   { source: File.join(repo_root, 'docs', 'CONSTITUTION.md'), target: 'constitution.html', active: 'constitution', base_prefix: '' },
@@ -100,7 +101,8 @@ docs_to_build.each do |doc|
   
   # For static pages, adapt the tab links to point to the static HTML files
   doc_template = template_string.dup
-  doc_template.gsub!('href="/codelab"', "href=\"#{prefix}codelab/index.html\"")
+  doc_template.gsub!('href="/workshop/"', "href=\"#{prefix}workshop/index.html\"")
+  doc_template.gsub!('href="/codelab"', "href=\"#{prefix}workshop/index.html\"")
   doc_template.gsub!('href="/constitution"', "href=\"#{prefix}constitution.html\"")
   doc_template.gsub!('href="/skeleton"', "href=\"#{prefix}skeleton.html\"")
   doc_template.gsub!('href="/slides/"', "href=\"#{prefix}slides/index.html\"")
@@ -125,7 +127,8 @@ portal_template_string = server_code.split("@@portal\n").last.split("@@").first
 portal_renderer = ERB.new(portal_template_string)
 portal_html = portal_renderer.result(binding)
 # Adjust links for static output in root index.html
-portal_html.gsub!('href="/codelab"', 'href="codelab/index.html"')
+portal_html.gsub!('href="/workshop/"', 'href="workshop/index.html"')
+portal_html.gsub!('href="/codelab"', 'href="workshop/index.html"')
 portal_html.gsub!('href="/slides/"', 'href="slides/index.html"')
 portal_html.gsub!('href="/constitution"', 'href="constitution.html"')
 portal_html.gsub!('href="/skeleton"', 'href="skeleton.html"')
@@ -133,11 +136,13 @@ portal_html.gsub!('href="/skeleton"', 'href="skeleton.html"')
 File.write(File.join(build_dir, 'index.html'), portal_html)
 puts "   📄 Rendered Landing Portal -> workshop/build/index.html"
 
-# Copy workshop assets to build/assets and build/codelab/assets
+# Copy workshop assets to build/assets, build/workshop/assets, and build/codelab/assets
 assets_dir = File.join(workshop_dir, 'assets')
 if Dir.exist?(assets_dir)
   FileUtils.mkdir_p(File.join(build_dir, 'assets'))
   FileUtils.cp_r(Dir.glob(File.join(assets_dir, '*')), File.join(build_dir, 'assets/'))
+  FileUtils.mkdir_p(File.join(build_dir, 'workshop', 'assets'))
+  FileUtils.cp_r(Dir.glob(File.join(assets_dir, '*')), File.join(build_dir, 'workshop', 'assets/'))
   FileUtils.mkdir_p(File.join(build_dir, 'codelab', 'assets'))
   FileUtils.cp_r(Dir.glob(File.join(assets_dir, '*')), File.join(build_dir, 'codelab', 'assets/'))
 end
