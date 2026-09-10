@@ -18,6 +18,13 @@ module "service_account_cloud_run" {
   }
 }
 
+# Required GCP API for Cloud Run
+resource "google_project_service" "run" {
+  project            = var.project_id
+  service            = "run.googleapis.com"
+  disable_on_destroy = false
+}
+
 # GenerateCoverImageJob asks Vertex AI (gemini-2.5-flash-image, "Nano Banana")
 # for a cover image whenever a post is saved without one. Authentication is
 # Application Default Credentials only — the Cloud Run service account above,
@@ -144,6 +151,11 @@ resource "google_cloud_run_v2_service" "rails_app" {
       client_version,
     ]
   }
+
+  depends_on = [
+    google_project_service.run,
+    google_project_service.sqladmin,
+  ]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
