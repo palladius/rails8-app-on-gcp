@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.20] - 2026-09-10
+### Fixed
+- 🛠️ **Billing API Error Handling & Worktree Bundle Cache Support (FL-003 / FL-004)**:
+  - Enhanced `bin/workshop_diagnostics.rb` to gracefully catch disabled `cloudbilling.googleapis.com` API with remediation advice instead of crashing.
+  - Added parent repo bundle cache discovery to `bin/workshop_uat.rb` when running in isolated git worktrees, preventing redundant `bundle install` overhead.
+  - Added billing API enablement tip to `workshop/CODELAB.md`.
+
 ## [0.2.19] - 2026-09-10
 ### Added
 - 🛡️ **Dedicated Cloud Build Service Account for CI/CD (Issue [#59](https://github.com/palladius/rails8-app-on-gcp/issues/59))**:
