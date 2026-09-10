@@ -50,8 +50,8 @@
 - [x] Task: Rebuild Codelab HTML via `ruby workshop/visualizer/build_ghpages.rb` [84a4683]
 - [x] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md) [838233d]
 
-## Phase 5: End-to-End Verification & Quality Gate
-- [~] Task: Run full automated test suites (`cd blog && bin/rails test`, `cd workshop/hive && bundle exec rake test`)
-- [ ] Task: Run `just test` (per project standard)
-- [ ] Task: Update `VERSION` and `CHANGELOG.md`
-- [ ] Task: Phase 5 Verification & Checkpoint (Refer to workflow.md)
+## Phase 5: End-to-End Verification & Quality Gate [checkpoint: 9e1c802]
+- [x] Task: Run full automated test suites (`cd blog && bin/rails test`, `cd workshop/hive && bundle exec rake test`) [77cda98]
+- [x] Task: Run `just test` (per project standard) [77cda98]
+- [x] Task: Update `VERSION` and `CHANGELOG.md` [77cda98]
+- [x] Task: Phase 5 Verification & Checkpoint (Refer to workflow.md) [9e1c802]
