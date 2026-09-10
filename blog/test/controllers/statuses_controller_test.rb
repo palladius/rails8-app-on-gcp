@@ -25,7 +25,6 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
     assert_includes json["storage"], "blobs_count"
     assert json["ai"].present?
     assert json["jobs"].present?
-<<<<<<< HEAD
     assert json["quest"].present?
   end
 

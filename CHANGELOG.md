@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.21] - 2026-09-10
+### Added
+- 🧪 **Workshop Status Telemetry Inference Evals (Steps 5, 6, 7)**:
+  - Added unit test cases to `StatusesControllerTest` asserting deterministic step inference for Step 5 (Cloud SQL local storage), Step 6 (Cloud Run non-AI baseline), and Step 7 (Cloud Run + Cloud SQL + GCS + active AI).
+  - Added programmatic step evaluations in `workshop/skeleton.yaml` and asserted in `test/test_workshop_skeleton.rb`.
+
 ## [0.2.20] - 2026-09-10
 ### Fixed
 - 🛠️ **Billing API Error Handling & Worktree Bundle Cache Support (FL-003 / FL-004)**:
