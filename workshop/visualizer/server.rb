@@ -1023,52 +1023,54 @@ __END__
       margin: 0;
       padding: 0;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f8f9fa;
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: #ffffff;
       color: #202124;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .page-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 48px 32px 64px 32px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      padding: 24px;
     }
-    .portal-card {
-      background: #ffffff;
-      border: 1px solid #dadce0;
-      border-radius: 12px;
-      max-width: 760px;
-      width: 100%;
-      padding: 36px 40px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-      position: relative;
-    }
-    .portal-topbar {
+    .top-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a73e8;
+      letter-spacing: -0.3px;
     }
     .lang-switcher {
       display: flex;
       gap: 6px;
-      background: rgba(0, 0, 0, 0.05);
-      padding: 3px 6px;
-      border-radius: 16px;
+      background: #f1f3f4;
+      padding: 4px 8px;
+      border-radius: 20px;
     }
     .lang-btn {
       text-decoration: none;
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1;
-      padding: 3px 6px;
-      border-radius: 12px;
+      padding: 4px 8px;
+      border-radius: 14px;
       cursor: pointer;
       opacity: 0.55;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
     .lang-btn:hover {
       opacity: 0.9;
@@ -1080,106 +1082,124 @@ __END__
     }
     .lang-text {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: #3c4043;
     }
+    .hero {
+      margin-bottom: 40px;
+    }
     h1 {
-      font-size: 26px;
-      font-weight: 600;
+      font-size: 36px;
+      font-weight: 700;
       color: #1a73e8;
-      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
     }
     .tagline {
-      font-size: 14.5px;
-      line-height: 1.55;
-      color: #5f6368;
-      margin-bottom: 28px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #4a5568;
+      max-width: 820px;
     }
     .destinations {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 28px;
+      gap: 28px;
+      margin-bottom: 48px;
+      flex: 1;
     }
-    @media (max-width: 620px) {
+    @media (max-width: 720px) {
       .destinations {
         grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      .tagline {
+        font-size: 16px;
+      }
+      .page-container {
+        padding: 24px 16px 40px 16px;
       }
     }
     .btn-dest {
       display: flex;
       flex-direction: column;
-      border: 1px solid #dadce0;
-      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       background: #ffffff;
       overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     }
     .btn-dest:hover {
       border-color: #1a73e8;
-      box-shadow: 0 6px 16px rgba(26, 115, 232, 0.12);
-      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(26, 115, 232, 0.12);
+      transform: translateY(-3px);
     }
     .dest-thumb {
       width: 100%;
-      height: 140px;
+      height: 180px;
       object-fit: cover;
-      background: #e8eaed;
-      border-bottom: 1px solid #dadce0;
+      background: #f7fafc;
+      border-bottom: 1px solid #e2e8f0;
     }
     .dest-body {
-      padding: 16px 18px 20px 18px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       flex: 1;
     }
     .dest-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 19px;
+      font-weight: 700;
       color: #1a73e8;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .dest-desc {
-      font-size: 13px;
-      color: #5f6368;
-      line-height: 1.45;
+      font-size: 14px;
+      color: #4a5568;
+      line-height: 1.55;
     }
-    .secondary-links {
-      border-top: 1px solid #f1f3f4;
-      padding-top: 16px;
+    footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 13px;
-      color: #5f6368;
+      color: #718096;
+      margin-top: auto;
     }
-    .secondary-links .internal-refs {
-      font-size: 11px;
-      color: #80868b;
-    }
-    .secondary-links .internal-refs a {
-      color: #80868b;
+    footer .internal-refs a {
+      color: #a0aec0;
       text-decoration: none;
+      margin-left: 4px;
     }
-    .secondary-links .internal-refs a:hover {
+    footer .internal-refs a:hover {
       color: #1a73e8;
       text-decoration: underline;
     }
-    .secondary-links .repo-link a {
+    footer .repo-link a {
       color: #1a73e8;
       text-decoration: none;
+      font-weight: 500;
     }
-    .secondary-links .repo-link a:hover {
+    footer .repo-link a:hover {
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <% is_it = (@lang == 'it') %>
-  <div class="portal-card">
-    <div class="portal-topbar">
-      <h1>Rails 8 on Google Cloud</h1>
+  <div class="page-container">
+    <header class="top-nav">
+      <div class="brand-title">Google Cloud &middot; Rails 8</div>
       <div class="lang-switcher">
         <a href="?lang=en" class="lang-btn <%= !is_it ? 'active' : '' %>" title="English">
           <span>🇬🇧</span>
@@ -1190,17 +1210,23 @@ __END__
           <span class="lang-text">IT</span>
         </a>
       </div>
-    </div>
+    </header>
 
-    <p class="tagline">
-      <%= is_it ? "Architettura di riferimento cloud-native e workshop interattivo per rilasciare Ruby on Rails 8 su Google Cloud Platform con Cloud Run, Cloud SQL e Gemini AI." : "A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI." %>
-    </p>
+    <main class="hero">
+      <h1>Rails 8 on Google Cloud</h1>
+      <p class="tagline">
+        <%= is_it ? "Architettura di riferimento cloud-native e workshop interattivo per rilasciare Ruby on Rails 8 su Google Cloud Platform con Cloud Run, Cloud SQL e Gemini AI." : "A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI." %>
+      </p>
+    </main>
 
-    <div class="destinations">
+    <section class="destinations">
       <a href="/workshop/" class="btn-dest">
         <img src="/assets/codelab-preview.png" alt="Workshop Codelab Preview" class="dest-thumb" onerror="this.style.display='none'" />
         <div class="dest-body">
-          <span class="dest-title"><%= is_it ? "Se cercavi il workshop QUI &rarr;" : "Workshop Codelab &rarr;" %></span>
+          <span class="dest-title">
+            <span><%= is_it ? "Se cercavi il workshop QUI" : "Workshop Codelab" %></span>
+            <span>&rarr;</span>
+          </span>
           <span class="dest-desc"><%= is_it ? "Guida interattiva passo dopo passo con comandi da terminale, checkpoint architetturali e telemetria live." : "Interactive step-by-step Codelab guide with terminal commands, checkpoints, and live telemetry." %></span>
         </div>
       </a>
@@ -1208,16 +1234,19 @@ __END__
       <a href="/slides/" class="btn-dest">
         <img src="/assets/slide1-preview.png" alt="Slide 1 Preview" class="dest-thumb" onerror="this.style.display='none'" />
         <div class="dest-body">
-          <span class="dest-title"><%= is_it ? "Se cercavi le slides QUI &rarr;" : "Presentation Slides &rarr;" %></span>
+          <span class="dest-title">
+            <span><%= is_it ? "Se cercavi le slides QUI" : "Presentation Slides" %></span>
+            <span>&rarr;</span>
+          </span>
           <span class="dest-desc"><%= is_it ? "Slide deck Marp con visual di apertura, concetti chiave, self-QR code e l'inno musicale del workshop." : "Marp presentation slide deck with kickoff visuals, concepts, self-QR code, and workshop anthem." %></span>
         </div>
       </a>
-    </div>
+    </section>
 
-    <div class="secondary-links">
-      <span class="internal-refs"><small style="font-size: 10px;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
+    <footer>
+      <span class="internal-refs"><small style="font-size: 11px; color: #a0aec0;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
       <span class="repo-link"><a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener">GitHub Repository &rarr;</a></span>
-    </div>
+    </footer>
   </div>
 </body>
 </html>
