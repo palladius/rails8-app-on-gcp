@@ -1,0 +1,2 @@
+Task: Modernize blog/public/500.html & Capture Automated After Screenshot
+Redesigned 500 error page with Gemini gradient, glassmorphic card, error reporting telemetry badge, and navigation actions; created automated Playwright capture script and registered in skeleton.yaml.
