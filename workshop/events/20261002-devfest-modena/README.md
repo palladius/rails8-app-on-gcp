@@ -1,6 +1,6 @@
 # 🎤 DevFest Modena 2026 — Rails 8 on Google Cloud Workshop
 
-- **Date:** October 2–4, 2026 (Workshop premiere: Oct 2)
+- **Date:** 2 October, 2026 (Workshop premiere)
 - **Venue:** Fondazione San Carlo, Modena 🇮🇹
 - **Room / Hall:** **Sala 40**
 - **Official Website:** [https://devfest.modena.it](https://devfest.modena.it/)
