@@ -24,7 +24,7 @@
   - [x] Implement colorized visual formatting with `🛡️  Verifying Cumulative Invariants (Active for Steps 1 -> N):` and `[INV: Step X+]` badges
   - [x] Add regression alert emission upon invariant failure with clear diagnostic explanations
   - [x] Run `test/test_workshop_invariants.rb` and verify all tests pass
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Visualizer, Tooling & End-to-End Verification
 
