@@ -5,6 +5,7 @@ require "uri"
 require "time"
 require "json"
 require "shellwords"
+require_relative "proctor_reviewer"
 
 module WorkshopHive
   class Healthchecker
@@ -55,6 +56,38 @@ module WorkshopHive
               end
             end
 
+            # Quest / Step 8 Proctor Verification
+            quest = parsed_json["quest"] || {}
+            ghi_issue = quest["ghi_issue"]
+            ghi_url = quest["ghi_url"]
+            step_8_completed = quest["step_8_completed"]
+
+            proctor_status = :none
+            proctor_reviewer = nil
+            proctor_approved_at = nil
+
+            if ghi_issue && ghi_issue.to_i > 0
+              review_res = ProctorReviewer.review(ghi_issue)
+              proctor_status = review_res[:status]
+              proctor_reviewer = review_res[:reviewer]
+              proctor_approved_at = review_res[:approved_at]
+            end
+
+            raw_step_num = step["number"]
+            effective_step_num =
+              if proctor_status == :lgtm_approved
+                8
+              else
+                raw_step_num
+              end
+
+            effective_step_desc =
+              if proctor_status == :lgtm_approved
+                "Step 8: Choose Your Own Adventure / Quests (Proctor Approved 🏆)"
+              else
+                step["description"]
+              end
+
             status_data = {
               app_version: sys["app_version"],
               ruby_version: sys["ruby_version"],
@@ -67,8 +100,8 @@ module WorkshopHive
               git_commit: sys["git_commit"],
               pending_jobs: parsed_json.dig("jobs", "pending_count") || 0,
               failed_jobs: parsed_json.dig("jobs", "failed_count") || 0,
-              step_number: step["number"],
-              step_description: step["description"],
+              step_number: effective_step_num,
+              step_description: effective_step_desc,
               db_tier: db["tier"] || db["badge"],
               db_badge: db["badge"],
               storage_tier: storage["tier"] || storage["badge"],
@@ -76,7 +109,13 @@ module WorkshopHive
               ai_badge: ai["badge"],
               k_service: k_service,
               k_revision: k_revision,
-              admin_email: admin_email
+              admin_email: admin_email,
+              quest_step_8_completed: step_8_completed,
+              quest_ghi_issue: ghi_issue,
+              quest_ghi_url: ghi_url,
+              proctor_status: proctor_status,
+              proctor_reviewer: proctor_reviewer,
+              proctor_approved_at: proctor_approved_at
             }
           rescue JSON::ParserError
             # Non è un json valido
