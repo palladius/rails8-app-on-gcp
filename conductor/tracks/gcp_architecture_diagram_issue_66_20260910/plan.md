@@ -13,10 +13,10 @@
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 2 Complete)
 
 ## Phase 3: Progressive Evolution Frames & Animated GIF
-- [ ] Task: Implement milestone frame generators (Local SQLite -> Cloud SQL -> GCS -> Cloud Run -> Vertex AI) in `diagrams/generate_diagrams.py`
-- [ ] Task: Assemble evolution frames into looping `arch_evolution.gif` using Pillow
-- [ ] Task: Output `assets/arch_evolution.gif` and `workshop/assets/images/arch_evolution.gif`
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement milestone frame generators (Local SQLite -> Cloud SQL -> GCS -> Cloud Run -> Vertex AI) in `diagrams/generate_diagrams.py` (0221616)
+- [x] Task: Assemble evolution frames into looping `arch_evolution.gif` using Pillow (0221616)
+- [x] Task: Output `assets/arch_evolution.gif` and `workshop/assets/images/arch_evolution.gif` (0221616)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 3 Complete)
 
 ## Phase 4: Workshop & Presentation Slides Integration
 - [ ] Task: Embed diagram and GIF in `workshop/CODELAB.md` (Page 1) and synchronize with `workshop/SKELETON.md`
