@@ -7,10 +7,10 @@
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 1 Complete)
 
 ## Phase 2: Canonical GCP Architecture Diagram Implementation
-- [ ] Task: Implement canonical multi-container Cloud Run architecture in `diagrams/generate_diagrams.py` featuring ALL GCP services and official GCP icons
-- [ ] Task: Render high-resolution `arch_diagram.png` to `assets/` and `workshop/assets/images/`
-- [ ] Task: Verify test `test/test_architecture_diagram.rb` passes for canonical diagram
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement canonical multi-container Cloud Run architecture in `diagrams/generate_diagrams.py` featuring ALL GCP services and official GCP icons (a164c54)
+- [x] Task: Render high-resolution `arch_diagram.png` to `assets/` and `workshop/assets/images/` (a164c54)
+- [x] Task: Verify test `test/test_architecture_diagram.rb` passes for canonical diagram (a164c54)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 2 Complete)
 
 ## Phase 3: Progressive Evolution Frames & Animated GIF
 - [ ] Task: Implement milestone frame generators (Local SQLite -> Cloud SQL -> GCS -> Cloud Run -> Vertex AI) in `diagrams/generate_diagrams.py`
