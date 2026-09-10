@@ -21,7 +21,9 @@ from diagrams.gcp.ml import VertexAI
 from diagrams.gcp.devtools import Build, ContainerRegistry
 from diagrams.gcp.network import LoadBalancing
 from diagrams.gcp.operations import Logging, Monitoring
-from diagrams.onprem.client import Users
+from diagrams.generic.database import SQL as GenericSQL
+from diagrams.generic.storage import Storage as GenericStorage
+from diagrams.onprem.client import Users, Client
 from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -138,12 +140,179 @@ def generate_canonical():
     if not generated_png.exists():
         raise RuntimeError(f"Failed to generate {generated_png}")
 
-    # Copy to target asset locations
     dest_repo = ASSETS_DIR / "arch_diagram.png"
     dest_workshop = WORKSHOP_IMAGES_DIR / "arch_diagram.png"
     shutil.copyfile(generated_png, dest_repo)
     shutil.copyfile(generated_png, dest_workshop)
     print(f"✅ Canonical diagram saved to:\n   - {dest_repo}\n   - {dest_workshop}")
+
+
+def generate_evolution():
+    """Generates sequential milestone photograms and compiles arch_evolution.gif."""
+    print("🎞️ Generating Progressive Workshop Evolution Photograms...")
+    frames = []
+
+    # Frame 1: Local / Ephemeral Baseline
+    f1_path = OUTPUT_TMP_DIR / "step1_local_baseline"
+    with Diagram(
+        "Step 1: Local Baseline [EPHEMERAL DB / STORAGE 🟡]",
+        filename=str(f1_path),
+        show=False,
+        direction="LR",
+        graph_attr=GRAPH_ATTRS,
+        node_attr=NODE_ATTRS,
+        edge_attr=EDGE_ATTRS,
+        outformat="png",
+    ):
+        dev = Client("Developer Laptop\n(localhost:3000)")
+        with Cluster("Local Host Machine"):
+            web = Run("Puma Web Server\n(Rails 8 Baseline)")
+            sqlite = GenericSQL("Local SQLite DB\n(Ephemeral Disk)")
+            disk = GenericStorage("Local Disk Storage\n(public/uploads)")
+
+        dev >> Edge(label="HTTP :3000") >> web
+        web >> Edge(label="Direct File I/O") >> sqlite
+        web >> Edge(label="ActiveStorage local") >> disk
+
+    frames.append(OUTPUT_TMP_DIR / "step1_local_baseline.png")
+
+    # Frame 2: Google Cloud SQL
+    f2_path = OUTPUT_TMP_DIR / "step2_cloud_sql"
+    with Diagram(
+        "Step 3: Google Cloud SQL [PERSISTENT MANAGED DB 🐘]",
+        filename=str(f2_path),
+        show=False,
+        direction="LR",
+        graph_attr=GRAPH_ATTRS,
+        node_attr=NODE_ATTRS,
+        edge_attr=EDGE_ATTRS,
+        outformat="png",
+    ):
+        dev = Client("Developer Laptop\n(localhost:3000)")
+        with Cluster("Local Environment"):
+            web = Run("Puma Web Server\n(Rails 8)")
+            proxy = Run("Cloud SQL Auth Proxy\n(localhost:5432)")
+            disk = GenericStorage("Local Disk Storage\n(Ephemeral Uploads)")
+
+        with Cluster("Google Cloud Managed Persistence"):
+            db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
+
+        dev >> Edge(label="HTTP :3000") >> web
+        web >> Edge(label="localhost:5432") >> proxy
+        proxy >> Edge(label="mTLS Encrypted Tunnel", color="#188038", style="bold") >> db
+        web >> Edge(label="ActiveStorage local") >> disk
+
+    frames.append(OUTPUT_TMP_DIR / "step2_cloud_sql.png")
+
+    # Frame 3: Private GCS with IAM signed URLs
+    f3_path = OUTPUT_TMP_DIR / "step3_cloud_storage"
+    with Diagram(
+        "Step 4: Private Cloud Storage [IAM SIGNED URLS 🪣]",
+        filename=str(f3_path),
+        show=False,
+        direction="LR",
+        graph_attr=GRAPH_ATTRS,
+        node_attr=NODE_ATTRS,
+        edge_attr=EDGE_ATTRS,
+        outformat="png",
+    ):
+        dev = Client("Developer Laptop\n(localhost:3000)")
+        with Cluster("Local Environment"):
+            web = Run("Puma Web Server\n(Rails 8)")
+            proxy = Run("Cloud SQL Auth Proxy\n(localhost:5432)")
+
+        with Cluster("Google Cloud Managed Persistence"):
+            db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
+            gcs = Storage("Google Cloud Storage\n(Private Bucket)")
+
+        with Cluster("Google Cloud Security & Identity"):
+            iam = Iam("Cloud IAM Credentials\n(Blob Signer)")
+
+        dev >> Edge(label="HTTP :3000") >> web
+        web >> Edge(label="localhost:5432") >> proxy
+        proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
+        web >> Edge(label="ActiveStorage (iam: true)", color="#4285F4") >> gcs
+        iam >> Edge(label="Signed URL V4 Credentials", color="#d93025", style="dotted") >> web
+
+    frames.append(OUTPUT_TMP_DIR / "step3_cloud_storage.png")
+
+    # Frame 4: Cloud Run Multi-Container Pod
+    f4_path = OUTPUT_TMP_DIR / "step4_cloud_run"
+    with Diagram(
+        "Step 6: Cloud Run Multi-Container Pod [SERVERLESS 🚀]",
+        filename=str(f4_path),
+        show=False,
+        direction="LR",
+        graph_attr=GRAPH_ATTRS,
+        node_attr=NODE_ATTRS,
+        edge_attr=EDGE_ATTRS,
+        outformat="png",
+    ):
+        users = Users("Web & Mobile Users")
+        with Cluster("Google Cloud Ingress"):
+            lb = LoadBalancing("Cloud Load Balancing")
+
+        with Cluster("Cloud Run Multi-Container Pod"):
+            web = Run("Puma Web (Rails 8)")
+            worker = Run("Solid Queue Worker")
+            proxy = Run("Cloud SQL Proxy (Sidecar)")
+
+        with Cluster("Google Cloud Persistence"):
+            db = SQL("Cloud SQL PostgreSQL")
+            gcs = Storage("Google Cloud Storage")
+
+        with Cluster("Google Cloud Security"):
+            sm = SecretManager("Secret Manager")
+
+        users >> lb >> web
+        web >> Edge(label="Enqueue Jobs", style="dashed") >> worker
+        web >> proxy
+        worker >> proxy
+        proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
+        web >> gcs
+        worker >> gcs
+        sm >> Edge(label="Runtime Secrets", style="dotted", color="#d93025") >> web
+        sm >> Edge(style="dotted", color="#d93025") >> worker
+
+    frames.append(OUTPUT_TMP_DIR / "step4_cloud_run.png")
+
+    # Frame 5: Canonical Production Architecture (Full GCP Blueprint)
+    # Ensure canonical is generated
+    generate_canonical()
+    frames.append(OUTPUT_TMP_DIR / "arch_diagram.png")
+
+    print(f"🎬 Compiling {len(frames)} photograms into animated GIF...")
+
+    # Load and normalize all frames to a uniform canvas size with white background
+    images = [Image.open(f).convert("RGBA") for f in frames]
+    max_w = max(img.width for img in images)
+    max_h = max(img.height for img in images)
+
+    canvas_w = max(max_w + 80, 1600)
+    canvas_h = max(max_h + 80, 900)
+
+    processed_frames = []
+    for img in images:
+        canvas = Image.new("RGB", (canvas_w, canvas_h), (255, 255, 255))
+        offset_x = (canvas_w - img.width) // 2
+        offset_y = (canvas_h - img.height) // 2
+        canvas.paste(img, (offset_x, offset_y), mask=img.split()[3])
+        processed_frames.append(canvas)
+
+    gif_repo = ASSETS_DIR / "arch_evolution.gif"
+    gif_workshop = WORKSHOP_IMAGES_DIR / "arch_evolution.gif"
+
+    # 1800ms per frame, loop indefinitely
+    processed_frames[0].save(
+        gif_repo,
+        save_all=True,
+        append_images=processed_frames[1:],
+        duration=1800,
+        loop=0,
+        optimize=True,
+    )
+    shutil.copyfile(gif_repo, gif_workshop)
+    print(f"🎉 Animated GIF successfully compiled:\n   - {gif_repo}\n   - {gif_workshop}")
 
 
 def main():
@@ -160,6 +329,9 @@ def main():
 
     if args.canonical or args.all:
         generate_canonical()
+
+    if args.evolution or args.all:
+        generate_evolution()
 
     return 0
 
