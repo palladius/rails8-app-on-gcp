@@ -1,0 +1,2 @@
+Task: Capture Baseline Error UI (Red/Playwright)
+Created automated screenshot script for baseline 500 error page using Playwright/headless Chrome and registered in skeleton.yaml.
