@@ -8,7 +8,7 @@
     - [x] Register declarative screenshot in `workshop/skeleton.yaml`
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [48e9500]
 
-## Phase 2: Native Google Cloud JSON Logging Formatter
+## Phase 2: Native Google Cloud JSON Logging Formatter [checkpoint: 7161e97]
 
 - [x] Task: Write Failing Unit Tests for GoogleJsonFormatter (Red Phase) [77ff44a]
     - [x] Create `blog/test/lib/google_json_formatter_test.rb` validating JSON structure, severity mapping, timestamp formatting, trace ID injection, and nil/binary handling
@@ -17,11 +17,11 @@
     - [x] Implement `GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter` in `blog/lib/google_json_formatter.rb`
     - [x] Configure `config.logger` in `blog/config/environments/production.rb` and allow activation in any environment via `LOG_FORMAT=json`
     - [x] Run tests and verify 100% pass
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [7161e97]
 
 ## Phase 3: Error Reporting STDERR Hook & Diagnostic Demo Route (`/boom`)
 
-- [ ] Task: Write Failing Tests for `/boom` & Error Reporting to STDERR (Red Phase)
+- [~] Task: Write Failing Tests for `/boom` & Error Reporting to STDERR (Red Phase)
     - [ ] Create test in `blog/test/controllers/boom_controller_test.rb` asserting `/boom` triggers 500 and emits formatted exception to stderr
     - [ ] Run tests and verify they fail
 - [ ] Task: Implement `/boom` Diagnostic Endpoint & STDERR Cloud Error Reporting (Green Phase)
