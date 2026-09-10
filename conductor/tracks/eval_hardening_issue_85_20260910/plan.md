@@ -16,15 +16,15 @@ This plan implements semantic YAML parsing, negative testing, header warning tes
 
 ## Phase 2: Semantic YAML Parsing & Invariant Engine Hardening
 
-- [ ] Task: Write failing unit tests for semantic parsing and new invariant handlers (Red Phase)
-  - [ ] Extend `test/test_workshop_invariants.rb` with tests for `compose_has_service` (using YAML), `no_local_storage` (using YAML), `three_tier_architecture`, `toolchain_integrity`, `database_migrations_current`, and `admin_user_seeded`.
-- [ ] Task: Implement semantic YAML parsing and new invariant handlers (Green Phase)
-  - [ ] Refactor `lib/workshop_eval/invariant_checker.rb` to use `YAML.safe_load`.
-  - [ ] Implement `check_three_tier_architecture` (verifies `web`, `worker`, `cloudsql-proxy`).
-  - [ ] Implement `check_toolchain_integrity` (ultra-fast PATH check for `git`, `gcloud`, `docker`, `terraform`, `ruby`, `just`).
-  - [ ] Implement `check_admin_user_seeded` (checks `User.where(admin: true).exists?` safely).
-  - [ ] Implement `check_database_migrations_current` (checks pending migrations safely when DB connected).
-- [ ] Task: Phase 2 Verification & Checkpoint
+- [x] Task: Write failing unit tests for semantic parsing and new invariant handlers (Red Phase)
+  - [x] Extend `test/test_workshop_invariants.rb` with tests for `compose_has_service` (using YAML), `no_local_storage` (using YAML), `three_tier_architecture`, `toolchain_integrity`, `database_migrations_current`, and `admin_user_seeded`.
+- [x] Task: Implement semantic YAML parsing and new invariant handlers (Green Phase)
+  - [x] Refactor `lib/workshop_eval/invariant_checker.rb` to use `YAML.safe_load`.
+  - [x] Implement `check_three_tier_architecture` (verifies `web`, `worker`, `cloudsql-proxy`).
+  - [x] Implement `check_toolchain_integrity` (ultra-fast PATH check for `git`, `gcloud`, `docker`, `terraform`, `ruby`, `just`).
+  - [x] Implement `check_admin_user_seeded` (checks `User.where(admin: true).exists?` safely).
+  - [x] Implement `check_database_migrations_current` (checks pending migrations safely when DB connected).
+- [x] Task: Phase 2 Verification & Checkpoint
 
 ---
 

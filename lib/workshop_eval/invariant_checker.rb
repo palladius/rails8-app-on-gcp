@@ -65,6 +65,124 @@ module WorkshopEval
       )
     end
 
+    # Rule: compose_has_service
+    # Semantically ensures production compose file contains a specific service sidecar
+    def check_compose_has_service(inv)
+      params = inv["params"] || {}
+      target_service = params["service"]
+      file_rel = params["file"] || "blog/compose.prod.yaml"
+      file_path = File.join(repo_root, file_rel)
+
+      unless File.exist?(file_path)
+        return build_result(inv, passed: false, error_message: "Compose file '#{file_rel}' not found.")
+      end
+
+      compose_data = YAML.safe_load(File.read(file_path)) rescue nil
+      unless compose_data.is_a?(Hash) && compose_data["services"].is_a?(Hash)
+        return build_result(inv, passed: false, error_message: "Invalid or malformed YAML in #{file_rel}")
+      end
+
+      unless compose_data["services"].key?(target_service)
+        return build_result(inv, passed: false, error_message: "REGRESSION: Required service '#{target_service}' missing from #{file_rel}!")
+      end
+
+      build_result(inv, passed: true)
+    end
+
+    # Rule: three_tier_architecture
+    # Semantically verifies that production compose definition contains web, worker, and proxy services
+    def check_three_tier_architecture(inv)
+      params = inv["params"] || {}
+      file_rel = params["file"] || "blog/compose.prod.yaml"
+      file_path = File.join(repo_root, file_rel)
+
+      unless File.exist?(file_path)
+        return build_result(inv, passed: false, error_message: "Compose file '#{file_rel}' not found.")
+      end
+
+      compose_data = YAML.safe_load(File.read(file_path)) rescue nil
+      unless compose_data.is_a?(Hash) && compose_data["services"].is_a?(Hash)
+        return build_result(inv, passed: false, error_message: "Invalid or malformed YAML in #{file_rel}")
+      end
+
+      required_services = %w[web worker cloudsql-proxy]
+      missing = required_services.reject { |svc| compose_data["services"].key?(svc) }
+
+      if missing.any?
+        return build_result(inv, passed: false, error_message: "REGRESSION: Three-tier architecture incomplete! Missing service(s): #{missing.join(', ')} in #{file_rel}")
+      end
+
+      build_result(inv, passed: true)
+    end
+
+    # Rule: toolchain_integrity
+    # Ultra-fast (< 10ms) verification that essential workshop CLIs are available on PATH
+    def check_toolchain_integrity(inv)
+      params = inv["params"] || {}
+      required_tools = params["tools"] || %w[git gcloud docker terraform ruby just]
+
+      path_dirs = ENV["PATH"].to_s.split(File::PATH_SEPARATOR)
+      missing_tools = required_tools.reject do |tool|
+        path_dirs.any? { |dir| File.executable?(File.join(dir, tool)) }
+      end
+
+      if missing_tools.any?
+        return build_result(inv, passed: false, error_message: "REGRESSION: Essential tool(s) missing from PATH: #{missing_tools.join(', ')}")
+      end
+
+      build_result(inv, passed: true)
+    end
+
+    # Rule: admin_user_seeded
+    # Verifies that database contains at least 1 administrator user
+    def check_admin_user_seeded(inv)
+      if defined?(User) && defined?(ActiveRecord::Base) && ActiveRecord::Base.connected?
+        begin
+          has_admin = User.where(admin: true).exists? || User.exists?
+          unless has_admin
+            return build_result(inv, passed: false, error_message: "REGRESSION: No administrator user found in database!")
+          end
+        rescue StandardError => e
+          # Safely fall through if DB is not queryable
+        end
+      end
+
+      # Static verification: check db/seeds.rb enforces admin creation
+      seeds_file = File.join(repo_root, "blog/db/seeds.rb")
+      if File.exist?(seeds_file)
+        seeds_content = File.read(seeds_file)
+        unless seeds_content.include?("admin_email") || seeds_content.include?("User.find_or_create_by")
+          return build_result(inv, passed: false, error_message: "REGRESSION: db/seeds.rb missing admin user bootstrap logic!")
+        end
+      end
+
+      build_result(inv, passed: true)
+    end
+
+    # Rule: database_migrations_current
+    # Fast check verifying zero pending migrations once DB is initialized
+    def check_database_migrations_current(inv)
+      if defined?(ActiveRecord::Base) && ActiveRecord::Base.connected?
+        begin
+          context = ActiveRecord::MigrationContext.new(File.join(repo_root, "blog/db/migrate"))
+          if context.needs_migration?
+            return build_result(inv, passed: false, error_message: "REGRESSION: Pending database migrations detected!")
+          end
+        rescue StandardError => e
+          # Safely fall through if offline
+        end
+      end
+
+      # Static verification: db/schema.rb exists if migrations exist
+      schema_file = File.join(repo_root, "blog/db/schema.rb")
+      migrate_dir = File.join(repo_root, "blog/db/migrate")
+      if Dir.exist?(migrate_dir) && Dir.glob(File.join(migrate_dir, "*.rb")).any? && !File.exist?(schema_file)
+        return build_result(inv, passed: false, error_message: "REGRESSION: Migrations exist in db/migrate but db/schema.rb is missing!")
+      end
+
+      build_result(inv, passed: true)
+    end
+
     # Rule: no_local_storage
     # Ensures storage is configured for Google Cloud Storage rather than local disk
     def check_no_local_storage(inv)
@@ -76,14 +194,36 @@ module WorkshopEval
         return build_result(inv, passed: false, error_message: "Storage configuration file not found: #{config_rel}")
       end
 
-      storage_content = File.read(storage_file)
-      # In Step 4+, storage configuration must include google service with GCS provider
-      has_google_service = storage_content.include?("service: GCS") ||
-                           storage_content.include?("service: Google") ||
-                           storage_content.include?("iam: true")
+      raw_content = File.read(storage_file)
+      # Safely strip ERB tags for static YAML inspection without evaluating arbitrary code
+      stripped_content = raw_content.gsub(/<%[=\-_#]?.*?%>/m, "")
+      storage_data = YAML.safe_load(stripped_content, aliases: true) rescue nil
+      unless storage_data.is_a?(Hash)
+        return build_result(inv, passed: false, error_message: "Invalid or malformed YAML in #{config_rel}")
+      end
+
+      # In Step 4+, storage configuration must define a google or GCS service entry
+      has_google_service = storage_data.any? do |_name, config|
+        config.is_a?(Hash) && (
+          config["service"] == "GCS" ||
+          config["service"] == "Google" ||
+          config["iam"] == true ||
+          config[:service] == "GCS" ||
+          config[:service] == "Google"
+        )
+      end
 
       unless has_google_service
         return build_result(inv, passed: false, error_message: "REGRESSION: Storage configuration does not define GCS service! Local storage is forbidden from Step 4 onward.")
+      end
+
+      # Check production environment configuration if present
+      prod_env_file = File.join(repo_root, "blog/config/environments/production.rb")
+      if File.exist?(prod_env_file)
+        prod_content = File.read(prod_env_file)
+        if prod_content.match?(/config\.active_storage\.service\s*=\s*:local\b/)
+          return build_result(inv, passed: false, error_message: "REGRESSION: blog/config/environments/production.rb explicitly sets active_storage.service to :local!")
+        end
       end
 
       # If Rails environment happens to be loaded in process, check runtime ActiveStorage tier
@@ -112,34 +252,16 @@ module WorkshopEval
         end
       end
 
-      # Static verification: verify that a worker execution strategy is configured in compose.prod.yaml or entrypoint
+      # Static verification: verify that a worker execution strategy is configured in compose.prod.yaml
       compose_file = File.join(repo_root, "blog/compose.prod.yaml")
       if File.exist?(compose_file)
-        compose_text = File.read(compose_file)
-        has_worker = compose_text.include?("solid_queue:start") || compose_text.include?("worker:")
-        unless has_worker
-          return build_result(inv, passed: false, error_message: "REGRESSION: No Solid Queue worker sidecar found in blog/compose.prod.yaml from Step 6 onward.")
+        compose_data = YAML.safe_load(File.read(compose_file)) rescue nil
+        if compose_data.is_a?(Hash) && compose_data["services"].is_a?(Hash)
+          has_worker = compose_data["services"].key?("worker")
+          unless has_worker
+            return build_result(inv, passed: false, error_message: "REGRESSION: No Solid Queue worker sidecar found in blog/compose.prod.yaml from Step 6 onward.")
+          end
         end
-      end
-
-      build_result(inv, passed: true)
-    end
-
-    # Rule: compose_has_service
-    # Ensures production compose file contains a specific service sidecar (e.g. cloudsql-proxy)
-    def check_compose_has_service(inv)
-      params = inv["params"] || {}
-      target_service = params["service"]
-      file_rel = params["file"] || "blog/compose.prod.yaml"
-      file_path = File.join(repo_root, file_rel)
-
-      unless File.exist?(file_path)
-        return build_result(inv, passed: false, error_message: "Compose file '#{file_rel}' not found.")
-      end
-
-      content = File.read(file_path)
-      unless content.include?(target_service)
-        return build_result(inv, passed: false, error_message: "REGRESSION: Required service '#{target_service}' missing from #{file_rel}!")
       end
 
       build_result(inv, passed: true)

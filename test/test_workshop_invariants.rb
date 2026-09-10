@@ -2,6 +2,7 @@
 
 require "minitest/autorun"
 require "yaml"
+require "tmpdir"
 require_relative "../lib/workshop_eval/invariant_checker"
 
 class WorkshopInvariantsTest < Minitest::Test
@@ -49,6 +50,68 @@ class WorkshopInvariantsTest < Minitest::Test
     assert_match(/nonexistent-sidecar-service-xyz/, result[:error_message])
   end
 
+  def test_check_compose_has_service_ignores_comments_via_semantic_parsing
+    Dir.mktmpdir do |dir|
+      mock_compose = File.join(dir, "compose.yaml")
+      # cloudsql-proxy is only in comments, not in services dict
+      File.write(mock_compose, <<~YAML)
+        # We might add cloudsql-proxy in the future:
+        # services:
+        #   cloudsql-proxy:
+        #     image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.0
+        services:
+          web:
+            image: blog:latest
+      YAML
+
+      custom_checker = WorkshopEval::InvariantChecker.new(invariants: [], repo_root: dir)
+      inv = {
+        "id" => "test-comment",
+        "check" => "compose_has_service",
+        "params" => { "service" => "cloudsql-proxy", "file" => "compose.yaml" }
+      }
+      result = custom_checker.evaluate_invariant(inv)
+      refute result[:passed], "Expected semantic YAML parsing to reject service only present in comments"
+    end
+  end
+
+  def test_check_three_tier_architecture_passes_for_gold_compose
+    inv = {
+      "id" => "test-three-tier",
+      "check" => "three_tier_architecture",
+      "params" => { "file" => "blog/compose.prod.yaml" }
+    }
+    result = @checker.evaluate_invariant(inv)
+    assert result[:passed], "three_tier_architecture should pass for blog/compose.prod.yaml: #{result[:error_message]}"
+  end
+
+  def test_check_toolchain_integrity_runs_fast_and_detects_tools
+    inv = {
+      "id" => "test-tools",
+      "check" => "toolchain_integrity"
+    }
+    result = @checker.evaluate_invariant(inv)
+    assert result[:passed], "Toolchain check should pass: #{result[:error_message]}"
+  end
+
+  def test_check_admin_user_seeded_runs_safely
+    inv = {
+      "id" => "test-admin",
+      "check" => "admin_user_seeded"
+    }
+    result = @checker.evaluate_invariant(inv)
+    assert result[:passed], "admin_user_seeded check should pass safely: #{result[:error_message]}"
+  end
+
+  def test_check_database_migrations_current_runs_safely
+    inv = {
+      "id" => "test-migrations",
+      "check" => "database_migrations_current"
+    }
+    result = @checker.evaluate_invariant(inv)
+    assert result[:passed], "database_migrations_current check should pass safely: #{result[:error_message]}"
+  end
+
   def test_check_no_local_storage_detects_storage_configuration
     inv = {
       "id" => "test-storage",
@@ -65,7 +128,6 @@ class WorkshopInvariantsTest < Minitest::Test
       "check" => "zero_stuck_jobs"
     }
     result = @checker.evaluate_invariant(inv)
-    # In test/local environment without running Solid Queue worker or pending jobs, it must pass without crashing
     assert result[:passed], "zero_stuck_jobs should pass when queue is clean or idle: #{result[:error_message]}"
   end
 end
