@@ -19,7 +19,7 @@
     - [x] Run tests and verify 100% pass
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [7161e97]
 
-## Phase 3: Error Reporting STDERR Hook & Diagnostic Demo Route (`/boom`)
+## Phase 3: Error Reporting STDERR Hook & Diagnostic Demo Route (`/boom`) [checkpoint: 18f2fba]
 
 - [x] Task: Write Failing Tests for `/boom` & Error Reporting to STDERR (Red Phase) [9a1eed8]
     - [x] Create test in `blog/test/controllers/boom_controller_test.rb` asserting `/boom` triggers 500 and emits formatted exception to stderr
@@ -28,7 +28,7 @@
     - [x] Add `GET /boom` route in `blog/config/routes.rb` and controller action in `blog/app/controllers/boom_controller.rb`
     - [x] Add unhandled exception logging hook emitting exception name, message, and backtrace to `$stderr` formatted for GCP Error Reporting
     - [x] Run tests and verify all pass
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [18f2fba]
 
 ## Phase 4: Googley 500 Error UI Modernization & "After" Brag Screenshot
 
