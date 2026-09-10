@@ -40,4 +40,39 @@ class SheetsReaderTest < Minitest::Test
     refute_empty entries
     assert entries.all? { |e| e[:nickname] && e[:url] && e[:step] }
   end
+
+  def test_parse_duration
+    assert_equal 3600, WorkshopHive::SheetsReader.parse_duration("1h")
+    assert_equal 86400, WorkshopHive::SheetsReader.parse_duration("24h")
+    assert_equal 172800, WorkshopHive::SheetsReader.parse_duration("2d")
+    assert_equal 604800, WorkshopHive::SheetsReader.parse_duration("1w")
+    assert_equal 2592000, WorkshopHive::SheetsReader.parse_duration("1mo")
+    assert_equal 1800, WorkshopHive::SheetsReader.parse_duration("30m")
+    assert_nil WorkshopHive::SheetsReader.parse_duration("all")
+    assert_nil WorkshopHive::SheetsReader.parse_duration("")
+    assert_nil WorkshopHive::SheetsReader.parse_duration(nil)
+  end
+
+  def test_filter_by_max_age
+    now = Time.now
+    entries = [
+      { nickname: "Fresh", url: "https://fresh.run.app", timestamp: (now - 3600).iso8601 }, # 1 hour ago
+      { nickname: "Yesterday", url: "https://yesterday.run.app", timestamp: (now - 90000).iso8601 }, # ~25 hours ago
+      { nickname: "Ancient", url: "https://ancient.run.app", timestamp: (now - 86400 * 40).iso8601 } # 40 days ago
+    ]
+
+    filtered_24h = WorkshopHive::SheetsReader.filter_by_max_age(entries, "24h")
+    assert_equal 1, filtered_24h.size
+    assert_equal "Fresh", filtered_24h.first[:nickname]
+
+    filtered_2d = WorkshopHive::SheetsReader.filter_by_max_age(entries, "2d")
+    assert_equal 2, filtered_2d.size
+    assert_equal ["Fresh", "Yesterday"], filtered_2d.map { |e| e[:nickname] }
+
+    filtered_1mo = WorkshopHive::SheetsReader.filter_by_max_age(entries, "1mo")
+    assert_equal 2, filtered_1mo.size
+
+    filtered_all = WorkshopHive::SheetsReader.filter_by_max_age(entries, "all")
+    assert_equal 3, filtered_all.size
+  end
 end

@@ -5,6 +5,45 @@ const CACHE_KEY_HEALTH = "hive_cached_health";
 let cachedLeaderboard = [];
 let cachedHealth = {};
 
+// Max Age filter from Query String (e.g. ?max_age=24h or ?max_age=2d or ?max_age=1mo)
+function getCurrentMaxAge() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("max_age") || "all";
+}
+
+let activeMaxAge = getCurrentMaxAge();
+
+function updateTimeFilterUI() {
+  const buttons = document.querySelectorAll(".time-filter-btn");
+  buttons.forEach(btn => {
+    const filter = btn.getAttribute("data-filter");
+    if (filter === activeMaxAge || (activeMaxAge === "all" && filter === "all")) {
+      btn.className = "time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm";
+    } else {
+      btn.className = "time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent";
+    }
+  });
+}
+
+function setTimeFilter(filterVal) {
+  activeMaxAge = filterVal;
+  const url = new URL(window.location);
+  if (filterVal === "all" || !filterVal) {
+    url.searchParams.delete("max_age");
+  } else {
+    url.searchParams.set("max_age", filterVal);
+  }
+  window.history.replaceState({}, "", url);
+  updateTimeFilterUI();
+  fetchLeaderboard();
+}
+
+window.addEventListener("popstate", () => {
+  activeMaxAge = getCurrentMaxAge();
+  updateTimeFilterUI();
+  fetchLeaderboard();
+});
+
 try {
   const savedLd = localStorage.getItem(CACHE_KEY_LEADERBOARD);
   if (savedLd) cachedLeaderboard = JSON.parse(savedLd);
@@ -16,14 +55,15 @@ try {
 }
 
 // Render immediato prima ancora di fare qualsiasi fetch
-if (cachedLeaderboard.length > 0) {
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  updateTimeFilterUI();
+  if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
     document.getElementById("stat-healthy-apps").textContent = healthyCount;
     renderTable();
-  });
-}
+  }
+});
 
 let previousStudentsCount = cachedLeaderboard.length;
 let audioContext = null;
@@ -73,7 +113,8 @@ window.addEventListener("click", () => {
 
 async function fetchLeaderboard() {
   try {
-    const res = await fetch("/api/leaderboard");
+    const query = (activeMaxAge && activeMaxAge !== "all") ? `?max_age=${encodeURIComponent(activeMaxAge)}` : "";
+    const res = await fetch(`/api/leaderboard${query}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const newEntries = data.entries || [];
@@ -99,8 +140,20 @@ async function fetchHealth() {
   try {
     const res = await fetch("/api/healthchecks");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    cachedHealth = data.checks || {};
+    const newChecks = data.checks || {};
+    
+    // Preserva la telemetria precedente per ogni studente se il nuovo check è down/temporaneamente vuoto
+    Object.keys(newChecks).forEach(url => {
+      const incoming = newChecks[url];
+      const prev = cachedHealth[url];
+      if (prev && prev.telemetry && Object.keys(prev.telemetry).length > 0) {
+        if (!incoming.telemetry || Object.keys(incoming.telemetry).length === 0) {
+          incoming.telemetry = prev.telemetry;
+        }
+      }
+    });
+
+    cachedHealth = newChecks;
     try {
       localStorage.setItem(CACHE_KEY_HEALTH, JSON.stringify(cachedHealth));
     } catch {}
@@ -135,10 +188,14 @@ function renderTable() {
   if (!tbody) return;
 
   if (cachedLeaderboard.length === 0) {
+    const filterMsg = (activeMaxAge && activeMaxAge !== "all")
+      ? `No submissions found in the last <b>${escapeHtml(activeMaxAge)}</b>. <button onclick="setTimeFilter('all')" class="text-amber-400 hover:underline cursor-pointer font-bold ml-1">Show All</button>`
+      : "No student submissions registered yet.";
+
     tbody.innerHTML = `
       <tr>
         <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
-          No student submissions registered yet.
+          ${filterMsg}
         </td>
       </tr>
     `;
@@ -168,11 +225,37 @@ function renderTable() {
     }
 
 
-    // 2. Colonna 2: HH:MM Nome a sx + Step badge con hover
+    // 2. Colonna 2: HH:MM Nome a sx + Visual Step Segmented Progress Bar con hover
     const hhmm = formatHHMM(student.timestamp);
     const nickname = student.nickname || "Anonymous";
-    const stepNum = t.step_number || student.step_number || 1;
+    const rawStep = t.step_number || student.step_number || 1;
+    const stepNum = Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
     const stepText = t.step_description ? t.step_description.replace(/Step \d+:\s*/, "") : (student.step || `Step ${stepNum}`);
+
+    // Barra visiva a 8 segmenti orizzontali: ad es. [▮][▮][▮][▮][▯][▯][▯][▯] 4/8
+    let segmentsHtml = "";
+    for (let i = 1; i <= 8; i++) {
+      if (i <= stepNum) {
+        // Segmento completato / attivo
+        const color = (i === 8) ? 'bg-purple-400' : (i >= 5 ? 'bg-amber-400' : 'bg-emerald-400');
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm"></span>`;
+      } else {
+        // Segmento futuro / spento
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40"></span>`;
+      }
+    }
+
+    const stepBarHtml = `
+      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border border-slate-700/60 hover:border-amber-500/50 transition-all cursor-help ml-auto group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+        <span class="font-mono text-[11px] font-bold tracking-tight">
+          <span class="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+        </span>
+        <div class="flex items-center gap-0.5">
+          ${segmentsHtml}
+        </div>
+        ${stepNum === 8 ? '<span class="text-[11px] leading-none ml-0.5">🏆</span>' : ''}
+      </div>
+    `;
 
     // 3. Colonna 3 (Riga 1): URL che occupa molto spazio
     //    Colonna 3 (Riga 2): Loghi Ruby/Rails + Metriche (Posts / Users / Images) di fianco!
@@ -202,6 +285,64 @@ function renderTable() {
       envBadge = `<span class="px-1.5 py-0.2 rounded border text-[10px] font-bold ${colorClasses}" title="Rails.env: ${escapeHtml(railsEnv)}">${escapeHtml(shortEnv)}</span>`;
     }
 
+    // Google Cloud Triad Detection (Cloud SQL, GCS, Vertex AI)
+    let gcpTriadHtml = "";
+    if (hasTelemetry) {
+      const isCloudSql = (t.db_tier && (t.db_tier.toString().includes("cloud_sql") || t.db_tier.toString().includes("Cloud SQL"))) || (t.db_badge && t.db_badge.includes("Cloud SQL"));
+      const isGcs = (t.storage_tier && (t.storage_tier.toString().includes("gcs") || t.storage_tier.toString().includes("Cloud Storage"))) || (t.storage_badge && t.storage_badge.includes("Cloud Storage"));
+      const isVertex = (t.ai_badge && (t.ai_badge.includes("Vertex") || t.ai_badge.includes("ADC")));
+
+      // 1. Cloud SQL badge (Active green if Cloud SQL, else grayscale/crossed with red X)
+      const sqlBadge = isCloudSql ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono" title="Google Cloud SQL (mTLS Auth Proxy): ACTIVE">
+          <span class="text-xs leading-none">🐘</span>
+          <span class="font-bold text-[9px] tracking-tight">SQL</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud SQL: Not configured yet (using ephemeral local SQLite)">
+          <span class="text-xs leading-none filter grayscale">🐘</span>
+          <span class="line-through text-[9px]">SQL</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      // 2. GCS badge (Active teal if GCS, else grayscale/crossed with red X)
+      const gcsBadge = isGcs ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-teal-500/40 bg-teal-500/10 text-teal-300 text-[10px] font-mono" title="Google Cloud Storage (iam: true): ACTIVE">
+          <span class="text-xs leading-none">☁️</span>
+          <span class="font-bold text-[9px] tracking-tight">GCS</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Google Cloud Storage: Not configured yet (using ephemeral local disk)">
+          <span class="text-xs leading-none filter grayscale">☁️</span>
+          <span class="line-through text-[9px]">GCS</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      // 3. Vertex AI badge (Active amber if Vertex AI, else grayscale/crossed with red X)
+      const vertexBadge = isVertex ? `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 text-[10px] font-mono" title="Vertex AI (Nano Banana / Imagen 3): ACTIVE">
+          <span class="text-xs leading-none">🍌</span>
+          <span class="font-bold text-[9px] tracking-tight">AI</span>
+        </span>
+      ` : `
+        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-700/60 bg-slate-800/40 text-slate-500 text-[10px] font-mono grayscale opacity-60 hover:opacity-100 transition-opacity" title="Vertex AI: Inactive (using Google AI Studio or disabled)">
+          <span class="text-xs leading-none filter grayscale">🍌</span>
+          <span class="line-through text-[9px]">AI</span>
+          <span class="text-[8px] text-rose-500 font-bold">✕</span>
+        </span>
+      `;
+
+      gcpTriadHtml = `
+        <div class="flex items-center gap-1.5 pl-2 border-l border-slate-700/60">
+          ${sqlBadge}
+          ${gcsBadge}
+          ${vertexBadge}
+        </div>
+      `;
+    }
+
     const stackHtml = hasTelemetry ? `
       <div class="flex items-center gap-2 text-xs font-mono">
         <span class="inline-flex items-center gap-1 text-rose-300 font-medium">
@@ -213,14 +354,55 @@ function renderTable() {
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3.5 h-3.5 inline-block" alt="Rails">
           <span>${railsVersion}</span>
         </span>
+        ${gcpTriadHtml}
       </div>
     ` : `
       <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
     `;
 
-    // Metriche di fianco allo stack nella riga 2
+    // Metriche e Delta Revision di fianco allo stack nella riga 2
     let metricsHtml = "";
     const statusJsonUrl = student.url.replace(/\/+$/, '') + '/status.json';
+
+    const jobsBadge = (t.pending_jobs !== undefined)
+      ? `<span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Pending background jobs (Solid Queue)">⏳ <b class="text-amber-300 font-semibold">${t.pending_jobs}</b></span>`
+      : "";
+
+    // Calcolo della delta revision pura (es. "00013-l44")
+    let deltaRevBadge = "";
+    if (t.k_revision) {
+      const service = t.k_service || (student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null);
+      let deltaRev = "";
+      if (service) {
+        deltaRev = t.k_revision.replace(new RegExp(`^${service}-?`), '');
+      } else {
+        deltaRev = t.k_revision;
+      }
+
+      // Se la diff non esiste o è vuota, o coincide con l'intero service name, o non è una vera revisione -> o perfetto o niente!
+      if (deltaRev && deltaRev !== service && deltaRev.length > 0 && deltaRev !== 'deployed') {
+        const hoverTitle = service ? `Cloud Run Service: ${service}\nFull Revision: ${t.k_revision}` : `Cloud Run Revision: ${t.k_revision}`;
+        deltaRevBadge = `
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:border-emerald-500/50 transition-colors cursor-help" title="${escapeHtml(hoverTitle)}">
+            <span class="text-xs leading-none">🏷️</span>
+            <span class="font-bold text-[9.5px] tracking-tight text-emerald-200">${escapeHtml(deltaRev)}</span>
+          </span>
+        `;
+      }
+    }
+
+    // Failed jobs alert (se > 0, mostra badge rosso allarme!)
+    const failedJobsBadge = (t.failed_jobs && t.failed_jobs > 0)
+      ? `<span class="bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40 text-rose-300 font-bold blink-down" title="Warning: ${t.failed_jobs} failed jobs in Solid Queue!">💥 <b class="text-rose-200">${t.failed_jobs}</b></span>`
+      : "";
+
+    // Git commit hash badge (se presente da Rails /status.json)
+    const gitCommitBadge = t.git_commit
+      ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-sky-500/15 text-sky-300 border border-sky-500/30 hover:bg-sky-500/25 transition-colors cursor-help" title="Git Commit Hash: ${escapeHtml(t.git_commit)}">
+          <span class="text-[10px]">⌥</span>
+          <span class="font-bold text-[9.5px] tracking-tight">${escapeHtml(t.git_commit)}</span>
+        </span>`
+      : "";
 
     if (t.posts_count !== undefined) {
       metricsHtml = `
@@ -228,17 +410,25 @@ function renderTable() {
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Posts count">📝 <b class="text-amber-300 font-semibold">${t.posts_count}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Admin users count">👤 <b class="text-sky-300 font-semibold">${t.users_count || 0}</b></span>
           <span class="bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/60 text-slate-300" title="Blobs/Images count">🖼️ <b class="text-emerald-300 font-semibold">${t.blobs_count || 0}</b></span>
+          ${jobsBadge}
+          ${failedJobsBadge}
           <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
+          ${deltaRevBadge}
+          ${gitCommitBadge}
         </div>
       `;
     } else {
       metricsHtml = `
         <div class="flex items-center gap-2 text-xs font-mono pl-3 border-l border-slate-700/60">
+          ${jobsBadge}
+          ${failedJobsBadge}
           <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform" title="Inspect raw telemetry JSON (/status.json)">
             <img src="/json_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm" alt="JSON">
           </a>
+          ${deltaRevBadge}
+          ${gitCommitBadge}
         </div>
       `;
     }
@@ -268,55 +458,22 @@ function renderTable() {
             ` : ''}
           </div>
 
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/60 transition-all cursor-help ml-auto" title="${escapeHtml(stepText)}">
-            <span>Step ${stepNum}</span>
-            <span class="text-[9px] text-amber-400/60">ℹ️</span>
-          </span>
+          ${stepBarHtml}
         </div>
       </td>
 
-      <!-- COLONNA 3: Riga 1 URL; Riga 2 Stack Ruby/Rails + Metriche di fianco -->
+      <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
       <td class="py-2 px-3 align-middle">
         <div class="flex flex-col gap-1">
-          <!-- Riga 1: URL largo + eventuale Cloud Run badge con icona ufficiale e hover -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 break-all" title="${escapeHtml(student.url)}">
-              <span class="opacity-70 text-xs">🔗</span>
+          <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
+          <div class="flex items-center gap-2">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all" title="${escapeHtml(student.url)}">
+              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm flex-shrink-0" alt="Cloud Run" title="Google Cloud Run">
               <span class="font-medium">${escapeHtml(student.url)}</span>
             </a>
-
-            ${(() => {
-              const fullRev = (t.k_revision || '').trim();
-              const fullService = (t.k_service || '').trim();
-              const fallbackService = student.url.includes('.run.app') ? student.url.split('.')[0].replace(/^https?:\/\//, '').split('-').slice(0, 3).join('-') : null;
-              const service = fullService || fallbackService;
-
-              if (!service && !fullRev) return '';
-
-              // Estrai il delta di revisione (es. "test-rails8-workshop-rails-app-00013-l44" -> "00013-l44")
-              let deltaRev = '';
-              if (fullRev) {
-                if (service && fullRev.startsWith(service)) {
-                  deltaRev = fullRev.slice(service.length).replace(/^-/, '');
-                } else {
-                  const match = fullRev.match(/(\d{5}-[a-z0-9]+)$/i) || fullRev.match(/(\d{4,}-[a-z0-9]+)$/i);
-                  deltaRev = match ? match[1] : fullRev;
-                }
-              }
-
-              const displayLabel = deltaRev ? `rev ${deltaRev}` : (fullRev || 'cloud-run');
-              const hoverTitle = `Cloud Run Service: ${service || 'unknown'}\nFull Revision: ${fullRev || service || 'N/A'}`;
-
-              return `
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 hover:border-emerald-500/60 shadow-sm transition-all cursor-help" title="${escapeHtml(hoverTitle)}">
-                  <img src="/cloud_run_icon.png" class="w-3.5 h-3.5 object-contain inline-block drop-shadow-sm" alt="Cloud Run">
-                  <span class="font-bold text-[10px] tracking-tight text-emerald-200 bg-emerald-950/60 px-1 rounded border border-emerald-500/30">${escapeHtml(displayLabel)}</span>
-                </span>
-              `;
-            })()}
           </div>
 
-          <!-- Riga 2: Stack Ruby/Rails e Metriche affiancate -->
+          <!-- Riga 2: Stack Ruby/Rails, Metriche, JSON icon e Delta Revision affiancati -->
           <div class="flex flex-wrap items-center gap-2.5">
             ${stackHtml}
             ${metricsHtml}
@@ -343,7 +500,7 @@ function renderStagesDistribution() {
     3: "Stateless Shock",
     4: "GCS Persistence",
     5: "Secret Manager",
-    6: "Gold Sidecars",
+    6: "Cloud SQL Proxy",
     7: "GenAI Cover",
     8: "Final Quest 🏆"
   };

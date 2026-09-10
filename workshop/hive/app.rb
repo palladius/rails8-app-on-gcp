@@ -35,12 +35,14 @@ module WorkshopHive
 
     get "/api/leaderboard" do
       content_type :json
+      max_age = params["max_age"]
       authorizer = ServiceAccountLoader.load_authorizer
-      entries = SheetsReader.fetch_entries(credentials: authorizer)
+      entries = SheetsReader.fetch_entries(credentials: authorizer, max_age: max_age)
 
       {
         status: "ok",
         total_students: entries.size,
+        max_age: max_age,
         entries: entries,
         timestamp: Time.now.utc.iso8601
       }.to_json

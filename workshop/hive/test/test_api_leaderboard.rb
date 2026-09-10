@@ -41,6 +41,20 @@ class AppLeaderboardApiTest < Minitest::Test
     refute_empty parsed["entries"]
   end
 
+  def test_get_leaderboard_api_with_max_age
+    env = Rack::MockRequest.env_for("/api/leaderboard?max_age=24h", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+
+    assert_equal "ok", parsed["status"]
+    assert_equal "24h", parsed["max_age"]
+    assert parsed.key?("entries")
+  end
+
   def test_get_healthchecks_api
     env = Rack::MockRequest.env_for("/api/healthchecks", method: "GET")
     status, headers, body = app.call(env)
