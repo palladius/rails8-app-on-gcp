@@ -30,7 +30,7 @@
     - [x] Run tests and verify all pass
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [18f2fba]
 
-## Phase 4: Googley 500 Error UI Modernization & "After" Brag Screenshot
+## Phase 4: Googley 500 Error UI Modernization & "After" Brag Screenshot [checkpoint: c45f99c]
 
 - [x] Task: Modernize `blog/public/500.html` to Google/Gemini Guidelines [0fd75ef]
     - [x] Redesign `blog/public/500.html` with clean Googley card styling, smooth gradient accents, friendly robot/error illustration, request ID placeholder, and "Back to Home" button
@@ -38,4 +38,4 @@
     - [x] Create Playwright capture script `workshop/screenshots/issue82_error_after.playwright.js`
     - [x] Execute Playwright script to capture `workshop/assets/screenshots/issue-82-error-after.png`
     - [x] Verify `just test` and `just test-screenshots` pass cleanly
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [c45f99c]
