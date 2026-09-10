@@ -4,8 +4,8 @@
 Generates:
 1. Canonical production reference architecture diagram (arch_diagram.png),
    highlighting exclusively REAL BILLABLE Google Cloud products with a single
-   Cloud Run service icon and 3 compact stacked sub-containers in monospace (tt)
-   with emoji icons.
+   Cloud Run service icon and a compact 3-row matrioska container table
+   in monospace (tt) with emojis (strictly stacked vertically).
 2. Progressive evolutionary frames and animated GIF (arch_evolution.gif).
 """
 
@@ -22,8 +22,6 @@ from diagrams.gcp.storage import Storage
 from diagrams.gcp.security import SecretManager
 from diagrams.gcp.ml import VertexAI
 from diagrams.gcp.devtools import Build, ContainerRegistry
-from diagrams.generic.database import SQL as GenericSQL
-from diagrams.generic.storage import Storage as GenericStorage
 from diagrams.onprem.client import Users, Client
 from PIL import Image
 
@@ -60,6 +58,14 @@ def ensure_dirs():
     OUTPUT_TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
+CONTAINERS_TABLE_HTML = """<
+<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" BGCOLOR="#FFFFFF" COLOR="#4285F4" STYLE="ROUNDED">
+  <TR><TD BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🌐 rails_app</B> (puma :8080)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#FEF7E0" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>⚡ solid_queue</B> (worker)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🔒 cloud_sql_proxy</B> (sidecar :5432)</FONT></TD></TR>
+</TABLE>>"""
+
+
 def generate_canonical():
     """Generates the canonical production GCP architecture diagram highlighting real billable GCP objects."""
     print("🎨 Generating Canonical Google Cloud Architecture Diagram (Compact 3-Row Matrioskas & Billable GCP Objects)...")
@@ -79,10 +85,8 @@ def generate_canonical():
 
         with Cluster("Google Cloud Run (1. Billable Serverless Service)"):
             cloud_run = Run("Cloud Run\n(Serverless Pod)")
-            web = Node("🌐 rails_app (puma :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            web - Edge(style="invis") - worker - Edge(style="invis") - proxy
+            containers = Node(label=CONTAINERS_TABLE_HTML, shape="none")
+            cloud_run >> Edge(label=":8080", color="#1a73e8") >> containers
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(2. Managed DB Instance)")
@@ -97,25 +101,18 @@ def generate_canonical():
 
         # Ingress traffic
         users >> Edge(label="HTTPS Ingress", color="#1a73e8", style="bold") >> cloud_run
-        cloud_run >> Edge(label="Port 8080", color="#1a73e8") >> web
-
-        # In-pod async job delegation
-        web >> Edge(label="Enqueue Jobs (Solid Queue DB)", color="#f9ab00", style="dashed") >> worker
 
         # Database connections via localhost Cloud SQL proxy
-        web >> Edge(label="localhost:5432", color="#188038") >> proxy
-        worker >> Edge(label="localhost:5432", color="#188038") >> proxy
-        proxy >> Edge(label="mTLS Encrypted Tunnel\n(No Public IP)", color="#188038", style="bold") >> db
+        containers >> Edge(label="mTLS Encrypted Tunnel\n(No Public IP)", color="#188038", style="bold") >> db
 
         # Object Storage
-        web >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
-        worker >> Edge(label="Direct Blob Attach", color="#4285F4") >> gcs
+        containers >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
 
         # Secret injection
         sm >> Edge(label="Runtime Secret Injection", color="#d93025", style="dotted") >> cloud_run
 
         # GenAI Async Pipeline
-        worker >> Edge(label="Nano Banana Imagen 3\n& Audio Summaries", color="#a142f4", style="bold") >> vertex
+        containers >> Edge(label="Nano Banana Imagen 3\n& Audio Summaries", color="#a142f4", style="bold") >> vertex
 
         # CI/CD deployment
         cb >> Edge(label="Build Containers") >> ar >> Edge(label="Deploy Revision") >> cloud_run
@@ -140,6 +137,13 @@ def generate_evolution():
 
     # Frame 1: Local / Ephemeral Baseline
     f1_path = OUTPUT_TMP_DIR / "step1_local_baseline"
+    f1_table = """<
+<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" BGCOLOR="#FFFFFF" COLOR="#DADCE0" STYLE="ROUNDED">
+  <TR><TD BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🌐 rails_app</B> (puma :3000)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#F1F3F4" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🗄️ local_sqlite</B> (ephemeral disk)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#F1F3F4" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>📁 local_storage</B> (public/uploads)</FONT></TD></TR>
+</TABLE>>"""
+
     with Diagram(
         "Step 1: Local Baseline [EPHEMERAL DB / STORAGE 🟡]",
         filename=str(f1_path),
@@ -152,18 +156,21 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Host Machine"):
-            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
-            sqlite = GenericSQL("Local SQLite DB\n(Ephemeral Disk)")
-            disk = GenericStorage("Local Disk Storage\n(public/uploads)")
+            local_stack = Node(label=f1_table, shape="none")
 
-        dev >> Edge(label="HTTP :3000") >> web
-        web >> Edge(label="Direct File I/O") >> sqlite
-        web >> Edge(label="ActiveStorage local") >> disk
+        dev >> Edge(label="HTTP :3000") >> local_stack
 
     frames.append(OUTPUT_TMP_DIR / "step1_local_baseline.png")
 
     # Frame 2: Google Cloud SQL
     f2_path = OUTPUT_TMP_DIR / "step2_cloud_sql"
+    f2_table = """<
+<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" BGCOLOR="#FFFFFF" COLOR="#DADCE0" STYLE="ROUNDED">
+  <TR><TD BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🌐 rails_app</B> (puma :3000)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🔒 cloud_sql_proxy</B> (localhost:5432)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#F1F3F4" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>📁 local_storage</B> (ephemeral uploads)</FONT></TD></TR>
+</TABLE>>"""
+
     with Diagram(
         "Step 3: Google Cloud SQL [PERSISTENT MANAGED DB 🐘]",
         filename=str(f2_path),
@@ -176,23 +183,24 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
-            proxy = Node("🔒 cloud_sql_proxy (localhost:5432)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
-            disk = GenericStorage("Local Disk Storage\n(Ephemeral Uploads)")
-            web - Edge(style="invis") - proxy
+            local_stack = Node(label=f2_table, shape="none")
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
 
-        dev >> Edge(label="HTTP :3000") >> web
-        web >> Edge(label="localhost:5432") >> proxy
-        proxy >> Edge(label="mTLS Encrypted Tunnel", color="#188038", style="bold") >> db
-        web >> Edge(label="ActiveStorage local") >> disk
+        dev >> Edge(label="HTTP :3000") >> local_stack
+        local_stack >> Edge(label="mTLS Tunnel", color="#188038", style="bold") >> db
 
     frames.append(OUTPUT_TMP_DIR / "step2_cloud_sql.png")
 
     # Frame 3: Private GCS with IAM signed URLs
     f3_path = OUTPUT_TMP_DIR / "step3_cloud_storage"
+    f3_table = """<
+<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" BGCOLOR="#FFFFFF" COLOR="#DADCE0" STYLE="ROUNDED">
+  <TR><TD BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🌐 rails_app</B> (puma :3000)</FONT></TD></TR>
+  <TR><TD BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🔒 cloud_sql_proxy</B> (localhost:5432)</FONT></TD></TR>
+</TABLE>>"""
+
     with Diagram(
         "Step 4: Private Cloud Storage [IAM SIGNED URLS 🪣]",
         filename=str(f3_path),
@@ -205,18 +213,15 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
-            proxy = Node("🔒 cloud_sql_proxy (localhost:5432)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
-            web - Edge(style="invis") - proxy
+            local_stack = Node(label=f3_table, shape="none")
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
             gcs = Storage("Google Cloud Storage\n(Private Bucket)")
 
-        dev >> Edge(label="HTTP :3000") >> web
-        web >> Edge(label="localhost:5432") >> proxy
-        proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
-        web >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
+        dev >> Edge(label="HTTP :3000") >> local_stack
+        local_stack >> Edge(label="mTLS Tunnel", color="#188038") >> db
+        local_stack >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
 
     frames.append(OUTPUT_TMP_DIR / "step3_cloud_storage.png")
 
@@ -236,10 +241,8 @@ def generate_evolution():
 
         with Cluster("Google Cloud Run (Billable Serverless Service)"):
             cloud_run = Run("Cloud Run\n(Serverless Pod)")
-            web = Node("🌐 rails_app (puma :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.38", width="3.0")
-            web - Edge(style="invis") - worker - Edge(style="invis") - proxy
+            containers = Node(label=CONTAINERS_TABLE_HTML, shape="none")
+            cloud_run >> Edge(label=":8080", color="#1a73e8") >> containers
 
         with Cluster("Google Cloud Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL")
@@ -247,13 +250,9 @@ def generate_evolution():
 
         sm = SecretManager("Secret Manager\n(Runtime Secrets)")
 
-        users >> Edge(label="HTTPS") >> cloud_run >> web
-        web >> Edge(label="Enqueue Jobs", style="dashed") >> worker
-        web >> proxy
-        worker >> proxy
-        proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
-        web >> gcs
-        worker >> gcs
+        users >> Edge(label="HTTPS") >> cloud_run
+        containers >> Edge(label="mTLS Tunnel", color="#188038") >> db
+        containers >> Edge(label="ActiveStorage", color="#4285F4") >> gcs
         sm >> Edge(label="Runtime Secrets", style="dotted", color="#d93025") >> cloud_run
 
     frames.append(OUTPUT_TMP_DIR / "step4_cloud_run.png")

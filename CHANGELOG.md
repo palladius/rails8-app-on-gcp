@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.13] - 2026-09-10
+### Added
+- 📐 **Deterministic GCP Architecture Diagram & Evolution Animation (Issue [#66](https://github.com/palladius/rails8-app-on-gcp/issues/66))**:
+  - Implemented deterministic, code-driven architecture generator using Python `diagrams` in `diagrams/generate_diagrams.py`.
+  - Confined reference diagram exclusively to billable GCP objects with official Google Cloud icons (Cloud Run, Cloud SQL, GCS, Secret Manager, Vertex AI, Cloud Build, Artifact Registry).
+  - Modeled multi-container Cloud Run architecture as a single service with 3 sub-containers vertically stacked using Graphviz HTML-like tables (`rails_app`, `solid_queue`, `cloud_sql_proxy`).
+  - Added progressive milestone evolution frames and generated animated looping GIF `assets/arch_evolution.gif`.
+  - Embedded canonical diagram and evolution animation in Page 1 of `workshop/CODELAB.md`, `workshop/SKELETON.md`, and presentation slides `slides/index.md`.
+  - Added `just diagram`, `just diagram-evolution`, `just diagrams`, and automated unit test suite `just test-diagrams`.
+
 ## [0.2.12] - 2026-09-10
 ### Fixed
 - 📸 **Step 7 Workshop UI Screenshot Clean-Up**:
