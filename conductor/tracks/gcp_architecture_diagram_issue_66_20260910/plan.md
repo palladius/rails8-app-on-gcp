@@ -23,3 +23,6 @@
 - [x] Task: Add architecture diagram slide to `slides/index.md` and compile with `just build-slides` (674b831)
 - [x] Task: Run `build_ghpages.rb` and full test suites (`just test`, `just test-slides`, `ruby test/test_architecture_diagram.rb`) (674b831)
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 4 Complete)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions eac12d2
