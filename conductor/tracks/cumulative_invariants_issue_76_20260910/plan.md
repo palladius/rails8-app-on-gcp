@@ -13,7 +13,7 @@
   - [x] Add `inv-cloud-sql-connected` (`from_step: 6`, `check: compose_has_service`, params: `service: cloudsql-proxy`)
   - [x] Add `step-7-llm-clean-ui-no-warnings` to Step 7 `evals:` list
   - [x] Verify `test/test_workshop_skeleton.rb` passes (TDD Green phase)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2: Ruby Invariant Engine Implementation (`bin/workshop_eval.rb`)
 
