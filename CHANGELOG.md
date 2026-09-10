@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.12] - 2026-09-10
+### Fixed
+- 📸 **Step 7 Workshop UI Screenshot Clean-Up**:
+  - Replaced `step-7-podcastifier-ui.png` with a clean, architecturally consistent view (`[CLOUD PERSISTENT]` banner, zero stuck jobs alert, authentic GCS cloud storage stamp and dual audio player).
+- 🐝 **Workshop Hive Frontend Healthcheck Bugfix**:
+  - Fixed missing `const data = await res.json()` in `workshop/hive/public/js/hive.js` `fetchHealth()` function, enabling real-time telemetry rendering and healthy count synchronization.
+
 ## [0.2.11] - 2026-09-10
 ### Added
 - 🎙️ **Step 7 Podcastifier Showcase Assets & Audio Links**:
