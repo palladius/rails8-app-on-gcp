@@ -2,10 +2,10 @@
 
 ## Phase 1: Test Suite & Declarative Schema (TDD Foundation)
 
-- [ ] Task: Write unit tests for cumulative invariants schema and runner logic
-  - [ ] Update `test/test_workshop_skeleton.rb` to assert that `workshop/skeleton.yaml` contains `invariants` list with required fields (`id`, `from_step`, `title`, `description`, `check`)
-  - [ ] Create `test/test_workshop_invariants.rb` with tests covering invariant step filtering (`from_step <= N`), execution isolation, and regression alert triggering
-  - [ ] Verify that new tests fail initially (TDD Red phase)
+- [x] Task: Write unit tests for cumulative invariants schema and runner logic (72286db)
+  - [x] Update `test/test_workshop_skeleton.rb` to assert that `workshop/skeleton.yaml` contains `invariants` list with required fields (`id`, `from_step`, `title`, `description`, `check`)
+  - [x] Create `test/test_workshop_invariants.rb` with tests covering invariant step filtering (`from_step <= N`), execution isolation, and regression alert triggering
+  - [x] Verify that new tests fail initially (TDD Red phase)
 - [ ] Task: Extend `workshop/skeleton.yaml` with declarative invariants and Step 7 LLM eval
   - [ ] Define root-level `invariants:` list in `workshop/skeleton.yaml`
   - [ ] Add `inv-persistent-gcs-storage` (`from_step: 4`, `check: no_local_storage`)
