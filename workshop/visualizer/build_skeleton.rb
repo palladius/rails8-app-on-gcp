@@ -69,6 +69,22 @@ steps.each do |step|
   lines << ""
 end
 
+invariants = data['invariants'] || []
+if invariants.any?
+  lines << "## 🛡️ Cumulative Cascading Invariants (Monotonic Checks)"
+  lines << ""
+  lines << "Architectural milestones in the workshop are irreversible one-way doors. When running `just workshop-eval <N>`, all active cumulative invariants where `from_step <= N` are strictly enforced to eliminate ephemeral regressions:"
+  lines << ""
+  invariants.each do |inv|
+    lines << "- **`[INV: Step #{inv['from_step']}+]` #{inv['title']}** (`#{inv['id']}`)"
+    lines << "  - *Description:* #{inv['description']}"
+    lines << "  - *Check Rule:* `#{inv['check']}`"
+  end
+  lines << ""
+  lines << "---"
+  lines << ""
+end
+
 lines << "## 🎯 Verification Checklist"
 lines << ""
 steps.each do |step|
