@@ -3,7 +3,7 @@
 <!-- 🏷️ Codelab Version: 2.1.0 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
-## Introduction 2.1.0
+## Introduction
 
 *Duration: 5min*
 
