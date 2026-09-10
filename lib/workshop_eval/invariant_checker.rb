@@ -218,11 +218,15 @@ module WorkshopEval
       end
 
       # Check production environment configuration if present
-      prod_env_file = File.join(repo_root, "blog/config/environments/production.rb")
-      if File.exist?(prod_env_file)
+      prod_env_file = [
+        File.join(repo_root, "blog/config/environments/production.rb"),
+        File.join(repo_root, "config/environments/production.rb")
+      ].find { |p| File.exist?(p) }
+
+      if prod_env_file
         prod_content = File.read(prod_env_file)
         if prod_content.match?(/config\.active_storage\.service\s*=\s*:local\b/)
-          return build_result(inv, passed: false, error_message: "REGRESSION: blog/config/environments/production.rb explicitly sets active_storage.service to :local!")
+          return build_result(inv, passed: false, error_message: "REGRESSION: #{prod_env_file} explicitly sets active_storage.service to :local!")
         end
       end
 

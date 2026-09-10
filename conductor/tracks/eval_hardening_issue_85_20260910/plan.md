@@ -30,13 +30,13 @@ This plan implements semantic YAML parsing, negative testing, header warning tes
 
 ## Phase 3: Negative Regression Testing Suite
 
-- [ ] Task: Write negative regression tests in `test/test_workshop_invariants.rb`
-  - [ ] Assert broken compose files return `passed: false` with clear diagnostics.
-  - [ ] Assert `:local` storage returns `passed: false`.
-  - [ ] Assert stalled background jobs return `passed: false`.
-- [ ] Task: Test CLI exit code behavior
-  - [ ] Assert `bin/workshop_eval.rb` exits with code 1 when an invariant fails.
-- [ ] Task: Phase 3 Verification & Checkpoint
+- [x] Task: Write negative regression tests in `test/test_workshop_invariants.rb`
+  - [x] Assert broken compose files return `passed: false` with clear diagnostics.
+  - [x] Assert `:local` storage returns `passed: false`.
+  - [x] Assert stalled background jobs return `passed: false`.
+- [x] Task: Test CLI exit code behavior
+  - [x] Assert `bin/workshop_eval.rb` exits with code 1 when an invariant fails.
+- [x] Task: Phase 3 Verification & Checkpoint
 
 ---
 

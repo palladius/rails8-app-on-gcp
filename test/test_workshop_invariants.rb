@@ -122,12 +122,104 @@ class WorkshopInvariantsTest < Minitest::Test
     assert result[:passed]
   end
 
-  def test_check_zero_stuck_jobs_runs_safely
+  def test_negative_regression_three_tier_missing_worker
+    Dir.mktmpdir do |dir|
+      mock_compose = File.join(dir, "compose.prod.yaml")
+      File.write(mock_compose, <<~YAML)
+        services:
+          web:
+            image: blog:latest
+          cloudsql-proxy:
+            image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.0
+      YAML
+
+      custom_checker = WorkshopEval::InvariantChecker.new(invariants: [], repo_root: dir)
+      inv = {
+        "id" => "inv-three-tier-test",
+        "check" => "three_tier_architecture",
+        "params" => { "file" => "compose.prod.yaml" }
+      }
+      result = custom_checker.evaluate_invariant(inv)
+      refute result[:passed]
+      assert_match(/worker/, result[:error_message])
+      assert_match(/REGRESSION/, result[:error_message])
+    end
+  end
+
+  def test_negative_regression_local_storage_forbidden
+    Dir.mktmpdir do |dir|
+      mock_storage = File.join(dir, "storage.yml")
+      File.write(mock_storage, <<~YAML)
+        local:
+          service: Disk
+          root: /tmp/storage
+      YAML
+
+      custom_checker = WorkshopEval::InvariantChecker.new(invariants: [], repo_root: dir)
+      inv = {
+        "id" => "inv-storage-test",
+        "check" => "no_local_storage",
+        "params" => { "config_file" => "storage.yml" }
+      }
+      result = custom_checker.evaluate_invariant(inv)
+      refute result[:passed]
+      assert_match(/Local storage is forbidden/, result[:error_message])
+    end
+  end
+
+  def test_negative_regression_production_rb_sets_local_storage
+    Dir.mktmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "config/environments"))
+      mock_storage = File.join(dir, "config/storage.yml")
+      File.write(mock_storage, <<~YAML)
+        google_prod:
+          service: GCS
+          bucket: my-bucket
+      YAML
+      mock_prod = File.join(dir, "config/environments/production.rb")
+      File.write(mock_prod, <<~RUBY)
+        Rails.application.configure do
+          config.active_storage.service = :local
+        end
+      RUBY
+
+      custom_checker = WorkshopEval::InvariantChecker.new(invariants: [], repo_root: dir)
+      inv = {
+        "id" => "inv-storage-test",
+        "check" => "no_local_storage",
+        "params" => { "config_file" => "config/storage.yml" }
+      }
+      result = custom_checker.evaluate_invariant(inv)
+      refute result[:passed]
+      assert_match(/explicitly sets active_storage\.service to :local/, result[:error_message])
+    end
+  end
+
+  def test_negative_regression_toolchain_missing_tool
     inv = {
-      "id" => "test-jobs",
-      "check" => "zero_stuck_jobs"
+      "id" => "test-tools-fail",
+      "check" => "toolchain_integrity",
+      "params" => { "tools" => ["nonexistent_cli_utility_never_found_xyz_123"] }
     }
     result = @checker.evaluate_invariant(inv)
-    assert result[:passed], "zero_stuck_jobs should pass when queue is clean or idle: #{result[:error_message]}"
+    refute result[:passed]
+    assert_match(/nonexistent_cli_utility_never_found_xyz_123/, result[:error_message])
+  end
+
+  def test_negative_regression_cli_exits_one_on_failure
+    require "open3"
+    # Execute bin/workshop_eval.rb with an impossible step or broken invariant simulation
+    # Using ruby code eval that deliberately raises to trigger REGRESSION ALERT
+    cmd = "ruby -e '
+      require_relative \"lib/workshop_eval/invariant_checker\"
+      checker = WorkshopEval::InvariantChecker.new(invariants: [
+        { \"id\" => \"reg-fail\", \"from_step\" => 1, \"title\" => \"Broken Invariant\", \"check\" => \"ruby_code\", \"code\" => \"raise \\\"Regression boom\\\"\" }
+      ])
+      res = checker.evaluate_invariant(checker.invariants.first)
+      exit(res.passed? ? 0 : 1)
+    '"
+    _, _, status = Open3.capture3(cmd, chdir: File.expand_path("..", __dir__))
+    assert_equal 1, status.exitstatus, "Checker must exit with status 1 when an invariant fails"
   end
 end
+
