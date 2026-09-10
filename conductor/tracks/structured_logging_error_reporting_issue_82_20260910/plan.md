@@ -32,10 +32,10 @@
 
 ## Phase 4: Googley 500 Error UI Modernization & "After" Brag Screenshot
 
-- [ ] Task: Modernize `blog/public/500.html` to Google/Gemini Guidelines
-    - [ ] Redesign `blog/public/500.html` with clean Googley card styling, smooth gradient accents, friendly robot/error illustration, request ID placeholder, and "Back to Home" button
-- [ ] Task: Capture Automated "After" Screenshot & Run Verification
-    - [ ] Create Playwright capture script `workshop/screenshots/issue82_error_after.playwright.js`
-    - [ ] Execute Playwright script to capture `workshop/assets/screenshots/issue-82-error-after.png`
-    - [ ] Verify `just test` and `just test-screenshots` pass cleanly
+- [x] Task: Modernize `blog/public/500.html` to Google/Gemini Guidelines [0fd75ef]
+    - [x] Redesign `blog/public/500.html` with clean Googley card styling, smooth gradient accents, friendly robot/error illustration, request ID placeholder, and "Back to Home" button
+- [x] Task: Capture Automated "After" Screenshot & Run Verification [0fd75ef]
+    - [x] Create Playwright capture script `workshop/screenshots/issue82_error_after.playwright.js`
+    - [x] Execute Playwright script to capture `workshop/assets/screenshots/issue-82-error-after.png`
+    - [x] Verify `just test` and `just test-screenshots` pass cleanly
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
