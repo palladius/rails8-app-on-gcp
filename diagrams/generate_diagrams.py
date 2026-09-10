@@ -4,7 +4,8 @@
 Generates:
 1. Canonical production reference architecture diagram (arch_diagram.png),
    highlighting exclusively REAL BILLABLE Google Cloud products with a single
-   Cloud Run service icon and 3 sub-matrioska containers.
+   Cloud Run service icon and 3 compact stacked sub-containers in monospace (tt)
+   with emoji icons.
 2. Progressive evolutionary frames and animated GIF (arch_evolution.gif).
 """
 
@@ -14,7 +15,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from diagrams import Diagram, Cluster, Edge
+from diagrams import Diagram, Cluster, Edge, Node
 from diagrams.gcp.compute import Run
 from diagrams.gcp.database import SQL
 from diagrams.gcp.storage import Storage
@@ -23,7 +24,6 @@ from diagrams.gcp.ml import VertexAI
 from diagrams.gcp.devtools import Build, ContainerRegistry
 from diagrams.generic.database import SQL as GenericSQL
 from diagrams.generic.storage import Storage as GenericStorage
-from diagrams.onprem.container import Docker
 from diagrams.onprem.client import Users, Client
 from PIL import Image
 
@@ -62,7 +62,7 @@ def ensure_dirs():
 
 def generate_canonical():
     """Generates the canonical production GCP architecture diagram highlighting real billable GCP objects."""
-    print("🎨 Generating Canonical Google Cloud Architecture Diagram (Billable GCP Objects Only)...")
+    print("🎨 Generating Canonical Google Cloud Architecture Diagram (Compact 3-Row Matrioskas & Billable GCP Objects)...")
     out_filename = OUTPUT_TMP_DIR / "arch_diagram"
 
     with Diagram(
@@ -79,12 +79,11 @@ def generate_canonical():
 
         with Cluster("Google Cloud Run (1. Billable Serverless Service)"):
             cloud_run = Run("Cloud Run Service\n(Serverless Pod)")
-            with Cluster("1. Rails Web Server"):
-                web = Docker("Puma Server\n(Port 8080)")
-            with Cluster("2. Background Worker"):
-                worker = Docker("Solid Queue\n(Async Jobs)")
-            with Cluster("3. Database Proxy"):
-                proxy = Docker("Cloud SQL Proxy\n(mTLS Sidecar)")
+            with Cluster("Pod Containers (In-Pod localhost)"):
+                web = Node("🌐 puma (web :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
+                worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.35")
+                proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
+                web - Edge(style="invis") - worker - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(2. Managed DB Instance)")
@@ -154,7 +153,7 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Host Machine"):
-            web = Docker("Rails 8 (Puma)\n(Port 3000)")
+            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
             sqlite = GenericSQL("Local SQLite DB\n(Ephemeral Disk)")
             disk = GenericStorage("Local Disk Storage\n(public/uploads)")
 
@@ -178,9 +177,10 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Docker("Rails 8 (Puma)\n(Port 3000)")
-            proxy = Docker("Cloud SQL Proxy\n(localhost:5432)")
+            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
+            proxy = Node("🔒 cloud_sql_proxy (localhost:5432)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
             disk = GenericStorage("Local Disk Storage\n(Ephemeral Uploads)")
+            web - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
@@ -206,8 +206,9 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Docker("Rails 8 (Puma)\n(Port 3000)")
-            proxy = Docker("Cloud SQL Proxy\n(localhost:5432)")
+            web = Node("🌐 puma (web :3000)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
+            proxy = Node("🔒 cloud_sql_proxy (localhost:5432)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
+            web - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
@@ -236,12 +237,11 @@ def generate_evolution():
 
         with Cluster("Google Cloud Run (Billable Serverless Service)"):
             cloud_run = Run("Cloud Run Service")
-            with Cluster("1. Rails Web Server"):
-                web = Docker("Puma Server")
-            with Cluster("2. Background Worker"):
-                worker = Docker("Solid Queue")
-            with Cluster("3. Database Proxy"):
-                proxy = Docker("Cloud SQL Proxy")
+            with Cluster("Pod Containers"):
+                web = Node("🌐 puma (web :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
+                worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.35")
+                proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
+                web - Edge(style="invis") - worker - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL")
