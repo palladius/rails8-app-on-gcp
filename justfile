@@ -60,6 +60,22 @@ build-slides:
 test-slides:
     ruby test/test_slides.rb
 
+# generate canonical GCP architecture diagram (assets/arch_diagram.png)
+diagram:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --canonical
+
+# generate progressive workshop architecture evolution frames and GIF (assets/arch_evolution.gif)
+diagram-evolution:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --evolution
+
+# generate both canonical GCP architecture diagram and evolution GIF
+diagrams:
+    cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --all
+
+# run automated tests on architecture diagrams
+test-diagrams:
+    ruby test/test_architecture_diagram.rb
+
 # generate screenshots idempotently (skips already existing screenshots, use force="true" to overwrite)
 generate-screenshots filter="" *flags:
     node workshop/screenshots/runner.js {{filter}} {{flags}}
