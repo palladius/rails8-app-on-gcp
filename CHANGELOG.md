@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
   - Added slide build and deployment into GitHub Pages (`workshop/build/slides/`, `.github/workflows/deploy-pages.yml`).
   - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
   - Added bilingual language switcher with 🇬🇧 EN and 🇮🇹 IT flags with static mirror (`index_it.html`).
-  - Added visual thumbnail previews to the portal destination cards (Codelab step preview and Slide 1 artwork).
+  - Added visual thumbnail previews to the portal destination cards with enlarged 420px previews (filling ~70% of card height) and compact typography.
+  - Reordered portal navigation cards: **1. Presentation Slides** ("Get started with Antigravity, get credits and THEN start the workshop!") and **2. Workshop Codelab** ("When you have Antigravity installed and Billing enabled for GCP, you can start this codelab!").
   - Explicitly added `git` (2.30+) to workshop prerequisites checklist and evaluation specs (`CODELAB.md`, `skeleton.yaml`, `SKELETON.md`, and landing-page READMEs).
   - Added dedicated standalone slide verification test suite (`test/test_slides.rb`, `just test-slides`) testing against HTML/div escaping leaks, overflow, and image rendering.
   - Improved Slide 2 (Antigravity download) with gray down arrow ⬇️, standalone button, and small URL caption.

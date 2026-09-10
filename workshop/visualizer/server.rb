@@ -1033,7 +1033,7 @@ __END__
     .page-container {
       max-width: 1040px;
       margin: 0 auto;
-      padding: 48px 32px 64px 32px;
+      padding: 24px 28px 24px 28px;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -1042,12 +1042,12 @@ __END__
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 32px;
-      padding-bottom: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
       border-bottom: 1px solid #edf2f7;
     }
     .brand-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: #1a73e8;
       letter-spacing: -0.3px;
@@ -1056,21 +1056,21 @@ __END__
       display: flex;
       gap: 6px;
       background: #f1f3f4;
-      padding: 4px 8px;
+      padding: 3px 6px;
       border-radius: 20px;
     }
     .lang-btn {
       text-decoration: none;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1;
-      padding: 4px 8px;
-      border-radius: 14px;
+      padding: 3px 6px;
+      border-radius: 12px;
       cursor: pointer;
       opacity: 0.55;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
     .lang-btn:hover {
       opacity: 0.9;
@@ -1086,85 +1086,89 @@ __END__
       color: #3c4043;
     }
     .hero {
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
     h1 {
-      font-size: 36px;
+      font-size: 30px;
       font-weight: 700;
       color: #1a73e8;
       letter-spacing: -0.5px;
-      margin-bottom: 14px;
+      margin-bottom: 6px;
     }
     .tagline {
-      font-size: 18px;
-      line-height: 1.6;
-      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.45;
+      color: #5f6368;
       max-width: 820px;
     }
     .destinations {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 28px;
-      margin-bottom: 48px;
+      gap: 24px;
+      margin-bottom: 20px;
       flex: 1;
     }
     @media (max-width: 720px) {
       .destinations {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 16px;
       }
       h1 {
-        font-size: 28px;
+        font-size: 24px;
       }
       .tagline {
-        font-size: 16px;
+        font-size: 14px;
       }
       .page-container {
-        padding: 24px 16px 40px 16px;
+        padding: 16px 14px 24px 14px;
+      }
+      .dest-thumb {
+        height: 260px;
       }
     }
     .btn-dest {
       display: flex;
       flex-direction: column;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      border-radius: 14px;
       text-decoration: none;
       transition: all 0.25s ease;
       background: #ffffff;
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
     .btn-dest:hover {
       border-color: #1a73e8;
-      box-shadow: 0 8px 24px rgba(26, 115, 232, 0.12);
-      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(26, 115, 232, 0.15);
+      transform: translateY(-4px);
     }
     .dest-thumb {
       width: 100%;
-      height: 180px;
+      height: 420px;
       object-fit: cover;
+      object-position: top center;
       background: #f7fafc;
       border-bottom: 1px solid #e2e8f0;
     }
     .dest-body {
-      padding: 24px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex: 0 0 auto;
     }
     .dest-title {
-      font-size: 19px;
+      font-size: 17px;
       font-weight: 700;
       color: #1a73e8;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .dest-desc {
-      font-size: 14px;
-      color: #4a5568;
-      line-height: 1.55;
+      font-size: 13px;
+      color: #5f6368;
+      line-height: 1.45;
     }
     footer {
       border-top: 1px solid #e2e8f0;
@@ -1220,25 +1224,25 @@ __END__
     </main>
 
     <section class="destinations">
-      <a href="/workshop/" class="btn-dest">
-        <img src="/assets/codelab-preview.png" alt="Workshop Codelab Preview" class="dest-thumb" onerror="this.style.display='none'" />
-        <div class="dest-body">
-          <span class="dest-title">
-            <span><%= is_it ? "Se cercavi il workshop QUI" : "Workshop Codelab" %></span>
-            <span>&rarr;</span>
-          </span>
-          <span class="dest-desc"><%= is_it ? "Guida interattiva passo dopo passo con comandi da terminale, checkpoint architetturali e telemetria live." : "Interactive step-by-step Codelab guide with terminal commands, checkpoints, and live telemetry." %></span>
-        </div>
-      </a>
-
       <a href="/slides/" class="btn-dest">
         <img src="/assets/slide1-preview.png" alt="Slide 1 Preview" class="dest-thumb" onerror="this.style.display='none'" />
         <div class="dest-body">
           <span class="dest-title">
-            <span><%= is_it ? "Se cercavi le slides QUI" : "Presentation Slides" %></span>
+            <span><%= is_it ? "1. Slide di Presentazione" : "1. Presentation Slides" %></span>
             <span>&rarr;</span>
           </span>
-          <span class="dest-desc"><%= is_it ? "Punto di partenza del workshop: kickoff, architettura concettuale e pair-programming con Google Antigravity." : "Workshop kickoff & visual entrypoint: core concepts, cloud architecture, and pair-programming with Google Antigravity." %></span>
+          <span class="dest-desc"><%= is_it ? "Inizia con Antigravity, ottieni i crediti e POI avvia il workshop!" : "Get started with Antigravity, get credits and THEN start the workshop!" %></span>
+        </div>
+      </a>
+
+      <a href="/workshop/" class="btn-dest">
+        <img src="/assets/codelab-preview.png" alt="Workshop Codelab Preview" class="dest-thumb" onerror="this.style.display='none'" />
+        <div class="dest-body">
+          <span class="dest-title">
+            <span><%= is_it ? "2. Workshop Codelab" : "2. Workshop Codelab" %></span>
+            <span>&rarr;</span>
+          </span>
+          <span class="dest-desc"><%= is_it ? "Quando hai Antigravity installato e la fatturazione abilitata su GCP, puoi iniziare questo codelab!" : "When you have Antigravity installed and Billing enabled for GCP, you can start this codelab!" %></span>
         </div>
       </a>
     </section>
