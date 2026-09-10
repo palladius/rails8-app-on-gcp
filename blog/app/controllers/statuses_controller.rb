@@ -22,6 +22,9 @@ class StatusesController < ApplicationController
     # Workshop Step Auto-Inference (0 ms)
     @workshop_step = infer_workshop_step
 
+    # Quest / Step 8 Telemetry (0 ms)
+    @quest_status = detect_quest_status
+
     # Safe Non-Secret Environment Variables Inspection
     @env_inspection = safe_env_inspection
 
@@ -52,6 +55,7 @@ class StatusesController < ApplicationController
           storage: @storage_status,
           ai: @ai_status,
           jobs: @jobs_status,
+          quest: @quest_status,
           safe_environment: @env_inspection
         }
       end
@@ -251,6 +255,33 @@ class StatusesController < ApplicationController
     titles[num] || "Step #{num}: Active Milestone"
   end
 
+  def detect_quest_status
+    raw = ENV["STEP_8_GHI"].to_s.strip
+    return { step_8_completed: false, ghi_issue: nil, ghi_url: nil } if raw.blank?
+
+    issue_id =
+      if raw =~ %r{github\.com/[^/]+/[^/]+/issues/(\d+)}
+        Regexp.last_match(1).to_i
+      elsif raw =~ /\A\d+\z/
+        raw.to_i
+      end
+
+    if issue_id && issue_id.positive?
+      canonical_url = "https://github.com/palladius/rails8-app-on-gcp/issues/#{issue_id}"
+      {
+        step_8_completed: true,
+        ghi_issue: issue_id,
+        ghi_url: canonical_url
+      }
+    else
+      {
+        step_8_completed: false,
+        ghi_issue: nil,
+        ghi_url: nil
+      }
+    end
+  end
+
   def safe_env_inspection
     # Known sensitive keys to strictly mask with asterisks
     secret_patterns = [/pass/i, /key/i, /secret/i, /token/i, /credential/i, /auth/i]
@@ -273,6 +304,7 @@ class StatusesController < ApplicationController
       ADMIN_PASSWORD
       GEMINI_API_KEY
       DATABASE_URL
+      STEP_8_GHI
     ]
 
     vars_of_interest.map do |var_name|
