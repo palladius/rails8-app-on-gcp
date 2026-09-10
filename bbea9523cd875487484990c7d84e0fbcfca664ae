@@ -1,0 +1,4 @@
+Task: Write unit tests for ProctorReviewer in workshop/hive/test/test_proctor_reviewer.rb (TDD Red)
+Summary: Added tests verifying proctor LGTM approval, non-proctor comments, absent LGTM, API failure fallback, and in-memory TTL caching.
+Files: workshop/hive/test/test_proctor_reviewer.rb
+Why: Establishes Red baseline for Hive backend proctor verification.
