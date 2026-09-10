@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   # Real-time environment and telemetry inspection for workshop professors & students
   get "status" => "statuses#show", as: :status
 
+  # Diagnostic test route deliberately raising RuntimeError to verify Cloud Error Reporting
+  get "boom" => "booms#show", as: :boom
+
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
