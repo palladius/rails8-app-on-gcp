@@ -34,7 +34,7 @@ resource "google_secret_manager_secret" "rails_master_key" {
 
 resource "google_secret_manager_secret_version" "rails_master_key" {
   secret      = google_secret_manager_secret.rails_master_key.id
-  secret_data = "dummy-key-replace-me"
+  secret_data = fileexists("${path.module}/../blog/config/master.key") ? file("${path.module}/../blog/config/master.key") : "0123456789abcdef0123456789abcdef"
 }
 
 # Admin Password

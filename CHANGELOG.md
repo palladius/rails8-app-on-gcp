@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.10] - 2026-09-10
+### Fixed
+- 🛠️ **Virgin Project Provisioning & Deploy 1 Robustness (Issue [#72](https://github.com/palladius/rails8-app-on-gcp/issues/72))**:
+  - Added explicit `google_project_service` for `run.googleapis.com` in `iac/cloudrun.tf` and `sqladmin.googleapis.com` in `iac/database.tf` to prevent cryptic Cloud Run "Internal Error code 7" on volume mounts.
+  - Updated `iac/check_gcp_setup.sh` to proactively detect and grant least-privilege roles to the Default Compute SA (`storage.admin`, `logging.logWriter`, `artifactregistry.writer`, `cloudbuild.builds.builder`) preventing `PERMISSION_DENIED` on `gcloud run deploy --source`.
+  - Updated `iac/secrets.tf` to detect local `master.key` or fallback to a valid 32-char hex string instead of invalid-length dummy text.
+  - Documented `SECRET_KEY_BASE_DUMMY=1` in `workshop/CODELAB.md` Step 3 deployment command.
+
 ## [0.2.9] - 2026-09-10
 ### Added
 - 🌐 **Workshop Landing Portal & Slides on GitHub Pages (`/slides/`, `/codelab/`)**:

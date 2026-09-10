@@ -270,12 +270,12 @@ Deploy directly from source code to Cloud Run. Google Cloud automatically detect
 # Ensure default region is set
 export GOOGLE_CLOUD_REGION="europe-west1"
 
-# Deploy single-container service from source
+# Deploy single-container service from source (with dummy key fallback if starting without credentials)
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
   --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,RAILS_MASTER_KEY=$(cat blog/config/master.key)
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1
 ```
 
 During deployment:

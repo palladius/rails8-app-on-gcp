@@ -59,6 +59,23 @@ else
   echo "     (Run: cd iac && terraform apply)"
 fi
 
+# Modern GCP projects enforce least privilege on Default Compute SA, breaking `gcloud run deploy --source`
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)" 2>/dev/null)
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+if gcloud iam service-accounts describe "$COMPUTE_SA" &>/dev/null; then
+  if gcloud projects get-iam-policy "$PROJECT_ID" --filter="bindings.members:${COMPUTE_SA}" --format="value(bindings.role)" 2>/dev/null | grep -q "roles/artifactregistry.writer"; then
+    echo "  ✅ Default Compute SA has Cloud Build deployment permissions."
+  else
+    echo "  ⚠️ Default Compute SA lacks Artifact Registry / Cloud Build permissions for 'gcloud run deploy --source'."
+    echo "     Granting required roles (storage.admin, logging.logWriter, artifactregistry.writer, cloudbuild.builds.builder)..."
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${COMPUTE_SA}" --role="roles/storage.admin" --quiet &>/dev/null || true
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${COMPUTE_SA}" --role="roles/logging.logWriter" --quiet &>/dev/null || true
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${COMPUTE_SA}" --role="roles/artifactregistry.writer" --quiet &>/dev/null || true
+    gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:${COMPUTE_SA}" --role="roles/cloudbuild.builds.builder" --quiet &>/dev/null || true
+    echo "  ✅ Granted Cloud Build deployment roles to ${COMPUTE_SA}."
+  fi
+fi
+
 echo -e "\n=== 3️⃣ Checking RAILS_MASTER_KEY (GCP & Local) ==="
 if gcloud secrets describe "rails-master-key" &>/dev/null; then
   echo "  ✅ GCP Secret 'rails-master-key' exists."
