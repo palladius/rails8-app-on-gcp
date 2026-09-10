@@ -92,4 +92,6 @@ The workshop and presentation materials are published on GitHub Pages:
 * 🚀 **Presentation Slides:** [https://palladius.github.io/rails8-app-on-gcp/slides/](https://palladius.github.io/rails8-app-on-gcp/slides/) (Kickoff, Antigravity setup, GCP credits)
 * 🛠️ **Workshop Codelab:** [https://palladius.github.io/rails8-app-on-gcp/codelab/](https://palladius.github.io/rails8-app-on-gcp/codelab/) (Interactive step-by-step guide)
 
+> 💡 *Want to know more about how this workshop was conceived, architected, and tested? Delve into the [Developer's Guide](docs/DEVELOPERS_GUIDE.md).*
+
 ![Workshop Preview](assets/workshop_preview.png)
