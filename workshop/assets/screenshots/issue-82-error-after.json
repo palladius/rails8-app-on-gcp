@@ -1,0 +1,20 @@
+{
+  "id": "issue-82-error-after",
+  "step_id": "step-8",
+  "title": "Modernized Googley/Gemini 500 Error Page",
+  "description": "Captures the modernized Google/Gemini styled 500 error card with error reporting badges and action buttons",
+  "recorded_at": "2026-09-10T13:11:03.960Z",
+  "computer_name": "derek.zrh.corp.google.com",
+  "platform": "Linux 7.1.6-1rodete1-amd64 (x64)",
+  "user": "ricc",
+  "git_commit": "c6fdeb703a330ba9af159ab5c959320dc42f99fe",
+  "git_branch": "automate_rails8_gcp_demo",
+  "app_version": "0.2.12",
+  "rails_env": "development",
+  "base_url": "http://localhost:3000",
+  "output_file": "workshop/assets/screenshots/issue-82-error-after.png",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  }
+}

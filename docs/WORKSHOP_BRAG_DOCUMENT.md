@@ -31,7 +31,12 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
                                                  • Zero-Branch "Time Machine" Progression
 ```
 
+> 📊 **Presentation Slides & Visual Pitch Decks:**
+> - **Workshop Kickoff Deck:** [`slides/index.md`](../slides/index.md) (`just slides`)
+> - **"Why is this workshop different?" Showcase Deck:** [`slides/why-different.md`](../slides/why-different.md)
+
 ---
+
 
 ## 🌟 Pillar 1: The Content — "Production-Grade Rails 8 on GCP Done RIGHT"
 
@@ -64,7 +69,21 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
 | Matz on Vespa holding Ruby in Piazza Grande | Western Matz in poncho & iconic dark glasses | Classic retro steam engine on Rails |
 | [View High-Res PNG](file:///usr/local/google/home/ricc/.gemini/antigravity/worktrees/rails8-app-on-gcp/brag_workshop_automation_narrative/eventi/20261003-modena-devfest/modena_devfest_poster_3_fellini_dolcevita_pure_art.png) · ([GitHub link](../eventi/20261003-modena-devfest/modena_devfest_poster_3_fellini_dolcevita_pure_art.png)) | [View High-Res PNG](file:///usr/local/google/home/ricc/.gemini/antigravity/worktrees/rails8-app-on-gcp/brag_workshop_automation_narrative/eventi/20261003-modena-devfest/modena_devfest_poster_2_spaghetti_western_matz_accurate.png) · ([GitHub link](../eventi/20261003-modena-devfest/modena_devfest_poster_2_spaghetti_western_matz_accurate.png)) | [View High-Res PNG](file:///usr/local/google/home/ricc/.gemini/antigravity/worktrees/rails8-app-on-gcp/brag_workshop_automation_narrative/eventi/20261003-modena-devfest/modena_devfest_poster_1_cinema_paradiso_pure_art.png) · ([GitHub link](../eventi/20261003-modena-devfest/modena_devfest_poster_1_cinema_paradiso_pure_art.png)) |
 
+### 5. Native Google Cloud Structured JSON Logging & Zero-Gem Error Reporting (Issue #82)
+- **The Problem:** Default Rails logs on Cloud Run are emitted as unstructured plain text strings (`[2c766853...] Started GET...`). They are fragmented across lines, untraceable, difficult to query, and force developers to install heavy, expensive third-party APM gems for error alerting.
+- **The Zero-Gem Cloud-Native Innovation ([Issue #82](https://github.com/palladius/rails8-app-on-gcp/issues/82)):**
+  - **Single-Line `GoogleJsonFormatter`:** Formats Rails logs as single-line JSON records mapping severities (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`), ISO8601 timestamps, and `logging.googleapis.com/trace`.
+  - **Interactive Navigable JSON Tree (`jsonPayload`):** Cloud Run automatically parses single-line JSON into structured `jsonPayload` fields (`controller`, `action`, `status`, `duration_ms`, `db_runtime_ms`, and workshop `telemetry`), allowing instant filtering and sub-millisecond query indexing.
+  - **Native Error Reporting via STDERR:** Unhandled exceptions and stack traces streamed to STDERR are natively detected, grouped, and monitored by Google Cloud Error Reporting without adding a single third-party APM gem.
+  - **Trace Correlation:** The `logging.googleapis.com/trace` key seamlessly correlates container stdout/stderr logs with Google Cloud Run HTTP request logs and Google Cloud Trace.
+
+| 🔴 Before (Unstructured Flat Text) | 🟢 After (Interactive Navigable JSON Tree & Error Reporting) |
+| :---: | :---: |
+| Flat text strings with generic severity `*` | Rich structured `jsonPayload` tree with Google Cloud badges |
+| ![Cloud Logging Before](../workshop/assets/screenshots/issue-82-cloud-logging-before.png) | ![Cloud Logging After](../workshop/assets/screenshots/issue-82-cloud-logging-after.png) |
+
 ---
+
 
 ## 🤖 Pillar 2: The Metamodel — "Automated Quality Engineering & Agent-First Design"
 
@@ -182,3 +201,6 @@ To demonstrate Nano Banana's creative capacity for local conferences (e.g. Moden
    - **Friction Logging Loop autonomo**: tramite la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab), agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**).
    - **Curriculum e Step Evals**: formalmente dichiarato in [`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md) con evaluation a 3 livelli (Shell, Ruby e LLM-as-a-judge).
    - **Screenshot Playwright 100% dichiarativi** e **Hive Leaderboard** in tempo reale via Google Form.
+3. **Observability Cloud-Native a Zero Gemme (Issue #82)**:
+   - Diciamo addio alle pesanti gemme APM di terze parti (Sentry, New Relic, Datadog): i log di Rails vengono trasformati nativamente in **JSON strutturato a riga singola (`GoogleJsonFormatter`)**.
+   - In Google Cloud Console, i log diventano un **Tree JSON Navigabile (`jsonPayload`)** con campi indicizzati e query sub-millisecondo (`controller`, `action`, `duration_ms`, `db_runtime_ms`, `telemetry.db_tier`), con correlazione automatica `logging.googleapis.com/trace` verso Cloud Trace e raggruppamento automatico degli errori su STDERR tramite **Google Cloud Error Reporting**!

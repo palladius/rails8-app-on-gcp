@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.16] - 2026-09-10
+### Added
+- 🪵 **Native Google Cloud Structured JSON Logging & STDERR Error Reporting (Issue [#82](https://github.com/palladius/rails8-app-on-gcp/issues/82))**:
+  - Implemented zero-gem `GoogleJsonFormatter` (`blog/lib/google_json_formatter.rb`) converting Rails logs to single-line structured JSON with Cloud Logging severity levels, ISO8601 timestamps, and `logging.googleapis.com/trace` context.
+  - Wired `GoogleJsonFormatter` into `blog/config/environments/production.rb` with fallback (`LOG_FORMAT=plain`) and added initializer for local testing (`LOG_FORMAT=json`).
+  - Added `CloudErrorReportingMiddleware` (`blog/config/initializers/error_reporting.rb`) piping unhandled exceptions and backtraces to `STDERR` for automated incident group clustering in Google Cloud Error Reporting.
+  - Added diagnostic test route `GET /boom` (`BoomsController`) to safely test live Cloud Error Reporting on Cloud Run.
+  - Modernized `blog/public/500.html` to Google/Gemini aesthetic guidelines with glassmorphism card, banana illustration, error reporting telemetry badges, and interactive navigation buttons.
+  - Automated high-resolution "Before" and "After" screenshot captures via Playwright (`issue82_error_before.playwright.js`, `issue82_error_after.playwright.js`) integrated into `workshop/skeleton.yaml` and runnable via `just screenshots`.
+
 ## [0.2.15] - 2026-09-10
 ### Added
 - 🏆 **Step 8 Proctor-Validated Graduation Trophy (Issue [#83](https://github.com/palladius/rails8-app-on-gcp/issues/83))**:

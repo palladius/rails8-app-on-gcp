@@ -330,6 +330,25 @@ steps:
         type: "llm"
         description: "Evaluate student's capstone quest architecture and report"
         prompt: "Review the student's chosen capstone quest implementation. Confirm it satisfies cloud security, observability, or GenAI best practices. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+    screenshots:
+      - id: "issue-82-error-before"
+        title: "Baseline Generic Rails 500 Error Page"
+        description: "Captures the default unstyled Rails 500 Internal Server Error page before modernizing to Google/Gemini aesthetic"
+        output_path: "workshop/assets/screenshots/issue-82-error-before.png"
+        script: "workshop/screenshots/issue82_error_before.playwright.js"
+        viewport:
+          width: 1280
+          height: 800
+        selector: "body"
+      - id: "issue-82-error-after"
+        title: "Modernized Googley/Gemini 500 Error Page"
+        description: "Captures the modernized Google/Gemini styled 500 error card with error reporting badges and action buttons"
+        output_path: "workshop/assets/screenshots/issue-82-error-after.png"
+        script: "workshop/screenshots/issue82_error_after.playwright.js"
+        viewport:
+          width: 1280
+          height: 800
+        selector: "body"
 
 invariants:
   - id: "inv-toolchain-integrity"
@@ -388,3 +407,4 @@ invariants:
     check: "three_tier_architecture"
     params:
       file: "blog/compose.prod.yaml"
+

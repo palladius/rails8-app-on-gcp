@@ -14,5 +14,6 @@
 - **Deployment Platform:** Google Cloud Run (Containerized via Docker)
 - **File Storage:** Google Cloud Storage (via ActiveStorage)
 - **Background Jobs & Caching:** Solid Queue, Solid Cache, and Solid Cable (using the DB backend)
+- **Observability & SRE:** Native Google Cloud Structured JSON Logging (GoogleJsonFormatter) & Google Cloud Error Reporting (zero-gem STDERR streaming)
 - **Secrets Management:** Google Secret Manager (planned for v2)
 - **Task Runner:** `just` (via justfile)
