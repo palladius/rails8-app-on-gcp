@@ -287,6 +287,10 @@ steps:
         type: "llm"
         description: "Verify student implementation of Podcastifier via Antigravity if attempted"
         prompt: "Check the deployed Cloud Run post view for a podcast generation action or audio player (e.g. 'Generate Audio Podcast' button or <audio controls>). If present, confirm it renders without 500 error and points to an audio stream. If not yet attempted by student, report skipped/optional. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+      - id: "step-7-llm-clean-ui-no-warnings"
+        type: "llm"
+        description: "Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges"
+        prompt: "Inspect the rendered post view and screenshots for Step 7. Verify that the UI exhibits zero yellow warning alert banners (such as stuck background jobs or missing worker warnings) and no ephemeral disk badges. The interface must be completely clean. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
 
   - id: "step-8"
     number: 8
@@ -309,3 +313,27 @@ steps:
         type: "llm"
         description: "Evaluate student's capstone quest architecture and report"
         prompt: "Review the student's chosen capstone quest implementation. Confirm it satisfies cloud security, observability, or GenAI best practices. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+
+invariants:
+  - id: "inv-persistent-gcs-storage"
+    from_step: 4
+    title: "GCS Persistent Storage Invariant (No Ephemeral Local Disk)"
+    description: "From Step 4 onward, media storage cannot be :local; it must use Google Cloud Storage (:google_dev or :google_prod)."
+    check: "no_local_storage"
+    params:
+      config_file: "blog/config/storage.yml"
+
+  - id: "inv-zero-stuck-background-jobs"
+    from_step: 6
+    title: "Zero Stuck Jobs Invariant (Worker Sidecar Active)"
+    description: "From Step 6 onward, Solid Queue worker must actively drain jobs. Pending background jobs cannot accumulate in queue."
+    check: "zero_stuck_jobs"
+
+  - id: "inv-cloud-sql-connected"
+    from_step: 6
+    title: "Cloud SQL Production Persistence Invariant"
+    description: "From Step 6 onward, production deployment cannot use ephemeral SQLite containers and must include Cloud SQL Auth Proxy sidecar."
+    check: "compose_has_service"
+    params:
+      service: "cloudsql-proxy"
+      file: "blog/compose.prod.yaml"

@@ -185,6 +185,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
   - `[RUBY]` Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)
   - `[LLM]` Verify student implementation of Podcastifier via Antigravity if attempted
+  - `[LLM]` Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges
 
 ---
 
@@ -203,6 +204,22 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[RUBY]` Verify IAP authentication concern exists for Quest 1
   - `[LLM]` Evaluate student's capstone quest architecture and report
+
+---
+
+## 🛡️ Cumulative Cascading Invariants (Monotonic Checks)
+
+Architectural milestones in the workshop are irreversible one-way doors. When running `just workshop-eval <N>`, all active cumulative invariants where `from_step <= N` are strictly enforced to eliminate ephemeral regressions:
+
+- **`[INV: Step 4+]` GCS Persistent Storage Invariant (No Ephemeral Local Disk)** (`inv-persistent-gcs-storage`)
+  - *Description:* From Step 4 onward, media storage cannot be :local; it must use Google Cloud Storage (:google_dev or :google_prod).
+  - *Check Rule:* `no_local_storage`
+- **`[INV: Step 6+]` Zero Stuck Jobs Invariant (Worker Sidecar Active)** (`inv-zero-stuck-background-jobs`)
+  - *Description:* From Step 6 onward, Solid Queue worker must actively drain jobs. Pending background jobs cannot accumulate in queue.
+  - *Check Rule:* `zero_stuck_jobs`
+- **`[INV: Step 6+]` Cloud SQL Production Persistence Invariant** (`inv-cloud-sql-connected`)
+  - *Description:* From Step 6 onward, production deployment cannot use ephemeral SQLite containers and must include Cloud SQL Auth Proxy sidecar.
+  - *Check Rule:* `compose_has_service`
 
 ---
 
