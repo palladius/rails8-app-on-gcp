@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.18] - 2026-09-10
+### Added
+- 🇮🇹 **DevFest Modena 2026 Premiere Date & Landing Portal Event Badge**:
+  - Updated premier workshop date to Saturday 3 October 2026 (Sala 40, 10:30-13:30, 180 min).
+  - Renamed event documentation hierarchy to `workshop/events/20261003-devfest-modena/`.
+  - Added interactive DevFest event badge to the landing page visualizer (`workshop/visualizer/server.rb`) linking directly to event briefing documentation.
+
 ## [0.2.17] - 2026-09-10
 ### Added
 - 📐 **Deterministic GCP Architecture Diagrams & Nano Banana Visual Reference (Issue [#66](https://github.com/palladius/rails8-app-on-gcp/issues/66))**:
