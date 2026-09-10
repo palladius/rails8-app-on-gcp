@@ -17,3 +17,5 @@ log/
 GEMINI.riccardo.md
 node_modules/
 .riccardo/
+*.tmp
+.tmp
