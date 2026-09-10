@@ -60,3 +60,8 @@
 
 - [x] **Track: Declarative Workshop Screenshots (Issue #42)**
 *Link: [tracks/declarative_screenshots_issue_42_20260909/index.md](tracks/declarative_screenshots_issue_42_20260909/index.md)*
+
+---
+
+- [ ] **Track: Proctor-Validated Graduation Trophy via GHI & LGTM Verification (Issue #83)**
+*Link: [tracks/proctor_graduation_trophy_issue_83_20260910/index.md](tracks/proctor_graduation_trophy_issue_83_20260910/index.md)*
