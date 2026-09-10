@@ -21,13 +21,13 @@
 
 ## Phase 3: Error Reporting STDERR Hook & Diagnostic Demo Route (`/boom`)
 
-- [~] Task: Write Failing Tests for `/boom` & Error Reporting to STDERR (Red Phase)
-    - [ ] Create test in `blog/test/controllers/boom_controller_test.rb` asserting `/boom` triggers 500 and emits formatted exception to stderr
-    - [ ] Run tests and verify they fail
-- [ ] Task: Implement `/boom` Diagnostic Endpoint & STDERR Cloud Error Reporting (Green Phase)
-    - [ ] Add `GET /boom` route in `blog/config/routes.rb` and controller action in `blog/app/controllers/boom_controller.rb`
-    - [ ] Add unhandled exception logging hook emitting exception name, message, and backtrace to `$stderr` formatted for GCP Error Reporting
-    - [ ] Run tests and verify all pass
+- [x] Task: Write Failing Tests for `/boom` & Error Reporting to STDERR (Red Phase) [9a1eed8]
+    - [x] Create test in `blog/test/controllers/boom_controller_test.rb` asserting `/boom` triggers 500 and emits formatted exception to stderr
+    - [x] Run tests and verify they fail
+- [x] Task: Implement `/boom` Diagnostic Endpoint & STDERR Cloud Error Reporting (Green Phase) [ccf9b0a]
+    - [x] Add `GET /boom` route in `blog/config/routes.rb` and controller action in `blog/app/controllers/boom_controller.rb`
+    - [x] Add unhandled exception logging hook emitting exception name, message, and backtrace to `$stderr` formatted for GCP Error Reporting
+    - [x] Run tests and verify all pass
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4: Googley 500 Error UI Modernization & "After" Brag Screenshot
