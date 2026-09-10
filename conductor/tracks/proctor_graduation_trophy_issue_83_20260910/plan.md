@@ -13,7 +13,7 @@
     - [x] Confirm all controller tests pass (Green)
 - [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md) [6d2a649]
 
-## Phase 2: Hive Backend Proctor Reviewer Engine (`workshop/hive/`)
+## Phase 2: Hive Backend Proctor Reviewer Engine (`workshop/hive/`) [checkpoint: a6fbf61]
 - [x] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red) [bbea952]
     - [x] Test proctor comment with "LGTM" returns `:lgtm_approved` and reviewer username
     - [x] Test non-proctor comment with "LGTM" returns `:review_pending`
@@ -27,15 +27,15 @@
     - [x] Match case-insensitive `\bLGTM\b` from approved proctors
     - [x] Add in-memory thread-safe cache with 120s expiration
     - [x] Confirm `test_proctor_reviewer.rb` passes (Green)
-- [~] Task: Integrate `ProctorReviewer` into `workshop/hive/lib/healthchecker.rb`
-    - [ ] Extract `quest` metadata from `/status.json`
-    - [ ] When `ghi_issue` is present, invoke `ProctorReviewer.review(ghi_issue)`
-    - [ ] Expose `quest` and `proctor_status` in telemetry payload
-    - [ ] Update existing `test_healthchecker.rb` and `test_api_leaderboard.rb`
-- [ ] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Integrate `ProctorReviewer` into `workshop/hive/lib/healthchecker.rb` [d231477]
+    - [x] Extract `quest` metadata from `/status.json`
+    - [x] When `ghi_issue` is present, invoke `ProctorReviewer.review(ghi_issue)`
+    - [x] Expose `quest` and `proctor_status` in telemetry payload
+    - [x] Update existing `test_healthchecker.rb` and `test_api_leaderboard.rb`
+- [x] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md) [a6fbf61]
 
 ## Phase 3: Hive Frontend Visualization (`workshop/hive/public/js/hive.js`)
-- [ ] Task: Update Hive student row rendering in `workshop/hive/public/js/hive.js`
+- [~] Task: Update Hive student row rendering in `workshop/hive/public/js/hive.js`
     - [ ] Check `quest` telemetry and `proctor_status`
     - [ ] When `lgtm_approved`: render progress bar as `8/8` with purple/gold glowing bar and clickable trophy 🏆 linking to `quest.ghi_url`
     - [ ] When `review_pending`: render progress bar as `7/8` with a badge `⏳ GHI #XX pending proctor review` linking to `quest.ghi_url`
