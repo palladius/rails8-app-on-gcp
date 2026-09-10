@@ -16,3 +16,6 @@
 - **Background Jobs & Caching:** Solid Queue, Solid Cache, and Solid Cable (using the DB backend)
 - **Secrets Management:** Google Secret Manager (planned for v2)
 - **Task Runner:** `just` (via justfile)
+
+## Tooling & Architecture Visualization
+- **Architecture Diagrams as Code:** Python `diagrams` (`mingrammer/diagrams`) via `uv` with official Google Cloud icons, and Pillow for evolutionary GIF rendering.
