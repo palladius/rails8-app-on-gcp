@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-09-10
+### Added
+- 🌐 **Workshop Landing Portal & Slides on GitHub Pages (`/slides/`, `/codelab/`)**:
+  - Implemented clean, minimal landing portal page at root (`/` / `index.html`) offering direct navigation between Workshop Codelab ("Se cercavi il workshop QUI") and Presentation Slides ("Se cercavi le slides QUI").
+  - Isolated multi-doc Google Codelab guide under `/codelab/`.
+  - Added slide build and deployment into GitHub Pages (`workshop/build/slides/`, `.github/workflows/deploy-pages.yml`).
+  - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
+
 ## [0.2.8] - 2026-09-09
 ### Added
 - 🎶 **Workshop Anthem & Short Clip on Final Slide (`slides/index.md`, `slides/dist/index.html`)**:

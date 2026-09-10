@@ -155,23 +155,20 @@ class CodelabServer < Sinatra::Base
     end
   end
   
-  # Main route
+  # Root Landing Portal
   get '/' do
+    erb :portal
+  end
+
+  get '/codelab' do
     target_file = if params[:doc]
                     resolve_doc_path(params[:doc])
                   elsif params[:file]
                     resolve_doc_path(params[:file])
                   else
-                    settings.default_file
+                    resolve_doc_path('codelab')
                   end
     @active_doc = current_doc_type(target_file)
-    @codelab = parse_markdown(target_file)
-    erb :index
-  end
-
-  get '/codelab' do
-    target_file = resolve_doc_path('codelab')
-    @active_doc = 'codelab'
     @codelab = parse_markdown(target_file)
     erb :index
   end
@@ -217,7 +214,7 @@ class CodelabServer < Sinatra::Base
     }.to_json
   end
 
-  # Slides endpoint
+  # Slides routes
   get '/slides/?' do
     slides_candidates = [
       File.expand_path('../../slides/dist/index.html', __dir__),
@@ -228,6 +225,21 @@ class CodelabServer < Sinatra::Base
       send_file slides_html
     else
       redirect 'http://localhost:8082/'
+    end
+  end
+
+  get '/slides/*' do |slide_path|
+    repo_root = File.expand_path('../..', __dir__)
+    candidates = [
+      File.expand_path(slide_path, File.join(repo_root, 'slides', 'dist')),
+      File.expand_path(slide_path, File.join(repo_root, 'slides'))
+    ]
+    found = candidates.find { |f| File.exist?(f) && !File.directory?(f) }
+    if found
+      send_file found
+    else
+      status 404
+      "Slide asset not found: #{slide_path}"
     end
   end
 
@@ -990,3 +1002,143 @@ __END__
   </script>
 </body>
 </html>
+
+@@portal
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rails 8 on Google Cloud — Workshop Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #202124;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .portal-card {
+      background: #ffffff;
+      border: 1px solid #dadce0;
+      border-radius: 12px;
+      max-width: 680px;
+      width: 100%;
+      padding: 40px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 12px;
+    }
+    .tagline {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #5f6368;
+      margin-bottom: 32px;
+    }
+    .destinations {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 580px) {
+      .destinations {
+        grid-template-columns: 1fr;
+      }
+    }
+    .btn-dest {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      background: #ffffff;
+    }
+    .btn-dest:hover {
+      border-color: #1a73e8;
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.12);
+      transform: translateY(-2px);
+    }
+    .dest-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 6px;
+    }
+    .dest-desc {
+      font-size: 13px;
+      color: #5f6368;
+      line-height: 1.4;
+    }
+    .secondary-links {
+      border-top: 1px solid #f1f3f4;
+      padding-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #5f6368;
+    }
+    .secondary-links .internal-refs {
+      font-size: 11px;
+      color: #80868b;
+    }
+    .secondary-links .internal-refs a {
+      color: #80868b;
+      text-decoration: none;
+    }
+    .secondary-links .internal-refs a:hover {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+    .secondary-links .repo-link a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+    .secondary-links .repo-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="portal-card">
+    <h1>Rails 8 on Google Cloud</h1>
+    <p class="tagline">
+      A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI.
+    </p>
+
+    <div class="destinations">
+      <a href="/codelab" class="btn-dest">
+        <span class="dest-title">Se cercavi il workshop QUI &rarr;</span>
+        <span class="dest-desc">Interactive step-by-step Codelab guide with terminal commands, checkpoints, and architecture notes.</span>
+      </a>
+
+      <a href="/slides/" class="btn-dest">
+        <span class="dest-title">Se cercavi le slides QUI &rarr;</span>
+        <span class="dest-desc">Marp presentation slide deck with kickoff visuals, concepts, and workshop anthem.</span>
+      </a>
+    </div>
+
+    <div class="secondary-links">
+      <span class="internal-refs"><small style="font-size: 10px;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
+      <span class="repo-link"><a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener">GitHub Repository &rarr;</a></span>
+    </div>
+  </div>
+</body>
+</html>
+

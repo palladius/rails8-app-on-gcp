@@ -83,6 +83,11 @@ style: |
 # Rails 8 on Google Cloud 🚀
 ### Workshop Kickoff & Pair Programming with Google Antigravity
 
+<div style="position: absolute; top: 32px; right: 48px; text-align: center; background: white; padding: 6px 8px 4px 8px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+  <img src="images/slides-qr.png" style="width: 82px; height: 82px; display: block;" alt="Slides QR Code" />
+  <span style="font-size: 0.42em; color: #5f6368; font-weight: bold; display: block; margin-top: 2px;">📱 Slides Link</span>
+</div>
+
 <div style="text-align: center; margin: 10px 0;">
   <img src="images/slide1-style1-pixar.png" style="max-height: 330px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
 </div>
