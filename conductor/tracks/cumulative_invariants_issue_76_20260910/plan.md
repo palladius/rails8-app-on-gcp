@@ -17,13 +17,13 @@
 
 ## Phase 2: Ruby Invariant Engine Implementation (`bin/workshop_eval.rb`)
 
-- [ ] Task: Implement the Invariant Engine with an elegant, idiomatic Ruby design
-  - [ ] Create `lib/workshop_eval/invariant_checker.rb` implementing modular rule evaluation for `no_local_storage`, `zero_stuck_jobs`, `compose_has_service`, and `ruby_code`
-  - [ ] Ensure non-blocking offline resilience and fast timeouts (< 5s) adhering to `docs/CONSTITUTION.md`
-  - [ ] Update `bin/workshop_eval.rb` to load invariants and evaluate all active invariants where `from_step <= current_step_number`
-  - [ ] Implement colorized visual formatting with `🛡️  Verifying Cumulative Invariants (Active for Steps 1 -> N):` and `[INV: Step X+]` badges
-  - [ ] Add regression alert emission upon invariant failure with clear diagnostic explanations
-  - [ ] Run `test/test_workshop_invariants.rb` and verify all tests pass
+- [x] Task: Implement the Invariant Engine with an elegant, idiomatic Ruby design (3427b55)
+  - [x] Create `lib/workshop_eval/invariant_checker.rb` implementing modular rule evaluation for `no_local_storage`, `zero_stuck_jobs`, `compose_has_service`, and `ruby_code`
+  - [x] Ensure non-blocking offline resilience and fast timeouts (< 5s) adhering to `docs/CONSTITUTION.md`
+  - [x] Update `bin/workshop_eval.rb` to load invariants and evaluate all active invariants where `from_step <= current_step_number`
+  - [x] Implement colorized visual formatting with `🛡️  Verifying Cumulative Invariants (Active for Steps 1 -> N):` and `[INV: Step X+]` badges
+  - [x] Add regression alert emission upon invariant failure with clear diagnostic explanations
+  - [x] Run `test/test_workshop_invariants.rb` and verify all tests pass
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Visualizer, Tooling & End-to-End Verification
