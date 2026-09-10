@@ -1,0 +1,4 @@
+Task: Implement detect_quest_status in blog/app/controllers/statuses_controller.rb (TDD Green)
+Summary: Added detect_quest_status helper to parse STEP_8_GHI environment variable (numeric string or full GitHub issue URL) and emit quest object in /status.json. Added STEP_8_GHI to safe_env_inspection.
+Files: blog/app/controllers/statuses_controller.rb
+Why: Fulfills Rails telemetry requirement of Issue #83.
