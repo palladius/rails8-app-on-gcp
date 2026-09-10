@@ -319,3 +319,12 @@ steps:
           width: 1280
           height: 800
         selector: "body"
+      - id: "issue-82-error-after"
+        title: "Modernized Googley/Gemini 500 Error Page"
+        description: "Captures the modernized Google/Gemini styled 500 error card with error reporting badges and action buttons"
+        output_path: "workshop/assets/screenshots/issue-82-error-after.png"
+        script: "workshop/screenshots/issue82_error_after.playwright.js"
+        viewport:
+          width: 1280
+          height: 800
+        selector: "body"
