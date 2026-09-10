@@ -1,12 +1,12 @@
 # Implementation Plan: Proctor-Validated Step 8 Graduation Trophy via GHI & LGTM Verification
 
 ## Phase 1: Rails Telemetry (`StatusesController` & `STEP_8_GHI` Quest Object)
-- [ ] Task: Write failing tests for `STEP_8_GHI` in `blog/test/controllers/statuses_controller_test.rb` (TDD Red)
-    - [ ] Add test for `STEP_8_GHI="83"` emitting integer `83` and canonical issue URL
-    - [ ] Add test for `STEP_8_GHI="https://github.com/palladius/rails8-app-on-gcp/issues/83"` parsing correctly
-    - [ ] Add test for missing / nil `STEP_8_GHI` emitting `step_8_completed: false`
-    - [ ] Confirm tests fail (Red)
-- [ ] Task: Implement `detect_quest_status` in `blog/app/controllers/statuses_controller.rb` (TDD Green)
+- [x] Task: Write failing tests for `STEP_8_GHI` in `blog/test/controllers/statuses_controller_test.rb` (TDD Red) [6d5ea91]
+    - [x] Add test for `STEP_8_GHI="83"` emitting integer `83` and canonical issue URL
+    - [x] Add test for `STEP_8_GHI="https://github.com/palladius/rails8-app-on-gcp/issues/83"` parsing correctly
+    - [x] Add test for missing / nil `STEP_8_GHI` emitting `step_8_completed: false`
+    - [x] Confirm tests fail (Red)
+- [~] Task: Implement `detect_quest_status` in `blog/app/controllers/statuses_controller.rb` (TDD Green)
     - [ ] Parse `ENV['STEP_8_GHI']` for integer ID or regex match against github issue URL
     - [ ] Expose `quest` object in `/status.json` with `step_8_completed`, `ghi_issue`, `ghi_url`
     - [ ] Add `STEP_8_GHI` to `safe_env_inspection` list
