@@ -20,6 +20,12 @@ The process is going to look like:
 * **`assets/*.jpg` (Source of Truth)** $\to$ copied to `../blog/app/assets/images/` and `build/assets/`
 * ⚠️ **RULE:** NEVER edit generated HTML (`build/*.html`). Always modify the Markdown source of truth!
 
+## 📅 Workshop Events Directory (`workshop/events/YYYYMMDD-EVENT_NAME/`)
+
+Specific workshop editions and conference deliveries are organized under `workshop/events/YYYYMMDD-EVENT_NAME/`:
+- Contains event-specific readmes, schedules, links to live deployed slides, and conference retrospectives.
+- Premiere event: `workshop/events/20261002-devfest-modena/`.
+
 ---
 
 ## 🧭 Zero-Branch Progression Architecture (Rewind & Uplift Directives)

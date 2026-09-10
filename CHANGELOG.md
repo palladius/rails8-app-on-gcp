@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
   - Isolated multi-doc Google Codelab guide under `/codelab/`.
   - Added slide build and deployment into GitHub Pages (`workshop/build/slides/`, `.github/workflows/deploy-pages.yml`).
   - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
+  - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
 
 ## [0.2.8] - 2026-09-09
 ### Added
