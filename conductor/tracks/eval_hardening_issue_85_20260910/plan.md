@@ -57,10 +57,10 @@ This plan implements semantic YAML parsing, negative testing, header warning tes
 
 ## Phase 5: Verification, Versioning & Review
 
-- [ ] Task: Run full verification suite
-  - [ ] Run `just test`.
-  - [ ] Run `just workshop-eval all`.
-- [ ] Task: Version bump & documentation
-  - [ ] Update `VERSION` to `0.2.14`.
-  - [ ] Update `CHANGELOG.md` with Issue #85 summary.
-- [ ] Task: Phase 5 Verification & Final Review
+- [x] Task: Run full verification suite
+  - [x] Run `just test`.
+  - [x] Run `just workshop-eval all`.
+- [x] Task: Version bump & documentation
+  - [x] Update `VERSION` to `0.2.14`.
+  - [x] Update `CHANGELOG.md` with Issue #85 summary.
+- [x] Task: Phase 5 Verification & Final Review

@@ -1,5 +1,19 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.14] - 2026-09-10
+### Added
+- 🛡️ **Hardened Workshop Evaluations, Negative Testing & Header Warning Mappings (Issue [#85](https://github.com/palladius/rails8-app-on-gcp/issues/85))**:
+  - **Header Alerts Test Suite**: Created comprehensive integration test suite `blog/test/integration/workshop_alerts_test.rb` mapping all top-left header educational warnings (`_ephemeral_database` for SQL, `_ephemeral_storage` for Storage, `_ai_status` for AI, and kill-switch `DISABLE_WORKSHOP_ALERTS`).
+  - **Semantic YAML Invariant Engine**: Refactored `WorkshopEval::InvariantChecker` from string grepping to semantic `YAML.safe_load` with ERB comment stripping.
+  - **Negative Regression Test Suite**: Built automated test suite in `test/test_workshop_invariants.rb` proving that broken topologies, local storage reversions, missing tools, and broken code trigger `REGRESSION ALERT` and exit code `1`.
+  - **Additional Cumulative Invariants**: Added 4 new approved monotonic invariants:
+    - `inv-toolchain-integrity` (`from_step: 0`): Ultra-fast (< 10ms) PATH lookup for `git`, `gcloud`, `docker`, `terraform`, `ruby >= 3.3`, `just`.
+    - `inv-database-migrations-current` (`from_step: 2`): Schema currency check ensuring 0 pending migrations.
+    - `inv-admin-user-seeded` (`from_step: 2`): Bootstrapped admin user check.
+    - `inv-three-tier-architecture` (`from_step: 6`): Production compose definition check ensuring `web`, `worker`, `cloudsql-proxy`.
+  - **Step 7 Deterministic UI Assertion**: Added `step-7-ruby-clean-ui-deterministic` verifying absence of warning alerts, stuck jobs, and ephemeral badges.
+  - **Permissive Crutches Removal**: Replaced `|| true` in shell evaluations with intelligent offline environment guards (`test -z "$GOOGLE_CLOUD_PROJECT"`).
+
 ## [0.2.13] - 2026-09-10
 ### Added
 - 🛡️ **Cumulative Cascading Invariants Engine (Issue [#76](https://github.com/palladius/rails8-app-on-gcp/issues/76))**:
