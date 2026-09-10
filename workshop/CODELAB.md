@@ -1,40 +1,48 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.0.1alpha -->
+<!-- 🏷️ Codelab Version: 2.1.0 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
-## Introduction
+## Introduction 2.1.0
 
 *Duration: 5min*
 
+<!--
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
+-->
 
-Welcome to the **Rails 8 on Google Cloud** workshop (v2.0.1alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
+Welcome to the [**Rails 8**](https://rubyonrails.org/2024/11/7/rails-8-no-paas-required) **on Google Cloud** workshop (v2.0.1alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
-This curriculum is structured around the **3 Progressive Cloud Run Deployments**, the **Zero-Branch Time-Machine** progression model, and AI pair programming with **Google Antigravity**:
-1. **Deploy 1 (Step 3 - The Stateless Shock):** Deploy a single container with local SQLite to experience serverless statelessness first-hand in under 3 minutes.
-2. **Deploy 2 (Step 4 - GCS Persistent Storage):** Wire ActiveStorage to Google Cloud Storage with private IAM Credentials blob signing (`iam: true`) and observe the POLA stuck jobs warning banner.
-3. **Deploy 3 (Step 6 - Gold Standard Multi-Container Sidecars):** Deploy the canonical production architecture with Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar containers connecting to managed PostgreSQL.
+In this workshop we don't just deploy an app — we execute an **opinionated, production-grade cloud modernization** (*lift-and-shift done right!*).
+
+You start from the typical *"works on my machine"* local setup (ephemeral disk, embedded SQLite, in-process jobs) and progressively evolve it into an **enterprise, bulletproof cloud architecture** on Google Cloud:
+
+1. 🐘 **From Local SQLite → Enterprise Cloud SQL (PostgreSQL):**
+   Say goodbye to locked DB files and ephemeral container restarts. We graduate to fully managed PostgreSQL, secured with **Cloud SQL Auth Proxy** over mutual TLS (mTLS) — zero public IP exposure, zero firewall headaches, and IAM-authenticated database governance.
+
+2. 🪣 **From Ephemeral Local Storage → Scalable, Private Google Cloud Storage (GCS):**
+   Local files vanish into thin air the moment a serverless container scales to zero. We migrate ActiveStorage to private, highly durable GCS buckets secured with **IAM Credential blob signing (`iam: true`)** — zero dangerous public buckets, zero leaked Service Account JSON keys!
+
+3. 🚀 **From Monolithic In-Process Jobs → Dedicated Multi-Container Sidecars on Cloud Run:**
+   Running background workers inside your web process steals valuable request threads. We elevate Rails 8 [**Solid Queue**](https://github.com/rails/solid_queue) into a dedicated worker container running alongside Puma in a [**Cloud Run multi-container pod**](https://docs.cloud.google.com/run/docs/deploy-run-compose) — seamless horizontal scaling, instant job processing, and zero web thread starvation!
+
+🍌 *And because we live in 2026, we supercharge the whole stack with [**Google Antigravity**](https://antigravity.google/download) and Vertex AI GenAI pipelines running in the background!*
 
 ### What you'll learn
-- How to pair-program with Google Antigravity to demystify Rails 8 and Google Cloud.
-- How to run automated pre-flight diagnostics (`just workshop-test`) and test stages in isolated clones (`just workshop-uat`).
-- How to transition configurations seamlessly without branch confusion using `just workshop-rewind` and `just workshop-restore-gold`.
-- How to provision Google Cloud infrastructure asynchronously using Terraform while continuing local development without blocking.
-- How to eliminate security anti-patterns: private GCS buckets (`iam: true`) and Cloud SQL Auth Proxy mTLS tunnels instead of opening `0.0.0.0/0`.
-- How to inject secrets directly from Google Cloud Secret Manager.
+- How to pair-program with [**Google Antigravity**](https://antigravity.google/download) to demystify Rails 8 and [**Google Cloud**](https://cloud.google.com/).
+- How to run automated pre-flight diagnostics (`just workshop-test`).
+- How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [google](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
+- How to eliminate security anti-patterns: private [**GCS buckets**](https://cloud.google.com/storage) (`iam: true`) and [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) mTLS tunnels instead of opening `0.0.0.0/0`.
+- How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
 - How to orchestrate asynchronous GenAI background jobs (NanoBanana cover generator, bilingual podcast synthesis) via Solid Queue.
 
-> 🐝 **Live Workshop Telemetry & Leaderboard**  
-> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
-> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)  
+> 🐝 **Live Workshop Telemetry & Leaderboard**
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:
+> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 > *(Puoi registrarti fin da subito o appena completi il primo deploy su Cloud Run nello Step 3!)*
 
 Let's get started!
 
-> 🦖 **DEV TELEMETRY & WORKSHOP TRACKING:**  
-> **Workshop Curriculum:** `v2.0.1alpha` (Release `v0.2.8`) | **Git Branch:** `fix-podcastifier-as-workshop-quest-v200`  
-> ⚠️ *Riccardo ricordati di toglierlo prima di Modena!* Segnatevi questo commit hash nel Friction Log per correlare i test.
 
 ## Step 0: Prerequisites, Antigravity Setup & Billing Verification
 
@@ -70,7 +78,7 @@ gcloud config set project $GOOGLE_CLOUD_PROJECT
 gcloud config set compute/region europe-west1
 ```
 
-> 💡 **Why a Dedicated Configuration?**  
+> 💡 **Why a Dedicated Configuration?**
 > Using `gcloud config configurations create rails8-on-gcp-workshop` isolates all CLI settings (account, quota project, default region) specifically for this workshop. When you finish, you can switch back to your normal setup anytime with `gcloud config configurations activate default`.
 
 ![Active gcloud configuration](assets/images/gcloud_config_configurations_list.png)
@@ -259,7 +267,7 @@ To guarantee that our starting configuration is 100% ephemeral (local SQLite dat
 just workshop-rewind 1
 ```
 
-> 💡 **What just happened?**  
+> 💡 **What just happened?**
 > `workshop-rewind 1` applied the `stage-1-stateless` configuration overlay to `blog/config/` without leaving the `main` branch. Your app is configured with SQLite on container disk and ActiveStorage on local filesystem.
 
 ### 2. Deploying Single-Container Puma to Cloud Run
@@ -295,8 +303,8 @@ Open the generated Cloud Run URL in your browser!
    - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
    - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
 
-> 🐝 **Join the Live Workshop Hive Leaderboard!**  
-> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:  
+> 🐝 **Join the Live Workshop Hive Leaderboard!**
+> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:
 > 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
@@ -307,7 +315,7 @@ Cloud Run is a **stateless, serverless platform**. When web traffic drops to zer
 
 #### The First Hint: Stuck Jobs Banner
 When you create a post or attach an image in a single-container deployment, Rails enqueues ActiveJob tasks (like image dimension analysis or metadata indexing). But since nobody is running a background worker, you will see the warning banner:
-> ⚠️ **Notice: background jobs currently pending execution.**  
+> ⚠️ **Notice: background jobs currently pending execution.**
 > *Solid Queue worker is not running in this single-container deployment.*
 
 #### The Tempting Fix: Running Solid Queue inside Puma
@@ -324,13 +332,13 @@ gcloud run services update blog \
 
 Now, go back to your browser and **refresh the page**:
 
-💥 **The Stateless Shock:**  
+💥 **The Stateless Shock:**
 1. **The Good News:** The Solid Queue worker is now active inside Puma! Any new jobs get drained immediately.
-2. **The Cold Shower (The Catch!):**  
+2. **The Cold Shower (The Catch!):**
    - Because Cloud Run deployed a new revision, the previous container instance was replaced!
    - The article you wrote and the SQLite database file on disk **were completely wiped out**!
    - You see the pedagogical in-app alert banner:
-     > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**  
+     > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**
      > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
 3. **The Architectural Lesson:** Running background workers inside Puma consumes precious web thread CPU/RAM, and *still does not solve persistence*.
 
@@ -374,7 +382,7 @@ google:
   iam: true  # Sign URLs via IAM Credentials signBlob API (zero private key JSON files required!)
 ```
 
-> 💡 **Design Decision — Why `iam: true` instead of `public: true`?**  
+> 💡 **Design Decision — Why `iam: true` instead of `public: true`?**
 > Making a bucket public (`allUsers:objectViewer`) is a hazardous security anti-pattern. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
 
 ![GCS IAM Signing Architecture](assets/images/gcs_iam_signing_diagram.jpg)
@@ -436,7 +444,7 @@ However, Cloud Run is currently running only **one single web container** (`puma
 
 Look at the top of your blog page: you will see a bright warning banner rendered by `blog/app/views/layouts/_check_stuck_jobs.html.erb`:
 
-> ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**  
+> ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**
 > *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
 
 <!-- workshop-screenshot: id="step-4-gcs-stuck-jobs-warning" -->
@@ -635,8 +643,8 @@ In this hands-on workshop exercise, you pair program with **Google Antigravity**
 > - 🇮🇹 [Italian Overview (`it-IT-Wavenet-A`)](assets/audio/podcastifier_italian_overview.mp3)
 > - 🇬🇧 [English Overview (`en-US-Wavenet-D`)](assets/audio/podcastifier_english_overview.mp3)
 
-> 💡 **Reference Implementation Branch:**  
-> If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:  
+> 💡 **Reference Implementation Branch:**
+> If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:
 > [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier) (`git checkout solutions/podcastifier`).
 
 ### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)

@@ -61,7 +61,7 @@ def parse_markdown(file_path)
     
     steps << {
       title: title,
-      content: "## " + title + "\n" + body
+      content: body
     }
   end
   
