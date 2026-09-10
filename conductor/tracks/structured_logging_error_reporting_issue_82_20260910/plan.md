@@ -10,13 +10,13 @@
 
 ## Phase 2: Native Google Cloud JSON Logging Formatter
 
-- [ ] Task: Write Failing Unit Tests for GoogleJsonFormatter (Red Phase)
-    - [ ] Create `blog/test/lib/google_json_formatter_test.rb` validating JSON structure, severity mapping, timestamp formatting, trace ID injection, and nil/binary handling
-    - [ ] Run `bin/rails test test/lib/google_json_formatter_test.rb` and verify tests fail
-- [ ] Task: Implement GoogleJsonFormatter (Green Phase)
-    - [ ] Implement `GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter` in `blog/lib/google_json_formatter.rb`
-    - [ ] Configure `config.logger` in `blog/config/environments/production.rb` and allow activation in any environment via `LOG_FORMAT=json`
-    - [ ] Run tests and verify 100% pass
+- [x] Task: Write Failing Unit Tests for GoogleJsonFormatter (Red Phase) [77ff44a]
+    - [x] Create `blog/test/lib/google_json_formatter_test.rb` validating JSON structure, severity mapping, timestamp formatting, trace ID injection, and nil/binary handling
+    - [x] Run `bin/rails test test/lib/google_json_formatter_test.rb` and verify tests fail
+- [x] Task: Implement GoogleJsonFormatter (Green Phase) [8ed7482]
+    - [x] Implement `GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter` in `blog/lib/google_json_formatter.rb`
+    - [x] Configure `config.logger` in `blog/config/environments/production.rb` and allow activation in any environment via `LOG_FORMAT=json`
+    - [x] Run tests and verify 100% pass
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Error Reporting STDERR Hook & Diagnostic Demo Route (`/boom`)
