@@ -1,0 +1,1 @@
+Phase 3: Negative Regression Testing Suite. Created automated tests in test/test_workshop_invariants.rb proving that broken compose topolgies, local storage configurations, missing tools, and broken code raise actionable REGRESSION ALERT messages and cause exit code 1.
