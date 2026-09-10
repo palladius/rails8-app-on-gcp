@@ -1,0 +1,1 @@
+Task: Write unit tests for cumulative invariants schema and runner logic. Created test/test_workshop_invariants.rb and updated test/test_workshop_skeleton.rb to establish TDD Red phase.
