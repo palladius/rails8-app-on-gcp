@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
   - Integrated Gemini 3 Pro Image (Nano Banana Pro) architecture diagrams: Variant 1 (Flat Vector Enterprise `assets/nanobanana_arch_flat.png`) as Page 1 hero visual in Codelab and Skeleton, and Variant 2 (Isometric 3D `assets/nanobanana_arch_isometric.png`).
   - Added `just diagrams`, `just diagram`, `just diagram-evolution`, `just nanobanana`, and `just test-diagrams` (`test/test_architecture_diagram.rb`).
 
+### Fixed
+- 🪣 **ACTIVE_STORAGE_SERVICE Environment Injection & Workshop Compatibility (Issue [#91](https://github.com/palladius/rails8-app-on-gcp/issues/91))**:
+  - Made `blog/config/environments/production.rb` dynamically respect `ENV["ACTIVE_STORAGE_SERVICE"]` (defaulting to `:google_prod`), allowing Cloud Run deployments with `--set-env-vars ACTIVE_STORAGE_SERVICE=...` to take effect in production.
+  - Added service alias `google:` in `blog/config/storage.yml` (and `workshop/time-machine/stage-2-gcs/blog/config/storage.yml`) aliasing `google_prod`, ensuring full backwards and forward compatibility with workshop codelab instructions and CLI commands.
+  - Updated time-machine stage 2 production configuration to match.
+
 ## [0.2.16] - 2026-09-10
 ### Added
 - 🪵 **Native Google Cloud Structured JSON Logging & STDERR Error Reporting (Issue [#82](https://github.com/palladius/rails8-app-on-gcp/issues/82))**:

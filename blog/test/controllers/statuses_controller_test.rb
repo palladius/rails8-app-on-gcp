@@ -74,4 +74,12 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
       ENV["STEP_8_GHI"] = old_val if old_val
     end
   end
+
+  test "storage configuration defines google_prod and google alias" do
+    storage_config = YAML.safe_load(ERB.new(File.read(Rails.root.join("config/storage.yml"))).result, aliases: true)
+    assert storage_config["google_prod"].present?, "Expected google_prod to be defined in storage.yml"
+    assert storage_config["google"].present?, "Expected google alias to be defined in storage.yml"
+    assert_equal "GCS", storage_config["google"]["service"]
+    assert_equal storage_config["google_prod"]["bucket"], storage_config["google"]["bucket"]
+  end
 end
