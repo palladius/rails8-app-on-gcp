@@ -46,8 +46,8 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
 
 ## 👥 Key Personas
 
-- **Riccardo:** Supreme Leader and pun-master 🦖
-- **Emiliano:** Al Mudnais cal'scorda i symlink 🍝🏎️
+- **Riccardo:** Supreme Leader and pun-master 🦖 (GitHub: `@palladius`)
+- **Emiliano:** Al Mudnais cal'scorda i symlink 🍝🏎️ (GitHub: `@emilianodellacasa`)
 
 ---
 

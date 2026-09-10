@@ -8,7 +8,7 @@ require "shellwords"
 
 module WorkshopHive
   class Healthchecker
-    DEFAULT_TIMEOUT = 2.0 # Secondi max per ping /up e /status
+    DEFAULT_TIMEOUT = 4.0 # Secondi max per ping /up e /status
 
     @results_cache = {}
     @cache_mutex = Mutex.new

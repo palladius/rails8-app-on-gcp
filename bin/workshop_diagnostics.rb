@@ -180,12 +180,18 @@ else
 
   # Check Billing Enabled (MANDATORY GATE!)
   print "   🔍 Verifying GCP Billing status... "
-  billing_cmd = "gcloud beta billing projects describe #{project_id} #{gcloud_flags_str} --format='value(billingEnabled)' 2>/dev/null"
-  billing_enabled, _stderr, status = Open3.capture3(billing_cmd)
+  billing_cmd = "gcloud beta billing projects describe #{project_id} #{gcloud_flags_str} --format='value(billingEnabled)'"
+  billing_enabled, billing_err, status = Open3.capture3(billing_cmd)
   billing_status = billing_enabled.strip.downcase
 
   if status.success? && billing_status == "true"
     puts "ACTIVE (Billing is linked!)".green
+  elsif billing_err.include?("cloudbilling.googleapis.com") || billing_err.include?("API [cloudbilling.googleapis.com] not enabled")
+    puts "API DISABLED".yellow
+    puts "⚠️  [WARNING] 'cloudbilling.googleapis.com' API is not enabled on project '#{project_id}'!".yellow
+    puts "   👉 Run this command to enable it:"
+    puts "      gcloud services enable cloudbilling.googleapis.com --project=#{project_id}"
+    warnings_count += 1
   else
     puts "INACTIVE or ACCESS DENIED".red
     puts "❌ [ERROR] GCP Billing is NOT enabled on project '#{project_id}'!".red
@@ -239,6 +245,24 @@ if project_id && !project_id.empty? && project_id != "(unset)"
     end
   else
     puts "ℹ️  GCS Bucket gs://#{bucket_dev} not yet created (normal before Step 1 terraform apply)".cyan
+  end
+end
+
+puts "\n--- 📸 4b. Declarative Screenshots Verification ---".bold
+skeleton_yaml = File.expand_path("../workshop/skeleton.yaml", __dir__)
+if File.exist?(skeleton_yaml)
+  runner_path = File.expand_path("../workshop/screenshots/runner.js", __dir__)
+  if File.exist?(runner_path)
+    stdout, stderr, status = Open3.capture3("node", runner_path, "--dry-run")
+    if status.success?
+      puts "✅ Declarative screenshot specs and scripts verified".green
+    else
+      puts "❌ Screenshot verification failed:\n#{stderr}".red
+      errors_count += 1
+    end
+  else
+    puts "⚠️  workshop/screenshots/runner.js not found".yellow
+    warnings_count += 1
   end
 end
 

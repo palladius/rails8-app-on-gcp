@@ -147,33 +147,37 @@ class CodelabServer < Sinatra::Base
       base = File.basename(file_path).downcase
       if base.include?('constitution')
         'constitution'
-      elsif base.include?('skeleton')
-        'skeleton'
       else
         'codelab'
       end
     end
+
+    def serve_codelab
+      target_file = if params[:doc]
+                      resolve_doc_path(params[:doc])
+                    elsif params[:file]
+                      resolve_doc_path(params[:file])
+                    else
+                      resolve_doc_path('codelab')
+                    end
+      @active_doc = current_doc_type(target_file)
+      @codelab = parse_markdown(target_file)
+      erb :index
+    end
   end
   
-  # Main route
+  # Root Landing Portal
   get '/' do
-    target_file = if params[:doc]
-                    resolve_doc_path(params[:doc])
-                  elsif params[:file]
-                    resolve_doc_path(params[:file])
-                  else
-                    settings.default_file
-                  end
-    @active_doc = current_doc_type(target_file)
-    @codelab = parse_markdown(target_file)
-    erb :index
+    @lang = (params[:lang] || 'en').to_s.downcase == 'it' ? 'it' : 'en'
+    erb :portal
   end
 
   get '/codelab' do
-    target_file = resolve_doc_path('codelab')
-    @active_doc = 'codelab'
-    @codelab = parse_markdown(target_file)
-    erb :index
+    serve_codelab
+  end
+
+  get '/workshop/?' do
+    serve_codelab
   end
 
   get '/constitution' do
@@ -217,7 +221,7 @@ class CodelabServer < Sinatra::Base
     }.to_json
   end
 
-  # Slides endpoint
+  # Slides routes
   get '/slides/?' do
     slides_candidates = [
       File.expand_path('../../slides/dist/index.html', __dir__),
@@ -228,6 +232,21 @@ class CodelabServer < Sinatra::Base
       send_file slides_html
     else
       redirect 'http://localhost:8082/'
+    end
+  end
+
+  get '/slides/*' do |slide_path|
+    repo_root = File.expand_path('../..', __dir__)
+    candidates = [
+      File.expand_path(slide_path, File.join(repo_root, 'slides', 'dist')),
+      File.expand_path(slide_path, File.join(repo_root, 'slides'))
+    ]
+    found = candidates.find { |f| File.exist?(f) && !File.directory?(f) }
+    if found
+      send_file found
+    else
+      status 404
+      "Slide asset not found: #{slide_path}"
     end
   end
 
@@ -990,3 +1009,250 @@ __END__
   </script>
 </body>
 </html>
+
+@@portal
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rails 8 on Google Cloud — Workshop Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: #ffffff;
+      color: #202124;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .page-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 28px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a73e8;
+      letter-spacing: -0.3px;
+    }
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+      background: #f1f3f4;
+      padding: 3px 6px;
+      border-radius: 20px;
+    }
+    .lang-btn {
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1;
+      padding: 3px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      opacity: 0.55;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .lang-btn:hover {
+      opacity: 0.9;
+    }
+    .lang-btn.active {
+      opacity: 1;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .lang-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #3c4043;
+    }
+    .hero {
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #1a73e8;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .tagline {
+      font-size: 15px;
+      line-height: 1.45;
+      color: #5f6368;
+      max-width: 820px;
+    }
+    .destinations {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    @media (max-width: 720px) {
+      .destinations {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .tagline {
+        font-size: 14px;
+      }
+      .page-container {
+        padding: 16px 14px 24px 14px;
+      }
+      .dest-thumb {
+        height: 260px;
+      }
+    }
+    .btn-dest {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      background: #ffffff;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .btn-dest:hover {
+      border-color: #1a73e8;
+      box-shadow: 0 10px 30px rgba(26, 115, 232, 0.15);
+      transform: translateY(-4px);
+    }
+    .dest-thumb {
+      width: 100%;
+      height: 420px;
+      object-fit: cover;
+      object-position: top center;
+      background: #f7fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .dest-body {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 auto;
+    }
+    .dest-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a73e8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dest-desc {
+      font-size: 13px;
+      color: #5f6368;
+      line-height: 1.45;
+    }
+    footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #718096;
+      margin-top: auto;
+    }
+    footer .internal-refs a {
+      color: #a0aec0;
+      text-decoration: none;
+      margin-left: 4px;
+    }
+    footer .internal-refs a:hover {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+    footer .repo-link a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    footer .repo-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <% is_it = (@lang == 'it') %>
+  <div class="page-container">
+    <header class="top-nav">
+      <div class="brand-title">Google Cloud &middot; Rails 8</div>
+      <div class="lang-switcher">
+        <a href="?lang=en" class="lang-btn <%= !is_it ? 'active' : '' %>" title="English">
+          <span>🇬🇧</span>
+          <span class="lang-text">EN</span>
+        </a>
+        <a href="?lang=it" class="lang-btn <%= is_it ? 'active' : '' %>" title="Italiano">
+          <span>🇮🇹</span>
+          <span class="lang-text">IT</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="hero">
+      <h1>Rails 8 on Google Cloud</h1>
+      <p class="tagline">
+        <%= is_it ? "Architettura di riferimento cloud-native e workshop interattivo per rilasciare Ruby on Rails 8 su Google Cloud Platform con Cloud Run, Cloud SQL e Gemini AI." : "A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI." %>
+      </p>
+    </main>
+
+    <section class="destinations">
+      <a href="/slides/" class="btn-dest">
+        <img src="/assets/slide1-preview.png" alt="Slide 1 Preview" class="dest-thumb" onerror="this.style.display='none'" />
+        <div class="dest-body">
+          <span class="dest-title">
+            <span><%= is_it ? "1. Slide di Presentazione" : "1. Presentation Slides" %></span>
+            <span>&rarr;</span>
+          </span>
+          <span class="dest-desc"><%= is_it ? "Inizia con Antigravity, ottieni i crediti e POI avvia il workshop!" : "Get started with Antigravity, get credits and THEN start the workshop!" %></span>
+        </div>
+      </a>
+
+      <a href="/workshop/" class="btn-dest">
+        <img src="/assets/codelab-preview.png" alt="Workshop Codelab Preview" class="dest-thumb" onerror="this.style.display='none'" />
+        <div class="dest-body">
+          <span class="dest-title">
+            <span><%= is_it ? "2. Workshop Codelab" : "2. Workshop Codelab" %></span>
+            <span>&rarr;</span>
+          </span>
+          <span class="dest-desc"><%= is_it ? "Quando hai Antigravity installato e la fatturazione abilitata su GCP, puoi iniziare questo codelab!" : "When you have Antigravity installed and Billing enabled for GCP, you can start this codelab!" %></span>
+        </div>
+      </a>
+    </section>
+
+    <footer>
+      <span class="internal-refs"><small style="font-size: 11px; color: #a0aec0;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
+      <span class="repo-link"><a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener">GitHub Repository &rarr;</a></span>
+    </footer>
+  </div>
+</body>
+</html>
+
+

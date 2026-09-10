@@ -1,11 +1,57 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-09-10
+### Added
+- 🌐 **Workshop Landing Portal & Slides on GitHub Pages (`/slides/`, `/codelab/`)**:
+  - Implemented clean, minimal landing portal page at root (`/` / `index.html`) offering direct navigation between Workshop Codelab and Presentation Slides.
+  - Isolated multi-doc Google Codelab guide under `/codelab/`.
+  - Added slide build and deployment into GitHub Pages (`workshop/build/slides/`, `.github/workflows/deploy-pages.yml`).
+  - Added slide 1 self-QR code pointing directly to `https://palladius.github.io/rails8-app-on-gcp/slides/`.
+  - Added bilingual language switcher with 🇬🇧 EN and 🇮🇹 IT flags with static mirror (`index_it.html`).
+  - Added visual thumbnail previews to the portal destination cards with enlarged 420px previews (filling ~70% of card height) and compact typography.
+  - Reordered portal navigation cards: **1. Presentation Slides** ("Get started with Antigravity, get credits and THEN start the workshop!") and **2. Workshop Codelab** ("When you have Antigravity installed and Billing enabled for GCP, you can start this codelab!").
+  - Explicitly added `git` (2.30+) to workshop prerequisites checklist and evaluation specs (`CODELAB.md`, `skeleton.yaml`, `SKELETON.md`, and landing-page READMEs).
+  - Added dedicated standalone slide verification test suite (`test/test_slides.rb`, `just test-slides`) testing against HTML/div escaping leaks, overflow, and image rendering.
+  - Improved Slide 2 (Antigravity download) with gray down arrow ⬇️, standalone button, and small URL caption.
+  - Polished Slide 5 with CSS class-based prompt styling and copy button.
+  - Enhanced final Slide 6 with author avatars alongside LinkedIn links and compact workshop anthem audio player.
+  - Introduced `workshop/events/YYYYMMDD-EVENT_NAME/` directory hierarchy for tracking workshop deliveries, initialized with `20261002-devfest-modena/`.
+- 🏆 **Workshop BRAG Document & Autonomous Engineering Architecture (PR [#61](https://github.com/palladius/rails8-app-on-gcp/pull/61), PR [#62](https://github.com/palladius/rails8-app-on-gcp/pull/62), Fixes [#60](https://github.com/palladius/rails8-app-on-gcp/issues/60))**:
+  - Published comprehensive Workshop BRAG document [`docs/WORKSHOP_BRAG_DOCUMENT.md`](docs/WORKSHOP_BRAG_DOCUMENT.md) detailing both Pillar 1 (Enterprise Multi-Container Serverless Architecture) and Pillar 2 (Agent-First Autonomous Engineering & Self-Healing Metamodel).
+  - Documented the **Agent-First Native Architecture**: Antigravity landing page guidance, custom repository skills (`skills/rails8app-workshop`, `skills/cloud-run-troubleshooting`), and in-app diagnostics.
+  - Documented the **Declarative SKELETON**: Machine-readable specification (`workshop/skeleton.yaml` $\to$ `workshop/SKELETON.md`) with actionable contracts (`prerequisites`, `pseudocode`, `postrequisites`) and 3-tier executable step evals (`[SHELL]`, `[RUBY]`, `[LLM]`).
+  - Documented **Constitutional Invariants** (`docs/CONSTITUTION.md`), Zero-Branch Time Machine progression, and Hive real-time classroom observability with visual telemetry badges.
+  - Added dual English architecture narrative and Italian community summary for Modena Ruby Day & meetups.
+
+## [0.2.8] - 2026-09-09
+### Added
+- 🎶 **Workshop Anthem & Short Clip on Final Slide (`slides/index.md`, `slides/dist/index.html`)**:
+  - Added HTML5 audio player widget with "Check this great song" to the concluding presentation slide.
+  - Linked the 30-second Lyria 3 clip preview and the full-length 3-minute energetic acoustic guitar composition (Lyria 3 Pro on Vertex AI) generated for Rubyists.
+
+### Fixed
+- 🛠️ **Terraform Provider 5.x & Virgin Project Hardening (FL-004)**:
+  - Fixed `iac/iap.tf`: In Google provider 5.x+, static `iap { enabled = true }` threw schema validation errors (`oauth2_client_id` and `oauth2_client_secret` required) even when `enable_iap = false`. Converted to optional `dynamic "iap"` block.
+  - Added `iap_client_id` and `iap_client_secret` (default `""`) to `iac/variables.tf`.
+  - Added `enable_cicd_trigger` (default `false`) to `iac/variables.tf` and conditioned `google_cloudbuild_trigger.deploy_on_push` in `iac/cicd.tf` to avoid BYOSA enforcement failures in clean attendee projects.
+  - Verified live Terraform execution on brand-new virgin project `rails8-workshop-fl04` with 20/20 evals passed.
+
 ## [0.2.7] - 2026-09-09
 ### Added
+- 📸 **Declarative Workshop Screenshots (Issue [#42](https://github.com/palladius/rails8-app-on-gcp/issues/42))**:
+  - Declarative screenshot specification integrated into `workshop/skeleton.yaml` under step declarations.
+  - Automated Playwright runner (`workshop/screenshots/runner.js`) with support for `--list`, `--dry-run`, and single step/id filters.
+  - Reference Playwright scripts:
+    - `workshop/screenshots/step2_home_ephemeral.playwright.js`
+    - `workshop/screenshots/step4_gcs_stuck_jobs.playwright.js`
+  - Integration with `justfile`: `just screenshots [filter]` and `just test-screenshots`.
+  - Diagnostics suite check added to `bin/workshop_diagnostics.rb` (`just workshop-test`).
+  - Markdown directives and documentation in `workshop/README.md` and `workshop/CODELAB.md`.
 - 🐝 **Workshop Hive Cloud Run Deployment (`workshop/hive/bin/deploy`, `workshop/hive/.env`)**:
   - Added dedicated one-click deployer script `workshop/hive/bin/deploy` that sources project configuration from local `workshop/hive/.env`.
   - Added `workshop/hive/.env.dist` blueprint template with `PROJECT_ID=palladius-genai`.
   - Integrated official Cloud Run service icon, hover-based service names with clean revision tags, and Rails environment badges (`prod`, `dev`, `test`).
+  - Added direct link `🐝 Hive` in the Rails Blog layout footer pointing to the live Cloud Run leaderboard.
 
 ## [0.2.6] - 2026-09-09
 ### Added
@@ -31,10 +77,27 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.3] - 2026-09-09
 ### Added
+- 🎙️ **Podcastifier Audio Pipeline (Step 7)**:
+  - Added `CloudTtsService` for Italian TTS voice synthesis (`it-IT-Wavenet-A`) via Application Default Credentials (ADC) with graceful offline fallback.
+  - Added `PodcastifierJob` and attached HTML5 `<audio controls>` player directly to post show view.
+  - Added unit test `blog/test/models/solid_queue_configuration_test.rb` validating Solid Queue enqueuing and execution.
+- 🛠️ **Troubleshooting Skills & Guidance**:
+  - Added `skills/cloud-run-troubleshooting/SKILL.md` with targeted recipes for Cloud Run log investigation via `gcloud logging read`.
+  - Added `skills/rails8app-workshop/SKILL.md` and failure modes reference `what-could-possibly-go-wrong.md`.
 - 🚀 **`just cloud-run-status` Recipe & Telemetry Inspector (`bin/cloud_run_status.sh`)**:
   - Added `just cloud-run-status [url]` command to automatically infer the live Cloud Run endpoint via `terraform output -raw cloud_run_url` (or fallback via `gcloud run services describe`), fetch `/status.json`, and render a rich terminal telemetry dashboard.
   - Added standard Terraform outputs in `iac/outputs.tf` (`cloud_run_url`, `cloud_run_service_name`, `project_id`, `region`).
   - Supports `--json` and `--url-only` flags for scripting and CI/CD pipelines.
+
+### Fixed
+- 🐘 **Multi-Database Migrations in Cloud Run Entrypoint (`blog/bin/docker-entrypoint`)**:
+  - Extended entrypoint to execute `db:prepare:queue`, `db:prepare:cache`, and `db:prepare:cable` alongside `primary` database preparation.
+  - Automatically invokes `db:seed` on startup to bootstrap the admin user from `GOOGLE_CLOUD_ACCOUNT` and eliminate missing admin warnings.
+- 🧭 **Status Controller & Telemetry Badge Robustness (`blog/app/controllers/statuses_controller.rb`)**:
+  - Synchronized `APP_VERSION` to package `blog/VERSION` cleanly into Docker image.
+  - Fixed `ADMIN_EMAIL` and `GOOGLE_CLOUD_REGION` / `GOOGLE_CLOUD_LOCATION` fallback resolution on `/status`.
+- 🔀 **Step 3 Codelab Twist: The "Puma Workaround" Trap**:
+  - Updated `workshop/CODELAB.md`, `workshop/SKELETON.md`, and `workshop/skeleton.yaml` with the pedagogical lesson of attempting `SOLID_QUEUE_IN_PUMA=true` on Cloud Run: jobs are drained, but container restart wipes out ephemeral SQLite data.
 
 ## [0.2.2] - 2026-09-09
 ### Fixed
@@ -67,6 +130,7 @@ All notable changes to this project will be documented in this file.
   - 100% passing automated evaluation suite (`just workshop-eval all` -> 20/20 evals passed).
 - 🌐 **Live GitHub Pages Publication**:
   - Automatically compiled and deployed via GitHub Actions to https://palladius.github.io/rails8-app-on-gcp/.
+
 
 
 ## [0.1.44] - 2026-09-09

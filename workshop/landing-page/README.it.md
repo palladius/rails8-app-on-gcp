@@ -30,11 +30,12 @@ Hai scaricato **Google Antigravity 2.0**, effettuato il login con il tuo account
 
 ### Step 0: Le Fondamenta dell'Ambiente Locale ("La Valle delle Lacrime" Risolta!)
 Prima di toccare il cloud, abbiamo bisogno dei nostri strumenti locali pronti:
-1. **Ruby 3.3+** (il runtime di Rails 8)
-2. **Google Cloud SDK (`gcloud`)** (autenticato con il tuo account)
-3. **Docker** (per i servizi locali e Mailpit)
-4. **Just** (il task runner moderno)
-5. **Terraform** (per l'infrastruttura cloud dello Step 1)
+1. **Git** (per il version control, clonare il repo e gestire i branch)
+2. **Ruby 3.3+** (il runtime di Rails 8)
+3. **Google Cloud SDK (`gcloud`)** (autenticato con il tuo account)
+4. **Docker** (per i servizi locali e Mailpit)
+5. **Just** (il task runner moderno)
+6. **Terraform** (per l'infrastruttura cloud dello Step 1)
 
 #### 💻 Configurazione Rapida per Sistema Operativo:
 

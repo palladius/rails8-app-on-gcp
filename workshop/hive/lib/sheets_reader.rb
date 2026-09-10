@@ -5,7 +5,7 @@ require "time"
 
 module WorkshopHive
   class SheetsReader
-    CACHE_TTL_SECONDS = 30
+    CACHE_TTL_SECONDS = 8
     @cache = nil
     @cache_timestamp = 0
 

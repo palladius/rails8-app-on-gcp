@@ -2,6 +2,8 @@
 
 The **Workshop Hive** is a live, gamified telemetry and leaderboard dashboard designed for the **Rails 8 on Google Cloud Workshop**.
 
+![Workshop Hive Leaderboard Screenshot](public/assets/hive_leaderboard_screenshot.png)
+
 It tracks students as they progress through each stage of the workshop (Step 1 through Step 7), pinging their live Cloud Run deployments to display real-time green/red health indicators.
 
 ---

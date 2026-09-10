@@ -4,7 +4,7 @@
 
 resource "local_file" "readme_md" {
   filename = "${path.module}/out/README.md"
-  content  = templatefile("${path.module}/README.md.tftpl", {
+  content = templatefile("${path.module}/README.md.tftpl", {
     project_id             = var.project_id
     region                 = var.region
     gcs_dev_name           = module.gcs_dev.name

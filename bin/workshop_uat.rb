@@ -61,17 +61,35 @@ begin
   end
 
   # Also copy bundle vendor or config if appropriate to skip re-bundling
-  bundle_dir = File.join(repo_root, "blog", "vendor", "bundle")
-  if Dir.exist?(bundle_dir)
+  # If running in an isolated git worktree, resolve main git repository root
+  git_common_dir = `git -C "#{repo_root}" rev-parse --git-common-dir 2>/dev/null`.strip
+  parent_repo_root = if !git_common_dir.empty? && git_common_dir != ".git"
+                       File.expand_path("..", git_common_dir)
+                     else
+                       repo_root
+                     end
+
+  candidate_bundle_dirs = [
+    File.join(repo_root, "blog", "vendor", "bundle"),
+    File.join(parent_repo_root, "blog", "vendor", "bundle")
+  ]
+  found_bundle_dir = candidate_bundle_dirs.find { |d| Dir.exist?(d) }
+
+  if found_bundle_dir
     target_bundle = File.join(tmp_dir, "blog", "vendor", "bundle")
     FileUtils.mkdir_p(File.dirname(target_bundle))
     # Symlink bundle cache to avoid slow bundle install
-    File.symlink(bundle_dir, target_bundle) rescue nil
+    File.symlink(found_bundle_dir, target_bundle) rescue nil
   end
 
-  local_bundle_config = File.join(repo_root, "blog", ".bundle")
-  if Dir.exist?(local_bundle_config)
-    FileUtils.cp_r(local_bundle_config, File.join(tmp_dir, "blog", ".bundle"))
+  candidate_bundle_configs = [
+    File.join(repo_root, "blog", ".bundle"),
+    File.join(parent_repo_root, "blog", ".bundle")
+  ]
+  found_bundle_config = candidate_bundle_configs.find { |d| Dir.exist?(d) }
+
+  if found_bundle_config
+    FileUtils.cp_r(found_bundle_config, File.join(tmp_dir, "blog", ".bundle"))
   end
 
   # 3. Apply Step N configuration

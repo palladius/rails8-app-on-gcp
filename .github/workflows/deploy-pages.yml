@@ -32,14 +32,26 @@ jobs:
         with:
           ruby-version: '3.3'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install dependencies
-        run: gem install kramdown kramdown-parser-gfm
+        run: |
+          gem install kramdown kramdown-parser-gfm
+          npm install -g @marp-team/marp-cli
+
+      - name: Build Presentation Slides
+        run: |
+          mkdir -p slides/dist
+          marp slides/index.md -o slides/dist/index.html --html
 
       - name: Build Workshop Sites
         run: |
           cd workshop
           
-          # Build the Static HTML (Google Codelab style)
+          # Build the Static HTML (Google Codelab style + Root Landing Portal + Slides)
           ruby visualizer/build_ghpages.rb
           
           # Assemble the deployment directory
