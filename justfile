@@ -41,20 +41,35 @@ workshop-dev port="8080":
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
+    @echo "Serving Marp slides on http://localhost:{{port}} (visit /why-different.md for Why-Different deck)"
     @if command -v marp >/dev/null 2>&1; then \
         PORT={{port}} marp --server slides --html; \
     else \
         PORT={{port}} npx -y @marp-team/marp-cli --server slides --html; \
     fi
 
+# run the "Why is this workshop different?" showcase deck (alias: slides-why-different)
+slides2 port="8083":
+    @echo "🚀 Launching 'Why is this workshop different?' deck at http://localhost:{{port}}/why-different.md"
+    @if command -v marp >/dev/null 2>&1; then \
+        PORT={{port}} marp --server slides --html; \
+    else \
+        PORT={{port}} npx -y @marp-team/marp-cli --server slides --html; \
+    fi
+
+alias slides-why-different := slides2
+
 # build static HTML slides into slides/dist/
 build-slides:
     @mkdir -p slides/dist
     @if command -v marp >/dev/null 2>&1; then \
         marp slides/index.md -o slides/dist/index.html --html; \
+        marp slides/why-different.md -o slides/dist/why-different.html --html; \
     else \
         npx -y @marp-team/marp-cli slides/index.md -o slides/dist/index.html --html; \
+        npx -y @marp-team/marp-cli slides/why-different.md -o slides/dist/why-different.html --html; \
     fi
+
 
 # run visual and structural unit tests on Marp slides
 test-slides:
