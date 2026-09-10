@@ -40,7 +40,12 @@ module WorkshopHive
       }
     ].freeze
 
-    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil)
+    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil, max_age: nil)
+      raw_entries = get_raw_entries(sheet_id: sheet_id, credentials: credentials)
+      filter_by_max_age(raw_entries, max_age)
+    end
+
+    def self.get_raw_entries(sheet_id:, credentials:)
       now = Time.now.to_i
       if @cache && (now - @cache_timestamp < CACHE_TTL_SECONDS)
         return @cache
@@ -75,6 +80,69 @@ module WorkshopHive
     rescue StandardError => e
       warn "[SheetsReader] Error fetching from Google Sheets/CSV: #{e.message}. Falling back to cached/mock data."
       @cache || MOCK_ENTRIES
+    end
+
+    # Parses duration strings like "24h", "2d", "1mo", "30m", "1w" into seconds
+    def self.parse_duration(str)
+      return nil if str.nil? || str.to_s.strip.empty?
+      s = str.to_s.strip.downcase
+
+      case s
+      when /^(\d+)\s*h(?:ours?)?$/
+        $1.to_i * 3600
+      when /^(\d+)\s*d(?:ays?)?$/
+        $1.to_i * 86400
+      when /^(\d+)\s*w(?:eeks?)?$/
+        $1.to_i * 7 * 86400
+      when /^(\d+)\s*mo(?:nths?)?$/
+        $1.to_i * 30 * 86400
+      when /^(\d+)\s*m(?:in(?:utes?)?)?$/
+        $1.to_i * 60
+      when /^(\d+)\s*s(?:ec(?:onds?)?)?$/
+        $1.to_i
+      when /^(\d+)$/
+        # Default unit is seconds if raw number, or treat <= 72 as hours
+        val = $1.to_i
+        val <= 72 ? val * 3600 : val
+      else
+        nil
+      end
+    end
+
+    def self.parse_timestamp(ts_str)
+      return nil if ts_str.nil? || ts_str.to_s.strip.empty?
+      str = ts_str.to_s.strip
+      # Try ISO8601 or standard formats first
+      Time.parse(str)
+    rescue ArgumentError
+      # Handle DD/MM/YYYY HH:MM:SS or MM/DD/YYYY HH:MM:SS
+      if str =~ %r{^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?}
+        p1, p2, year = $1.to_i, $2.to_i, $3.to_i
+        hour = $4 ? $4.to_i : 0
+        min = $5 ? $5.to_i : 0
+        sec = $6 ? $6.to_i : 0
+        # In Google Sheets from Italian/European locale it is usually DD/MM/YYYY; fallback to MM/DD/YYYY if p1 > 12
+        day, month = (p1 > 12) ? [p1, p2] : [p2, p1] # Default assume DD/MM/YYYY when p1 <= 31 and p2 <= 12
+        # Note: if both <= 12, Google Forms in IT locale is DD/MM/YYYY
+        if p1 <= 12 && p2 <= 12
+          day, month = p1, p2
+        end
+        Time.new(year, month, day, hour, min, sec) rescue nil
+      else
+        nil
+      end
+    end
+
+    def self.filter_by_max_age(entries, max_age_param)
+      seconds = parse_duration(max_age_param)
+      return entries unless seconds && seconds > 0
+
+      cutoff = Time.now - seconds
+      entries.select do |entry|
+        t = parse_timestamp(entry[:timestamp])
+        # If timestamp cannot be parsed, keep the entry so it is not unfairly dropped
+        t.nil? || t >= cutoff
+      end
     end
 
 

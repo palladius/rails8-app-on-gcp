@@ -5,6 +5,45 @@ const CACHE_KEY_HEALTH = "hive_cached_health";
 let cachedLeaderboard = [];
 let cachedHealth = {};
 
+// Max Age filter from Query String (e.g. ?max_age=24h or ?max_age=2d or ?max_age=1mo)
+function getCurrentMaxAge() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("max_age") || "all";
+}
+
+let activeMaxAge = getCurrentMaxAge();
+
+function updateTimeFilterUI() {
+  const buttons = document.querySelectorAll(".time-filter-btn");
+  buttons.forEach(btn => {
+    const filter = btn.getAttribute("data-filter");
+    if (filter === activeMaxAge || (activeMaxAge === "all" && filter === "all")) {
+      btn.className = "time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm";
+    } else {
+      btn.className = "time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent";
+    }
+  });
+}
+
+function setTimeFilter(filterVal) {
+  activeMaxAge = filterVal;
+  const url = new URL(window.location);
+  if (filterVal === "all" || !filterVal) {
+    url.searchParams.delete("max_age");
+  } else {
+    url.searchParams.set("max_age", filterVal);
+  }
+  window.history.replaceState({}, "", url);
+  updateTimeFilterUI();
+  fetchLeaderboard();
+}
+
+window.addEventListener("popstate", () => {
+  activeMaxAge = getCurrentMaxAge();
+  updateTimeFilterUI();
+  fetchLeaderboard();
+});
+
 try {
   const savedLd = localStorage.getItem(CACHE_KEY_LEADERBOARD);
   if (savedLd) cachedLeaderboard = JSON.parse(savedLd);
@@ -16,14 +55,15 @@ try {
 }
 
 // Render immediato prima ancora di fare qualsiasi fetch
-if (cachedLeaderboard.length > 0) {
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  updateTimeFilterUI();
+  if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
     document.getElementById("stat-healthy-apps").textContent = healthyCount;
     renderTable();
-  });
-}
+  }
+});
 
 let previousStudentsCount = cachedLeaderboard.length;
 let audioContext = null;
@@ -73,7 +113,8 @@ window.addEventListener("click", () => {
 
 async function fetchLeaderboard() {
   try {
-    const res = await fetch("/api/leaderboard");
+    const query = (activeMaxAge && activeMaxAge !== "all") ? `?max_age=${encodeURIComponent(activeMaxAge)}` : "";
+    const res = await fetch(`/api/leaderboard${query}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const newEntries = data.entries || [];
@@ -147,10 +188,14 @@ function renderTable() {
   if (!tbody) return;
 
   if (cachedLeaderboard.length === 0) {
+    const filterMsg = (activeMaxAge && activeMaxAge !== "all")
+      ? `No submissions found in the last <b>${escapeHtml(activeMaxAge)}</b>. <button onclick="setTimeFilter('all')" class="text-amber-400 hover:underline cursor-pointer font-bold ml-1">Show All</button>`
+      : "No student submissions registered yet.";
+
     tbody.innerHTML = `
       <tr>
         <td colspan="3" class="py-12 text-center text-slate-500 italic font-mono text-xs">
-          No student submissions registered yet.
+          ${filterMsg}
         </td>
       </tr>
     `;
