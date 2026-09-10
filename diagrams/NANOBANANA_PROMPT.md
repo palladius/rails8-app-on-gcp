@@ -58,43 +58,17 @@ Glowing fiber-optic data tubes and holographic directional arrows connect the ce
 Clean minimalist studio lighting, light gray aesthetic background, high tech data visualization, photorealistic 3D render, 8k resolution, crisp technical typography.
 ```
 
-### Variant 3: Dark Mode Technical Blueprint (Developer / Cyber Aesthetic)
-```text
-Technical software architecture blueprint on a deep navy-blue matte background (#0B132B) with faint grid lines.
-At the center, a clearly outlined rectangular module representing "Google Cloud Run (Serverless Multi-Container)".
-Inside, three horizontally aligned rows forming a vertical stack of containers in clean monospace font:
-- [ rails_app | Puma HTTP :8080 ]
-- [ solid_queue | Background Worker ]
-- [ cloud_sql_proxy | mTLS Sidecar :5432 ]
-Glowing circuit-style vector schematic lines with directional arrows connect to outer nodes:
-- Left: [ Secret Manager ] injecting secrets via dotted red circuit trace.
-- Right: [ Cloud SQL Postgres ] connected via shielded green conduit; [ Cloud Storage GCS ] connected via bright cyan data bus.
-- Bottom: [ Vertex AI GenAI Pipeline ] linked directly to the worker container.
-Precision engineering schematic, clean typography, neon accent colors (cyan, lime green, amber, electric blue), high contrast, zero blur, professional developer reference poster.
-```
-
 ---
 
 ## 💻 CLI Execution via Nano Banana Script
 
-Generate any variant directly using the local Nano Banana script:
+Generate variants directly using the local Nano Banana script:
 
 ```bash
-# Variant 1: Clean Flat Vector
-UV_INDEX_URL="https://pypi.org/simple" uv run ~/.gemini/config/skills/nano-banana-ricc/scripts/generate_image.py \
-  --prompt "..." \
-  --filename "assets/nanobanana_arch_flat.png" \
-  --resolution 2K
+# Variant 1: Clean Flat Vector Enterprise
+just nanobanana variant="flat"
 
-# Variant 2: Isometric 3D
-UV_INDEX_URL="https://pypi.org/simple" uv run ~/.gemini/config/skills/nano-banana-ricc/scripts/generate_image.py \
-  --prompt "..." \
-  --filename "assets/nanobanana_arch_isometric.png" \
-  --resolution 2K
-
-# Variant 3: Dark Blueprint
-UV_INDEX_URL="https://pypi.org/simple" uv run ~/.gemini/config/skills/nano-banana-ricc/scripts/generate_image.py \
-  --prompt "..." \
-  --filename "assets/nanobanana_arch_blueprint.png" \
-  --resolution 2K
+# Variant 2: Isometric 3D Infographic
+just nanobanana variant="isometric"
 ```
+

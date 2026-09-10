@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.16] - 2026-09-10
+### Removed
+- 🗑️ **Pruned Dark Cyber Blueprint Variant**:
+  - Removed Variant 3 (`nanobanana_arch_blueprint.png` and `dark_blueprint.txt`) based on user feedback.
+  - Curated canonical Nano Banana assets to the two premier variants: Flat Vector Enterprise (`nanobanana_arch_flat.png`) and Isometric 3D (`nanobanana_arch_isometric.png`).
+  - Updated prompt specification, tests, and justfile accordingly.
+
 ## [0.2.15] - 2026-09-10
 ### Added
 - 🍌 **Codelab Page 1 Reference Architecture Upgrade**:

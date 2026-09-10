@@ -49,6 +49,5 @@ class ArchitectureDiagramTest < Minitest::Test
     assert File.exist?(File.join(DIAGRAMS_DIR, "NANOBANANA_PROMPT.md")), "NANOBANANA_PROMPT.md must exist"
     assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_flat.png")), "nanobanana_arch_flat.png must exist"
     assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_isometric.png")), "nanobanana_arch_isometric.png must exist"
-    assert File.exist?(File.join(REPO_ROOT, "assets/nanobanana_arch_blueprint.png")), "nanobanana_arch_blueprint.png must exist"
   end
 end
