@@ -1,20 +1,20 @@
 # Implementation Plan: Proctor-Validated Step 8 Graduation Trophy via GHI & LGTM Verification
 
-## Phase 1: Rails Telemetry (`StatusesController` & `STEP_8_GHI` Quest Object)
+## Phase 1: Rails Telemetry (`StatusesController` & `STEP_8_GHI` Quest Object) [checkpoint: 6d2a649]
 - [x] Task: Write failing tests for `STEP_8_GHI` in `blog/test/controllers/statuses_controller_test.rb` (TDD Red) [6d5ea91]
     - [x] Add test for `STEP_8_GHI="83"` emitting integer `83` and canonical issue URL
     - [x] Add test for `STEP_8_GHI="https://github.com/palladius/rails8-app-on-gcp/issues/83"` parsing correctly
     - [x] Add test for missing / nil `STEP_8_GHI` emitting `step_8_completed: false`
     - [x] Confirm tests fail (Red)
-- [~] Task: Implement `detect_quest_status` in `blog/app/controllers/statuses_controller.rb` (TDD Green)
-    - [ ] Parse `ENV['STEP_8_GHI']` for integer ID or regex match against github issue URL
-    - [ ] Expose `quest` object in `/status.json` with `step_8_completed`, `ghi_issue`, `ghi_url`
-    - [ ] Add `STEP_8_GHI` to `safe_env_inspection` list
-    - [ ] Confirm all controller tests pass (Green)
-- [ ] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement `detect_quest_status` in `blog/app/controllers/statuses_controller.rb` (TDD Green) [1221e91]
+    - [x] Parse `ENV['STEP_8_GHI']` for integer ID or regex match against github issue URL
+    - [x] Expose `quest` object in `/status.json` with `step_8_completed`, `ghi_issue`, `ghi_url`
+    - [x] Add `STEP_8_GHI` to `safe_env_inspection` list
+    - [x] Confirm all controller tests pass (Green)
+- [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md) [6d2a649]
 
 ## Phase 2: Hive Backend Proctor Reviewer Engine (`workshop/hive/`)
-- [ ] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red)
+- [~] Task: Write unit tests for `ProctorReviewer` in `workshop/hive/test/test_proctor_reviewer.rb` (TDD Red)
     - [ ] Test proctor comment with "LGTM" returns `:lgtm_approved` and reviewer username
     - [ ] Test non-proctor comment with "LGTM" returns `:review_pending`
     - [ ] Test missing LGTM comment returns `:review_pending`
