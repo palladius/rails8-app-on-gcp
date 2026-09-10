@@ -1088,6 +1088,49 @@ __END__
     .hero {
       margin-bottom: 20px;
     }
+    .event-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .event-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: #f1f8e9;
+      border: 1px solid #c8e6c9;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: #2e7d32;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .event-link:hover {
+      background: #e8f5e9;
+      border-color: #81c784;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(46, 125, 50, 0.15);
+      color: #1b5e20;
+    }
+    .event-flag {
+      font-size: 15px;
+    }
+    .event-date {
+      font-weight: 700;
+    }
+    .event-title {
+      color: #388e3c;
+    }
+    .event-arrow {
+      font-size: 14px;
+      transition: transform 0.15s ease;
+    }
+    .event-link:hover .event-arrow {
+      transform: translateX(2px);
+    }
     h1 {
       font-size: 30px;
       font-weight: 700;
@@ -1217,6 +1260,13 @@ __END__
     </header>
 
     <main class="hero">
+      <div class="event-badge">
+        <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/events/20261002-devfest-modena/README.md" target="_blank" rel="noopener" class="event-link">
+          <span class="event-flag">🇮🇹</span>
+          <span class="event-date">2026-10-02 Modena</span> &middot; <span class="event-title">DevFest Modena 2026 (Sala 40)</span>
+          <span class="event-arrow">&rarr;</span>
+        </a>
+      </div>
       <h1>Rails 8 on Google Cloud</h1>
       <p class="tagline">
         <%= is_it ? "Architettura di riferimento cloud-native e workshop interattivo per rilasciare Ruby on Rails 8 su Google Cloud Platform con Cloud Run, Cloud SQL e Gemini AI." : "A cloud-native blueprint and interactive workshop for deploying modern Ruby on Rails 8 to Google Cloud Platform with Cloud Run, Cloud SQL, and Gemini AI." %>
