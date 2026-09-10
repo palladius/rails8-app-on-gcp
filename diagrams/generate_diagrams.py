@@ -2,7 +2,9 @@
 """Deterministic Google Cloud Architecture Diagram Generator for Rails 8 on GCP.
 
 Generates:
-1. Canonical production reference architecture diagram (arch_diagram.png).
+1. Canonical production reference architecture diagram (arch_diagram.png),
+   highlighting exclusively REAL BILLABLE Google Cloud products with a single
+   Cloud Run service icon and 3 sub-matrioska containers.
 2. Progressive evolutionary frames and animated GIF (arch_evolution.gif).
 """
 
@@ -16,13 +18,12 @@ from diagrams import Diagram, Cluster, Edge
 from diagrams.gcp.compute import Run
 from diagrams.gcp.database import SQL
 from diagrams.gcp.storage import Storage
-from diagrams.gcp.security import SecretManager, Iam
+from diagrams.gcp.security import SecretManager
 from diagrams.gcp.ml import VertexAI
 from diagrams.gcp.devtools import Build, ContainerRegistry
-from diagrams.gcp.network import LoadBalancing
-from diagrams.gcp.operations import Logging, Monitoring
 from diagrams.generic.database import SQL as GenericSQL
 from diagrams.generic.storage import Storage as GenericStorage
+from diagrams.onprem.container import Docker
 from diagrams.onprem.client import Users, Client
 from PIL import Image
 
@@ -60,10 +61,10 @@ def ensure_dirs():
 
 
 def generate_canonical():
-    """Generates the canonical production GCP architecture diagram."""
-    print("🎨 Generating Canonical Google Cloud Architecture Diagram...")
+    """Generates the canonical production GCP architecture diagram highlighting real billable GCP objects."""
+    print("🎨 Generating Canonical Google Cloud Architecture Diagram (Billable GCP Objects Only)...")
     out_filename = OUTPUT_TMP_DIR / "arch_diagram"
-    
+
     with Diagram(
         "Rails 8 on Google Cloud: Production Reference Architecture",
         filename=str(out_filename),
@@ -76,42 +77,32 @@ def generate_canonical():
     ):
         users = Users("Web & Mobile\nUsers")
 
-        with Cluster("Google Cloud Ingress & Perimeter"):
-            lb = LoadBalancing("Cloud Load Balancing\n& Custom Domain")
+        with Cluster("Google Cloud Run (1. Billable Serverless Service)"):
+            cloud_run = Run("Cloud Run Service\n(Serverless Pod)")
+            with Cluster("1. Rails Web Server"):
+                web = Docker("Puma Server\n(Port 8080)")
+            with Cluster("2. Background Worker"):
+                worker = Docker("Solid Queue\n(Async Jobs)")
+            with Cluster("3. Database Proxy"):
+                proxy = Docker("Cloud SQL Proxy\n(mTLS Sidecar)")
 
-        with Cluster("Cloud Run Service (Multi-Container Pod)"):
-            with Cluster("Container: web"):
-                web = Run("Puma Server\n(Rails 8.1 Monolith)")
+        with Cluster("Google Cloud Managed Persistence (Billable)"):
+            db = SQL("Cloud SQL PostgreSQL\n(2. Managed DB Instance)")
+            gcs = Storage("Google Cloud Storage\n(3. Private Media Bucket)")
 
-            with Cluster("Container: worker"):
-                worker = Run("Solid Queue Worker\n(Background Jobs)")
+        sm = SecretManager("Secret Manager\n(4. Runtime Secrets)")
+        vertex = VertexAI("Vertex AI\n(5. Nano Banana & Gemini)")
 
-            with Cluster("Container: sidecar"):
-                proxy = Run("Cloud SQL Auth Proxy\n(mTLS Tunnel)")
+        with Cluster("DevOps & CI/CD Pipeline (Billable)"):
+            cb = Build("Cloud Build\n(6. CI/CD Pipeline)")
+            ar = ContainerRegistry("Artifact Registry\n(7. OCI Containers)")
 
-        with Cluster("Google Cloud Managed Persistence"):
-            db = SQL("Cloud SQL PostgreSQL\n(Managed Database)")
-            gcs = Storage("Google Cloud Storage\n(Private Media Bucket)")
+        # Ingress traffic
+        users >> Edge(label="HTTPS Ingress", color="#1a73e8", style="bold") >> cloud_run
+        cloud_run >> Edge(label="Port 8080", color="#1a73e8") >> web
 
-        with Cluster("Google Cloud Security & Identity"):
-            sm = SecretManager("Secret Manager\n(RAILS_MASTER_KEY)")
-            iam = Iam("Cloud IAM\n(rails-app-sa & Blob Signer)")
-
-        with Cluster("Google Cloud GenAI Tier"):
-            vertex = VertexAI("Vertex AI\n(Nano Banana & Gemini)")
-
-        with Cluster("CI/CD & DevOps Automation"):
-            cb = Build("Cloud Build\n(Automated Pipeline)")
-            ar = ContainerRegistry("Artifact Registry\n(OCI Images)")
-
-        with Cluster("Observability & Telemetry"):
-            ops = [Logging("Cloud Logging\n(Structured JSON)"), Monitoring("Cloud Monitoring\n(Metrics & Uptime)")]
-
-        # Connections
-        users >> Edge(label="HTTPS / Ingress", color="#1a73e8", style="bold") >> lb >> Edge(label="Port 8080", color="#1a73e8") >> web
-        
-        # In-pod async job queue
-        web >> Edge(label="Enqueue Jobs\n(Solid Queue DB)", color="#f9ab00", style="dashed") >> worker
+        # In-pod async job delegation
+        web >> Edge(label="Enqueue Jobs (Solid Queue DB)", color="#f9ab00", style="dashed") >> worker
 
         # Database connections via localhost Cloud SQL proxy
         web >> Edge(label="localhost:5432", color="#188038") >> proxy
@@ -119,24 +110,17 @@ def generate_canonical():
         proxy >> Edge(label="mTLS Encrypted Tunnel\n(No Public IP)", color="#188038", style="bold") >> db
 
         # Object Storage
-        web >> Edge(label="ActiveStorage\n(IAM Signed URLs)", color="#4285F4") >> gcs
-        worker >> Edge(label="Direct Blob Attach\n(iam: true)", color="#4285F4") >> gcs
+        web >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
+        worker >> Edge(label="Direct Blob Attach", color="#4285F4") >> gcs
 
-        # Security & Identity
-        sm >> Edge(label="Runtime Secret Injection", color="#d93025", style="dotted") >> web
-        sm >> Edge(color="#d93025", style="dotted") >> worker
-        iam >> Edge(label="Blob Signing & Proxy Client", color="#d93025", style="dotted") >> web
-        iam >> Edge(color="#d93025", style="dotted") >> worker
+        # Secret injection
+        sm >> Edge(label="Runtime Secret Injection", color="#d93025", style="dotted") >> cloud_run
 
         # GenAI Async Pipeline
         worker >> Edge(label="Nano Banana Imagen 3\n& Audio Summaries", color="#a142f4", style="bold") >> vertex
 
         # CI/CD deployment
-        cb >> Edge(label="Build Containers") >> ar >> Edge(label="Deploy Revision") >> web
-
-        # Telemetry
-        web >> Edge(style="dotted", color="#5f6368") >> ops
-        worker >> Edge(style="dotted", color="#5f6368") >> ops
+        cb >> Edge(label="Build Containers") >> ar >> Edge(label="Deploy Revision") >> cloud_run
 
     generated_png = OUTPUT_TMP_DIR / "arch_diagram.png"
     if not generated_png.exists():
@@ -170,7 +154,7 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Host Machine"):
-            web = Run("Puma Web Server\n(Rails 8 Baseline)")
+            web = Docker("Rails 8 (Puma)\n(Port 3000)")
             sqlite = GenericSQL("Local SQLite DB\n(Ephemeral Disk)")
             disk = GenericStorage("Local Disk Storage\n(public/uploads)")
 
@@ -194,11 +178,11 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Run("Puma Web Server\n(Rails 8)")
-            proxy = Run("Cloud SQL Auth Proxy\n(localhost:5432)")
+            web = Docker("Rails 8 (Puma)\n(Port 3000)")
+            proxy = Docker("Cloud SQL Proxy\n(localhost:5432)")
             disk = GenericStorage("Local Disk Storage\n(Ephemeral Uploads)")
 
-        with Cluster("Google Cloud Managed Persistence"):
+        with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
 
         dev >> Edge(label="HTTP :3000") >> web
@@ -222,21 +206,17 @@ def generate_evolution():
     ):
         dev = Client("Developer Laptop\n(localhost:3000)")
         with Cluster("Local Environment"):
-            web = Run("Puma Web Server\n(Rails 8)")
-            proxy = Run("Cloud SQL Auth Proxy\n(localhost:5432)")
+            web = Docker("Rails 8 (Puma)\n(Port 3000)")
+            proxy = Docker("Cloud SQL Proxy\n(localhost:5432)")
 
-        with Cluster("Google Cloud Managed Persistence"):
+        with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(Managed Instance)")
             gcs = Storage("Google Cloud Storage\n(Private Bucket)")
-
-        with Cluster("Google Cloud Security & Identity"):
-            iam = Iam("Cloud IAM Credentials\n(Blob Signer)")
 
         dev >> Edge(label="HTTP :3000") >> web
         web >> Edge(label="localhost:5432") >> proxy
         proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
-        web >> Edge(label="ActiveStorage (iam: true)", color="#4285F4") >> gcs
-        iam >> Edge(label="Signed URL V4 Credentials", color="#d93025", style="dotted") >> web
+        web >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
 
     frames.append(OUTPUT_TMP_DIR / "step3_cloud_storage.png")
 
@@ -253,41 +233,39 @@ def generate_evolution():
         outformat="png",
     ):
         users = Users("Web & Mobile Users")
-        with Cluster("Google Cloud Ingress"):
-            lb = LoadBalancing("Cloud Load Balancing")
 
-        with Cluster("Cloud Run Multi-Container Pod"):
-            web = Run("Puma Web (Rails 8)")
-            worker = Run("Solid Queue Worker")
-            proxy = Run("Cloud SQL Proxy (Sidecar)")
+        with Cluster("Google Cloud Run (Billable Serverless Service)"):
+            cloud_run = Run("Cloud Run Service")
+            with Cluster("1. Rails Web Server"):
+                web = Docker("Puma Server")
+            with Cluster("2. Background Worker"):
+                worker = Docker("Solid Queue")
+            with Cluster("3. Database Proxy"):
+                proxy = Docker("Cloud SQL Proxy")
 
-        with Cluster("Google Cloud Persistence"):
+        with Cluster("Google Cloud Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL")
             gcs = Storage("Google Cloud Storage")
 
-        with Cluster("Google Cloud Security"):
-            sm = SecretManager("Secret Manager")
+        sm = SecretManager("Secret Manager\n(Runtime Secrets)")
 
-        users >> lb >> web
+        users >> Edge(label="HTTPS") >> cloud_run >> web
         web >> Edge(label="Enqueue Jobs", style="dashed") >> worker
         web >> proxy
         worker >> proxy
         proxy >> Edge(label="mTLS Tunnel", color="#188038") >> db
         web >> gcs
         worker >> gcs
-        sm >> Edge(label="Runtime Secrets", style="dotted", color="#d93025") >> web
-        sm >> Edge(style="dotted", color="#d93025") >> worker
+        sm >> Edge(label="Runtime Secrets", style="dotted", color="#d93025") >> cloud_run
 
     frames.append(OUTPUT_TMP_DIR / "step4_cloud_run.png")
 
-    # Frame 5: Canonical Production Architecture (Full GCP Blueprint)
-    # Ensure canonical is generated
+    # Frame 5: Canonical Production Architecture (Full Billable GCP Blueprint)
     generate_canonical()
     frames.append(OUTPUT_TMP_DIR / "arch_diagram.png")
 
     print(f"🎬 Compiling {len(frames)} photograms into animated GIF...")
 
-    # Load and normalize all frames to a uniform canvas size with white background
     images = [Image.open(f).convert("RGBA") for f in frames]
     max_w = max(img.width for img in images)
     max_h = max(img.height for img in images)
@@ -306,7 +284,6 @@ def generate_evolution():
     gif_repo = ASSETS_DIR / "arch_evolution.gif"
     gif_workshop = WORKSHOP_IMAGES_DIR / "arch_evolution.gif"
 
-    # 1800ms per frame, loop indefinitely
     processed_frames[0].save(
         gif_repo,
         save_all=True,
