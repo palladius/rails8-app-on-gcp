@@ -59,9 +59,28 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 
 ---
 
-## 🤖 Pillar 2: The Method — "Automated Quality Engineering & Self-Healing Feedback Loops"
+## 🤖 Pillar 2: The Metamodel — "Automated Quality Engineering & Agent-First Design"
 
-### 1. Autonomous Friction Logging Loop & Virgin Project Verification
+> *"We know people don't do workshops by hand anymore—so we engineered the first workshop designed natively for AI Pair Programmers!"* 🤖💡
+
+### 1. Antigravity & Agent-First by Design ("Tell Antigravity to go to this link...")
+- **The Modern Reality:** Developers in 2026 don't copy-paste shell commands one by one from a static PDF. They prompt an AI coding assistant (like **Google Antigravity** or **Gemini CLI**).
+- **The Agentic Entrypoint ([`workshop/landing-page/README.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md)):**
+  - The literal first instruction given to attendees on the presentation slides is:  
+    👉 **`"Tell Antigravity: Go to https://github.com/palladius/rails8-app-on-gcp/tree/main/workshop/landing-page and guide me through the workshop!"`**
+  - The landing page contains explicit **Rules of Engagement for the AI**:
+    - *Pedagogical Tutor, Not a Ghostwriter:* The agent is strictly commanded: *"DO NOT DO EVERYTHING FOR THE STUDENT. Guide them step-by-step, explain why things work, and ask them to verify results."*
+    - *Diagnostics First:* The agent is instructed to run environment checks first before touching any code.
+- **Dedicated Agent Skills ([`skills/rails8app-workshop`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop) & [`skills/cloud-run-troubleshooting`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/cloud-run-troubleshooting)):**
+  - We equip the agent with custom skills tailored for this workshop:
+    - [`skills/rails8app-workshop/SKILL.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/skills/rails8app-workshop/SKILL.md): Teaches the agent the exact repository structure, `just` recipes, and architectural gotchas.
+    - [`what-could-possibly-go-wrong.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/skills/rails8app-workshop/references/what-could-possibly-go-wrong.md): Encodes tribal knowledge on common student failures (missing billing accounts, unmigrated Solid Queue tables, unassigned IAM roles).
+    - [`skills/cloud-run-troubleshooting/SKILL.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/skills/cloud-run-troubleshooting/SKILL.md): Provides targeted `gcloud logging` recipes so the agent can autonomously diagnose Cloud Run crashes.
+- **Extensive In-App Telemetry ("Help Me Help You"):**
+  - Deep inside the Rails app, we embedded programmatic introspection hooks (`/status.json`, `StatusesController`, and in-app diagnostics).
+  - This tells both the student's AI pair programmer **and the proctor via Hive** 😉 exactly what stage the student has reached and what component is failing. It's a continuous, bidirectional feedback loop: *"Help me help you!"*
+
+### 2. Autonomous Friction Logging Loop & Virgin Project Verification
 - **Beyond Manual Quality Checks:** Instead of hoping students don't get stuck, we run autonomous subagents using the [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab) skill (`SKILL.md`).
 - **The Virgin Project Loop:** The agent provisions a temporary 3-day GCP project, follows [CODELAB.md](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB.md) step-by-step as an inexperienced attendee, logs empirical friction points (with sentiment emojis 🟢/🟡/🔴), and automatically authors PR fixes:
   - **FL-003 Iteration ([PR #51](https://github.com/palladius/rails8-app-on-gcp/pull/51)):** Caught multi-database migration gaps in the Docker entrypoint (`db:prepare:queue`, `db:prepare:cache`) and isolated Solid Queue execution. Resolved in release `v0.2.3`.
@@ -102,17 +121,24 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 - **The Innovation ([`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`workshop/SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md)):**
   - **Single Source of Truth**: The workshop curriculum is formally specified in a machine-readable schema (`workshop/skeleton.yaml`) and compiled into human-readable markdown (`SKELETON.md`).
   - **Strict Contracts**: Every single step declares actionable **`prerequisites`**, **`pseudocode`**, and **`postrequisites`**.
-  - **Executable Step Evals in Code (`bin/workshop_eval.rb`)**:
-    - Every step is backed by automated evaluations executed directly in code (both **Shell** commands and **Ruby** assertions).
-    - Students and AI agents can test any individual step or the whole curriculum via `just workshop-eval <step>` or `just workshop-eval all` (20/20 evals passed).
-    - If a step passes its evals, both human and AI know with mathematical certainty that the step's environment and infrastructure are green before proceeding!
+  - **Executable Step Evals in Code & LLM-as-a-Judge (`bin/workshop_eval.rb`)**:
+    - Every step is backed by automated evaluations spanning **3 distinct verification tiers**:
+      1. **`[SHELL]`**: CLI, infrastructure, and network connectivity checks.
+      2. **`[RUBY]`**: Runtime code assertions, file system contracts, and unit tests.
+      3. **`[LLM]`**: LLM-as-a-judge evaluations verifying student creative outputs (e.g. blog post creativity, Milanese poster prompt style adherence, and capstone quest implementations).
+    - Students and AI agents can test any individual step or the whole curriculum via `just workshop-eval <step>` or `just workshop-eval all` (**25/25 evaluations passed**).
+    - If a step passes its evals, both human and AI know with mathematical certainty that the step's environment, infrastructure, and code contracts are green before proceeding!
 
-### 5. The Zero-Branch Time Machine
-- **No Git Merge Hell:** Attendees never juggle 10 conflicting git branches.
-- **The Engine ([`bin/workshop_time_machine.rb`](https://github.com/palladius/rails8-app-on-gcp/blob/main/bin/workshop_time_machine.rb)):**
-  - Keeps students on `main`.
-  - Enables instant checkpoint rewinds or restorations via `just workshop-rewind <N>` and `just workshop-restore-gold`.
-  - Validated by isolated UAT sandbox runner [`bin/workshop_uat.rb`](https://github.com/palladius/rails8-app-on-gcp/blob/main/bin/workshop_uat.rb) (`just workshop-uat`).
+### 6. The Project Constitution: Inviolable Architectural Invariants
+- **The Problem:** In fast-moving projects and AI-assisted workflows, codebases suffer from drift, hacky shortcuts, or accidental regressions (e.g. committing `.env` files, breaking offline execution, or deploying unencrypted public databases).
+- **The Governing Authority ([`docs/CONSTITUTION.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/docs/CONSTITUTION.md)):**
+  - **Supreme Hierarchy**: `CONSTITUTION.md` sits above all agent instructions (`AGENTS.md`), developer guides, and curriculum files. Any constitutional change requires a **2/3 supermajority agreement** between **Riccardo 🦖**, **Emiliano 🏎️**, and **AI 🤖**.
+  - **Inviolable Invariants (Never to be Violated)**:
+    1. **§0 Language Directive (English First)**: All code, UI, commits, tests, and documentation are strictly English. Italian is welcome flavor/cameos, but English is the immutable single source of truth.
+    2. **§4 `main` Converges with the Workshop End-State**: `main` is always the complete, production-grade reference architecture (Step 8 Gold Standard).
+    3. **§5 Environmental Telemetry & UI Storytelling**: Visual alerts and badges must dynamically indicate ephemeral vs cloud-persistent tiers with zero runtime overhead.
+    4. **§6 The Localhost Invariant**: The entire application and workshop baseline **MUST run on `localhost` at ANY GIVEN TIME** without requiring active internet access or live Google Cloud credentials.
+    5. **Fast Diagnostic Tests (< 5s)**: Test suites and diagnostics must execute in under 5 seconds with actionable error diagnostics instead of hanging timeouts.
 
 ---
 
@@ -130,4 +156,10 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 
 ### Perché questo workshop è unico?
 1. **Il Contenuto di Livello Enterprise**: Dimostriamo come far girare un vero monolite Rails 8 in produzione su Google Cloud sfruttando i **Multi-Container Sidecars di Cloud Run** (Puma web + Solid Queue worker + Cloud SQL proxy mTLS con Docker Compose). Niente bucket pubblici o database aperti a `0.0.0.0/0`: usiamo ActiveStorage con **Google Cloud Storage e firma IAM short-lived (`iam: true`)**, Secret Manager per i segreti a runtime, e worker asincroni Solid Queue collegati a Vertex AI (Gemini + Imagen 3 + Text-to-Speech italiano).
-2. **L'Ingegneria dei Metadati e l'Automazione**: Abbiamo automatizzato il **Friction Logging** attraverso la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab): agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**). Il curriculum è formalmente dichiarato in un file machine-readable ([`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md)) con prerequisiti, post-requisiti azionabili ed **evaluation eseguibili direttamente in codice** (comandi Shell e asserzioni Ruby tramite `bin/workshop_eval.rb`, 20/20 test verdi!). Infine, abbiamo screenshot Playwright 100% dichiarativi come codice e la **Hive Leaderboard** in tempo reale: grazie a un **semplice Google Form pubblico** in cui lo studente inserisce solo nickname e URL di Cloud Run, il nostro poller interroga `/status.json` in background, deducendo automaticamente e live lo step raggiunto (es. `4/8` o `7/8`), lo stato di persistenza DB, storage GCS e AI senza che nessuno debba compilare o comunicare nulla a mano!
+2. **L'Ingegneria dei Metadati, l'Automazione & Filosofia Agent-First**: Sappiamo che nel 2026 gli sviluppatori **non fanno più i workshop a mano** con il copia-incolla dai PDF: usano agenti di coding! Quindi abbiamo creato il primo workshop **Agent-First nativo**:
+   - L'istruzione data agli studenti sulle slide è: *"Di' ad Antigravity di aprire [la landing page](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md) e guidarmi!"* con regole ferree per l'AI (*non fare il lavoro al posto dello studente, spiega il perché, lancia prima le diagnostiche*).
+   - Abbiamo creato **Skill dedicate per l'agente** ([`skills/rails8app-workshop`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop) e [`skills/cloud-run-troubleshooting`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/cloud-run-troubleshooting)) con la knowledge base di tutti i fallimenti tipici.
+   - **Test e diagnostiche dentro l'app Rails ("Help me help you")**: telemetria interna per dire sia all'agente che al proctor (tramite `/status.json` 😉) a che punto si trova lo studente e cosa manca.
+   - **Friction Logging Loop autonomo**: tramite la skill [`devrel-frictionlog-codelab`](https://github.com/palladius/gemini-cli-custom-commands/tree/main/skills/devrel-frictionlog-codelab), agenti AI istanziano progetti vergini su GCP, simulano l'esperienza dello studente, scovano i bachi e aprono PR risolutive (cicli **FL-003** e **FL-004**).
+   - **Curriculum e Step Evals**: formalmente dichiarato in [`workshop/skeleton.yaml`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/skeleton.yaml) $\to$ [`SKELETON.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SKELETON.md) con evaluation a 3 livelli (Shell, Ruby e LLM-as-a-judge).
+   - **Screenshot Playwright 100% dichiarativi** e **Hive Leaderboard** in tempo reale via Google Form.
