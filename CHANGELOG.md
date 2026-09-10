@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-09-10
+### Added
+- 🏆 **Workshop BRAG Document & Autonomous Engineering Architecture (PR [#61](https://github.com/palladius/rails8-app-on-gcp/pull/61), PR [#62](https://github.com/palladius/rails8-app-on-gcp/pull/62), Fixes [#60](https://github.com/palladius/rails8-app-on-gcp/issues/60))**:
+  - Published comprehensive Workshop BRAG document [`docs/WORKSHOP_BRAG_DOCUMENT.md`](docs/WORKSHOP_BRAG_DOCUMENT.md) detailing both Pillar 1 (Enterprise Multi-Container Serverless Architecture) and Pillar 2 (Agent-First Autonomous Engineering & Self-Healing Metamodel).
+  - Documented the **Agent-First Native Architecture**: Antigravity landing page guidance, custom repository skills (`skills/rails8app-workshop`, `skills/cloud-run-troubleshooting`), and in-app diagnostics.
+  - Documented the **Declarative SKELETON**: Machine-readable specification (`workshop/skeleton.yaml` $\to$ `workshop/SKELETON.md`) with actionable contracts (`prerequisites`, `pseudocode`, `postrequisites`) and 3-tier executable step evals (`[SHELL]`, `[RUBY]`, `[LLM]`).
+  - Documented **Constitutional Invariants** (`docs/CONSTITUTION.md`), Zero-Branch Time Machine progression, and Hive real-time classroom observability with visual telemetry badges.
+  - Added dual English architecture narrative and Italian community summary for Modena Ruby Day & meetups.
+
 ## [0.2.8] - 2026-09-09
 ### Fixed
 - 🛠️ **Terraform Provider 5.x & Virgin Project Hardening (FL-004)**:
