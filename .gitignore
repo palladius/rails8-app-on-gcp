@@ -19,3 +19,5 @@ node_modules/
 .riccardo/
 *.tmp
 .tmp
+.venv/
+__pycache__/
