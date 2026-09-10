@@ -34,16 +34,16 @@
     - [x] Update existing `test_healthchecker.rb` and `test_api_leaderboard.rb`
 - [x] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md) [a6fbf61]
 
-## Phase 3: Hive Frontend Visualization (`workshop/hive/public/js/hive.js`)
-- [~] Task: Update Hive student row rendering in `workshop/hive/public/js/hive.js`
-    - [ ] Check `quest` telemetry and `proctor_status`
-    - [ ] When `lgtm_approved`: render progress bar as `8/8` with purple/gold glowing bar and clickable trophy 🏆 linking to `quest.ghi_url`
-    - [ ] When `review_pending`: render progress bar as `7/8` with a badge `⏳ GHI #XX pending proctor review` linking to `quest.ghi_url`
-    - [ ] Ensure non-quest students render steps 1–7 normally
-- [ ] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md)
+## Phase 3: Hive Frontend Visualization (`workshop/hive/public/js/hive.js`) [checkpoint: 5ebab13]
+- [x] Task: Update Hive student row rendering in `workshop/hive/public/js/hive.js` [19f08c8]
+    - [x] Check `quest` telemetry and `proctor_status`
+    - [x] When `lgtm_approved`: render progress bar as `8/8` with purple/gold glowing bar and clickable trophy 🏆 linking to `quest.ghi_url`
+    - [x] When `review_pending`: render progress bar as `7/8` with a badge `⏳ GHI #XX pending proctor review` linking to `quest.ghi_url`
+    - [x] Ensure non-quest students render steps 1–7 normally
+- [x] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md) [5ebab13]
 
 ## Phase 4: Workshop Curriculum & Codelab Instructions (`workshop/CODELAB.md`)
-- [ ] Task: Document Step 8 graduation flow in `workshop/CODELAB.md`
+- [~] Task: Document Step 8 graduation flow in `workshop/CODELAB.md`
     - [ ] Explain how to complete a quest and submit a GitHub issue with title `🎓 [Step 8 Completed] <Name>: <Quest>`
     - [ ] Explain how to configure `STEP_8_GHI` on Cloud Run via `gcloud run services update`
     - [ ] Explain how proctors review and comment LGTM to unlock the 8/8 trophy on The Hive
