@@ -80,3 +80,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [x] **Track: Declarative Workshop Screenshots (Issue #42)**
 *Link: [./tracks/declarative_screenshots_issue_42_20260909/index.md](./tracks/declarative_screenshots_issue_42_20260909/index.md)*
+
+---
+
+- [ ] **Track: Native Google Cloud Structured JSON Logging, Error Reporting via STDERR & Before/After Error UI Screenshots (Issue #82)**
+*Link: [./tracks/structured_logging_error_reporting_issue_82_20260910/index.md](./tracks/structured_logging_error_reporting_issue_82_20260910/index.md)*
