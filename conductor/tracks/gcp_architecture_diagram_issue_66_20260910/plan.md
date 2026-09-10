@@ -2,7 +2,7 @@
 
 ## Phase 1: Environment & Tooling Setup (TDD Red-Green)
 - [x] Task: Write failing unit test `test/test_architecture_diagram.rb` checking for diagram outputs (cc7103b)
-- [ ] Task: Scaffold `diagrams/` with `pyproject.toml` via `uv` (`diagrams`, `pillow`)
+- [x] Task: Scaffold `diagrams/` with `pyproject.toml` via `uv` (`diagrams`, `pillow`) (204ac68)
 - [ ] Task: Add `just diagram`, `just diagram-evolution`, and `just diagrams` recipes to root `justfile`
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
