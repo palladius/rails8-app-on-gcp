@@ -57,6 +57,14 @@ This workshop shatters both paradigms across **TWO DISTINCT, INTERLOCKING FRONTS
 - **Strict Localhost Invariant:** Enforced by [CONSTITUTION.md §6](https://github.com/palladius/rails8-app-on-gcp/blob/main/docs/CONSTITUTION.md): the application runs offline on `localhost` without GCP credentials or internet, using graceful local fallbacks.
 - *Code & PR Reference:* Implemented in [PR #52](https://github.com/palladius/rails8-app-on-gcp/pull/52).
 
+#### 🍌 Live Demo Assets: 1960s Italian Cinema Posters for Modena DevFest
+To demonstrate Nano Banana's creative capacity for local conferences (e.g. Modena DevFest), the pipeline generated 3 authentic 1960s vintage film posters combining Ruby on Rails, Google Cloud, and Matz (stored in [`eventi/20261003-modena-devfest/`](https://github.com/palladius/rails8-app-on-gcp/tree/main/eventi/20261003-modena-devfest)):
+
+| 1. Fellini: *La Dolce Vita di Rails 8* 🛵 | 2. Sergio Leone: *Per un Pugno di Gemme* 🤠 | 3. Tornatore: *Cinema Paradiso* 🚂 |
+| :---: | :---: | :---: |
+| Matz on Vespa holding Ruby in Piazza Grande | Western Matz in poncho & iconic dark glasses | Classic retro steam engine on Rails |
+| [View High-Res PNG](https://github.com/palladius/rails8-app-on-gcp/blob/main/eventi/20261003-modena-devfest/modena_devfest_poster_3_fellini_dolcevita_pure_art.png) | [View High-Res PNG](https://github.com/palladius/rails8-app-on-gcp/blob/main/eventi/20261003-modena-devfest/modena_devfest_poster_2_spaghetti_western_matz_accurate.png) | [View High-Res PNG](https://github.com/palladius/rails8-app-on-gcp/blob/main/eventi/20261003-modena-devfest/modena_devfest_poster_1_cinema_paradiso_pure_art.png) |
+
 ---
 
 ## 🤖 Pillar 2: The Metamodel — "Automated Quality Engineering & Agent-First Design"
