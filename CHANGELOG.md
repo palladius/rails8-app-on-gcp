@@ -1,6 +1,6 @@
 All notable changes to this project will be documented in this file.
 
-## [0.2.12] - 2026-09-10
+## [0.2.13] - 2026-09-10
 ### Added
 - 🛡️ **Cumulative Cascading Invariants Engine (Issue [#76](https://github.com/palladius/rails8-app-on-gcp/issues/76))**:
   - Implemented monotonic architectural state checks ("one-way doors") in `workshop/skeleton.yaml` and `bin/workshop_eval.rb` to eliminate regressions across workshop steps (Friction Log FL005).
@@ -10,6 +10,13 @@ All notable changes to this project will be documented in this file.
   - Added `step-7-llm-clean-ui-no-warnings` evaluation to Step 7 verifying rendered UI and screenshots are clean without alert banners.
   - Updated visualizer compiler `workshop/visualizer/build_skeleton.rb` to document Cumulative Invariants in `workshop/SKELETON.md`.
   - Added unit test suite `test/test_workshop_invariants.rb` and extended `test/test_workshop_skeleton.rb`.
+
+## [0.2.12] - 2026-09-10
+### Fixed
+- 📸 **Step 7 Workshop UI Screenshot Clean-Up**:
+  - Replaced `step-7-podcastifier-ui.png` with a clean, architecturally consistent view (`[CLOUD PERSISTENT]` banner, zero stuck jobs alert, authentic GCS cloud storage stamp and dual audio player).
+- 🐝 **Workshop Hive Frontend Healthcheck Bugfix**:
+  - Fixed missing `const data = await res.json()` in `workshop/hive/public/js/hive.js` `fetchHealth()` function, enabling real-time telemetry rendering and healthy count synchronization.
 
 ## [0.2.11] - 2026-09-10
 ### Added

@@ -140,6 +140,7 @@ async function fetchHealth() {
   try {
     const res = await fetch("/api/healthchecks");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
     const newChecks = data.checks || {};
     
     // Preserva la telemetria precedente per ogni studente se il nuovo check è down/temporaneamente vuoto

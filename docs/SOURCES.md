@@ -10,6 +10,8 @@ A curated index of authoritative upstream documentation, architectural reference
   https://cloud.google.com/
 
 ### Cloud Run & Containers
+- 🐙 **Docker Compose Official Documentation**:  
+  https://docs.docker.com/compose/
 - 🐳 **Deploying Multi-Container Services / Docker Compose to Cloud Run**:  
   https://docs.cloud.google.com/run/docs/deploy-run-compose
 - 🚢 **Cloud Run Multi-Container Pods (Sidecars Specification)**:  
@@ -24,6 +26,8 @@ A curated index of authoritative upstream documentation, architectural reference
 ### Storage & Security
 - 🪣 **Google Cloud Storage (GCS) Overview**:  
   https://cloud.google.com/storage
+- 🪣 **Google Cloud Storage (GCS) Signed URLs**:  
+  https://docs.cloud.google.com/storage/docs/access-control/signed-urls
 - 🪣 **Google Cloud Storage (GCS) IAM-signed URLs without Service Account Keys (`signBlob`)**:  
   https://cloud.google.com/storage/docs/access-control/signing-urls-with-helpers
 - 🔒 **Cloud SQL Auth Proxy Overview & Mutual TLS (mTLS)**:  
@@ -34,6 +38,9 @@ A curated index of authoritative upstream documentation, architectural reference
 ### AI & Observability
 - 🤖 **Google Antigravity Download & IDE**:  
   https://antigravity.google/download
+- 🤹 **Workshop Agent Skills (`skills/`)**:  
+  - 💎 [Tutor Skill (`skills/rails8app-workshop`)](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop): AI Tutor rules, invariants, and Time-Machine navigation.
+  - 🩺 [Troubleshooting Skill (`skills/workshop-troubleshooting`)](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/workshop-troubleshooting): Error diagnosis across Cloud Run, Billing, DB, and Local Tools.
 - 🍌 **Google GenAI / Vertex AI Gemini API**:  
   https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview
 - 🐝 **Google Cloud Logging & Error Reporting**:  
@@ -43,6 +50,8 @@ A curated index of authoritative upstream documentation, architectural reference
 
 ## 💎 Ruby on Rails 8
 
+- 🏎️ **David Heinemeier Hansson (DHH)**:  
+  https://en.wikipedia.org/wiki/David_Heinemeier_Hansson
 - 🚀 **Rails 8: No PaaS Required (Official Announcement)**:  
   https://rubyonrails.org/2024/11/7/rails-8-no-paas-required
 - 📦 **Rails 8 Release Notes**:  
