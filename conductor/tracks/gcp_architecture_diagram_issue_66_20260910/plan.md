@@ -19,7 +19,7 @@
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 3 Complete)
 
 ## Phase 4: Workshop & Presentation Slides Integration
-- [ ] Task: Embed diagram and GIF in `workshop/CODELAB.md` (Page 1) and synchronize with `workshop/SKELETON.md`
-- [ ] Task: Add architecture diagram slide to `slides/index.md` and compile with `just build-slides`
-- [ ] Task: Run `build_ghpages.rb` and full test suites (`just test`, `just test-slides`, `ruby test/test_architecture_diagram.rb`)
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Embed diagram and GIF in `workshop/CODELAB.md` (Page 1) and synchronize with `workshop/SKELETON.md` (674b831)
+- [x] Task: Add architecture diagram slide to `slides/index.md` and compile with `just build-slides` (674b831)
+- [x] Task: Run `build_ghpages.rb` and full test suites (`just test`, `just test-slides`, `ruby test/test_architecture_diagram.rb`) (674b831)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (Phase 4 Complete)
