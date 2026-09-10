@@ -1,0 +1,2 @@
+Task: Write Failing Tests for /boom & Error Reporting to STDERR (Red Phase)
+Created integration test asserting /boom triggers RuntimeError and outputs stack trace to STDERR.
