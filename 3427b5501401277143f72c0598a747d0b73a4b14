@@ -1,0 +1,1 @@
+Task: Implement the Invariant Engine with an elegant, idiomatic Ruby design. Built WorkshopEval::InvariantChecker with rule dispatch and integrated cumulative cascading invariants into bin/workshop_eval.rb.
