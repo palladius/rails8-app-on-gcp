@@ -78,12 +78,11 @@ def generate_canonical():
         users = Users("Web & Mobile\nUsers")
 
         with Cluster("Google Cloud Run (1. Billable Serverless Service)"):
-            cloud_run = Run("Cloud Run Service\n(Serverless Pod)")
-            with Cluster("Pod Containers (In-Pod localhost)"):
-                web = Node("🌐 puma (web :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
-                worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.35")
-                proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
-                web - Edge(style="invis") - worker - Edge(style="invis") - proxy
+            cloud_run = Run("Cloud Run\n(Serverless Pod)")
+            web = Node("🌐 rails_app (puma :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            web - Edge(style="invis") - worker - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Managed Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL\n(2. Managed DB Instance)")
@@ -236,12 +235,11 @@ def generate_evolution():
         users = Users("Web & Mobile Users")
 
         with Cluster("Google Cloud Run (Billable Serverless Service)"):
-            cloud_run = Run("Cloud Run Service")
-            with Cluster("Pod Containers"):
-                web = Node("🌐 puma (web :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.35")
-                worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.35")
-                proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.35")
-                web - Edge(style="invis") - worker - Edge(style="invis") - proxy
+            cloud_run = Run("Cloud Run\n(Serverless Pod)")
+            web = Node("🌐 rails_app (puma :8080)", shape="box", style="rounded,filled", fillcolor="#e8f0fe", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            worker = Node("⚡ solid_queue (worker)", shape="box", style="rounded,filled", fillcolor="#fef7e0", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            proxy = Node("🔒 cloud_sql_proxy (sidecar)", shape="box", style="rounded,filled", fillcolor="#e6f4ea", fontname="Courier", fontsize="11", height="0.38", width="3.0")
+            web - Edge(style="invis") - worker - Edge(style="invis") - proxy
 
         with Cluster("Google Cloud Persistence (Billable)"):
             db = SQL("Cloud SQL PostgreSQL")
