@@ -1,0 +1,4 @@
+Task: Write failing tests for STEP_8_GHI in blog/test/controllers/statuses_controller_test.rb (TDD Red)
+Summary: Added tests verifying quest telemetry in /status.json with missing STEP_8_GHI, numeric ID, and full URL formats.
+Files: blog/test/controllers/statuses_controller_test.rb
+Why: Establishes Red baseline for Step 8 proctor-validated graduation trophy telemetry.
