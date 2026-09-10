@@ -219,6 +219,30 @@ steps:
         type: "ruby"
         description: "Verify master.key exists locally"
         code: "raise 'Missing master.key' unless File.exist?('blog/config/master.key') || File.exist?('blog/config/credentials.yml.enc')"
+      - id: "step-5-ruby-status-json-step"
+        type: "ruby"
+        description: "Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars"
+        code: |
+          require 'open3'
+          require 'json'
+          runner_code = <<~RUBY
+            c = StatusesController.new
+            c.instance_variable_set(:@db_status, c.send(:detect_db_status))
+            c.instance_variable_set(:@storage_status, c.send(:detect_storage_status))
+            c.instance_variable_set(:@ai_status, c.send(:detect_ai_status))
+            puts c.send(:infer_workshop_step).to_json
+          RUBY
+          cmd = ["bin/rails", "runner", runner_code]
+          env = {
+            "SECRET_KEY_BASE_DUMMY" => "1",
+            "RAILS_ENV" => "production",
+            "DATABASE_URL" => "postgres://user:pass@localhost:5432/app?host=/cloudsql/p:r:i",
+            "ACTIVE_STORAGE_SERVICE" => "local"
+          }
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          raise "Runner failed: #{err}" unless st.success?
+          step_info = JSON.parse(out.lines.last)
+          raise "Expected step 5, got #{step_info['number']}" unless step_info['number'] == 5
 
   - id: "step-6"
     number: 6
@@ -260,6 +284,34 @@ steps:
           has_sidecar_worker = compose_prod.include?('solid_queue:start')
           has_puma_plugin = puma_config.include?('plugin :solid_queue')
           raise 'Solid Queue worker execution strategy missing' unless has_sidecar_worker || has_puma_plugin
+      - id: "step-6-ruby-status-json-step"
+        type: "ruby"
+        description: "Verify status telemetry infers Step 6 on Cloud Run with Cloud SQL and GCS (non-AI baseline)"
+        code: |
+          require 'open3'
+          require 'json'
+          runner_code = <<~RUBY
+            c = StatusesController.new
+            c.instance_variable_set(:@db_status, c.send(:detect_db_status))
+            c.instance_variable_set(:@storage_status, c.send(:detect_storage_status))
+            c.instance_variable_set(:@ai_status, c.send(:detect_ai_status))
+            puts c.send(:infer_workshop_step).to_json
+          RUBY
+          cmd = ["bin/rails", "runner", runner_code]
+          env = {
+            "SECRET_KEY_BASE_DUMMY" => "1",
+            "K_SERVICE" => "blog",
+            "RAILS_ENV" => "production",
+            "DATABASE_URL" => "postgres://user:pass@localhost:5432/app?host=/cloudsql/p:r:i",
+            "ACTIVE_STORAGE_SERVICE" => "google_prod",
+            "GOOGLE_APPLICATION_CREDENTIALS" => "/dev/null",
+            "GOOGLE_CLOUD_PROJECT" => "",
+            "GEMINI_API_KEY" => ""
+          }
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          raise "Runner failed: #{err}" unless st.success?
+          step_info = JSON.parse(out.lines.last)
+          raise "Expected step 6, got #{step_info['number']}" unless step_info['number'] == 6
 
   - id: "step-7"
     number: 7
@@ -308,6 +360,32 @@ steps:
         type: "llm"
         description: "Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges"
         prompt: "Inspect the rendered post view and screenshots for Step 7. Verify that the UI exhibits zero yellow warning alert banners (such as stuck background jobs or missing worker warnings) and no ephemeral disk badges. The interface must be completely clean. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
+      - id: "step-7-ruby-status-json-step"
+        type: "ruby"
+        description: "Verify status telemetry infers Step 7 when Cloud Run has Cloud SQL, GCS, and active AI credentials"
+        code: |
+          require 'open3'
+          require 'json'
+          runner_code = <<~RUBY
+            c = StatusesController.new
+            c.instance_variable_set(:@db_status, c.send(:detect_db_status))
+            c.instance_variable_set(:@storage_status, c.send(:detect_storage_status))
+            c.instance_variable_set(:@ai_status, c.send(:detect_ai_status))
+            puts c.send(:infer_workshop_step).to_json
+          RUBY
+          cmd = ["bin/rails", "runner", runner_code]
+          env = {
+            "SECRET_KEY_BASE_DUMMY" => "1",
+            "K_SERVICE" => "blog",
+            "RAILS_ENV" => "production",
+            "DATABASE_URL" => "postgres://user:pass@localhost:5432/app?host=/cloudsql/p:r:i",
+            "ACTIVE_STORAGE_SERVICE" => "google_prod",
+            "GEMINI_API_KEY" => "dummy-gemini-key"
+          }
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          raise "Runner failed: #{err}" unless st.success?
+          step_info = JSON.parse(out.lines.last)
+          raise "Expected step 7, got #{step_info['number']}" unless step_info['number'] == 7
 
   - id: "step-8"
     number: 8

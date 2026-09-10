@@ -7,31 +7,12 @@ All notable changes to this project will be documented in this file.
   - **The Hive Backend (`workshop/hive/`)**: Created `WorkshopHive::ProctorReviewer` to verify GitHub issue comments from authorized proctors (`HIVE_PROCTORS="palladius,emilianodellacasa,ricc"`) containing case-insensitive `LGTM`, with in-memory 120s TTL caching and `Healthchecker` integration.
   - **The Hive Frontend (`public/js/hive.js`)**: Rendered 8/8 progress bar with purple/gold glowing effect and clickable golden trophy 🏆 linking to the approved GitHub issue. When awaiting review, displays `⏳ GHI #XX review pending` link badge.
   - **Codelab Instructions (`workshop/CODELAB.md`)**: Documented the 3-step proof-of-work graduation workflow at the conclusion of Step 8 and rebuilt static documentation via `just build-ghpages`.
+- 🧪 **Workshop Status Telemetry Evaluation Suite (`status.json` Step Verification)**:
+  - Added declarative ruby evaluations in `workshop/skeleton.yaml` for Steps 5, 6, and 7 asserting that `/status.json` auto-inference returns step numbers `5`, `6`, and `7` based on active infrastructure telemetry (Cloud SQL, GCS, and GenAI credentials).
+  - Synchronized `workshop/SKELETON.md` via `just build-skeleton`.
+  - Added test coverage in `test/test_workshop_skeleton.rb` and `blog/test/controllers/statuses_controller_test.rb`.
 
 ## [0.2.14] - 2026-09-10
-### Added
-- 🛡️ **Hardened Workshop Evaluations, Negative Testing & Header Warning Mappings (Issue [#85](https://github.com/palladius/rails8-app-on-gcp/issues/85))**:
-  - **Header Alerts Test Suite**: Created comprehensive integration test suite `blog/test/integration/workshop_alerts_test.rb` mapping all top-left header educational warnings (`_ephemeral_database` for SQL, `_ephemeral_storage` for Storage, `_ai_status` for AI, and kill-switch `DISABLE_WORKSHOP_ALERTS`).
-  - **Semantic YAML Invariant Engine**: Refactored `WorkshopEval::InvariantChecker` from string grepping to semantic `YAML.safe_load` with ERB comment stripping.
-  - **Negative Regression Test Suite**: Built automated test suite in `test/test_workshop_invariants.rb` proving that broken topologies, local storage reversions, missing tools, and broken code trigger `REGRESSION ALERT` and exit code `1`.
-  - **Additional Cumulative Invariants**: Added 4 new approved monotonic invariants:
-    - `inv-toolchain-integrity` (`from_step: 0`): Ultra-fast (< 10ms) PATH lookup for `git`, `gcloud`, `docker`, `terraform`, `ruby >= 3.3`, `just`.
-    - `inv-database-migrations-current` (`from_step: 2`): Schema currency check ensuring 0 pending migrations.
-    - `inv-admin-user-seeded` (`from_step: 2`): Bootstrapped admin user check.
-    - `inv-three-tier-architecture` (`from_step: 6`): Production compose definition check ensuring `web`, `worker`, `cloudsql-proxy`.
-  - **Step 7 Deterministic UI Assertion**: Added `step-7-ruby-clean-ui-deterministic` verifying absence of warning alerts, stuck jobs, and ephemeral badges.
-  - **Permissive Crutches Removal**: Replaced `|| true` in shell evaluations with intelligent offline environment guards (`test -z "$GOOGLE_CLOUD_PROJECT"`).
-
-## [0.2.13] - 2026-09-10
-### Added
-- 🛡️ **Cumulative Cascading Invariants Engine (Issue [#76](https://github.com/palladius/rails8-app-on-gcp/issues/76))**:
-  - Implemented monotonic architectural state checks ("one-way doors") in `workshop/skeleton.yaml` and `bin/workshop_eval.rb` to eliminate regressions across workshop steps (Friction Log FL005).
-  - Created `WorkshopEval::InvariantChecker` (`lib/workshop_eval/invariant_checker.rb`) with declarative rule handlers (`no_local_storage`, `zero_stuck_jobs`, `compose_has_service`, `ruby_code`).
-  - Defined milestone invariants for GCS Persistent Storage (Step 4+), Zero Stuck Jobs / Worker Active (Step 6+), and Cloud SQL Auth Proxy Connected (Step 6+).
-  - Wired automated evaluation of all active cumulative invariants (`from_step <= current_step_number`) into `bin/workshop_eval.rb` with dedicated visual banners and regression alerts.
-  - Added `step-7-llm-clean-ui-no-warnings` evaluation to Step 7 verifying rendered UI and screenshots are clean without alert banners.
-  - Updated visualizer compiler `workshop/visualizer/build_skeleton.rb` to document Cumulative Invariants in `workshop/SKELETON.md`.
-  - Added unit test suite `test/test_workshop_invariants.rb` and extended `test/test_workshop_skeleton.rb`.
 
 ## [0.2.12] - 2026-09-10
 ### Fixed
