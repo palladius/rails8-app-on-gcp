@@ -85,3 +85,9 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 
 - [x] **Track: Cumulative Cascading Invariants for Workshop Steps (Issue #76)**
 *Link: [./tracks/cumulative_invariants_issue_76_20260910/index.md](./tracks/cumulative_invariants_issue_76_20260910/index.md)*
+
+---
+
+- [ ] **Track: Hardening Workshop Evaluations: Semantic Checks, Negative Testing & Additional Monotonic Invariants (Issue #85)**
+*Link: [./tracks/eval_hardening_issue_85_20260910/index.md](./tracks/eval_hardening_issue_85_20260910/index.md)*
+
