@@ -45,4 +45,14 @@ class WorkshopSkeletonTest < Minitest::Test
     assert_includes invariant_ids, "inv-zero-stuck-background-jobs"
     assert_includes invariant_ids, "inv-cloud-sql-connected"
   end
+
+  def test_steps_include_status_json_inference_evals
+    [5, 6, 7].each do |step_num|
+      step = @skeleton["steps"].find { |s| s["number"] == step_num }
+      refute_nil step, "Step #{step_num} missing in skeleton.yaml"
+      eval_ids = (step["evals"] || []).map { |e| e["id"] }
+      assert_includes eval_ids, "step-#{step_num}-ruby-status-json-step",
+                      "Step #{step_num} must include status telemetry inference eval"
+    end
+  end
 end

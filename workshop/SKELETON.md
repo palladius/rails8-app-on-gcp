@@ -145,6 +145,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[SHELL]` Verify Secret Manager API is accessible or offline environment check
   - `[RUBY]` Verify master.key exists locally
+  - `[RUBY]` Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars
 
 ---
 
@@ -168,6 +169,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[RUBY]` Verify multi-container production compose configuration contains web, worker, and proxy
   - `[SHELL]` Verify full test suite passes against gold standard
   - `[RUBY]` Verify that Solid Queue worker or supervisor is active and draining jobs
+  - `[RUBY]` Verify status telemetry infers Step 6 on Cloud Run with Cloud SQL and GCS (non-AI baseline)
 
 ---
 
@@ -192,6 +194,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[LLM]` Verify student implementation of Podcastifier via Antigravity if attempted
   - `[RUBY]` Verify deterministic absence of warning alerts, stuck jobs, and ephemeral badges via integration tests
   - `[LLM]` Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges
+  - `[RUBY]` Verify status telemetry infers Step 7 when Cloud Run has Cloud SQL, GCS, and active AI credentials
 
 ---
 
