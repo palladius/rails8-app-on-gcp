@@ -119,4 +119,11 @@ Once `just workshop-test` outputs a clean green report, tell Google Antigravity:
 
 > *"All pre-flight checks are green! Let's proceed to Step 1: configuring our .env and launching immutable Terraform infrastructure!"*
 
+---
+
+## 🐛 Found a Bug? Be Googley!
+
+Be *googley*! If you find bugs of some sort, it would be nice for you to file a [GitHub Issue](https://github.com/palladius/rails8-app-on-gcp/issues/new), and maybe even a PR to this issue. Make sure to explain the context (at which workshop step, what you were told to do, ... and why/how it didn't work). The more detailed you'll be, the easier it will be for someone to fix the bug!
+
 Enjoy the journey! 🚀
+

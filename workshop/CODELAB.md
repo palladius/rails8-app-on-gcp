@@ -73,7 +73,7 @@ gcloud config set compute/region europe-west1
 > 💡 **Why a Dedicated Configuration?**  
 > Using `gcloud config configurations create rails8-on-gcp-workshop` isolates all CLI settings (account, quota project, default region) specifically for this workshop. When you finish, you can switch back to your normal setup anytime with `gcloud config configurations activate default`.
 
-> 📸 **TODO(riccardo): add screenshot showing terminal output of gcloud config configurations list with active rails8-on-gcp-workshop configuration**
+![Active gcloud configuration](assets/images/gcloud_config_configurations_list.png)
 
 ### 3. 🚨 Mandatory Guard Gate: GCP Billing Verification
 
@@ -85,7 +85,7 @@ gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
 ```
 Ensure `billingEnabled: true` is returned. If billing is disabled, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
 
-> 📸 **TODO(riccardo): add screenshot showing Google Cloud Console Billing page with active linked billing account or workshop credits**
+![Active GCP Billing Account](assets/images/gcp_billing_account_active.png)
 
 ### 4. Clone the Repository & Pair with Antigravity
 
