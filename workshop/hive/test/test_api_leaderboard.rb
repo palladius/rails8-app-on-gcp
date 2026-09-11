@@ -144,6 +144,74 @@ class AppLeaderboardApiTest < Minitest::Test
     assert_includes body_str, "leaderboard-tbody"
     assert_includes body_str, "/js/hive.js"
   end
+
+  def test_get_index_json_endpoint
+    env = Rack::MockRequest.env_for("/index.json?event_name=test-conf&event_start=2026-09-09T09:00:00Z&max_age=24h", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "application/json"
+
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+
+    assert_equal "ok", parsed["status"]
+    assert_equal "workshop-hive", parsed["service"]
+    assert_equal "test-conf", parsed.dig("event", "name")
+    assert parsed.key?("query_params")
+    assert_equal "test-conf", parsed["query_params"]["event_name"]
+    assert_equal "24h", parsed["query_params"]["max_age"]
+    assert parsed.key?("entries")
+    assert parsed["entries"].is_a?(Array)
+    refute_empty parsed["entries"]
+
+    entry = parsed["entries"].first
+    assert entry.key?("nickname")
+    assert entry.key?("url")
+    assert entry.key?("status_url")
+    assert entry.key?("up_url")
+    assert_equal "#{entry["url"].sub(%r{/+$}, '')}/status.json", entry["status_url"]
+  end
+
+  def test_get_status_json_endpoint_alias
+    env = Rack::MockRequest.env_for("/status.json", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "application/json"
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+    assert_equal "ok", parsed["status"]
+    assert parsed.key?("entries")
+  end
+
+  def test_get_metastatus_json_endpoint_alias
+    env = Rack::MockRequest.env_for("/metastatus.json", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "application/json"
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+    assert_equal "ok", parsed["status"]
+    assert parsed.key?("entries")
+  end
+
+  def test_get_root_with_accept_header_json
+    env = Rack::MockRequest.env_for("/", method: "GET", "HTTP_ACCEPT" => "application/json")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    assert_includes headers["content-type"], "application/json"
+    body_str = ""
+    body.each { |part| body_str += part }
+    parsed = JSON.parse(body_str)
+    assert_equal "ok", parsed["status"]
+    assert parsed.key?("entries")
+  end
 end
 
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2] - 2026-09-11
+### Added
+- 🍯 **Comprehensive JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
+  - Implemented `GET /index.json`, `GET /status.json`, and `GET /metastatus.json` endpoints returning the aggregated student array with direct links to their Cloud Run app (`url`), status JSON (`status_url`), and up healthcheck (`up_url`).
+  - Added HTTP content negotiation on `GET /` returning JSON when `Accept: application/json` header is sent.
+  - Added query string parameter persistence (`query_params: params`) and event metadata tracking (`event_name`, `event_start`, `elapsed_minutes`, `cinderella_hours_remaining`).
+  - Added comprehensive unit tests in `test_api_leaderboard.rb`.
+
 ## [0.1.1] - 2026-09-11
 ### Fixed & Added
 - 🐝 **Duplicate Cloud Run URL Deduplication & Toggle**:

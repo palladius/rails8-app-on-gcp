@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.24] - 2026-09-11
+### Added
+- 🍯 **Workshop Hive Structured Telemetry JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
+  - Added `GET /index.json`, `GET /status.json`, and `GET /metastatus.json` to Workshop Hive, exposing aggregated student telemetry with direct links to student Cloud Run endpoints (`url`), status JSONs (`status_url`), and up healthcheck endpoints (`up_url`).
+  - Added HTTP content negotiation on `GET /` to return JSON when `Accept: application/json` is requested.
+  - Implemented query string persistence (`query_params: params`) and event metadata tracking (`event_name`, `event_start`, `elapsed_minutes`, `cinderella_hours_remaining`).
+  - Added unit test suite in `test_api_leaderboard.rb`.
+
 ## [0.2.23] - 2026-09-11
 ### Fixed & Added
 - 🐝 **Workshop Hive Leaderboard Duplicate Cloud Run Deduplication & Toggle**:
