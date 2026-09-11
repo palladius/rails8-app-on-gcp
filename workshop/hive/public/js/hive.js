@@ -41,12 +41,88 @@ function setTimeFilter(filterVal) {
 window.addEventListener("popstate", () => {
   activeMaxAge = getCurrentMaxAge();
   updateTimeFilterUI();
+  updateDuplicateFilterUI();
   fetchLeaderboard();
 });
 
+function normalizeUrl(urlStr) {
+  if (!urlStr) return "";
+  let str = urlStr.trim();
+  if (!/^https?:\/\//i.test(str)) {
+    str = "https://" + str;
+  }
+  try {
+    const u = new URL(str);
+    const host = u.hostname.toLowerCase();
+    const scheme = host.endsWith(".run.app") ? "https:" : u.protocol.toLowerCase();
+    const port = (u.port && u.port !== "80" && u.port !== "443") ? `:${u.port}` : "";
+    const path = u.pathname.replace(/\/+$/, "");
+    return `${scheme}//${host}${port}${path}`;
+  } catch (e) {
+    return str.toLowerCase().replace(/\/+$/, "");
+  }
+}
+
+function deduplicateEntries(entries) {
+  if (!Array.isArray(entries)) return [];
+  const seen = new Map();
+  // Reverse iteration so the last entry seen is preserved (the latest submission)
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const entry = entries[i];
+    const key = normalizeUrl(entry.url);
+    if (!seen.has(key)) {
+      seen.set(key, entry);
+    }
+  }
+  return Array.from(seen.values()).reverse();
+}
+
+function shouldShowDuplicates() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("show_duplicates") === "true" ||
+         params.get("show_duplicates") === "1" ||
+         params.get("show_duplicatees") === "true" ||
+         params.has("show_duplicates_true") ||
+         params.has("show_duplicatees_true") ||
+         params.get("show_duplicates_true") === "true" ||
+         params.get("show_duplicatees_true") === "true";
+}
+
+function updateDuplicateFilterUI() {
+  const btn = document.getElementById("dupe-filter-btn");
+  const label = document.getElementById("dupe-filter-label");
+  if (!btn) return;
+  const showDupes = shouldShowDuplicates();
+  if (showDupes) {
+    btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm flex items-center gap-1";
+    if (label) label.textContent = "Dupes: ON";
+  } else {
+    btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent flex items-center gap-1";
+    if (label) label.textContent = "Dupes: Off";
+  }
+}
+
+function toggleDuplicates() {
+  const url = new URL(window.location);
+  if (shouldShowDuplicates()) {
+    url.searchParams.delete("show_duplicates");
+    url.searchParams.delete("show_duplicatees");
+    url.searchParams.delete("show_duplicates_true");
+    url.searchParams.delete("show_duplicatees_true");
+  } else {
+    url.searchParams.set("show_duplicates", "true");
+  }
+  window.history.replaceState({}, "", url);
+  updateDuplicateFilterUI();
+  fetchLeaderboard();
+}
+
 try {
   const savedLd = localStorage.getItem(CACHE_KEY_LEADERBOARD);
-  if (savedLd) cachedLeaderboard = JSON.parse(savedLd);
+  if (savedLd) {
+    const parsed = JSON.parse(savedLd);
+    cachedLeaderboard = shouldShowDuplicates() ? parsed : deduplicateEntries(parsed);
+  }
 
   const savedHl = localStorage.getItem(CACHE_KEY_HEALTH);
   if (savedHl) cachedHealth = JSON.parse(savedHl);
@@ -57,6 +133,7 @@ try {
 // Render immediato prima ancora di fare qualsiasi fetch
 document.addEventListener("DOMContentLoaded", () => {
   updateTimeFilterUI();
+  updateDuplicateFilterUI();
   if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
@@ -113,11 +190,15 @@ window.addEventListener("click", () => {
 
 async function fetchLeaderboard() {
   try {
-    const query = (activeMaxAge && activeMaxAge !== "all") ? `?max_age=${encodeURIComponent(activeMaxAge)}` : "";
+    const queryParams = new URLSearchParams();
+    if (activeMaxAge && activeMaxAge !== "all") queryParams.set("max_age", activeMaxAge);
+    if (shouldShowDuplicates()) queryParams.set("show_duplicates", "true");
+    const query = queryParams.toString() ? `?${queryParams.toString()}` : "";
+
     const res = await fetch(`/api/leaderboard${query}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const newEntries = data.entries || [];
+    const newEntries = shouldShowDuplicates() ? (data.entries || []) : deduplicateEntries(data.entries || []);
 
     // Suona il chime quando una nuova persona entra!
     if (previousStudentsCount > 0 && newEntries.length > previousStudentsCount) {
@@ -184,9 +265,142 @@ function formatHHMM(isoOrStr) {
   return "--:--";
 }
 
+function getVictoryTimestamp(student, t) {
+  if (t && t.proctor_approved_at) return t.proctor_approved_at;
+  if (t && t.checked_at) return t.checked_at;
+  return student.timestamp;
+}
+
+function computeStep8Winners() {
+  const winners = [];
+  cachedLeaderboard.forEach(student => {
+    const check = cachedHealth[student.url] || {};
+    const t = check.telemetry || {};
+    const isProctorApproved = (t.proctor_status === 'lgtm_approved');
+    const rawStep = t.step_number || student.step_number || 1;
+    const stepNum = isProctorApproved ? 8 : Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
+
+    if (stepNum === 8) {
+      const wonAtStr = getVictoryTimestamp(student, t);
+      const wonDate = new Date(wonAtStr);
+      winners.push({
+        url: student.url,
+        nickname: student.nickname || "Anonymous",
+        wonAt: wonAtStr,
+        wonAtTime: !isNaN(wonDate.getTime()) ? wonDate.getTime() : 9999999999999,
+        hhmm: formatHHMM(wonAtStr),
+        proctor_reviewer: t.proctor_reviewer,
+        quest_ghi_issue: t.quest_ghi_issue,
+        quest_ghi_url: t.quest_ghi_url || (t.quest_ghi_issue ? `https://github.com/palladius/rails8-app-on-gcp/issues/${t.quest_ghi_issue}` : null)
+      });
+    }
+  });
+
+  // Sort ascending: first to reach Step 8 gets Rank 1!
+  winners.sort((a, b) => a.wonAtTime - b.wonAtTime);
+
+  return winners.map((w, idx) => {
+    const rank = idx + 1;
+    const medal = (rank === 1) ? '🥇' : ((rank === 2) ? '🥈' : ((rank === 3) ? '🥉' : '🏆'));
+    const suffix = (rank === 1) ? 'st' : ((rank === 2) ? 'nd' : ((rank === 3) ? 'rd' : 'th'));
+    return {
+      ...w,
+      rank,
+      medal,
+      suffix
+    };
+  });
+}
+
+function renderStep8Podium(winners) {
+  const container = document.getElementById("step8-podium-container");
+  if (!container) return;
+
+  if (!winners || winners.length === 0) {
+    container.classList.add("hidden");
+    container.innerHTML = "";
+    return;
+  }
+
+  container.classList.remove("hidden");
+
+  let chipsHtml = "";
+  winners.forEach(w => {
+    let rankBadgeClass = "";
+    let borderClass = "";
+    let bgClass = "";
+    let medalBg = "";
+
+    if (w.rank === 1) {
+      bgClass = "bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-600/10";
+      borderClass = "border-amber-400/70 shadow-[0_0_12px_rgba(251,191,36,0.3)]";
+      rankBadgeClass = "text-amber-200 font-extrabold";
+      medalBg = "bg-amber-950/80 text-amber-300 border-amber-500/40";
+    } else if (w.rank === 2) {
+      bgClass = "bg-slate-400/15";
+      borderClass = "border-slate-400/60 shadow-[0_0_8px_rgba(148,163,184,0.25)]";
+      rankBadgeClass = "text-slate-200 font-bold";
+      medalBg = "bg-slate-900/80 text-slate-300 border-slate-500/40";
+    } else if (w.rank === 3) {
+      bgClass = "bg-amber-700/20";
+      borderClass = "border-amber-600/60 shadow-[0_0_8px_rgba(217,119,6,0.25)]";
+      rankBadgeClass = "text-amber-300 font-bold";
+      medalBg = "bg-amber-950/80 text-amber-400 border-amber-700/40";
+    } else {
+      bgClass = "bg-purple-950/30";
+      borderClass = "border-purple-500/40";
+      rankBadgeClass = "text-purple-300 font-medium";
+      medalBg = "bg-purple-900/40 text-purple-200 border-purple-500/30";
+    }
+
+    const reviewerText = w.proctor_reviewer ? ` (Approved by @${escapeHtml(w.proctor_reviewer)})` : "";
+    const titleText = `${w.rank}${w.suffix} Place! Completed Step 8 at ${w.hhmm}${reviewerText}`;
+
+    chipsHtml += `
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl ${bgClass} border ${borderClass} transition-all hover:scale-[1.03] shadow-sm" title="${escapeHtml(titleText)}">
+        <span class="text-lg leading-none">${w.medal}</span>
+        <div class="flex items-baseline gap-1.5 font-mono">
+          <span class="text-xs ${rankBadgeClass}">${escapeHtml(w.nickname)}</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded border ${medalBg} font-semibold">${escapeHtml(w.hhmm)}</span>
+        </div>
+        ${w.quest_ghi_issue ? `
+          <a href="${escapeHtml(w.quest_ghi_url)}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-amber-400/80 hover:text-amber-300 hover:underline" title="View Issue #${escapeHtml(w.quest_ghi_issue)}">#${escapeHtml(w.quest_ghi_issue)}</a>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl mb-1">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-2xl shadow-inner">
+          🏆
+        </div>
+        <div>
+          <div class="text-xs font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+            <span>Step 8 Champions Podium</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-[10px] font-mono text-purple-300 font-normal">First to Finish (Victory Chronology)</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            Students who completed the final quest, ranked strictly by timestamp of victory!
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap">
+        ${chipsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function renderTable() {
   const tbody = document.getElementById("leaderboard-tbody");
   if (!tbody) return;
+
+  const step8Winners = computeStep8Winners();
+  renderStep8Podium(step8Winners);
 
   if (cachedLeaderboard.length === 0) {
     const filterMsg = (activeMaxAge && activeMaxAge !== "all")
@@ -252,10 +466,10 @@ function renderTable() {
       if (i <= stepNum) {
         // Segmento completato / attivo
         const color = (i === 8) ? 'bg-purple-400' : (i >= 5 ? 'bg-amber-400' : 'bg-emerald-400');
-        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm"></span>`;
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm shrink-0"></span>`;
       } else {
         // Segmento futuro / spento
-        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40"></span>`;
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40 shrink-0"></span>`;
       }
     }
 
@@ -263,28 +477,28 @@ function renderTable() {
 
     let trophyHtml = "";
     let glowingBorderClass = "border-slate-700/60 hover:border-amber-500/50";
-    if (stepNum === 8 && isProctorApproved) {
-      glowingBorderClass = "border-purple-500/80 shadow-[0_0_12px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+
+    const winnerIndex = step8Winners.findIndex(w => w.url === student.url);
+    const winner = (winnerIndex !== -1) ? step8Winners[winnerIndex] : null;
+
+    if (winner) {
+      glowingBorderClass = (winner.rank === 1)
+        ? "border-amber-400/90 shadow-[0_0_12px_rgba(251,191,36,0.35)] bg-amber-950/40 ring-1 ring-amber-400/50"
+        : "border-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+
       const reviewerText = t.proctor_reviewer ? ` by @${escapeHtml(t.proctor_reviewer)}` : "";
+      const rankTitle = `🎓 ${winner.rank}${winner.suffix} Place Champion! Completed Step 8 at ${winner.hhmm}${reviewerText}`;
+
       if (questUrl) {
-        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block ml-0.5" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-[12px] leading-none">🏆</span></a>`;
+        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="${escapeHtml(rankTitle)} — Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-sm leading-none">${winner.medal}</span></a>`;
       } else {
-        trophyHtml = `<span class="text-[12px] leading-none ml-0.5" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
+        trophyHtml = `<span class="text-sm leading-none shrink-0" title="${escapeHtml(rankTitle)}">${winner.medal}</span>`;
       }
     } else if (stepNum === 8) {
-      trophyHtml = '<span class="text-[11px] leading-none ml-0.5">🏆</span>';
-    }
-
-    let pendingBadgeHtml = "";
-    if (isReviewPending && questUrl) {
-      pendingBadgeHtml = `
-        <div class="mt-0.5">
-          <a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-yellow-500/15 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/25 hover:border-yellow-500/50 transition-colors" title="Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate">
-            <span class="text-xs leading-none animate-pulse">⏳</span>
-            <span class="font-bold text-[9.5px]">GHI #${escapeHtml(t.quest_ghi_issue)} review pending</span>
-          </a>
-        </div>
-      `;
+      glowingBorderClass = "border-purple-500/60 bg-purple-950/30";
+      trophyHtml = '<span class="text-sm leading-none shrink-0" title="Step 8 Complete!">🏆</span>';
+    } else if (isReviewPending && questUrl) {
+      trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="⏳ Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate (Issue #${escapeHtml(t.quest_ghi_issue)})"><span class="text-xs leading-none animate-pulse">⏳</span></a>`;
     }
 
     let nameTrophyHtml = "";
@@ -298,15 +512,12 @@ function renderTable() {
     }
 
     const stepBarHtml = `
-      <div class="flex items-center gap-1.5 ml-auto">
-        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
-          <span class="font-mono text-[11px] font-bold tracking-tight">
-            <span class="${stepNum === 8 ? 'text-purple-300' : 'text-yellow-400'} drop-shadow-[0_0_4px_rgba(250,204,21,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
-          </span>
-          <div class="flex items-center gap-0.5">
-            ${segmentsHtml}
-          </div>
-          ${trophyHtml}
+      <div class="inline-flex items-center justify-between px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm w-[98px] shrink-0" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+        <span class="font-mono text-[11px] font-bold tracking-tight shrink-0">
+          <span class="${stepNum === 8 ? 'text-purple-300' : 'text-amber-400'} drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+        </span>
+        <div class="flex items-center gap-0.5 shrink-0">
+          ${segmentsHtml}
         </div>
       </div>
     `;
@@ -499,35 +710,34 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome (in giallo) + eventuale coppa + sotto GHI review pending + a dx Step bar fissa -->
-      <td class="py-2 px-3 whitespace-nowrap align-middle">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex flex-col">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
-              <span class="font-bold text-yellow-300 text-sm drop-shadow-sm">${escapeHtml(nickname)}</span>
-              ${nameTrophyHtml}
-              ${t.admin_email ? `
-                <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
-                  <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
-                </a>
-              ` : ''}
-            </div>
-            ${pendingBadgeHtml}
+      <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
+      <td class="py-2.5 px-3 align-middle w-[440px] overflow-hidden">
+        <div class="flex items-center justify-between gap-2 w-full overflow-hidden">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+            <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
+            ${trophyHtml ? `<span class="shrink-0 inline-flex items-center text-sm">${trophyHtml}</span>` : ''}
+            <span class="font-bold text-amber-400 text-sm truncate" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
+            ${t.admin_email ? `
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+                <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
+              </a>
+            ` : ''}
           </div>
 
-          ${stepBarHtml}
+          <div class="shrink-0">
+            ${stepBarHtml}
+          </div>
         </div>
       </td>
 
       <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
-      <td class="py-2 px-3 align-middle">
-        <div class="flex flex-col gap-1">
+      <td class="py-2.5 px-4 align-middle overflow-hidden">
+        <div class="flex flex-col gap-1 min-w-0">
           <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
-          <div class="flex items-center gap-2">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all" title="${escapeHtml(student.url)}">
-              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm flex-shrink-0" alt="Cloud Run" title="Google Cloud Run">
-              <span class="font-medium">${escapeHtml(student.url)}</span>
+          <div class="flex items-center gap-2 min-w-0">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 truncate max-w-full" title="${escapeHtml(student.url)}">
+              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm shrink-0" alt="Cloud Run" title="Google Cloud Run">
+              <span class="font-medium truncate">${escapeHtml(student.url)}</span>
             </a>
           </div>
 

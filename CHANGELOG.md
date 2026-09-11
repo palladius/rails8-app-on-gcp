@@ -1,5 +1,25 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.29] - 2026-09-11
+### Added & Improved
+- 🏆 **Workshop Hive Step 8 Champions Podium & Ranked Medals (Issue #89 / Hall of Fame)**:
+  - Added dedicated **Step 8 Champions Podium** strip above the leaderboard table, chronologically ranking finishers by victory timestamp (`won_at`).
+  - Added ranked medal badges to the left of the student nickname: `🥇` (1st place), `🥈` (2nd place), `🥉` (3rd place), and `🏆` (subsequent finishers) with rich hover tooltips.
+  - Added pulsating `⏳` review-pending indicator for quest submissions awaiting proctor approval.
+  - Added `step_8_podium` array to JSON endpoints (`/index.json`, `/status.json`, `/metastatus.json`).
+- 🍯 **Comprehensive Telemetry JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
+  - Implemented `GET /index.json`, `GET /status.json`, and `GET /metastatus.json` exposing aggregated student telemetry with direct links to student Cloud Run endpoints (`url`), status JSONs (`status_url`), and up healthchecks (`up_url`).
+  - Added HTTP content negotiation on `GET /` returning JSON when `Accept: application/json` is requested.
+  - Added event metadata tracking (`event_name`, `event_start`, `elapsed_minutes`, `cinderella_hours_remaining`).
+- 🐝 **Duplicate Cloud Run URL Deduplication & Toggle**:
+  - Automatically deduplicates Cloud Run URL submissions by taking the latest submission by default.
+  - Added `&show_duplicates=true` parameter and interactive toggle pill (`👯 Dupes: Off/ON`).
+- 📐 **Rigid `table-fixed` Layout & Column Width Rebalancing**:
+  - Widened Student & Step column to `440px` and table min-width to `900px`, giving long nicknames ample breathing room without truncation.
+  - Locked 8-segment progress bar dimensions to a strictly fixed `w-[96px]` pill with `shrink-0` bars.
+  - Replaced `break-all` on Cloud Run URLs with `truncate max-w-full`.
+  - Bumped Workshop Hive to v0.1.3 (`workshop/hive/VERSION`).
+
 ## [0.2.28] - 2026-09-11
 ### Fixed
 - 🐝 **Workshop Hive String Coercion**:
@@ -36,6 +56,15 @@ All notable changes to this project will be documented in this file.
 - 🐝 **Workshop Hive Frontend String Coercion**:
   - Coerced values to `String(str)` in `escapeHtml` (`workshop/hive/public/js/hive.js`) to handle numeric telemetry fields (such as GitHub issue numbers), preventing a `TypeError: str.replace is not a function` during table rendering.
   - Bumped Workshop Hive to v0.1.1 (`workshop/hive/VERSION`).
+
+## [0.2.23] - 2026-09-11
+### Fixed & Added
+- 🐝 **Workshop Hive Leaderboard Duplicate Cloud Run Deduplication & Toggle**:
+  - Implemented `deduplicate_by_url` and `normalize_url` in `WorkshopHive::SheetsReader` to eliminate duplicate Cloud Run submissions by keeping the second (latest) entry by default.
+  - Added `&show_duplicates=true` (and typo-tolerant `&show_duplicatees_true`) query parameter support in `GET /api/leaderboard` to opt out of deduplication and view all raw submissions.
+  - Added interactive duplicate toggle pill (`👯 Dupes: Off/ON`) in `public/index.html` and `public/js/hive.js`.
+  - Normalized URLs (whitespace trimming, case-insensitivity, trailing slash removal, and protocol scheme handling for `.run.app` domains).
+  - Added full test coverage for both default deduplication and opt-out duplicate display in `test_sheets_reader.rb` and `test_api_leaderboard.rb`.
 
 ## [0.2.22] - 2026-09-11
 ### Changed

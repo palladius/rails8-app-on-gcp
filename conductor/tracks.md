@@ -86,3 +86,8 @@
 - [x] **Track: Native Google Cloud Structured JSON Logging, Error Reporting via STDERR & Before/After Error UI Screenshots (Issue #82)**
 *Link: [tracks/structured_logging_error_reporting_issue_82_20260910/index.md](tracks/structured_logging_error_reporting_issue_82_20260910/index.md)*
 
+---
+
+- [ ] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
+*Link: [tracks/hive_compact_view_20260911/index.md](tracks/hive_compact_view_20260911/index.md)*
+
