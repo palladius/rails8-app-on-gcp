@@ -23,7 +23,7 @@
 | :--- | :--- | :--- |
 | `GOOGLE_CLOUD_PROJECT` | Active Google Cloud Project ID | **The universal GCP standard.** Used by Vertex AI, Secret Manager, Cloud SQL client, Cloud Storage, and Terraform. Replaces deprecated `PROJECT_ID` and `GCP_PROJECT_ID`. |
 | `GOOGLE_CLOUD_ACCOUNT` | Primary Google user identity (e.g., `user@gmail.com` or `user@google.com`) | Used for Google Cloud Billing checks, Terraform IAM policy bindings (`user:${email}`), ADC, and IAP identity. Automatically serves as the default administrator email for Rails `db:seed`. Replaces deprecated `GCLOUD_USER` and `GCP_EMAIL`. |
-| `GOOGLE_CLOUD_REGION` | GCP deployment region (e.g. `us-central1`, `europe-west1`) | Official Google Cloud standard for regional services (Cloud Run, Cloud SQL, Vertex AI). Defaults to `us-central1`. Replaces `GCP_REGION`. |
+| `GOOGLE_CLOUD_REGION` | GCP deployment region (e.g. `us-central1`, `europe-west1`) | Official Google Cloud standard for regional services (Cloud Run, Cloud SQL, Vertex AI). Defaults to `europe-west1`, matching `iac/variables.tf`. Replaces `GCP_REGION`. |
 | `GOOGLE_CLOUD_LOCATION` | Region/Location for AI and regional endpoints | Synonymous with or paired with `GOOGLE_CLOUD_REGION` for Vertex AI model locations. |
 | `APP_ADMIN_PASSWORD` | Initial seeded password for the Rails blog administrator | Explicitly distinguishes application admin password from system or cloud database passwords. Defaults to `Ch4ng3m3!!1`. |
 | `DATABASE_URL` | Connection string for PostgreSQL or SQLite | Rails standard 12-factor database URL. (e.g. `postgresql://user:pass@127.0.0.1:5432/blog_development`). |

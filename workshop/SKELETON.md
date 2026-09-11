@@ -94,9 +94,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 1
-  gcloud run deploy blog --source . --region us-central1 --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
+  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
   # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
-  gcloud run services update blog --region us-central1 --update-env-vars SOLID_QUEUE_IN_PUMA=true
+  gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars SOLID_QUEUE_IN_PUMA=true
   ```
 - **`postrequisites`**:
   - First live public HTTPS URL on Cloud Run
