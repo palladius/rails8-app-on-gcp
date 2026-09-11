@@ -11,16 +11,16 @@
 - [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2: JavaScript State Management & URL/Storage Synchronization
-- [ ] Task: Implement Compact Mode State Engine in hive.js
-  - [ ] Implement `isCompactMode()` checking `?compact=true`, `?compact=1`, `?density=compact`, and `localStorage('hive_compact_mode')`
-  - [ ] Implement `toggleCompactMode()` updating `localStorage` and syncing `window.history.replaceState`
-  - [ ] Implement `updateCompactViewUI()` updating button styling, icon, and label
-- [ ] Task: Adapt Podium & Summary Headers for Compact Mode
-  - [ ] Add compact mode responsive styling/class toggling for `#step8-podium-container` and stats cards to minimize vertical consumption
-- [ ] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement Compact Mode State Engine in hive.js (a008bbd)
+  - [x] Implement `isCompactMode()` checking `?compact=true`, `?compact=1`, `?density=compact`, and `localStorage('hive_compact_mode')`
+  - [x] Implement `toggleCompactMode()` updating `localStorage` and syncing `window.history.replaceState`
+  - [x] Implement `updateCompactViewUI()` updating button styling, icon, and label
+- [x] Task: Adapt Podium & Summary Headers for Compact Mode (a008bbd)
+  - [x] Add compact mode responsive styling/class toggling for `#step8-podium-container` and stats cards to minimize vertical consumption
+- [x] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Single-Line Row Rendering Engine & High-Density Verification
-- [ ] Task: Implement Strict Single-Line Student Row Template
+- [~] Task: Implement Strict Single-Line Student Row Template
   - [ ] Implement compact branch in `renderTable()` for every student row
   - [ ] Ensure Status dot + latency ms render inline on the same line
   - [ ] Ensure HH:MM + truncated nickname + 8-step bar render strictly on 1 line
