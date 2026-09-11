@@ -35,7 +35,7 @@ style: |
 
 ### Deploying Modern Rails 8 on Google Cloud (From Zero to AI)
 
-**Riccardo Carlesso & Emiliano Mancuso** (with AI Partner **Antigravity**)
+**Emiliano Della Casa** 🏎️ & **Riccardo Carlesso** 🦖 (with AI Partner **Antigravity** 🤖)
 
 ---
 

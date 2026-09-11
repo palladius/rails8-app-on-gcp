@@ -1,7 +1,7 @@
 # 🏆 Workshop BRAG Document: Deploying Modern Rails 8 on Google Cloud (From Zero to AI)
 
 > **The Definitive Monolith-to-Serverless Reference Architecture & Autonomous Workshop Engineering Engine**  
-> *Authors: Riccardo Carlesso & Emiliano Mancuso (with AI Partner Antigravity)*  
+> *Authors: Riccardo Carlesso 🦖 & Emiliano Della Casa 🍝🏎️ (with AI Partner Google Antigravity 🤖)*  
 > *Repository:* [`palladius/rails8-app-on-gcp`](https://github.com/palladius/rails8-app-on-gcp)
 
 ---

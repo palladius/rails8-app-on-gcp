@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.34] - 2026-09-11
+### Fixed & Improved
+- 🏎️ **Author Attribution & Showcase Alignment (Emiliano First!)**:
+  - Corrected Emiliano's surname in `docs/WORKSHOP_BRAG_DOCUMENT.md` and `slides/why-different.md` to **Emiliano Della Casa** 🍝🏎️.
+  - Placed Emiliano first in the author header of `slides/why-different.md` aligning with the application footer (*"Made with ❤️ by Emiliano & Riccardo"*).
+
 ## [0.2.33] - 2026-09-11
 ### Fixed
 - 🔗 **Slide Links Open in a New Tab (PR #105, closes #104)**:
