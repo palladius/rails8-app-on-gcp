@@ -1,10 +1,10 @@
 # Implementation Plan: Workshop Hive Leaderboard High-Density 50+ Compact View
 
 ## Phase 1: Test Scaffold & HTML Toolbar Controls
-- [ ] Task: Write Tests for Compact Mode HTML Elements & Query Param Handling
-  - [ ] Add endpoint test in `test/test_api_leaderboard.rb` verifying index.html contains `#compact-view-btn` and compact mode container attributes
-  - [ ] Verify tests fail before implementation (Red phase)
-- [ ] Task: Implement Compact Mode Toggle Button & Header Toolbar in HTML
+- [x] Task: Write Tests for Compact Mode HTML Elements & Query Param Handling (8056b19)
+  - [x] Add endpoint test in `test/test_api_leaderboard.rb` verifying index.html contains `#compact-view-btn` and compact mode container attributes
+  - [x] Verify tests fail before implementation (Red phase)
+- [~] Task: Implement Compact Mode Toggle Button & Header Toolbar in HTML
   - [ ] Update `workshop/hive/public/index.html` to add `#compact-view-btn` and `#compact-view-label` in the toolbar
   - [ ] Ensure toolbar styling matches the existing Tailwind dark palette and dupe filter styling
   - [ ] Run automated tests and verify green (Green phase)
