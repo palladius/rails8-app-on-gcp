@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.33] - 2026-09-11
+### Fixed
+- 🔗 **Slide Links Open in a New Tab (PR #105, closes #104)**:
+  - Added `target="_blank" rel="noopener noreferrer"` to all **9** external links in `slides/index.md` — none of them had it, so clicking any one (the **🎟️ Claim GCP Credits** button, the Antigravity download, the LinkedIn profiles, the Lyria MP3s) navigated away and **replaced the running deck**, forcing the presenter to hit Back mid-talk.
+  - This was a repeat report: the first bullet of the previous friction log already flagged the Antigravity download link, and it resurfaced on the Reclaim Credits slide.
+### Added
+- ✅ **Slide Link Regression Test**:
+  - `test/test_slides.rb` now asserts every `<a href="http…">` across `slides/*.md` carries `target="_blank"`, so a new slide with a bare external link fails the suite instead of surfacing on stage.
+
 ## [0.2.32] - 2026-09-11
 ### Fixed
 - 📋 **`just` Documented as a Prerequisite (PR #103, closes #102)**:

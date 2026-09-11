@@ -139,7 +139,7 @@ style: |
 ## 1. Download Google Antigravity 2.0 ⬇️
 
 <div style="margin: 8px 0 10px 0;">
-  <a href="https://antigravity.google/download" style="display: inline-block; background-color: #1a73e8; color: white; padding: 6px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
+  <a href="https://antigravity.google/download" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 6px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
     🚀 Download Antigravity 2.0
   </a>
 </div>
@@ -147,7 +147,7 @@ style: |
 <div style="text-align: center; margin: 4px 0;">
   <img src="images/antigravity-download.png" style="max-height: 270px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); border: 1px solid #dadce0;" />
   <p style="font-size: 0.72em; margin: 4px 0 0 0; color: #5f6368;">
-    🔗 <a href="https://antigravity.google/download" style="color: #1a73e8; text-decoration: none;">antigravity.google/download</a>
+    🔗 <a href="https://antigravity.google/download" target="_blank" rel="noopener noreferrer" style="color: #1a73e8; text-decoration: none;">antigravity.google/download</a>
   </p>
 </div>
 
@@ -177,12 +177,12 @@ style: |
   <div style="flex: 1;">
     <p>Redeem your Google Cloud credits for today's workshop:</p>
     <div style="margin: 10px 0 14px 0;">
-      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" style="display: inline-block; background-color: #1a73e8; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
+      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
         🎟️ Claim GCP Credits
       </a>
     </div>
     <ul style="font-size: 0.85em;">
-      <li>🔗 <strong>Link:</strong> <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8">me.developers.google.com/...</a></li>
+      <li>🔗 <strong>Link:</strong> <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer">me.developers.google.com/...</a></li>
       <li>☁️ Activate sandbox GCP Project & billing.</li>
       <li>💵 Covers Cloud Run, Cloud SQL & GCS.</li>
     </ul>
@@ -253,15 +253,15 @@ and guide me step-by-step through the workshop!"
 <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
   <div style="display: flex; align-items: center; gap: 8px;">
     <img src="images/riccardo-carlesso.webp" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #1a73e8; box-shadow: 0 1px 4px rgba(0,0,0,0.15);" alt="Riccardo" />
-    <span>🦖 <strong>Riccardo:</strong> <a href="https://linkedin.com/in/riccardocarlesso">linkedin.com/in/riccardocarlesso</a></span>
+    <span>🦖 <strong>Riccardo:</strong> <a href="https://linkedin.com/in/riccardocarlesso" target="_blank" rel="noopener noreferrer">linkedin.com/in/riccardocarlesso</a></span>
   </div>
   <div style="display: flex; align-items: center; gap: 8px;">
     <img src="images/emiliano-della-casa.png" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 2px solid #188038; box-shadow: 0 1px 4px rgba(0,0,0,0.15);" alt="Emiliano" />
-    <span>🏎️ <strong>Emiliano:</strong> <a href="https://www.linkedin.com/in/emilianodellacasa">linkedin.com/in/emilianodellacasa</a></span>
+    <span>🏎️ <strong>Emiliano:</strong> <a href="https://www.linkedin.com/in/emilianodellacasa" target="_blank" rel="noopener noreferrer">linkedin.com/in/emilianodellacasa</a></span>
   </div>
 </div>
 <p style="margin: 0 0 8px 0;">
-👉 Start hacking at <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md"><code>workshop/landing-page/README.md</code></a>
+👉 Start hacking at <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md" target="_blank" rel="noopener noreferrer"><code>workshop/landing-page/README.md</code></a>
 </p>
 
 <div style="background-color: #f1f3f4; border: 1px solid #dadce0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; font-size: 0.9em;">
@@ -274,8 +274,8 @@ and guide me step-by-step through the workshop!"
 Your browser does not support audio playback.
 </audio>
 <div style="display: flex; gap: 12px; font-size: 0.78em; margin-top: 2px;">
-<span>⚡ <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-clip-preview.mp3">30s Clip</a></span>
-<span>🎸 <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3">Full 3m Song (3.4MB)</a></span>
+<span>⚡ <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-clip-preview.mp3" target="_blank" rel="noopener noreferrer">30s Clip</a></span>
+<span>🎸 <a href="https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3" target="_blank" rel="noopener noreferrer">Full 3m Song (3.4MB)</a></span>
 </div>
 </div>
 </div>

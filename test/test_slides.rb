@@ -5,6 +5,7 @@ require "fileutils"
 class SlidesTest < Minitest::Test
   REPO_ROOT = File.expand_path("..", __dir__)
   SLIDES_MD = File.join(REPO_ROOT, "slides/index.md")
+  ALL_SLIDE_SOURCES = Dir[File.join(REPO_ROOT, "slides/*.md")].reject { |f| File.basename(f) == "README.md" }.sort
   SLIDES_DIST_DIR = File.join(REPO_ROOT, "slides/dist")
   SLIDES_HTML = File.join(SLIDES_DIST_DIR, "index.html")
 
@@ -40,6 +41,30 @@ class SlidesTest < Minitest::Test
 
     text_button_leaks = html.scan(/&lt;button\s+onclick=[^&]*&gt;/)
     assert_empty text_button_leaks, "Found literal escaped &lt;button onclick=...&gt; in slides HTML:\n#{text_button_leaks.join("\n")}"
+  end
+
+  # A link that swallows the deck is a live-presentation bug: the presenter loses their
+  # slides mid-talk and has to hit Back on a projector. Reported twice in the friction
+  # logs (Antigravity download link, then the "Claim GCP Credits" button), hence a test.
+  def test_external_links_in_slides_open_in_a_new_tab
+    offenders = []
+
+    ALL_SLIDE_SOURCES.each do |path|
+      File.readlines(path, chomp: true).each_with_index do |line, index|
+        line.scan(/<a\s+[^>]*href="https?:\/\/[^"]*"[^>]*>/) do |tag|
+          next if tag.include?('target="_blank"')
+
+          offenders << "#{File.basename(path)}:#{index + 1}: #{tag.strip[0, 120]}"
+        end
+      end
+    end
+
+    assert_empty offenders, <<~MSG
+      External slide links must open in a new tab, otherwise clicking one replaces the deck:
+      #{offenders.join("\n")}
+
+      Add `target="_blank" rel="noopener noreferrer"` to each link.
+    MSG
   end
 
   def test_rendered_png_images_can_be_generated
