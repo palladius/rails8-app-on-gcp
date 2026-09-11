@@ -12,6 +12,36 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 🎶 **Official Workshop Anthem (Generated with Google Lyria 3 Pro)**:
 🎧 [Listen / Download "An energetic acoustic guitar song for Rubyists" (MP3, 3.4 MB)](https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3)
 
+## ✅ Prerequisites
+
+Every command below is a [`just`](https://just.systems) recipe, so **install `just` first** — without it nothing in this repo runs:
+
+```bash
+# Recommended: latest upstream release (1.40+)
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+
+# macOS
+brew install just
+
+# Debian/Ubuntu — ships 1.21; supported, but older than upstream
+sudo apt install just
+```
+
+Check it works with `just --list`: it should print the full recipe list — if it prints a parse error instead, your `just` is too old for the justfile (see `just test-justfile`). Then make sure you also have:
+
+| Tool | Check | Needed for |
+| :--- | :--- | :--- |
+| **just** (1.21+, 1.40+ recommended) | `just --version` | every command in this repo and in the workshop |
+| **Ruby 3.3+ & Rails 8** | `ruby -v`, `rails -v` | `just install`, `just dev` |
+| **Docker & Docker Compose** | `docker compose version` | `just compose-up` |
+| **Google Cloud SDK** | `gcloud version` | deployment, `just workshop-test` |
+| **Terraform** (1.5+) | `terraform -version` | `just terraform-apply` |
+| **Node.js** | `node -v` | `just slides`, `just screenshots` |
+
+> 💡 Doing the workshop? `just workshop-test` runs the full pre-flight diagnostics (Gmail identity, GCP billing, ADC, keys) once the toolchain above is in place.
+
+---
+
 ## 🚀 Quickstart: Starting the Apps & Services
 
 You can run the project in three different local modes depending on your development focus:

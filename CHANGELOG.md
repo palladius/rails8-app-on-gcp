@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.32] - 2026-09-11
+### Fixed
+- 📋 **`just` Documented as a Prerequisite (PR #103, closes #102)**:
+  - `just` is the very first command of the workshop (`just install`) and drives every step, but it was listed as a prerequisite **nowhere**: not in `README.md` (which had no prerequisites section at all), not in the Step 0 checklist of `workshop/CODELAB.md`, not in `step-0.prerequisites` of `workshop/skeleton.yaml`, and not among the step-0 evals — which had `step-0-shell-git`, `-gcloud` and `-adc` but no `-just`.
+  - Added a `## ✅ Prerequisites` section to `README.md` with install one-liners (upstream installer, Homebrew, apt) and a tool/check/why table covering just, Ruby & Rails, Docker, gcloud, Terraform and Node.
+  - Added a `just` entry at the top of the Step 0 Prerequisites Checklist in `workshop/CODELAB.md`, with the same install snippets and a `just --list` smoke check.
+  - Added `just` to `step-0.prerequisites` in `workshop/skeleton.yaml` and recompiled `workshop/SKELETON.md` via `just build-skeleton`.
+### Added
+- 🧪 **`step-0-shell-just` Eval**:
+  - New step-0 eval running `just --version && just --summary > /dev/null`, so `just workshop-eval 0` now fails fast on a missing `just` *or* on a justfile that does not parse on the attendee's version — the exact failure behind #100.
+
 ## [0.2.31] - 2026-09-11
 ### Fixed
 - 📖 **Codelab & Workshop Curriculum Hardening (PR #99, closes #96)**:
