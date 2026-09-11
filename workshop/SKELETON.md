@@ -94,7 +94,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 1
-  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT
+  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # dummy key fallback: without credentials the container dies with 'Missing `secret_key_base`'
   # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
   gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars SOLID_QUEUE_IN_PUMA=true
   ```
@@ -118,7 +118,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 2
-  gcloud run deploy blog --source . --set-env-vars GCS_BUCKET=$GCS_BUCKET
+  gcloud run deploy blog --source . --update-env-vars GCS_BUCKET=$GCS_BUCKET # update, not set: --set-env-vars would wipe the vars from Step 3
   # Observe surviving images & stuck jobs banner
   ```
 - **`postrequisites`**:

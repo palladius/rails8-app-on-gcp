@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.46] - 2026-09-11
+### Fixed
+- 🔐 **Step 3 Deploy Boots Again (PR #128, closes #127)**:
+  - `workshop/skeleton.yaml` step-3 deploy omitted `SECRET_KEY_BASE_DUMMY=1`, which `CODELAB.md:376` has and labels *"dummy key fallback if starting without credentials"*. An attendee starting fresh has no `blog/config/master.key`, so the container died with ``ArgumentError: Missing `secret_key_base` for 'production'`` and never bound `PORT=8080` — surfacing as the opaque *"user-provided container failed to start and listen on the port"*.
+  - Third divergence found in that single skeleton command, after the `us-central1` region in #121, between two files whose header says they *"must be kept in sync at all times"*.
+  - Fixed step-4 next door too: `--set-env-vars GCS_BUCKET=$GCS_BUCKET` **replaces** the whole environment rather than merging, wiping `GOOGLE_CLOUD_ACCOUNT` and `SECRET_KEY_BASE_DUMMY` from step 3 and crashing the container identically one step later. Now `--update-env-vars`.
+  - Both lines carry an inline note explaining what breaks without them; `SKELETON.md` recompiled.
+
 ## [0.2.45] - 2026-09-11
 ### Added
 - 🛂 **Build Service Account Pre-Flight Check (PR #126, closes #125)**:
