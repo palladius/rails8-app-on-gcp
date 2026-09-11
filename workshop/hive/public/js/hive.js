@@ -604,8 +604,8 @@ function renderStagesDistribution() {
 }
 
 function escapeHtml(str) {
-  if (!str) return "";
-  return str.replace(/[&<>"']/g, function(m) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/[&<>"']/g, function(m) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
   });
 }

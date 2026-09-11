@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.1] - 2026-09-11
+### Fixed
+- Fixed `escapeHtml` in `public/js/hive.js` to coerce numbers (such as GHI issue IDs) to String, preventing a `TypeError: str.replace is not a function` during table rendering.
+
 ## [0.1.0] - 2026-09-10
 ### Added
 - 🏆 **Proctor-Validated Proof-of-Work Verification (Issue #83)**:

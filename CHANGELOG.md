@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.24] - 2026-09-11
+### Fixed
+- 🐝 **Workshop Hive Frontend String Coercion**:
+  - Coerced values to `String(str)` in `escapeHtml` (`workshop/hive/public/js/hive.js`) to handle numeric telemetry fields (such as GitHub issue numbers), preventing a `TypeError: str.replace is not a function` during table rendering.
+  - Bumped Workshop Hive to v0.1.1 (`workshop/hive/VERSION`).
+
 ## [0.2.23] - 2026-09-11
 ### Changed
 - 🎨 **Deterministic Architecture Diagram Polish**:
