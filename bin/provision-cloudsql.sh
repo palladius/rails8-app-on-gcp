@@ -8,7 +8,7 @@ set -euo pipefail
 echo "🚀 [Workshop Step 0] Starting Background Cloud SQL Provisioning..."
 
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null || echo '')}"
-REGION="${GOOGLE_CLOUD_REGION:-us-central1}"
+REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"  # must match iac/variables.tf (region default) so Cloud SQL lands beside the buckets
 
 if [[ -z "$PROJECT_ID" || "$PROJECT_ID" == "(unset)" ]]; then
   echo "❌ Error: No Google Cloud Project ID detected."

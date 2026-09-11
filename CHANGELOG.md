@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.42] - 2026-09-11
+### Fixed
+- 🌍 **Region Unified on `europe-west1` (PR #122, closes #121)**:
+  - `workshop/skeleton.yaml` step-3 pseudocode hard-coded `--region us-central1` (twice), compiled straight into `SKELETON.md`, while `CODELAB.md` exports `GOOGLE_CLOUD_REGION="europe-west1"` and `iac/variables.tf` defaults to `europe-west1`. The workshop contradicted itself, and attendees (or the agent reading the skeleton) deployed Cloud Run to the wrong continent.
+  - Worse than latency: later steps build the Cloud SQL connection name as `PROJECT:$GOOGLE_CLOUD_REGION:INSTANCE` and run `gcloud run services describe blog --region $GOOGLE_CLOUD_REGION`, so a service deployed in `us-central1` is **invisible** to every subsequent command and cannot reach an instance provisioned beside the buckets in `europe-west1`.
+  - Replaced the hard-coded region with `$GOOGLE_CLOUD_REGION` in the step-3 pseudocode and with `${GOOGLE_CLOUD_REGION:-europe-west1}` in the step-3 eval; recompiled `SKELETON.md`.
+  - `bin/provision-cloudsql.sh` defaulted to `us-central1` when `GOOGLE_CLOUD_REGION` was unset — and the variable was **absent from `.env.dist` entirely**, so the fallback was the normal path: Cloud SQL was provisioned across the Atlantic from the buckets. Default is now `europe-west1`, matching Terraform.
+  - Added `GOOGLE_CLOUD_REGION="europe-west1"` to `.env.dist` with a note on why the region must stay aligned, and corrected `docs/ENV_VAR_NAMES.md`, which advertised `us-central1` as the default.
+
 ## [0.2.39] - 2026-09-11
 ### Fixed
 - 📁 **Step 2 Now Says `cd blog` (PR #115, closes #114)**:
