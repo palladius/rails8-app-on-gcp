@@ -20,19 +20,19 @@
 - [x] Task: Phase 2 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3: Single-Line Row Rendering Engine & High-Density Verification
-- [~] Task: Implement Strict Single-Line Student Row Template
-  - [ ] Implement compact branch in `renderTable()` for every student row
-  - [ ] Ensure Status dot + latency ms render inline on the same line
-  - [ ] Ensure HH:MM + truncated nickname + 8-step bar render strictly on 1 line
-  - [ ] Ensure Cloud Run link + JSON link + Ruby/Rails version chips render strictly on 1 line with `whitespace-nowrap` and `overflow-hidden`
-  - [ ] Reduce row height to `py-1` and text size to `text-[11px]` / `text-xs`
-- [ ] Task: Verify 50-Student Screen Fit & Performance
-  - [ ] Test with synthesized 50-student dataset to confirm all 50 rows fit without cell overflow or vertical row wrapping
-  - [ ] Verify seamless transition when switching between Compact and Expanded mode
-- [ ] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement Strict Single-Line Student Row Template (01919a7)
+  - [x] Implement compact branch in `renderTable()` for every student row
+  - [x] Ensure Status dot + latency ms render inline on the same line
+  - [x] Ensure HH:MM + truncated nickname + 8-step bar render strictly on 1 line
+  - [x] Ensure Cloud Run link + JSON link + Ruby/Rails version chips render strictly on 1 line with `whitespace-nowrap` and `overflow-hidden`
+  - [x] Reduce row height to `py-1` and text size to `text-[11px]` / `text-xs`
+- [x] Task: Verify 50-Student Screen Fit & Performance (01919a7)
+  - [x] Test with synthesized 50-student dataset to confirm all 50 rows fit without cell overflow or vertical row wrapping
+  - [x] Verify seamless transition when switching between Compact and Expanded mode
+- [x] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4: Version Bump, Documentation & Final Verification
-- [ ] Task: Version Bump and Changelog Update
+- [~] Task: Version Bump and Changelog Update
   - [ ] Bump `workshop/hive/VERSION` from 0.1.3 to 0.1.4
   - [ ] Document High-Density Compact Mode (50+ students single-line view) in `workshop/hive/CHANGELOG.md`
 - [ ] Task: Full Regression Suite Verification
