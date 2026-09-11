@@ -9,6 +9,18 @@ resource "google_project_service" "artifactregistry" {
   disable_on_destroy = false
 }
 
+# Required GCP API for Cloud Build.
+#
+# Needed well before any CI/CD trigger exists: `gcloud run deploy --source .`
+# (workshop Step 3) builds the image with Cloud Build, so without this the
+# attendee's first deploy stops to ask for the API mid-workshop. Enabling it
+# here means `terraform apply` in Step 1 has already done it.
+resource "google_project_service" "cloudbuild" {
+  project            = var.project_id
+  service            = "cloudbuild.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Artifact Registry for Docker images
 resource "google_artifact_registry_repository" "docker" {
   location      = var.region
@@ -61,6 +73,8 @@ resource "google_cloudbuild_trigger" "deploy_on_push" {
   }
 
   filename = "cloudbuild.yaml"
+
+  depends_on = [google_project_service.cloudbuild]
 
   substitutions = {
     _AR_REGION = var.region
