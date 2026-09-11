@@ -1,5 +1,17 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.36] - 2026-09-11
+### Added
+- 🪫 **Antigravity Out-of-Credits Guidance (PR #110, closes #107)**:
+  - Attendees who exhausted Antigravity's free credits were hard-blocked with nowhere to look: `grep -ri antigravity` across the slides, `CODELAB.md`, `SKELETON.md` and the landing page returned **not one line** about credits, quota or rate limits.
+  - Added an "⚡ Out of Antigravity free credits?" box to slide 3 (`slides/index.md`) leading with the trap — **the redeemed Cloud credits do not refill Antigravity**, since its quota sits on Google AI plans while vouchers land on a Cloud Billing account — followed by a four-step ladder: switch model pool (Claude/GPT-OSS have an independent, free-tier-eligible quota), pick a Flash model, Antigravity CLI with a free AI Studio key, then weekly refresh or Google AI Pro/Ultra.
+  - Added a matching `### 5. 🪫 If Antigravity Runs Out of Free Credits` section to Step 0 of `workshop/CODELAB.md` with the exact CLI bring-your-own-key steps (`modelProvider: gemini` + `GEMINI_API_KEY` + `agy`) and their documented gotchas — BYOK is unsupported in the IDE, the CLI is the only documented exception.
+  - Slide 3 reflowed to fit: the redundant plaintext link bullet was dropped, the QR tightened to 128px and the "Localhost first" callout folded into the bullet list; verified by rendering the deck to PNG and inspecting the slide for overflow.
+### Fixed
+- 💎 **Ruby Version Pinned to 3.4.5 in Constitution (PR #109, closes #108)**:
+  - Updated `blog/Dockerfile` and `blog/config/deploy.yml` to pin Ruby to 3.4.5 across all environments.
+  - Ratified Constitution Section 7 in `docs/CONSTITUTION.md` (bumped to v1.2.0) with rationale from FL006 (avoiding Ruby 4.0 URI parser breaking changes on Cloud SQL Auth Proxy socket paths).
+
 ## [0.2.35] - 2026-09-11
 ### Added
 - 🎨 **Cloud SQL Proxy Custom Vector Icon**:

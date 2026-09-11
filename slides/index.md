@@ -173,30 +173,34 @@ style: |
 
 ## 3. Reclaim Credits Now 💳
 
-<div style="display: flex; gap: 24px; align-items: flex-start; margin-top: 8px;">
+<div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 2px;">
   <div style="flex: 1;">
-    <p>Redeem your Google Cloud credits for today's workshop:</p>
-    <div style="margin: 10px 0 14px 0;">
-      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85em;">
+    <p style="margin: 0 0 4px 0;">Redeem your Google Cloud credits for today's workshop:</p>
+    <div style="margin: 6px 0 8px 0;">
+      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 7px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.8em;">
         🎟️ Claim GCP Credits
       </a>
     </div>
-    <ul style="font-size: 0.85em;">
-      <li>🔗 <strong>Link:</strong> <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer">me.developers.google.com/...</a></li>
-      <li>☁️ Activate sandbox GCP Project & billing.</li>
-      <li>💵 Covers Cloud Run, Cloud SQL & GCS.</li>
+    <ul style="font-size: 0.84em; margin: 0;">
+      <li>☁️ Activates sandbox GCP Project &amp; billing.</li>
+      <li>💵 Covers Cloud Run, Cloud SQL &amp; GCS.</li>
+      <li>⚠️ <strong>Localhost first</strong> — early steps are 100% local.</li>
     </ul>
   </div>
   <div style="text-align: center;">
-    <img src="images/reclaim-credits-qr.png" style="width: 190px; height: 190px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);" alt="Scan QR Code to Claim Credits" />
-    <p style="font-size: 0.7em; color: #5f6368; margin-top: 4px;">📱 Scan with phone camera</p>
+    <img src="images/reclaim-credits-qr.png" style="width: 158px; height: 158px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);" alt="Scan QR Code to Claim Credits" />
+    <p style="font-size: 0.66em; color: #5f6368; margin-top: 3px;">📱 Scan with phone camera</p>
   </div>
 </div>
 
-<div class="highlight" style="font-size: 0.8em; margin-top: 8px;">
-
-⚠️ **Localhost First!** Initial steps run 100% locally on SQLite/Docker before touching the cloud.
-
+<div style="border: 1px solid #f9ab00; background-color: #fef7e0; border-radius: 6px; padding: 9px 14px; margin-top: 10px; font-size: 0.74em; line-height: 1.35;">
+<strong>⚡ Out of Antigravity free credits?</strong> These Cloud credits <strong>do not</strong> refill them — Antigravity bills on Google AI plans, a separate surface. Try in order:
+<ol style="margin: 3px 0 0 0; padding-left: 1.2em;">
+<li><strong>Switch model pool:</strong> Claude / GPT-OSS have their own quota and are free-tier eligible (model selector under the prompt box).</li>
+<li><strong>Pick a Flash model</strong> rather than Pro — lighter on rate limits.</li>
+<li><strong>Antigravity CLI + free Gemini API key</strong> from AI Studio — bring-your-own-key works on the <em>CLI only</em>, never in the IDE. Steps in Step 0 of the codelab.</li>
+<li><strong>Otherwise:</strong> free quota refreshes <strong>weekly</strong>, or upgrade to Google AI Pro / Ultra.</li>
+</ol>
 </div>
 
 ---
