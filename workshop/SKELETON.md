@@ -118,7 +118,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 2
-  gcloud run deploy blog --source . --update-env-vars GCS_BUCKET=$GCS_BUCKET # update, not set: --set-env-vars would wipe the vars from Step 3
+  gcloud run deploy blog --source . --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
   # Observe surviving images & stuck jobs banner
   ```
 - **`postrequisites`**:

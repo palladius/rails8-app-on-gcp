@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.47] - 2026-09-12
+### Fixed
+- 🪣 **Step 4 Deploy Sets `GOOGLE_CLOUD_PROJECT` (PR #130, closes #129)**:
+  - The Step 4 container died with ``Google::Apis::ClientError: invalid: Invalid bucket name: '-activestorage-prod'`` — an empty prefix — aborting `db:prepare` and never binding `PORT=8080`, behind the same opaque "container failed to start" message as #127.
+  - `blog/config/storage.yml:19` derives the bucket and the signer SA from `ENV["GOOGLE_CLOUD_PROJECT"]` (falling back to credentials, which a fresh attendee does not have). `workshop/skeleton.yaml` step 4 never set it, so the name collapsed to `-activestorage-prod`.
+  - Worse, the variable the instructions *do* name is inert: `grep -rn GCS_BUCKET blog/` matches **nothing** — the app never reads it. Attendees pass a correct bucket name, conclude storage is configured, and fail on a variable nobody mentioned.
+  - Step 4 now sets `GOOGLE_CLOUD_PROJECT` and `ACTIVE_STORAGE_SERVICE=google` and drops the inert `GCS_BUCKET`, with an inline note that the bucket is derived from the project. `SKELETON.md` recompiled.
+  - `GCS_BUCKET` is still documented at `CODELAB.md:517`; #129 asks whether it should be honoured by `storage.yml` or removed, rather than guessing.
+
 ## [0.2.46] - 2026-09-11
 ### Fixed
 - 🔐 **Step 3 Deploy Boots Again (PR #128, closes #127)**:
