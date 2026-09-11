@@ -22,6 +22,7 @@ from diagrams.gcp.storage import Storage
 from diagrams.gcp.security import SecretManager
 from diagrams.gcp.ml import VertexAI
 from diagrams.gcp.devtools import Build, ContainerRegistry
+from diagrams.gcp.operations import Logging
 from diagrams.onprem.client import Users, Client
 from PIL import Image
 
@@ -64,9 +65,10 @@ ASSETS_ICONS_DIR = ASSETS_DIR / "icons"
 
 
 def get_icon_paths():
-    """Returns paths to 14px Rails and Solid Queue icons, generating or verifying them."""
+    """Returns paths to 14px Rails, Cloud SQL proxy, and Solid Queue icons, generating or verifying them."""
     ASSETS_ICONS_DIR.mkdir(parents=True, exist_ok=True)
     rails_path = ASSETS_ICONS_DIR / "rails_14.png"
+    proxy_path = ASSETS_ICONS_DIR / "cloud_sql_proxy_14.png"
     queue_path = ASSETS_ICONS_DIR / "solid_queue_14.png"
 
     if not rails_path.exists():
@@ -76,10 +78,10 @@ def get_icon_paths():
             img = Image.open(src_rails).convert("RGBA")
             img.resize((14, 14), Image.Resampling.LANCZOS).save(rails_path)
 
-    return str(rails_path.resolve()), str(queue_path.resolve())
+    return str(rails_path.resolve()), str(proxy_path.resolve()), str(queue_path.resolve())
 
 
-def get_containers_table_html(rails_icon: str, queue_icon: str) -> str:
+def get_containers_table_html(rails_icon: str, proxy_icon: str, queue_icon: str) -> str:
     return f"""<
 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#FFFFFF" COLOR="#4285F4" STYLE="ROUNDED">
   <TR>
@@ -89,7 +91,7 @@ def get_containers_table_html(rails_icon: str, queue_icon: str) -> str:
   </TR>
   <TR>
     <TD BGCOLOR="#E6F4EA" ALIGN="RIGHT"><FONT FACE="Courier" POINT-SIZE="11"><B>5432</B> </FONT></TD>
-    <TD BGCOLOR="#E6F4EA" ALIGN="CENTER"><FONT POINT-SIZE="11">🔒</FONT></TD>
+    <TD BGCOLOR="#E6F4EA" ALIGN="CENTER"><IMG SRC="{proxy_icon}"/></TD>
     <TD PORT="proxy" BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"> <B>cloud_sql_proxy</B> <I>(sidecar)</I></FONT></TD>
   </TR>
   <TR>
@@ -104,8 +106,8 @@ def generate_canonical():
     """Generates the canonical production GCP architecture diagram highlighting real billable GCP objects."""
     print("🎨 Generating Canonical Google Cloud Architecture Diagram (Compact 3-Row Matrioskas & Billable GCP Objects)...")
     out_filename = OUTPUT_TMP_DIR / "arch_diagram"
-    rails_icon, queue_icon = get_icon_paths()
-    containers_table = get_containers_table_html(rails_icon, queue_icon)
+    rails_icon, proxy_icon, queue_icon = get_icon_paths()
+    containers_table = get_containers_table_html(rails_icon, proxy_icon, queue_icon)
 
     with Diagram(
         "Rails 8 on Google Cloud: Production Reference Architecture",
@@ -124,16 +126,17 @@ def generate_canonical():
             containers = Node(label=containers_table, shape="none", fixedsize="false")
             cloud_run - Edge(style="invis") - containers
 
-        with Cluster("Google Cloud Persistence"):
+        with Cluster("GCP Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
             gcs = Storage("S3. Cloud Storage")
 
         sm = SecretManager("S4. Secret Manager")
         vertex = VertexAI("S5. Vertex AI")
 
-        with Cluster("DevOps & CI/CD"):
+        with Cluster("DevOps & Observability"):
             cb = Build("S6. Cloud Build")
             ar = ContainerRegistry("S7. Artifact Registry")
+            log = Logging("S8. Cloud Logging\n(Ruby native JSON)")
 
         # Ingress traffic
         users >> Edge(label="HTTPS", color="#1a73e8", style="bold") >> cloud_run
@@ -141,8 +144,8 @@ def generate_canonical():
         # Database connections via localhost Cloud SQL proxy
         containers >> Edge(label="mTLS Tunnel", color="#188038", style="bold", tailport="proxy:e", minlen="2") >> db
 
-        # Object Storage
-        containers >> Edge(label="ActiveStorage", color="#4285F4", tailport="rails:e", minlen="2") >> gcs
+        # Object Storage (bidirectional ActiveStorage)
+        containers >> Edge(label="ActiveStorage", color="#4285F4", tailport="rails:e", minlen="2", reverse=True) >> gcs
 
         # Secret injection
         sm >> Edge(label="Secrets", color="#d93025", style="dotted") >> cloud_run
@@ -152,6 +155,9 @@ def generate_canonical():
 
         # CI/CD deployment
         cb >> Edge(label="Build") >> ar >> Edge(label="Deploy") >> cloud_run
+
+        # Structured Cloud Logging (Issue #82)
+        cloud_run >> Edge(label="JSON Logs (#82)", color="#ea4335", style="dashed") >> log
 
     generated_png = OUTPUT_TMP_DIR / "arch_diagram.png"
     if not generated_png.exists():
@@ -169,8 +175,8 @@ def generate_canonical():
 def generate_evolution():
     """Generates sequential milestone photograms and compiles arch_evolution.gif."""
     print("🎞️ Generating Progressive Workshop Evolution Photograms...")
-    rails_icon, queue_icon = get_icon_paths()
-    containers_table = get_containers_table_html(rails_icon, queue_icon)
+    rails_icon, proxy_icon, queue_icon = get_icon_paths()
+    containers_table = get_containers_table_html(rails_icon, proxy_icon, queue_icon)
     frames = []
 
     # Frame 1: Local / Ephemeral Baseline
@@ -223,7 +229,7 @@ def generate_evolution():
         with Cluster("Local Environment"):
             local_stack = Node(label=f2_table, shape="none")
 
-        with Cluster("Google Cloud Persistence"):
+        with Cluster("GCP Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
 
         dev >> Edge(label="HTTP :3000") >> local_stack
@@ -253,13 +259,13 @@ def generate_evolution():
         with Cluster("Local Environment"):
             local_stack = Node(label=f3_table, shape="none")
 
-        with Cluster("Google Cloud Persistence"):
+        with Cluster("GCP Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
             gcs = Storage("S3. Cloud Storage")
 
         dev >> Edge(label="HTTP :3000") >> local_stack
         local_stack >> Edge(label="mTLS Tunnel", color="#188038", tailport="proxy:e") >> db
-        local_stack >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4", tailport="rails:e") >> gcs
+        local_stack >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4", tailport="rails:e", reverse=True) >> gcs
 
     frames.append(OUTPUT_TMP_DIR / "step3_cloud_storage.png")
 
@@ -282,7 +288,7 @@ def generate_evolution():
             containers = Node(label=containers_table, shape="none", fixedsize="false")
             cloud_run - Edge(style="invis") - containers
 
-        with Cluster("Google Cloud Persistence"):
+        with Cluster("GCP Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
             gcs = Storage("S3. Cloud Storage")
 
@@ -290,7 +296,7 @@ def generate_evolution():
 
         users >> Edge(label="HTTPS", color="#1a73e8", style="bold") >> cloud_run
         containers >> Edge(label="mTLS Tunnel", color="#188038", tailport="proxy:e") >> db
-        containers >> Edge(label="ActiveStorage", color="#4285F4", tailport="rails:e") >> gcs
+        containers >> Edge(label="ActiveStorage", color="#4285F4", tailport="rails:e", reverse=True) >> gcs
         sm >> Edge(label="Secrets", style="dotted", color="#d93025") >> cloud_run
 
     frames.append(OUTPUT_TMP_DIR / "step4_cloud_run.png")
