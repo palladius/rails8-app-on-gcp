@@ -2,15 +2,25 @@
 
 A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cloud Run, ...)
 
-🟢 **Dev**: https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/
-🔴 **Prod**: https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/
-🌐 **Workshop Portal**: https://palladius.github.io/rails8-app-on-gcp/
-🚀 **Presentation Slides**: https://palladius.github.io/rails8-app-on-gcp/slides/
-📖 **Workshop Codelab**: https://palladius.github.io/rails8-app-on-gcp/codelab/
-🐝 **Workshop Hive (Leaderboard)**: https://workshop-hive-x42ijqglgq-ew.a.run.app/ (or https://workshop-hive-272932496670.europe-west1.run.app/)
+![Production Reference Architecture](assets/arch_diagram.png)
 
-🎶 **Official Workshop Anthem (Generated with Google Lyria 3 Pro)**:
-🎧 [Listen / Download "An energetic acoustic guitar song for Rubyists" (MP3, 3.4 MB)](https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3)
+### 🔗 Live Environments
+
+| Env | URL |
+| :--- | :--- |
+| 🟢 **Dev** | [palladius-genai-rails-app-**dev**-….run.app](https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/) |
+| 🔴 **Prod** | [palladius-genai-rails-app-**prod**-….run.app](https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/) |
+
+### 📚 Workshop & Docs
+
+| Resource | URL |
+| :--- | :--- |
+| 🌐 Workshop Portal | [palladius.github.io/rails8-app-on-gcp/](https://palladius.github.io/rails8-app-on-gcp/) |
+| 🚀 Presentation Slides | [palladius.github.io/…/slides/](https://palladius.github.io/rails8-app-on-gcp/slides/) |
+| 📖 Workshop Codelab | [palladius.github.io/…/codelab/](https://palladius.github.io/rails8-app-on-gcp/codelab/) |
+| 🐝 Workshop Hive (Leaderboard) | [workshop-hive-….run.app](https://workshop-hive-x42ijqglgq-ew.a.run.app/) |
+
+> 🎶 **Official Workshop Anthem** (Google Lyria 3 Pro): 🎧 [Listen / Download MP3 (3.4 MB)](https://raw.githubusercontent.com/palladius/rails8-app-on-gcp/artifacts/issue-44/assets/lyria-3-pro-preview.mp3)
 
 ## ✅ Prerequisites
 
@@ -31,14 +41,16 @@ Check it works with `just --list`: it should print the full recipe list — if i
 
 | Tool | Check | Needed for |
 | :--- | :--- | :--- |
-| **just** (1.21+, 1.40+ recommended) | `just --version` | every command in this repo and in the workshop |
-| **Ruby 3.3+ & Rails 8** | `ruby -v`, `rails -v` | `just install`, `just dev` |
-| **Docker & Docker Compose** | `docker compose version` | `just compose-up` |
-| **Google Cloud SDK** | `gcloud version` | deployment, `just workshop-test` |
-| **Terraform** (1.5+) | `terraform -version` | `just terraform-apply` |
-| **Node.js** | `node -v` | `just slides`, `just screenshots` |
+| [**just**](https://just.systems) (1.21+, 1.40+ recommended) | `just --version` | every command in this repo and in the workshop |
+| [**Git**](https://git-scm.com/downloads) (2.30+) | `git --version` | cloning the repo, branching, version control |
+| [**Ruby 3.3+**](https://www.ruby-lang.org/en/downloads/) & [**Rails 8**](https://rubyonrails.org/) | `ruby -v`, `rails -v` | `just install`, `just dev` |
+| [**Docker**](https://docs.docker.com/get-docker/) & [**Docker Compose**](https://docs.docker.com/compose/install/) | `docker compose version` | `just compose-up` |
+| [**Google Cloud SDK**](https://cloud.google.com/sdk/docs/install) (`gcloud` CLI) | `gcloud version` | deployment, `just workshop-test` |
+| [**Terraform**](https://developer.hashicorp.com/terraform/install) (1.5+) | `terraform -version` | `just terraform-apply` |
+| [**Node.js**](https://nodejs.org/) | `node -v` | `just slides`, `just screenshots` |
+| [**Google Antigravity**](https://antigravity.google/download) | — | AI pair-programming assistant (IDE or CLI) |
 
-> 💡 Doing the workshop? `just workshop-test` runs the full pre-flight diagnostics (Gmail identity, GCP billing, ADC, keys) once the toolchain above is in place.
+> 💡 **Doing the workshop?** The full pre-flight checklist (Gmail identity, GCP billing, ADC, keys) is in [**Step 0 of the Codelab**](https://palladius.github.io/rails8-app-on-gcp/codelab/#step-0). Run `just workshop-test` to verify everything in one shot.
 
 ---
 
