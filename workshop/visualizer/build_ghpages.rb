@@ -76,6 +76,16 @@ def render_markdown(text)
   Kramdown::Document.new(text, input: 'GFM', syntax_highlighter: nil).to_html
 end
 
+def debug_mode?
+  %w[1 true yes on].include?(ENV['DEBUG'].to_s.downcase)
+end
+
+def show_internal_docs?
+  return true if @active_doc && @active_doc != 'codelab'
+
+  debug_mode?
+end
+
 # Extract template from server.rb
 server_rb_path = File.join(script_dir, 'server.rb')
 server_code = File.read(server_rb_path)
