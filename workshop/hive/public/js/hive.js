@@ -178,7 +178,7 @@ function formatHHMM(isoOrStr) {
     }
   } catch {}
 
-  const match = isoOrStr.match(/(\d{1,2}:\d{2})/);
+  const match = String(isoOrStr).match(/(\d{1,2}:\d{2})/);
   if (match) return match[1];
 
   return "--:--";

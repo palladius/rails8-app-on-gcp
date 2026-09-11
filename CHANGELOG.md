@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.28] - 2026-09-11
+### Fixed
+- 🐝 **Workshop Hive String Coercion**:
+  - Fixed `formatHHMM` in `workshop/hive/public/js/hive.js` to coerce timestamp inputs to String before matching regex patterns.
+  - Bumped Workshop Hive to `0.1.2`.
+
 ## [0.2.27] - 2026-09-11
 ### Added
 - 🔍 **Codelab Visualizer Debug Mode & Internal Docs Toggling**:

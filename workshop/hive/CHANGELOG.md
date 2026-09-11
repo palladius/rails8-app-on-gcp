@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.2] - 2026-09-11
+### Fixed
+- Fixed `formatHHMM` in `public/js/hive.js` to coerce timestamp inputs to String before matching regex, preventing errors on non-string inputs.
+
 ## [0.1.1] - 2026-09-11
 ### Fixed
 - Fixed `escapeHtml` in `public/js/hive.js` to coerce numbers (such as GHI issue IDs) to String, preventing a `TypeError: str.replace is not a function` during table rendering.
