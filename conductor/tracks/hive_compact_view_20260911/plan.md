@@ -4,11 +4,11 @@
 - [x] Task: Write Tests for Compact Mode HTML Elements & Query Param Handling (8056b19)
   - [x] Add endpoint test in `test/test_api_leaderboard.rb` verifying index.html contains `#compact-view-btn` and compact mode container attributes
   - [x] Verify tests fail before implementation (Red phase)
-- [~] Task: Implement Compact Mode Toggle Button & Header Toolbar in HTML
-  - [ ] Update `workshop/hive/public/index.html` to add `#compact-view-btn` and `#compact-view-label` in the toolbar
-  - [ ] Ensure toolbar styling matches the existing Tailwind dark palette and dupe filter styling
-  - [ ] Run automated tests and verify green (Green phase)
-- [ ] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Implement Compact Mode Toggle Button & Header Toolbar in HTML (f362291)
+  - [x] Update `workshop/hive/public/index.html` to add `#compact-view-btn` and `#compact-view-label` in the toolbar
+  - [x] Ensure toolbar styling matches the existing Tailwind dark palette and dupe filter styling
+  - [x] Run automated tests and verify green (Green phase)
+- [x] Task: Phase 1 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2: JavaScript State Management & URL/Storage Synchronization
 - [ ] Task: Implement Compact Mode State Engine in hive.js
