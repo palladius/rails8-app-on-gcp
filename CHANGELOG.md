@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.22] - 2026-09-11
+### Changed
+- 📐 **Codelab Page 1 Layout Modernization**:
+  - Reordered Page 1 (Overview) in `workshop/CODELAB.md` to place the Target Reference Architecture (**Variant 1: Clean Flat Vector Enterprise**) and evolution GIF prominently *above* the "What you'll learn" section.
+
 ## [0.2.21] - 2026-09-10
 ### Added
 - 🧪 **Workshop Status Telemetry Inference Evals (Steps 5, 6, 7)**:

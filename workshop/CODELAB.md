@@ -11,7 +11,7 @@
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 -->
 
-Welcome to the [**Rails 8**](https://rubyonrails.org/2024/11/7/rails-8-no-paas-required) **on Google Cloud** workshop (v2.0.1alpha)! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
+Welcome to the [**Rails 8**](https://rubyonrails.org/2024/11/7/rails-8-no-paas-required) **on Google Cloud** workshop! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
 In this workshop we don't just deploy an app — we execute an **opinionated, production-grade cloud modernization** (*lift-and-shift done right!*).
 
@@ -25,14 +25,6 @@ You start from the typical *"works on my machine"* local setup (ephemeral disk, 
 🍌 *And because we live in 2026, we supercharge the whole stack with [**Google Antigravity**](https://antigravity.google/download). This is not an after thought, we have prompts and [**skills**](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills) to guide your harness to better execute (and enjoy) this workshop!*
 
 
-### What you'll learn
-- How to pair-program with [**Google Antigravity**](https://antigravity.google/download) to demystify Rails 8 and [**Google Cloud**](https://cloud.google.com/).
-- How to run automated pre-flight diagnostics (`just workshop-test`).
-- How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [`google`](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
-- How to eliminate security anti-patterns: private [**GCS buckets**](https://cloud.google.com/storage) (`iam: true`) and [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) mTLS tunnels instead of opening `0.0.0.0/0`.
-- How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
-- How to orchestrate asynchronous GenAI [**background jobs**](https://guides.rubyonrails.org/active_job_basics.html) (NanoBanana cover generator, bilingual podcast synthesis) via [**Solid Queue**](https://github.com/rails/solid_queue).
-
 ### 🏛️ Target Reference Architecture (Variant 1: Clean Flat Vector Enterprise)
 
 Here is the canonical Google Cloud reference architecture you will build and deploy (**Variant 1: Clean Flat Vector Enterprise**), showcasing our production multi-container Cloud Run service connected to all managed Google Cloud persistence and AI services:
@@ -45,6 +37,15 @@ Here is the canonical Google Cloud reference architecture you will build and dep
 Watch our stack progressively modernize from an ephemeral single-machine baseline to a fully managed Google Cloud blueprint across each workshop milestone:
 
 ![Workshop Architectural Evolution](assets/images/arch_evolution.gif)
+
+
+### What you'll learn
+- How to pair-program with [**Google Antigravity**](https://antigravity.google/download) to demystify Rails 8 and [**Google Cloud**](https://cloud.google.com/).
+- How to run automated pre-flight diagnostics (`just workshop-test`).
+- How to provision Google Cloud infrastructure asynchronously using [**Terraform**](https://docs.cloud.google.com/docs/terraform) while continuing local development without blocking using [`google`](https://registry.terraform.io/providers/hashicorp/google/latest/docs) provider.
+- How to eliminate security anti-patterns: private [**GCS buckets**](https://cloud.google.com/storage) (`iam: true`) and [**Cloud SQL Auth Proxy**](https://docs.cloud.google.com/sql/docs/mysql/sql-proxy) mTLS tunnels instead of opening `0.0.0.0/0`.
+- How to inject secrets directly from [**Google Cloud Secret Manager**](https://docs.cloud.google.com/secret-manager/docs/overview).
+- How to orchestrate asynchronous GenAI [**background jobs**](https://guides.rubyonrails.org/active_job_basics.html) (NanoBanana cover generator, bilingual podcast synthesis) via [**Solid Queue**](https://github.com/rails/solid_queue).
 
 Let's get started!
 
