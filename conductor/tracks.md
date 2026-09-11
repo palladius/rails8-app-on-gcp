@@ -88,6 +88,6 @@
 
 ---
 
-- [ ] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
+- [~] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
 *Link: [tracks/hive_compact_view_20260911/index.md](tracks/hive_compact_view_20260911/index.md)*
 
