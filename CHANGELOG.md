@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.31] - 2026-09-11
+### Fixed
+- 🧰 **Justfile Parses Again on Distro-Shipped `just` (PR #101, closes #100)**:
+  - Gave the variadic parameter a default in `screenshots`, `screenshots-force` and `generate-screenshots` (`filter="" *flags="":`), removing the last "Non-default parameter `flags` follows default parameter" parse failures.
+  - This was a **whole-file** failure, not a per-recipe one: `just` aborts at parse time, so on `just` < 1.40.0 (Debian/Ubuntu ship 1.21) *every* recipe died — `just slides`, `just dev`, even `just --list` — while the error pointed at an unrelated `screenshots` recipe.
+  - `*flags=""` parses on both old and new `just` and keeps argument passthrough identical, unlike the parameter reordering used in #97/PR #98 (which only fixed `workshop-dev`).
+### Added
+- ✅ **Justfile Regression Lint (`just test-justfile`)**:
+  - Added `test/test_justfile.rb`, failing whenever a required parameter follows a defaulted one, and asserting `just --summary` actually parses the justfile when `just` is installed.
+
 ## [0.2.30] - 2026-09-11
 ### Fixed
 - 🛠️ **Justfile Recipe Parameter Order (PR #98, closes #97)**:

@@ -79,6 +79,10 @@ test-slides:
 test-visualizer:
     ruby test/test_workshop_visualizer.rb
 
+# lint the justfile itself (keeps every recipe parseable on distro-shipped `just`)
+test-justfile:
+    ruby test/test_justfile.rb
+
 # generate canonical GCP architecture diagram (assets/arch_diagram.png)
 diagram:
     cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --canonical
@@ -105,19 +109,19 @@ nanobanana variant="flat":
     UV_INDEX_URL="https://pypi.org/simple" NANOBANANA_OUTPUT_FOLDER="assets" uv run /usr/local/google/home/ricc/.gemini/config/skills/nano-banana-ricc/scripts/generate_image.py --prompt "$$(cat $$PROMPT_FILE)" --filename "nanobanana_arch_{{variant}}.png" --resolution 2K
 
 # capture declarative screenshots idempotently (skips already existing screenshots)
-screenshots filter="" *flags:
+screenshots filter="" *flags="":
     node workshop/screenshots/runner.js {{filter}} {{flags}}
 
 alias screenshot := screenshots
 
 # force re-capture declarative screenshots (overwrites existing screenshots)
-screenshots-force filter="" *flags:
+screenshots-force filter="" *flags="":
     node workshop/screenshots/runner.js {{filter}} --force {{flags}}
 
 alias screenshot-force := screenshots-force
 
 # legacy alias for backwards compatibility
-generate-screenshots filter="" *flags:
+generate-screenshots filter="" *flags="":
     node workshop/screenshots/runner.js {{filter}} {{flags}}
 
 # test and validate all declarative screenshot declarations and scripts without needing server
