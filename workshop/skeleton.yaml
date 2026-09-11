@@ -81,13 +81,15 @@ steps:
     title: "The Local Baseline, Mailpit & Admin Onboarding"
     description: "Run local Docker Compose stack, seed the database with admin identity, intercept welcome email in Mailpit, and inspect models."
     pseudocode: |
-      cp .env.dist .env && vim .env # set GOOGLE_CLOUD_ACCOUNT
+      cp .env.dist blog/.env && vim blog/.env # set GOOGLE_CLOUD_ACCOUNT (dotenv-rails reads blog/.env, not the repo root)
+      cd blog # the Rails app, compose.yaml and bin/rails all live here
       docker compose up -d
       bin/rails db:prepare db:seed
       open http://localhost:8025 # Mailpit
     prerequisites:
       - "Step 1 kicked off"
       - "Local Docker engine running"
+      - "Commands run from blog/ (Rails app, compose.yaml and bin/rails live there, not in the repo root)"
     postrequisites:
       - "Running local Rails 8 application with SQLite/Docker Postgres"
       - "Admin account bootstrapped from GOOGLE_CLOUD_ACCOUNT"

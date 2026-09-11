@@ -236,11 +236,16 @@ Our starting point is a clean, modern Rails 8 blog application running on localh
 
 ### 1. Boot the App Locally
 
-Start the local development stack:
+> 📁 **Mind the directory!** This repo holds the Rails app in **`blog/`** and the Terraform in `iac/`. Step 1 left you in the repo root, so **every command in Step 2 runs from `blog/`** — `Gemfile`, `bin/rails` and `compose.yaml` all live there. Running them from the root fails with `no configuration file provided: not found` or a missing `Gemfile`.
+
+Move into the Rails app and start the local development stack:
 ```bash
+cd blog
 bundle install
 bin/rails db:setup
 ```
+
+> 💡 Prefer not to think about it? `just install` and `just compose-up` from the repo root do the `cd blog` for you.
 
 ### 2. 🌱 Smart Seed Auto-Discovery & Admin Bootstrap (Issue #21 & #25)
 
@@ -256,10 +261,11 @@ Run seed with your admin email:
 GOOGLE_CLOUD_ACCOUNT="myname@gmail.com" bin/rails db:seed
 ```
 
-Boot the services:
+Boot the services (still from `blog/`):
 ```bash
 docker compose up
 # (Or run bin/dev if running directly on your host machine)
+# From the repo root, the equivalent is: just compose-up
 ```
 
 ### 3. The Mailpit Experience & Console Workout

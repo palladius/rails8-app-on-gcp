@@ -64,9 +64,11 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`prerequisites`**:
   - Step 1 kicked off
   - Local Docker engine running
+  - Commands run from blog/ (Rails app, compose.yaml and bin/rails live there, not in the repo root)
 - **`pseudocode`**:
   ```bash
-  cp .env.dist .env && vim .env # set GOOGLE_CLOUD_ACCOUNT
+  cp .env.dist blog/.env && vim blog/.env # set GOOGLE_CLOUD_ACCOUNT (dotenv-rails reads blog/.env, not the repo root)
+  cd blog # the Rails app, compose.yaml and bin/rails all live here
   docker compose up -d
   bin/rails db:prepare db:seed
   open http://localhost:8025 # Mailpit

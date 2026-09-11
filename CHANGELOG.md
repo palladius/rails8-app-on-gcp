@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.39] - 2026-09-11
+### Fixed
+- 📁 **Step 2 Now Says `cd blog` (PR #115, closes #114)**:
+  - Step 2 of `workshop/CODELAB.md` was written for a working directory it never puts the reader in. Step 0 ends with `cd rails8-app-on-gcp` and Step 1 with `cd ..`, so attendees reach Step 2 in the repo root — where `bundle install`, `bin/rails db:setup`, `bin/rails db:seed`, `bin/rails console` and `docker compose up` **all fail**, the last with `no configuration file provided: not found`. `Gemfile`, `bin/rails` and `compose.yaml` live in `blog/`.
+  - Added an explicit `cd blog` to the first Step 2 code block plus a "Mind the directory!" callout, and a pointer to `just install` / `just compose-up`, which handle the directory themselves.
+  - Fixed the same bug in `workshop/skeleton.yaml` step-2 pseudocode: `cp .env.dist .env` created the file in the repo root, where **`dotenv-rails` never reads it** — it loads `Rails.root.join(".env")`, i.e. `blog/.env` (`dotenv-3.1.8/lib/dotenv/rails.rb:46,57`). Now `cp .env.dist blog/.env`, followed by `cd blog`. Added the directory requirement to `step-2.prerequisites` and recompiled `SKELETON.md`.
+  - This single omission had already produced **two** bullets in an earlier friction log (the compose failure and the `db:seed` `.env` failure) before costing a third attendee time. The repo already knew: `README.md` documents `cd blog && docker compose up -d`, every justfile recipe is `cd blog && …`, and step-2's own eval is `cd blog && bin/rails test` — the eval knew about `blog/`, the human-facing instructions did not.
+
 ## [0.2.38] - 2026-09-11
 ### Fixed & Improved
 - 🛠️ **Friction Log FL006 (Steps 4→8 Deployment & Broken Images Evals, PR #113, closes #96)**:
