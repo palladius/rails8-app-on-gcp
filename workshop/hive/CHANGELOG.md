@@ -1,10 +1,14 @@
 # Changelog
 
+## [0.1.6] - 2026-09-11
+### Added & Improved
+- 🏷️ **Version Badge in Footer**:
+  - Embedded version badge (`v0.1.6`) in the leaderboard footer with dynamic API fallback.
+  - Added `version` attribute to `/up` and `/api/leaderboard` JSON endpoints.
+- 🎨 **Status Code Formatting**:
+  - Replaced `H503` with `/503` (and `/<code>` generally) for HTTP error status indicators across standard and compact table views.
+
 ## [0.1.5] - 2026-09-11
-### Fixed
-- 🐞 **Client-Side Compact Scope Fix**:
-  - Scoped `const compact = isCompactMode()` properly at top of `renderTable()` in `public/js/hive.js`.
-  - Fixed client-side rendering exception when loading cached or live telemetry.
 
 ## [0.1.4] - 2026-09-11
 ### Added & Improved

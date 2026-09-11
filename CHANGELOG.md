@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.27] - 2026-09-11
+### Added & Improved
+- 🏷️ **Workshop Hive Leaderboard Footer Version & Status Formatting**:
+  - Embedded version badge (`v0.1.6`) directly into the leaderboard footer for instant visual verification.
+  - Formatted down HTTP codes as `/<code >` (e.g. `/503`) instead of `H503` for sleeker telemetry display.
+  - Bumped `workshop/hive/VERSION` to `0.1.6`.
+
 ## [0.2.26] - 2026-09-11
 ### Fixed
 - 🐞 **Workshop Hive Leaderboard Client-Side Compact Scope Fix**:
