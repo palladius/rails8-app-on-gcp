@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.30] - 2026-09-11
+### Fixed
+- 🛠️ **Justfile Recipe Parameter Order (PR #98, closes #97)**:
+  - Swapped `*flags` before `port="8080"` in the `workshop-dev` recipe (`workshop-dev *flags port="8080":`), fixing a parse error where non-default variadic parameter followed a default parameter on stricter `just` versions.
+
 ## [0.2.29] - 2026-09-11
 ### Added & Improved
 - 🏆 **Workshop Hive Step 8 Champions Podium & Ranked Medals (Issue #89 / Hall of Fame)**:

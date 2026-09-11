@@ -36,8 +36,8 @@ autopush:
     git push origin main
 
 # run the workshop codelab visualizer server (serves /, /constitution, /skeleton, /a2ui)
-workshop-dev *flags port="8080":
-    ruby workshop/visualizer/server.rb --port {{port}} {{flags}}
+workshop-dev *flags:
+    ruby workshop/visualizer/server.rb {{ flags }}
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
