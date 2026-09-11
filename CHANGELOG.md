@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.41] - 2026-09-11
+### Fixed
+- 🚦 **Step 2 Run Modes Made Explicitly Exclusive (PR #120, closes #118)**:
+  - Step 2 offered `bin/dev` in the same code block as `docker compose up`, as if the two were interchangeable — while `README.md` states they are **mutually exclusive** by design, both binding port 3000 ("Anti-POLA" fail-fast note). Attendees who followed the step literally hit `A server is already running (pid: 1, ...)` plus `Unable to access log file`.
+  - Rewrote the boot section as an explicit either/or: **Mode A — Docker Compose** (what Step 2 assumes; Mailpit `:8025` and Adminer `:8081` only exist there, and the app is already served at `:3000` — do not also run `just dev`) and **Mode B — Native** (only with the stack down via `just compose-down`).
+  - Added a recovery callout explaining that `pid: 1` is the process **inside** the container — `compose.yaml` bind-mounts the working tree and runs as root — with the `sudo` actually required to clean up, since `blog/tmp/pids/` ends up root-owned and the obvious `rm` fails too.
+  - The underlying container-writes-root-files bug is tracked separately in #119.
+
 ## [0.2.40] - 2026-09-11
 ### Fixed
 - 💎 **Ruby 3.4.5 Named as the Real Prerequisite (PR #117, closes #116)**:
