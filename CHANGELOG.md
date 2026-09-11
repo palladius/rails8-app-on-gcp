@@ -1,5 +1,18 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.35] - 2026-09-11
+### Added
+- 🎨 **Cloud SQL Proxy Custom Vector Icon**:
+  - Generated official Google Cloud SQL blue hexagon badge with integrated golden key/lock using Nano Banana Pro (`nano-banana-ricc`), rendering crisp 14px, 20px, and 64px transparent vector icons (`assets/icons/cloud_sql_proxy_14.png`).
+- 📊 **DevOps & Observability with Cloud Logging (Issue #82)**:
+  - Integrated `S8. Cloud Logging (Ruby native JSON)` node with a red dashed event stream (`JSON Logs (#82)`) originating from `S1. Cloud Run`, highlighting zero-gem structured JSON logging and Cloud Error Reporting.
+
+### Changed
+- ↔️ **Bidirectional ActiveStorage Edge**:
+  - Connected `rails_app` to `S3. Cloud Storage` with bidirectional arrowheads (`reverse=True`), representing both blob streaming and signed URL generation.
+- 🗄️ **Compact Cluster Labels**:
+  - Renamed `Google Cloud Persistence` to `GCP Persistence` across all canonical and progressive evolution milestone diagrams.
+
 ## [0.2.34] - 2026-09-11
 ### Fixed & Improved
 - 🏎️ **Author Attribution & Showcase Alignment (Emiliano First!)**:
