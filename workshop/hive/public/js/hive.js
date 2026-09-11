@@ -41,12 +41,88 @@ function setTimeFilter(filterVal) {
 window.addEventListener("popstate", () => {
   activeMaxAge = getCurrentMaxAge();
   updateTimeFilterUI();
+  updateDuplicateFilterUI();
   fetchLeaderboard();
 });
 
+function normalizeUrl(urlStr) {
+  if (!urlStr) return "";
+  let str = urlStr.trim();
+  if (!/^https?:\/\//i.test(str)) {
+    str = "https://" + str;
+  }
+  try {
+    const u = new URL(str);
+    const host = u.hostname.toLowerCase();
+    const scheme = host.endsWith(".run.app") ? "https:" : u.protocol.toLowerCase();
+    const port = (u.port && u.port !== "80" && u.port !== "443") ? `:${u.port}` : "";
+    const path = u.pathname.replace(/\/+$/, "");
+    return `${scheme}//${host}${port}${path}`;
+  } catch (e) {
+    return str.toLowerCase().replace(/\/+$/, "");
+  }
+}
+
+function deduplicateEntries(entries) {
+  if (!Array.isArray(entries)) return [];
+  const seen = new Map();
+  // Reverse iteration so the last entry seen is preserved (the latest submission)
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const entry = entries[i];
+    const key = normalizeUrl(entry.url);
+    if (!seen.has(key)) {
+      seen.set(key, entry);
+    }
+  }
+  return Array.from(seen.values()).reverse();
+}
+
+function shouldShowDuplicates() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("show_duplicates") === "true" ||
+         params.get("show_duplicates") === "1" ||
+         params.get("show_duplicatees") === "true" ||
+         params.has("show_duplicates_true") ||
+         params.has("show_duplicatees_true") ||
+         params.get("show_duplicates_true") === "true" ||
+         params.get("show_duplicatees_true") === "true";
+}
+
+function updateDuplicateFilterUI() {
+  const btn = document.getElementById("dupe-filter-btn");
+  const label = document.getElementById("dupe-filter-label");
+  if (!btn) return;
+  const showDupes = shouldShowDuplicates();
+  if (showDupes) {
+    btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm flex items-center gap-1";
+    if (label) label.textContent = "Dupes: ON";
+  } else {
+    btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent flex items-center gap-1";
+    if (label) label.textContent = "Dupes: Off";
+  }
+}
+
+function toggleDuplicates() {
+  const url = new URL(window.location);
+  if (shouldShowDuplicates()) {
+    url.searchParams.delete("show_duplicates");
+    url.searchParams.delete("show_duplicatees");
+    url.searchParams.delete("show_duplicates_true");
+    url.searchParams.delete("show_duplicatees_true");
+  } else {
+    url.searchParams.set("show_duplicates", "true");
+  }
+  window.history.replaceState({}, "", url);
+  updateDuplicateFilterUI();
+  fetchLeaderboard();
+}
+
 try {
   const savedLd = localStorage.getItem(CACHE_KEY_LEADERBOARD);
-  if (savedLd) cachedLeaderboard = JSON.parse(savedLd);
+  if (savedLd) {
+    const parsed = JSON.parse(savedLd);
+    cachedLeaderboard = shouldShowDuplicates() ? parsed : deduplicateEntries(parsed);
+  }
 
   const savedHl = localStorage.getItem(CACHE_KEY_HEALTH);
   if (savedHl) cachedHealth = JSON.parse(savedHl);
@@ -57,6 +133,7 @@ try {
 // Render immediato prima ancora di fare qualsiasi fetch
 document.addEventListener("DOMContentLoaded", () => {
   updateTimeFilterUI();
+  updateDuplicateFilterUI();
   if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
@@ -113,11 +190,15 @@ window.addEventListener("click", () => {
 
 async function fetchLeaderboard() {
   try {
-    const query = (activeMaxAge && activeMaxAge !== "all") ? `?max_age=${encodeURIComponent(activeMaxAge)}` : "";
+    const queryParams = new URLSearchParams();
+    if (activeMaxAge && activeMaxAge !== "all") queryParams.set("max_age", activeMaxAge);
+    if (shouldShowDuplicates()) queryParams.set("show_duplicates", "true");
+    const query = queryParams.toString() ? `?${queryParams.toString()}` : "";
+
     const res = await fetch(`/api/leaderboard${query}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const newEntries = data.entries || [];
+    const newEntries = shouldShowDuplicates() ? (data.entries || []) : deduplicateEntries(data.entries || []);
 
     // Suona il chime quando una nuova persona entra!
     if (previousStudentsCount > 0 && newEntries.length > previousStudentsCount) {

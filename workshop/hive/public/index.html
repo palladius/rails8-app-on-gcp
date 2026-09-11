@@ -136,6 +136,11 @@
           <button type="button" data-filter="1mo" onclick="setTimeFilter('1mo')" class="time-filter-btn px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer">
             1mo
           </button>
+          <span class="text-slate-700">|</span>
+          <button type="button" id="dupe-filter-btn" onclick="toggleDuplicates()" class="px-2 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 border border-transparent flex items-center gap-1" title="Toggle duplicate Cloud Run submissions display (?show_duplicates=true)">
+            <span>👯</span>
+            <span id="dupe-filter-label">Dupes: Off</span>
+          </button>
         </div>
       </div>
 

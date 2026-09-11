@@ -2,6 +2,7 @@
 
 require "json"
 require "time"
+require "uri"
 
 module WorkshopHive
   class SheetsReader
@@ -40,9 +41,10 @@ module WorkshopHive
       }
     ].freeze
 
-    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil, max_age: nil)
+    def self.fetch_entries(sheet_id: ENV.fetch("HIVE_SPREADSHEET_ID", DEFAULT_SPREADSHEET_ID), credentials: nil, max_age: nil, deduplicate: true)
       raw_entries = get_raw_entries(sheet_id: sheet_id, credentials: credentials)
-      filter_by_max_age(raw_entries, max_age)
+      filtered = filter_by_max_age(raw_entries, max_age)
+      deduplicate ? deduplicate_by_url(filtered) : filtered
     end
 
     def self.get_raw_entries(sheet_id:, credentials:)
@@ -146,7 +148,7 @@ module WorkshopHive
     end
 
 
-    def self.parse_rows(rows)
+    def self.parse_rows(rows, deduplicate: false)
       return [] if rows.nil? || rows.size <= 1
 
       header = rows[0].map(&:to_s).map(&:downcase)
@@ -155,7 +157,7 @@ module WorkshopHive
       url_idx = header.index { |h| h.include?("url") || h.include?("run") || h.include?("deploy") } || 2
       step_idx = header.index { |h| h.include?("step") || h.include?("level") }
 
-      rows[1..].map do |row|
+      parsed = rows[1..].map do |row|
         url_str = row[url_idx].to_s.strip
         step_str = step_idx ? row[step_idx].to_s.strip : ""
         step_num = extract_step_number(step_str, url_str)
@@ -168,6 +170,48 @@ module WorkshopHive
           timestamp: row[ts_idx].to_s.strip
         }
       end.reject { |e| e[:url].empty? }
+
+      deduplicate ? deduplicate_by_url(parsed) : parsed
+    end
+
+    # Deduplicates entries by normalized Cloud Run URL.
+    # When duplicate Cloud Run URLs exist, retains the LAST occurrence (the second / latest submission).
+    def self.deduplicate_by_url(entries)
+      return [] if entries.nil? || entries.empty?
+
+      entries.reverse.uniq { |e| normalize_url(e[:url]) }.reverse
+    end
+
+    # Normalizes URLs for accurate deduplication comparison:
+    # - trims whitespace
+    # - normalizes default scheme to https
+    # - downcases hostname and scheme
+    # - normalizes http to https for .run.app domains
+    # - strips trailing slashes
+    def self.normalize_url(url_str)
+      return "" if url_str.nil? || url_str.to_s.strip.empty?
+
+      str = url_str.to_s.strip
+      str = "https://#{str}" unless str.start_with?("http://", "https://")
+
+      uri = URI.parse(str)
+      scheme = uri.scheme&.downcase || "https"
+      host = uri.host&.downcase || ""
+      port = uri.port
+      if host.end_with?(".run.app")
+        scheme = "https"
+        port = 443 if port == 80
+      end
+
+      port_part = if (scheme == "http" && port == 80) || (scheme == "https" && port == 443) || port.nil?
+                    ""
+                  else
+                    ":#{port}"
+                  end
+      path = uri.path.to_s.sub(/\/+$/, "")
+      "#{scheme}://#{host}#{port_part}#{path}"
+    rescue StandardError
+      url_str.to_s.strip.downcase.sub(/\/+$/, "")
     end
 
     def self.extract_step_number(step_str, url_str = "")

@@ -36,13 +36,24 @@ module WorkshopHive
     get "/api/leaderboard" do
       content_type :json
       max_age = params["max_age"]
+
+      # Support show_duplicates=true, show_duplicatees=true, show_duplicates_true, show_duplicatees_true, 1, yes
+      show_dupes = params.key?("show_duplicates_true") ||
+                   params.key?("show_duplicatees_true") ||
+                   ["true", "1", "yes"].include?(params["show_duplicates"].to_s.strip.downcase) ||
+                   ["true", "1", "yes"].include?(params["show_duplicatees"].to_s.strip.downcase) ||
+                   ["true", "1", "yes"].include?(params["show_duplicates_true"].to_s.strip.downcase) ||
+                   ["true", "1", "yes"].include?(params["show_duplicatees_true"].to_s.strip.downcase)
+
+      deduplicate = !show_dupes
       authorizer = ServiceAccountLoader.load_authorizer
-      entries = SheetsReader.fetch_entries(credentials: authorizer, max_age: max_age)
+      entries = SheetsReader.fetch_entries(credentials: authorizer, max_age: max_age, deduplicate: deduplicate)
 
       {
         status: "ok",
         total_students: entries.size,
         max_age: max_age,
+        show_duplicates: show_dupes,
         entries: entries,
         timestamp: Time.now.utc.iso8601
       }.to_json

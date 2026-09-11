@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.23] - 2026-09-11
+### Fixed & Added
+- 🐝 **Workshop Hive Leaderboard Duplicate Cloud Run Deduplication & Toggle**:
+  - Implemented `deduplicate_by_url` and `normalize_url` in `WorkshopHive::SheetsReader` to eliminate duplicate Cloud Run submissions by keeping the second (latest) entry by default.
+  - Added `&show_duplicates=true` (and typo-tolerant `&show_duplicatees_true`) query parameter support in `GET /api/leaderboard` to opt out of deduplication and view all raw submissions.
+  - Added interactive duplicate toggle pill (`👯 Dupes: Off/ON`) in `public/index.html` and `public/js/hive.js`.
+  - Normalized URLs (whitespace trimming, case-insensitivity, trailing slash removal, and protocol scheme handling for `.run.app` domains).
+  - Added full test coverage for both default deduplication and opt-out duplicate display in `test_sheets_reader.rb` and `test_api_leaderboard.rb`.
+
 ## [0.2.22] - 2026-09-11
 ### Changed
 - 📐 **Codelab Page 1 Layout Modernization & Diagram Refinements**:

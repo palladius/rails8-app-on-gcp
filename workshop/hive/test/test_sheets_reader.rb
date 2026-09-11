@@ -75,4 +75,74 @@ class SheetsReaderTest < Minitest::Test
     filtered_all = WorkshopHive::SheetsReader.filter_by_max_age(entries, "all")
     assert_equal 3, filtered_all.size
   end
+
+  def test_normalize_url
+    assert_equal "https://blog.run.app", WorkshopHive::SheetsReader.normalize_url("https://blog.run.app/")
+    assert_equal "https://blog.run.app", WorkshopHive::SheetsReader.normalize_url("https://BLOG.RUN.APP/")
+    assert_equal "https://blog.run.app", WorkshopHive::SheetsReader.normalize_url("http://blog.run.app/")
+    assert_equal "https://blog.run.app", WorkshopHive::SheetsReader.normalize_url("  https://blog.run.app/  ")
+    assert_equal "http://localhost:8088", WorkshopHive::SheetsReader.normalize_url("http://localhost:8088/")
+    assert_equal "", WorkshopHive::SheetsReader.normalize_url("")
+    assert_equal "", WorkshopHive::SheetsReader.normalize_url(nil)
+  end
+
+  def test_deduplicate_by_url_takes_second_or_last_entry
+    entries = [
+      { nickname: "FirstSubmission", url: "https://my-app.a.run.app/", timestamp: "10:00" },
+      { nickname: "AnotherStudent", url: "https://other-app.a.run.app", timestamp: "10:05" },
+      { nickname: "SecondSubmission_Updated", url: "https://my-app.a.run.app", timestamp: "10:15" }
+    ]
+
+    deduped = WorkshopHive::SheetsReader.deduplicate_by_url(entries)
+    assert_equal 2, deduped.size
+
+    # The second / last submission for my-app is retained
+    assert_equal "AnotherStudent", deduped[0][:nickname]
+    assert_equal "SecondSubmission_Updated", deduped[1][:nickname]
+    assert_equal "10:15", deduped[1][:timestamp]
+  end
+
+  def test_parse_rows_deduplicates_when_requested
+    rows = [
+      ["Timestamp", "Nickname", "Cloud Run URL", "Current Step"],
+      ["10/09/2026 11:52:31", "Ricc dupe prima", "https://rails8-workshop-fl05-rails-app-421858982833.europe-west1.run.app/", "Step 5"],
+      ["10/09/2026 11:53:00", "IndependentStudent", "https://rails8-independent-123.europe-west1.run.app/", "Step 3"],
+      ["10/09/2026 11:58:31", "RiccardinoCM26_Gold_FL005", "https://rails8-workshop-fl05-rails-app-421858982833.europe-west1.run.app/", "Step 5"]
+    ]
+
+    # Without deduplication
+    all_entries = WorkshopHive::SheetsReader.parse_rows(rows, deduplicate: false)
+    assert_equal 3, all_entries.size
+
+    # With deduplication
+    deduped = WorkshopHive::SheetsReader.parse_rows(rows, deduplicate: true)
+    assert_equal 2, deduped.size
+    assert_equal "IndependentStudent", deduped[0][:nickname]
+    assert_equal "RiccardinoCM26_Gold_FL005", deduped[1][:nickname]
+  end
+
+  def test_fetch_entries_deduplicate_parameter
+    sample = [
+      { nickname: "First", url: "https://dupe.run.app/", timestamp: "11:00" },
+      { nickname: "Unique", url: "https://unique.run.app/", timestamp: "11:05" },
+      { nickname: "Second", url: "https://dupe.run.app", timestamp: "11:10" }
+    ]
+
+    original_raw = WorkshopHive::SheetsReader.method(:get_raw_entries)
+    WorkshopHive::SheetsReader.define_singleton_method(:get_raw_entries) { |**_args| sample }
+
+    begin
+      # Default: deduplicate: true
+      default_entries = WorkshopHive::SheetsReader.fetch_entries
+      assert_equal 2, default_entries.size
+      assert_equal "Second", default_entries[1][:nickname]
+
+      # Explicit: deduplicate: false (show duplicates)
+      all_entries = WorkshopHive::SheetsReader.fetch_entries(deduplicate: false)
+      assert_equal 3, all_entries.size
+      assert_equal ["First", "Unique", "Second"], all_entries.map { |e| e[:nickname] }
+    ensure
+      WorkshopHive::SheetsReader.define_singleton_method(:get_raw_entries, original_raw)
+    end
+  end
 end
