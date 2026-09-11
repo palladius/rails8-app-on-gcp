@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.23] - 2026-09-11
+### Changed
+- 🎨 **Deterministic Architecture Diagram Polish**:
+  - Replaced internal `:8080` arrow text with a clean direct connection from Cloud Run into the container ingress port.
+  - Formatted multi-container table into a unified CLI-style monospace block without vertical dividing lines and with 4-character aligned ports (`8080`, `5432`, `----`).
+  - Added official tiny 14px Ruby on Rails icon to `rails_app` and moved `rails_app` to the top position.
+  - Enabled dynamic node sizing (`fixedsize="false"`) so the container table sits completely inside the `Google Cloud Run` cluster box.
+
 ## [0.2.22] - 2026-09-11
 ### Changed
 - 📐 **Codelab Page 1 Layout Modernization & Diagram Refinements**:

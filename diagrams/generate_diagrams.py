@@ -60,11 +60,45 @@ def ensure_dirs():
     OUTPUT_TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
-CONTAINERS_TABLE_HTML = """<
-<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" BGCOLOR="#FFFFFF" COLOR="#4285F4" STYLE="ROUNDED">
-  <TR><TD PORT="proxy" BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🔒 cloud_sql_proxy</B> (sidecar :5432)</FONT></TD></TR>
-  <TR><TD PORT="rails" BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>🌐 rails_app</B> (puma :8080)</FONT></TD></TR>
-  <TR><TD PORT="worker" BGCOLOR="#FEF7E0" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"><B>⚡ solid_queue</B> (worker)</FONT></TD></TR>
+def get_rails_icon_path() -> str:
+    """Returns path to 14px resized official Rails icon, generating it if needed."""
+    icons_dir = OUTPUT_TMP_DIR / "icons"
+    icons_dir.mkdir(parents=True, exist_ok=True)
+    dest = icons_dir / "rails_14.png"
+    if not dest.exists():
+        import diagrams.programming.framework as df
+
+        src_rails = (
+            Path(df.__file__).parent.parent.parent
+            / "resources"
+            / "programming"
+            / "framework"
+            / "rails.png"
+        )
+        if src_rails.exists():
+            img = Image.open(src_rails).convert("RGBA")
+            img.resize((14, 14), Image.Resampling.LANCZOS).save(dest)
+    return str(dest.resolve())
+
+
+def get_containers_table_html(rails_icon: str) -> str:
+    return f"""<
+<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6" BGCOLOR="#FFFFFF" COLOR="#4285F4" STYLE="ROUNDED">
+  <TR>
+    <TD PORT="in" BGCOLOR="#E8F0FE" ALIGN="RIGHT"><FONT FACE="Courier" POINT-SIZE="11"><B>8080</B> </FONT></TD>
+    <TD BGCOLOR="#E8F0FE" ALIGN="CENTER"><IMG SRC="{rails_icon}"/></TD>
+    <TD PORT="rails" BGCOLOR="#E8F0FE" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"> <B>rails_app</B> <I>(puma)</I></FONT></TD>
+  </TR>
+  <TR>
+    <TD BGCOLOR="#E6F4EA" ALIGN="RIGHT"><FONT FACE="Courier" POINT-SIZE="11"><B>5432</B> </FONT></TD>
+    <TD BGCOLOR="#E6F4EA" ALIGN="CENTER"><FONT POINT-SIZE="11">🔒</FONT></TD>
+    <TD PORT="proxy" BGCOLOR="#E6F4EA" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"> <B>cloud_sql_proxy</B> <I>(sidecar)</I></FONT></TD>
+  </TR>
+  <TR>
+    <TD BGCOLOR="#FEF7E0" ALIGN="RIGHT"><FONT FACE="Courier" POINT-SIZE="11"><B>----</B> </FONT></TD>
+    <TD BGCOLOR="#FEF7E0" ALIGN="CENTER"><FONT POINT-SIZE="11">⚡</FONT></TD>
+    <TD PORT="worker" BGCOLOR="#FEF7E0" ALIGN="LEFT"><FONT FACE="Courier" POINT-SIZE="11"> <B>solid_queue</B> <I>(worker)</I></FONT></TD>
+  </TR>
 </TABLE>>"""
 
 
@@ -72,6 +106,8 @@ def generate_canonical():
     """Generates the canonical production GCP architecture diagram highlighting real billable GCP objects."""
     print("🎨 Generating Canonical Google Cloud Architecture Diagram (Compact 3-Row Matrioskas & Billable GCP Objects)...")
     out_filename = OUTPUT_TMP_DIR / "arch_diagram"
+    rails_icon = get_rails_icon_path()
+    containers_table = get_containers_table_html(rails_icon)
 
     with Diagram(
         "Rails 8 on Google Cloud: Production Reference Architecture",
@@ -87,8 +123,8 @@ def generate_canonical():
 
         with Cluster("Google Cloud Run"):
             cloud_run = Run("S1. Cloud Run")
-            containers = Node(label=CONTAINERS_TABLE_HTML, shape="none")
-            cloud_run >> Edge(label=" :8080 ", color="#1a73e8", tailport="e", headport="rails:w", minlen="2") >> containers
+            containers = Node(label=containers_table, shape="none", fixedsize="false")
+            cloud_run >> Edge(color="#1a73e8", tailport="e", headport="in:w") >> containers
 
         with Cluster("Google Cloud Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
@@ -135,6 +171,8 @@ def generate_canonical():
 def generate_evolution():
     """Generates sequential milestone photograms and compiles arch_evolution.gif."""
     print("🎞️ Generating Progressive Workshop Evolution Photograms...")
+    rails_icon = get_rails_icon_path()
+    containers_table = get_containers_table_html(rails_icon)
     frames = []
 
     # Frame 1: Local / Ephemeral Baseline
@@ -243,8 +281,8 @@ def generate_evolution():
 
         with Cluster("Google Cloud Run"):
             cloud_run = Run("S1. Cloud Run")
-            containers = Node(label=CONTAINERS_TABLE_HTML, shape="none")
-            cloud_run >> Edge(label=" :8080 ", color="#1a73e8", tailport="e", headport="rails:w", minlen="2") >> containers
+            containers = Node(label=containers_table, shape="none", fixedsize="false")
+            cloud_run >> Edge(color="#1a73e8", tailport="e", headport="in:w") >> containers
 
         with Cluster("Google Cloud Persistence"):
             db = SQL("S2. Cloud SQL - pgsql")
