@@ -278,19 +278,30 @@ function renderTable() {
     let pendingBadgeHtml = "";
     if (isReviewPending && questUrl) {
       pendingBadgeHtml = `
-        <a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 hover:border-amber-500/50 transition-colors" title="Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate">
-          <span class="text-xs leading-none animate-pulse">⏳</span>
-          <span class="font-bold text-[9.5px]">GHI #${escapeHtml(t.quest_ghi_issue)} review pending</span>
-        </a>
+        <div class="mt-0.5">
+          <a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-yellow-500/15 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/25 hover:border-yellow-500/50 transition-colors" title="Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate">
+            <span class="text-xs leading-none animate-pulse">⏳</span>
+            <span class="font-bold text-[9.5px]">GHI #${escapeHtml(t.quest_ghi_issue)} review pending</span>
+          </a>
+        </div>
       `;
+    }
+
+    let nameTrophyHtml = "";
+    if (stepNum === 8) {
+      const reviewerText = t.proctor_reviewer ? ` by @${escapeHtml(t.proctor_reviewer)}` : "";
+      if (questUrl) {
+        nameTrophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block ml-1" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-sm leading-none">🏆</span></a>`;
+      } else {
+        nameTrophyHtml = `<span class="text-sm leading-none ml-1" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
+      }
     }
 
     const stepBarHtml = `
       <div class="flex items-center gap-1.5 ml-auto">
-        ${pendingBadgeHtml}
         <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
           <span class="font-mono text-[11px] font-bold tracking-tight">
-            <span class="${stepNum === 8 ? 'text-purple-300' : 'text-amber-400'} drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+            <span class="${stepNum === 8 ? 'text-purple-300' : 'text-yellow-400'} drop-shadow-[0_0_4px_rgba(250,204,21,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
           </span>
           <div class="flex items-center gap-0.5">
             ${segmentsHtml}
@@ -488,17 +499,21 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome a sx + eventuale Gmail icon + Step badge -->
+      <!-- COLONNA 2: HH:MM Nome (in giallo) + eventuale coppa + sotto GHI review pending + a dx Step bar fissa -->
       <td class="py-2 px-3 whitespace-nowrap align-middle">
-        <div class="flex items-center gap-2.5">
-          <div class="flex items-baseline gap-1.5">
-            <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
-            <span class="font-bold text-amber-400 text-sm">${escapeHtml(nickname)}</span>
-            ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
-                <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
-              </a>
-            ` : ''}
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
+              <span class="font-bold text-yellow-300 text-sm drop-shadow-sm">${escapeHtml(nickname)}</span>
+              ${nameTrophyHtml}
+              ${t.admin_email ? `
+                <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+                  <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
+                </a>
+              ` : ''}
+            </div>
+            ${pendingBadgeHtml}
           </div>
 
           ${stepBarHtml}

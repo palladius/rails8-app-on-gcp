@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.25] - 2026-09-11
+### Changed
+- 🐝 **Workshop Hive UI Layout Refinements**:
+  - Moved `⏳ GHI #XX review pending` badge directly underneath the student's nickname instead of horizontally adjacent to the step bar, preserving fixed column alignments.
+  - Set student nickname font color to vibrant yellow (`text-yellow-300`).
+  - Added a trophy 🏆 directly next to the student's nickname when achieving Stage 8.
+  - Added cache-buster `?v=0.1.2` to `hive.js` script tag in `index.html`.
+  - Bumped Workshop Hive to v0.1.2 (`workshop/hive/VERSION`).
+
 ## [0.2.24] - 2026-09-11
 ### Fixed
 - 🐝 **Workshop Hive Frontend String Coercion**:
