@@ -8,7 +8,7 @@
   - Added pulsating `⏳` review-pending indicator for quest submissions awaiting proctor approval.
   - Added `step_8_podium` array to JSON endpoints (`/index.json`, `/status.json`, `/metastatus.json`).
 - 📐 **Rigid `table-fixed` Layout & Zero-Overlap Column Isolation**:
-  - Converted table to `table-fixed` with explicit widths (`w-14` for status, `w-[320px]` for Student & Step, `w-auto` for App URL & Metrics) to strictly prevent cells from overflowing into adjacent columns.
+  - Converted table to `table-fixed` with explicit widths (`w-14` for status, `w-[440px]` for Student & Step, `w-auto` for App URL & Metrics) to give nicknames ample breathing room while strictly preventing cells from overflowing.
   - Applied `truncate block` with full `title` tooltip to student nicknames, ensuring long names never push the progress bar.
   - Locked 8-segment progress bar dimensions to a strictly fixed `w-[96px]` pill with `shrink-0` bars, removing internal trophies.
   - Replaced `break-all` on Cloud Run URLs with `truncate max-w-full` to eliminate multi-line URL wrapping.

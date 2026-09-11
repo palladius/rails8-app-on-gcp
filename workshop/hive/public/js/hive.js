@@ -259,7 +259,7 @@ function formatHHMM(isoOrStr) {
     }
   } catch {}
 
-  const match = isoOrStr.match(/(\d{1,2}:\d{2})/);
+  const match = String(isoOrStr).match(/(\d{1,2}:\d{2})/);
   if (match) return match[1];
 
   return "--:--";
@@ -701,7 +701,7 @@ function renderTable() {
       </td>
 
       <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
-      <td class="py-2.5 px-3 align-middle w-[320px] overflow-hidden">
+      <td class="py-2.5 px-3 align-middle w-[440px] overflow-hidden">
         <div class="flex items-center justify-between gap-2 w-full overflow-hidden">
           <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
             <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
@@ -819,8 +819,8 @@ function renderStagesDistribution() {
 }
 
 function escapeHtml(str) {
-  if (!str) return "";
-  return str.replace(/[&<>"']/g, function(m) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/[&<>"']/g, function(m) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
   });
 }
