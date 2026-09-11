@@ -2,6 +2,12 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.31] - 2026-09-11
 ### Fixed
+- 📖 **Codelab & Workshop Curriculum Hardening (PR #99, closes #96)**:
+  - Added GCS bucket creation for Terraform state in Step 1 (`gs://${GOOGLE_CLOUD_PROJECT}-tfstate`).
+  - Translated Workshop Hive callout in Step 3 from Italian to English.
+  - Added explicit `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` environment variable injection in Cloud Run deploy commands.
+  - Dynamically discovered `SQL_INSTANCE_NAME` from Terraform output or `gcloud sql instances list` before running `describe`.
+  - Updated `workshop/skeleton.yaml` step evaluations and requirements.
 - 🧰 **Justfile Parses Again on Distro-Shipped `just` (PR #101, closes #100)**:
   - Gave the variadic parameter a default in `screenshots`, `screenshots-force` and `generate-screenshots` (`filter="" *flags="":`), removing the last "Non-default parameter `flags` follows default parameter" parse failures.
   - This was a **whole-file** failure, not a per-recipe one: `just` aborts at parse time, so on `just` < 1.40.0 (Debian/Ubuntu ship 1.21) *every* recipe died — `just slides`, `just dev`, even `just --list` — while the error pointed at an unrelated `screenshots` recipe.

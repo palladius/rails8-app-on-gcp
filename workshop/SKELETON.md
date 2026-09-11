@@ -134,7 +134,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Cloud SQL instance provisioned and in RUNNABLE state
 - **`pseudocode`**:
   ```bash
-  gcloud sql instances describe rails-postgres --format='value(state)'
+  export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name)
+  gcloud sql instances describe $SQL_INSTANCE_NAME --format='value(state)'
   gcloud secrets create rails-master-key --data-file=blog/config/master.key
   gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
   ```
@@ -144,7 +145,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Local mTLS proxy connectivity verified via cloud-sql-proxy
 - **`evals`**:
   - `[SHELL]` Verify Secret Manager API is accessible or offline environment check
-  - `[RUBY]` Verify master.key exists locally
+  - `[SHELL]` Verify Cloud SQL instance exists and is RUNNABLE (live check)
+  - `[SHELL]` Verify rails-master-key secret has a non-dummy value in Secret Manager
+  - `[RUBY]` Verify master.key exists locally AND matches credentials.yml.enc
   - `[RUBY]` Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars
 
 ---
