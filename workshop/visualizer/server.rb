@@ -66,7 +66,8 @@ require 'optparse'
 cli_options = {
   port: 8080,
   bind: 'localhost',
-  file: nil
+  file: nil,
+  debug: false
 }
 
 OptionParser.new do |opts|
@@ -79,12 +80,18 @@ OptionParser.new do |opts|
   opts.on("-b", "--bind BIND", "IP address to bind the server to (default: localhost)") do |b|
     cli_options[:bind] = b
   end
+
+  opts.on("-d", "--debug", "Enable debug mode (shows internal docs like Constitution and Skeleton)") do
+    cli_options[:debug] = true
+  end
   
   opts.on("-h", "--help", "Prints this help") do
     puts opts
     exit
   end
 end.parse!
+
+cli_options[:debug] ||= %w[1 true yes on].include?(ENV['DEBUG'].to_s.downcase)
 
 # If a file is specified as the remaining argument
 if ARGV.any?
@@ -117,6 +124,14 @@ class CodelabServer < Sinatra::Base
   set :base_dir, File.dirname(File.expand_path(CLI_OPTIONS[:file]))
   set :default_file, File.expand_path(CLI_OPTIONS[:file])
   
+  before do
+    if params.key?('debug')
+      val = params['debug'].to_s.downcase
+      is_debug = %w[1 true yes on].include?(val)
+      response.set_cookie('codelab_debug', value: (is_debug ? '1' : '0'), path: '/')
+    end
+  end
+
   helpers do
     def render_markdown(text)
       Kramdown::Document.new(text, input: 'GFM', syntax_highlighter: nil).to_html
@@ -147,9 +162,29 @@ class CodelabServer < Sinatra::Base
       base = File.basename(file_path).downcase
       if base.include?('constitution')
         'constitution'
+      elsif base.include?('skeleton')
+        'skeleton'
       else
         'codelab'
       end
+    end
+
+    def debug_mode?
+      if params.key?('debug')
+        return %w[1 true yes on].include?(params['debug'].to_s.downcase)
+      end
+
+      return true if request.cookies['codelab_debug'] == '1' || request.cookies['debug'] == '1'
+      return true if CLI_OPTIONS[:debug]
+      return true if %w[1 true yes on].include?(ENV['DEBUG'].to_s.downcase)
+
+      false
+    end
+
+    def show_internal_docs?
+      return true if @active_doc && @active_doc != 'codelab'
+
+      debug_mode?
     end
 
     def serve_codelab
@@ -331,20 +366,21 @@ class CodelabServer < Sinatra::Base
   end
 end
 
-# Startup Banner
-puts "\n"
-puts "🚀 Starting Codelab Visualizer Server on http://#{cli_options[:bind]}:#{cli_options[:port]}"
-puts "🦖 Hello, Supreme Leader and pun-master Riccardo!"
-puts "📖 Default file: #{cli_options[:file]}"
-puts "✨ Multi-Doc Switching Available:"
-puts "   👉 Codelab     : http://#{cli_options[:bind]}:#{cli_options[:port]}/codelab"
-puts "   👉 Constitution: http://#{cli_options[:bind]}:#{cli_options[:port]}/constitution"
-puts "   👉 Skeleton    : http://#{cli_options[:bind]}:#{cli_options[:port]}/skeleton"
-puts "💡 Tip: Edit any markdown file and refresh your browser to see updates instantly!"
-puts "Press Ctrl+C to stop the server.\n\n"
-
 # Run Sinatra app only if executed directly
 if __FILE__ == $0
+  puts "\n"
+  puts "🚀 Starting Codelab Visualizer Server on http://#{cli_options[:bind]}:#{cli_options[:port]}"
+  puts "🦖 Hello, Supreme Leader and pun-master Riccardo!"
+  puts "📖 Default file: #{cli_options[:file]}"
+  puts "✨ Multi-Doc Switching Available:"
+  puts "   👉 Codelab     : http://#{cli_options[:bind]}:#{cli_options[:port]}/codelab"
+  puts "   👉 Constitution: http://#{cli_options[:bind]}:#{cli_options[:port]}/constitution"
+  puts "   👉 Skeleton    : http://#{cli_options[:bind]}:#{cli_options[:port]}/skeleton"
+  is_debug = cli_options[:debug] || %w[1 true yes on].include?(ENV['DEBUG'].to_s.downcase)
+  puts "   🐞 Debug Mode  : #{is_debug ? 'ENABLED (internal docs visible)' : 'disabled (use --debug or ?debug=1 to show internal docs)'}"
+  puts "💡 Tip: Edit any markdown file and refresh your browser to see updates instantly!"
+  puts "Press Ctrl+C to stop the server.\n\n"
+
   CodelabServer.run!
 end
 
@@ -765,8 +801,10 @@ __END__
       <div class="codelab-title"><%= @codelab[:title] %></div>
       <div class="doc-switcher">
         <a href="/codelab" class="doc-tab <%= @active_doc == 'codelab' ? 'active' : '' %>">📖 Codelab</a>
-        <a href="/constitution" class="doc-tab <%= @active_doc == 'constitution' ? 'active' : '' %>">📜 Constitution</a>
-        <a href="/skeleton" class="doc-tab <%= @active_doc == 'skeleton' ? 'active' : '' %>">🦴 Skeleton</a>
+        <% if show_internal_docs? %>
+          <a href="/constitution" class="doc-tab <%= @active_doc == 'constitution' ? 'active' : '' %>">📜 Constitution</a>
+          <a href="/skeleton" class="doc-tab <%= @active_doc == 'skeleton' ? 'active' : '' %>">🦴 Skeleton</a>
+        <% end %>
       </div>
     </div>
     <div class="sidebar-menu">
@@ -1298,7 +1336,9 @@ __END__
     </section>
 
     <footer>
-      <span class="internal-refs"><small style="font-size: 11px; color: #a0aec0;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
+      <% if show_internal_docs? %>
+        <span class="internal-refs"><small style="font-size: 11px; color: #a0aec0;">internal:</small> <a href="/constitution">constitution</a> &middot; <a href="/skeleton">skeleton</a></span>
+      <% end %>
       <span class="repo-link"><a href="https://github.com/palladius/rails8-app-on-gcp" target="_blank" rel="noopener">GitHub Repository &rarr;</a></span>
     </footer>
   </div>

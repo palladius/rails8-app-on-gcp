@@ -36,8 +36,8 @@ autopush:
     git push origin main
 
 # run the workshop codelab visualizer server (serves /, /constitution, /skeleton, /a2ui)
-workshop-dev port="8080":
-    ruby workshop/visualizer/server.rb --port {{port}}
+workshop-dev port="8080" *flags:
+    ruby workshop/visualizer/server.rb --port {{port}} {{flags}}
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
@@ -74,6 +74,10 @@ build-slides:
 # run visual and structural unit tests on Marp slides
 test-slides:
     ruby test/test_slides.rb
+
+# run unit and routing tests on Codelab Visualizer server (Sinatra)
+test-visualizer:
+    ruby test/test_workshop_visualizer.rb
 
 # generate canonical GCP architecture diagram (assets/arch_diagram.png)
 diagram:

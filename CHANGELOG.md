@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.27] - 2026-09-11
+### Added
+- 🔍 **Codelab Visualizer Debug Mode & Internal Docs Toggling**:
+  - Added `-d / --debug` flag, `?debug=1` parameter, `DEBUG=1` environment variable, and cookie persistence (`codelab_debug`) to `workshop/visualizer/server.rb`.
+  - Hides internal developer documents (Constitution, Skeleton) by default for workshop attendees while retaining instant access when explicitly navigated or in debug mode.
+  - Added automated Sinatra test suite `test/test_workshop_visualizer.rb` and added `just test-visualizer` recipe to `justfile`.
+
 ## [0.2.26] - 2026-09-11
 ### Changed
 - 🎨 **Deterministic Architecture Diagram Polish**:
