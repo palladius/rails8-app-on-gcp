@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.26] - 2026-09-11
+### Fixed
+- 🐞 **Workshop Hive Leaderboard Client-Side Compact Scope Fix**:
+  - Resolved `ReferenceError: compact is not defined` in `renderTable()` by scoping `const compact = isCompactMode()` properly across student row loops.
+  - Bumped `workshop/hive/VERSION` to `0.1.5`.
+
 ## [0.2.25] - 2026-09-11
 ### Added & Improved
 - 📐 **Workshop Hive Leaderboard High-Density 50+ Compact View (Single-Line Row Mode)**:

@@ -477,6 +477,8 @@ function renderTable() {
   const tbody = document.getElementById("leaderboard-tbody");
   if (!tbody) return;
 
+  const compact = isCompactMode();
+
   const step8Winners = computeStep8Winners();
   renderStep8Podium(step8Winners);
 

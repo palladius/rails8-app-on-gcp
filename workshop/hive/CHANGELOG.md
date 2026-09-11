@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.5] - 2026-09-11
+### Fixed
+- 🐞 **Client-Side Compact Scope Fix**:
+  - Scoped `const compact = isCompactMode()` properly at top of `renderTable()` in `public/js/hive.js`.
+  - Fixed client-side rendering exception when loading cached or live telemetry.
+
 ## [0.1.4] - 2026-09-11
 ### Added & Improved
 - 📐 **High-Density 50+ Compact View (Issue #47 / Single-Line Row Mode)**:
