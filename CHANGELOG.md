@@ -1,5 +1,19 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.25] - 2026-09-11
+### Added & Improved
+- 📐 **Workshop Hive Leaderboard High-Density 50+ Compact View (Single-Line Row Mode)**:
+  - Added dedicated **Compact Mode** (`View: Compact (50+)` / `View: Full`) toggle button in `workshop/hive` header toolbar with `localStorage` persistence and URL sync (`?compact=true`).
+  - Implemented strict **Single-Line Student Rows** (`whitespace-nowrap`, row height `30px`, `py-1`):
+    - Inline status dot (🟢/🔴) + latency in ms.
+    - `HH:MM` timestamp, student nickname (truncated with hover tooltip), and medals/trophies.
+    - 8-segment progress bar.
+    - Cloud Run direct link with service logo.
+    - Raw `/status.json` endpoint direct link.
+    - Ruby & Rails version chips, Rails environment badge (`prod`/`dev`), and GCP Triad indicators (`🐘 ☁️ 🍌`).
+  - Adapted Step 8 Champions Podium to a low-profile slim strip in compact mode, maximizing vertical screen real estate for 50+ students on a single screen without scrolling.
+  - Bumped `workshop/hive/VERSION` to `0.1.4`.
+
 ## [0.2.24] - 2026-09-11
 ### Added
 - 🍯 **Workshop Hive Structured Telemetry JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
