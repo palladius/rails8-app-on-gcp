@@ -212,6 +212,40 @@ else
     puts "   👉 Run: gcloud auth application-default login"
     warnings_count += 1
   end
+
+  # Check the service account `gcloud run deploy --source` builds with.
+  # Modern GCP projects enforce least privilege on the Default Compute SA, so the
+  # first source deploy dies with PERMISSION_DENIED long after this suite said OK.
+  print "   🔍 Checking Default Compute SA can run `gcloud run deploy --source`... "
+  project_number, _err, num_status = Open3.capture3(
+    "gcloud projects describe #{project_id} --format='value(projectNumber)' 2>/dev/null"
+  )
+  project_number = project_number.to_s.strip
+  if !num_status.success? || project_number.empty?
+    puts "SKIPPED (project number unavailable)".yellow
+  else
+    compute_sa = "#{project_number}-compute@developer.gserviceaccount.com"
+    roles, _err, roles_status = Open3.capture3(
+      "gcloud projects get-iam-policy #{project_id} --flatten='bindings[].members' " \
+      "--filter='bindings.members:#{compute_sa}' --format='value(bindings.role)' 2>/dev/null"
+    )
+    granted = roles.to_s.split("\n").map(&:strip)
+    sufficient = granted.include?("roles/editor") ||
+                 granted.include?("roles/cloudbuild.builds.builder")
+
+    if !roles_status.success?
+      puts "SKIPPED (cannot read IAM policy)".yellow
+    elsif sufficient
+      puts "OK (#{granted.include?('roles/editor') ? 'roles/editor' : 'roles/cloudbuild.builds.builder'})".green
+    else
+      puts "INSUFFICIENT".red
+      puts "⚠️  [WARNING] #{compute_sa} lacks the roles Cloud Build needs.".yellow
+      puts "   Step 3's `gcloud run deploy --source .` will fail with PERMISSION_DENIED."
+      puts "   👉 Run: just project-status   (grants storage.admin, logging.logWriter,"
+      puts "                                  artifactregistry.writer, cloudbuild.builds.builder)"
+      warnings_count += 1
+    end
+  end
 end
 
 puts "\n--- 🔑 3. Checking Rails Secrets & Keys ---".bold

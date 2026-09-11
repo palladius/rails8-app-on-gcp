@@ -376,6 +376,15 @@ gcloud run deploy blog \
   --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1
 ```
 
+> 🧯 **`PERMISSION_DENIED: Build failed because the default service account is missing required IAM permissions`?** Two different causes wear the same error:
+>
+> 1. **gcloud just enabled an API for you.** If the deploy printed `The following APIs are not enabled ... cloudbuild.googleapis.com` and you answered `Y`, the build may have started before the new permissions finished propagating — gcloud's own prompt warns "this will take a few minutes". **Wait a minute and re-run the exact same command**; it usually succeeds. Step 1's `terraform apply` normally enables this API for you, so you should not see the prompt at all.
+> 2. **The Default Compute SA really is missing roles.** Modern GCP projects enforce least privilege on it, which breaks source deploys. Fix it with:
+>    ```bash
+>    just project-status   # grants storage.admin, logging.logWriter, artifactregistry.writer, cloudbuild.builds.builder
+>    ```
+>    `just workshop-test` also reports this now, so it is worth re-running if the deploy keeps failing.
+
 During deployment:
 1. Cloud Run builds your Rails container image.
 2. It assigns a public, secure TLS domain: `https://blog-[hash]-[region].a.run.app`.

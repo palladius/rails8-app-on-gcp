@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.45] - 2026-09-11
+### Added
+- 🛂 **Build Service Account Pre-Flight Check (PR #126, closes #125)**:
+  - Step 3's first source deploy can die with `PERMISSION_DENIED: Build failed because the default service account is missing required IAM permissions`. The repo already carried the remedy in `iac/check_gcp_setup.sh` (grants `storage.admin`, `logging.logWriter`, `artifactregistry.writer`, `cloudbuild.builds.builder` to the Default Compute SA), but **no attendee-facing material mentioned it**: `grep project-status|check_gcp_setup workshop/CODELAB.md workshop/skeleton.yaml` matched nothing, while `workshop/cfp/CFP.en.md` promises conference attendees exactly that script.
+  - `bin/workshop_diagnostics.rb` (`just workshop-test`, run at Step 1) now checks the Default Compute SA's roles read-only and warns with the remedy, two steps before the failure would surface. It reports, it does not grant — a diagnostics tool should not mutate project IAM unasked.
+### Fixed
+- 🧯 **Step 3 Troubleshooting for `PERMISSION_DENIED`**:
+  - Added a callout separating the two causes that wear the identical error: gcloud having just enabled `cloudbuild.googleapis.com` in the same command (its own prompt warns "this will take a few minutes" — wait and re-run), and the Default Compute SA genuinely lacking roles (`just project-status`).
+  - On the project where this was diagnosed the SA held `roles/editor` and the Cloud Build service agent existed, so the failure was the enablement race — which #123/PR #124 prevents by enabling the API back at Step 1.
+
 ## [0.2.44] - 2026-09-11
 ### Fixed
 - ⚡ **Cloud Build API Enabled Up Front (PR #124, closes #123)**:
