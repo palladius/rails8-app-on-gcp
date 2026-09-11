@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.38] - 2026-09-11
+### Fixed & Improved
+- 🛠️ **Friction Log FL006 (Steps 4→8 Deployment & Broken Images Evals, PR #113, closes #96)**:
+  - **Secret Leak Hardening (FL006-14)**: Added `/database_url/i` to `secret_patterns` in `StatusesController` to prevent sensitive credentials from leaking into `/status.json`.
+  - **Cloud SQL Sidecar Telemetry (FL006-15)**: Enhanced database tier detection when running on Cloud Run (`K_SERVICE` set) with localhost Cloud SQL Auth Proxy sidecar.
+  - **Multi-DB Schema Loading (FL006-16/17)**: Documented `db:schema:load:queue/cache/cable` and the 4 `DATABASE_*_URL` environment variables in `CODELAB.md`.
+  - **URI Socket Format (FL006-18)**: Added warnings and guidance for Ruby 3.4+ URI parser with Cloud SQL proxy sockets.
+  - **Step 6 Multi-Database Migrations (FL006-19)**: Expanded Step 6 deployment procedure in `CODELAB.md`.
+  - **Broken Images Evaluator (FL006-20)**: Added `step-7-ruby-no-broken-images` eval to `workshop/skeleton.yaml` checking for orphan ActiveStorage blobs.
+
 ## [0.2.27] - 2026-09-11
 ### Added & Improved
 - 🏷️ **Workshop Hive Leaderboard Footer Version & Status Formatting**:

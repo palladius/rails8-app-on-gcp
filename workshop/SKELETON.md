@@ -200,6 +200,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[RUBY]` Verify deterministic absence of warning alerts, stuck jobs, and ephemeral badges via integration tests
   - `[LLM]` Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges
   - `[RUBY]` Verify status telemetry infers Step 7 when Cloud Run has Cloud SQL, GCS, and active AI credentials
+  - `[RUBY]` Verify no posts have broken ActiveStorage cover image attachments (orphan blobs)
 
 ---
 
