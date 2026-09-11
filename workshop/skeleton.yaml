@@ -409,6 +409,24 @@ steps:
           step_info = JSON.parse(out.lines.last)
           raise "Expected step 7, got #{step_info['number']}" unless step_info['number'] == 7
 
+      - id: "step-7-ruby-no-broken-images"
+        type: "ruby"
+        description: "Verify no posts have broken ActiveStorage cover image attachments (orphan blobs)"
+        code: |
+          require 'open3'
+          runner_code = <<~RUBY
+            broken = Post.all.select { |p| p.cover_image.attached? && !p.cover_image.blob&.service&.exist?(p.cover_image.blob.key) rescue true }
+            if broken.any?
+              puts "BROKEN: #{broken.map(&:id).join(',')}"
+              exit 1
+            else
+              puts "OK: All #{Post.count} posts have valid images or no image"
+              exit 0
+            end
+          RUBY
+          cmd = ["bin/rails", "runner", runner_code]
+          out, err, st = Open3.capture3(*cmd, chdir: File.expand_path('blog', __dir__))
+          raise "Broken images found: #{out.strip}" unless st.success?
   - id: "step-8"
     number: 8
     title: "Choose Your Own Adventure / Advanced Quests 🏆"

@@ -98,7 +98,12 @@ class StatusesController < ApplicationController
     cfg = ActiveRecord::Base.connection_db_config
     adapter = cfg.adapter.to_s
     host = cfg.configuration_hash[:host].to_s
-    is_cloudsql = ENV["CLOUDSQL_INSTANCE"].present? || host.include?("cloudsql") || ENV["DATABASE_URL"].to_s.include?("cloudsql")
+    # Detect Cloud SQL even when using sidecar proxy (host appears as localhost)
+    any_db_url_has_cloudsql = ENV.select { |k, _| k.start_with?("DATABASE") }.any? { |_, v| v.to_s.include?("cloudsql") }
+    is_cloudsql = ENV["CLOUDSQL_INSTANCE"].present? ||
+                  host.include?("cloudsql") ||
+                  any_db_url_has_cloudsql ||
+                  (ENV["K_SERVICE"].present? && adapter == "postgresql" && host.in?(%w[localhost 127.0.0.1]))
 
     if is_cloudsql
       {
@@ -284,7 +289,7 @@ class StatusesController < ApplicationController
 
   def safe_env_inspection
     # Known sensitive keys to strictly mask with asterisks
-    secret_patterns = [/pass/i, /key/i, /secret/i, /token/i, /credential/i, /auth/i]
+    secret_patterns = [/pass/i, /key/i, /secret/i, /token/i, /credential/i, /auth/i, /database_url/i]
 
     # Inspection targets
     vars_of_interest = %w[

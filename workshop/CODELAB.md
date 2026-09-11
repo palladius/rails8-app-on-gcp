@@ -639,23 +639,53 @@ The production deployment runs three coordinated containers sharing the same loc
 
 ### 3. Running Database Migrations via Cloud Run Job
 
-Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job:
+Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job.
+
+> ⚠️ **Critical: DATABASE_URL Format for Cloud SQL Auth Proxy**
+>
+> Cloud Run Jobs use a Unix socket proxy (not TCP). The `DATABASE_URL` **must** use the triple-slash format:
+> ```
+> postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJECT:REGION:INSTANCE
+> ```
+> The traditional `postgresql://user:pass@host/db` format **will fail** with `URI::InvalidURIError` due to colons in the Cloud SQL connection name. This affects Ruby 3.4+ (`uri-1.1.1` gem).
 
 ```bash
 # Get the latest blog image from Cloud Run (jobs don't support --source)
 export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
 
-# Create migration job using the existing blog image
+# Build the DATABASE_URL in triple-slash format (required for Unix socket proxy)
+export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
+export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
+export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
+
+# Create migration job — note ALL 4 database URL env vars for Rails 8 multi-database
 gcloud run jobs create rails-migrate \
   --image=$BLOG_IMAGE \
   --command "bin/rails" \
   --args "db:prepare" \
-  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
-  --set-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}" \
+  --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}" \
+  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
+  --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
   --service-account=$RUN_SA \
   --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
 
 # Execute migration job
+gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
+```
+
+> 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
+> All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
+> Solid Queue/Cache/Cable tables won't be created.
+
+After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
+
+```bash
+# Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
+gcloud run jobs update rails-migrate \
+  --command "bash" \
+  --args "-c,bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
+  --region $GOOGLE_CLOUD_REGION
+
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
 
