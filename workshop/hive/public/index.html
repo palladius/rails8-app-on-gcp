@@ -152,14 +152,14 @@
     </div>
 
     <!-- Table Container -->
-    <div class="bg-[#0f172a] rounded-xl border border-slate-800 shadow-xl overflow-hidden">
+    <div class="bg-[#0f172a] rounded-xl border border-slate-800 shadow-xl overflow-x-auto">
       <table class="w-full text-left border-collapse table-auto">
         <thead>
           <tr class="border-b border-slate-800/80 bg-slate-950/60 text-[10px] font-mono text-slate-400 uppercase tracking-wider">
             <!-- Colonna 1: Live & Latency (sinistra) -->
             <th class="py-2 px-3 w-14 text-center">Status</th>
-            <!-- Colonna 2: Student & Step -->
-            <th class="py-2 px-3 font-semibold w-56">Student & Step</th>
+            <!-- Colonna 2: Student & Step (larghezza bloccata a 300px per allineamento perfetto) -->
+            <th class="py-2 px-3 font-semibold w-72 min-w-[280px] max-w-[300px]">Student & Step</th>
             <!-- Colonna 3: App URL, Stack & Metrics -->
             <th class="py-2 px-3 font-semibold">App URL, Stack & Metrics</th>
           </tr>

@@ -70,8 +70,12 @@ module WorkshopHive
         req = Net::HTTP::Get.new(uri.request_uri)
         req["User-Agent"] = "WorkshopHive-ProctorReviewer/1.0"
         req["Accept"] = "application/vnd.github.v3+json"
-        if ENV["GITHUB_TOKEN"].to_s.strip != ""
-          req["Authorization"] = "token #{ENV['GITHUB_TOKEN'].strip}"
+        token = ENV["GITHUB_TOKEN"].to_s.strip
+        if token.empty?
+          token = `gh auth token 2>/dev/null`.strip rescue ""
+        end
+        if !token.empty?
+          req["Authorization"] = "token #{token}"
         end
 
         res = http.request(req)

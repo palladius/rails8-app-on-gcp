@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.3] - 2026-09-11
+### Fixed & Improved
+- 🏆 **Leaderboard Column Alignment & Fixed-Width Step Bars**:
+  - Moved graduation trophy 🏆 (and pending ⏳ indicator) to the **left** of the student nickname (`HH:MM [🏆] [Nickname]`).
+  - Implemented automatic cropping (`truncate` with ellipsis and full tooltip hover `title`) for long student nicknames, preventing row elongation.
+  - Locked Student & Step column width (`w-72 min-w-[280px] max-w-[300px]`) in both table header and rows.
+  - Fixed 8-segment progress bar dimensions to a strictly fixed `w-[98px]` pill with `shrink-0` bars, removing the internal trophy that previously caused Step 8 rows to expand and rob width from the stack telemetry column.
+  - Added automatic `gh auth token` fallback in `ProctorReviewer` when `GITHUB_TOKEN` is unset.
+
 ## [0.1.2] - 2026-09-11
 ### Added
 - 🍯 **Comprehensive JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:

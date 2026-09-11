@@ -333,10 +333,10 @@ function renderTable() {
       if (i <= stepNum) {
         // Segmento completato / attivo
         const color = (i === 8) ? 'bg-purple-400' : (i >= 5 ? 'bg-amber-400' : 'bg-emerald-400');
-        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm"></span>`;
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] ${color} inline-block shadow-sm shrink-0"></span>`;
       } else {
         // Segmento futuro / spento
-        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40"></span>`;
+        segmentsHtml += `<span class="w-1.5 h-3 rounded-[1px] bg-slate-800 border border-slate-700/50 inline-block opacity-40 shrink-0"></span>`;
       }
     }
 
@@ -345,38 +345,27 @@ function renderTable() {
     let trophyHtml = "";
     let glowingBorderClass = "border-slate-700/60 hover:border-amber-500/50";
     if (stepNum === 8 && isProctorApproved) {
-      glowingBorderClass = "border-purple-500/80 shadow-[0_0_12px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+      glowingBorderClass = "border-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
       const reviewerText = t.proctor_reviewer ? ` by @${escapeHtml(t.proctor_reviewer)}` : "";
       if (questUrl) {
-        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block ml-0.5" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-[12px] leading-none">🏆</span></a>`;
+        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-sm leading-none">🏆</span></a>`;
       } else {
-        trophyHtml = `<span class="text-[12px] leading-none ml-0.5" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
+        trophyHtml = `<span class="text-sm leading-none shrink-0" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
       }
     } else if (stepNum === 8) {
-      trophyHtml = '<span class="text-[11px] leading-none ml-0.5">🏆</span>';
-    }
-
-    let pendingBadgeHtml = "";
-    if (isReviewPending && questUrl) {
-      pendingBadgeHtml = `
-        <a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 hover:border-amber-500/50 transition-colors" title="Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate">
-          <span class="text-xs leading-none animate-pulse">⏳</span>
-          <span class="font-bold text-[9.5px]">GHI #${escapeHtml(t.quest_ghi_issue)} review pending</span>
-        </a>
-      `;
+      glowingBorderClass = "border-purple-500/60 bg-purple-950/30";
+      trophyHtml = '<span class="text-sm leading-none shrink-0" title="Step 8 Complete!">🏆</span>';
+    } else if (isReviewPending && questUrl) {
+      trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="⏳ Quest submitted on GitHub! Awaiting proctor LGTM comment to graduate (Issue #${escapeHtml(t.quest_ghi_issue)})"><span class="text-xs leading-none animate-pulse">⏳</span></a>`;
     }
 
     const stepBarHtml = `
-      <div class="flex items-center gap-1.5 ml-auto">
-        ${pendingBadgeHtml}
-        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
-          <span class="font-mono text-[11px] font-bold tracking-tight">
-            <span class="${stepNum === 8 ? 'text-purple-300' : 'text-amber-400'} drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
-          </span>
-          <div class="flex items-center gap-0.5">
-            ${segmentsHtml}
-          </div>
-          ${trophyHtml}
+      <div class="inline-flex items-center justify-between px-2 py-1 rounded-lg bg-slate-900/90 border ${glowingBorderClass} transition-all cursor-help group shadow-sm w-[98px] shrink-0" title="Step ${stepNum} di 8: ${escapeHtml(stepText)}">
+        <span class="font-mono text-[11px] font-bold tracking-tight shrink-0">
+          <span class="${stepNum === 8 ? 'text-purple-300' : 'text-amber-400'} drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]">${stepNum}</span><span class="text-amber-700/80 text-[10px]">/8</span>
+        </span>
+        <div class="flex items-center gap-0.5 shrink-0">
+          ${segmentsHtml}
         </div>
       </div>
     `;
@@ -569,14 +558,15 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome a sx + eventuale Gmail icon + Step badge -->
-      <td class="py-2 px-3 whitespace-nowrap align-middle">
-        <div class="flex items-center gap-2.5">
-          <div class="flex items-baseline gap-1.5">
-            <span class="text-[11px] font-mono text-slate-400 font-medium">${escapeHtml(hhmm)}</span>
-            <span class="font-bold text-amber-400 text-sm">${escapeHtml(nickname)}</span>
+      <!-- COLONNA 2: HH:MM Nome a sx con eventuale 🏆 + Step badge a dx con larghezza fissa -->
+      <td class="py-2 px-3 align-middle w-72 min-w-[280px] max-w-[300px]">
+        <div class="flex items-center justify-between gap-2 w-full">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1">
+            <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
+            ${trophyHtml ? `<span class="shrink-0 inline-flex items-center">${trophyHtml}</span>` : ''}
+            <span class="font-bold text-amber-400 text-sm truncate" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
             ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
                 <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
               </a>
             ` : ''}
