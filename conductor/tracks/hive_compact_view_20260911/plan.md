@@ -32,10 +32,10 @@
 - [x] Task: Phase 3 Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4: Version Bump, Documentation & Final Verification
-- [~] Task: Version Bump and Changelog Update
-  - [ ] Bump `workshop/hive/VERSION` from 0.1.3 to 0.1.4
-  - [ ] Document High-Density Compact Mode (50+ students single-line view) in `workshop/hive/CHANGELOG.md`
-- [ ] Task: Full Regression Suite Verification
-  - [ ] Run all Hive test suites (`test_*.rb`)
-  - [ ] Run blog `just test` suite
-- [ ] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Version Bump and Changelog Update (451afc1)
+  - [x] Bump `workshop/hive/VERSION` from 0.1.3 to 0.1.4
+  - [x] Document High-Density Compact Mode (50+ students single-line view) in `workshop/hive/CHANGELOG.md`
+- [x] Task: Full Regression Suite Verification (451afc1)
+  - [x] Run all Hive test suites (`test_*.rb`)
+  - [x] Run blog `just test` suite
+- [x] Task: Phase 4 Verification & Checkpoint (Refer to workflow.md)
