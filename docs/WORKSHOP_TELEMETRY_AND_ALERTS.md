@@ -166,7 +166,7 @@ The CLI tool ([`bin/cloud_run_status.sh`](file:///usr/local/google/home/ricc/git
   🔗 URL:            https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app
   🧭 Dashboard:      https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app/status
   💚 Healthcheck:    https://test-rails8-workshop-rails-app-728928218194.europe-west1.run.app/up (200 OK)
-  🏷️  App Version:    v0.2.4 (Rails 8.1.3, Ruby 4.0.5)
+  🏷️  App Version:    v0.2.4 (Rails 8.1.3, Ruby 3.4.5)
   🎯 Workshop Step:  Step 4 (Step 4: Durable Storage with Google Cloud Storage (iam: true))
 ─────────────────────────────────────────────────────────────
   ☁️ Google Cloud Run:    Serverless container running on Cloud Run (Service: test-rails8-workshop-rails-app)

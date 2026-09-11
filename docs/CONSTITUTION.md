@@ -1,7 +1,7 @@
 # 📜 The Project Constitution
 
 <!--
-Current version: 1.1.0
+Current version: 1.2.0
 Ratified by: Riccardo 🦖, Emiliano 🏎️, Antigravity AI 🤖
 -->
 
@@ -47,7 +47,19 @@ To maximize learning clarity, the application UI must provide instant, tangible 
 - **Localhost Invariant:** The application and workshop baseline must run on `localhost` at **ANY GIVEN TIME** without requiring live cloud credentials or an active internet connection.
 - **Fast Diagnostic Tests:** Automated tests must execute with strict timeouts (**< 5 seconds**) and emit clear, actionable diagnostic messages if backing services (e.g., database, GCS, Cloud SQL Proxy) are unreachable or missing configuration. Learners and AI pair programmers must always be able to determine what is currently functional versus what requires configuration.
 
-### 7. Hierarchical Document Authority
+### 7. Ruby Version Pin: 3.4.5
+The project is frozen to **Ruby 3.4.5**. This version **MUST** be consistent across all artifacts:
+- `blog/.ruby-version`
+- `blog/Dockerfile` (`ARG RUBY_VERSION`)
+- `blog/config/deploy.yml`
+- `.github/workflows/deploy-pages.yml`
+- `workshop/CODELAB.md` (prerequisites section)
+- `workshop/skeleton.yaml` (Step 0 Ruby eval)
+- Any CI/CD workflow referencing Ruby
+
+> **Rationale (FL006):** Ruby 4.0 introduced a stricter `URI::Generic` parser (RFC 3986 compliance) that breaks PostgreSQL connection strings using Unix socket paths with colons (e.g., Cloud SQL Auth Proxy `?host=/cloudsql/project:region:instance`). This mismatch between `.ruby-version` (3.4.5) and `Dockerfile` (4.0.5) caused production failures on Cloud Run. Decision ratified by Riccardo 🦖 and Emiliano 🏎️ on 2026-09-11.
+
+### 8. Hierarchical Document Authority
 `docs/CONSTITUTION.md` is the supreme governing document of this repository. In case of any conflict:
 1. `docs/CONSTITUTION.md` (Supreme Meta-Constitution)
 2. `AGENTS.md` / `GEMINI.md` (Agent Operational Directives)

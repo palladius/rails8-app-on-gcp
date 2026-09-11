@@ -45,7 +45,7 @@ steps:
       - id: "step-0-ruby-env"
         type: "ruby"
         description: "Check Ruby version is 3.3 or higher"
-        code: "raise 'Ruby too old' if RUBY_VERSION < '3.3.0'"
+        code: "raise \"Ruby must be 3.4.x, got #{RUBY_VERSION}\" unless RUBY_VERSION.start_with?('3.4.')"
 
   - id: "step-1"
     number: 1

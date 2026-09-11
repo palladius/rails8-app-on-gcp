@@ -76,7 +76,7 @@ Before we begin, ensure you have the following tools available in your environme
 - **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
 - **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
 - **Docker & Docker Compose:** Installed and running locally.
-- **Ruby 3.3+ & Rails 8:** (`ruby -v`, `rails -v`).
+- **Ruby 3.4.5 & Rails 8:** (`ruby -v` must show `3.4.5`, `rails -v`). **Do NOT use Ruby 4.x** — it introduces breaking URI parser changes that affect Cloud SQL connectivity. Use `rbenv install 3.4.5 && rbenv local 3.4.5` if needed.
 - **Google Antigravity IDE / Gemini CLI:** Your autonomous AI pair programming assistant ([Download Google Antigravity](https://antigravity.google/download)).
 
 ### 2. Google Cloud Authentication, Dedicated Configuration & ADC
