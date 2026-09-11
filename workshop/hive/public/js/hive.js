@@ -88,6 +88,67 @@ function shouldShowDuplicates() {
          params.get("show_duplicatees_true") === "true";
 }
 
+const STORAGE_KEY_COMPACT = "hive_compact_mode";
+
+function isCompactMode() {
+  const params = new URLSearchParams(window.location.search);
+  const paramVal = params.get("compact") || params.get("density");
+  if (paramVal === "true" || paramVal === "1" || paramVal === "compact" || params.has("compact_true")) {
+    return true;
+  }
+  if (paramVal === "false" || paramVal === "0" || paramVal === "full" || paramVal === "expanded") {
+    return false;
+  }
+  try {
+    return localStorage.getItem(STORAGE_KEY_COMPACT) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function updateCompactViewUI() {
+  const btn = document.getElementById("compact-view-btn");
+  const label = document.getElementById("compact-view-label");
+  const compact = isCompactMode();
+  if (btn) {
+    if (compact) {
+      btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm flex items-center gap-1";
+      if (label) label.textContent = "View: Compact (50+)";
+    } else {
+      btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent flex items-center gap-1";
+      if (label) label.textContent = "View: Full";
+    }
+  }
+
+  const mainContainer = document.querySelector("main");
+  if (mainContainer) {
+    if (compact) {
+      mainContainer.classList.add("hive-compact-active");
+    } else {
+      mainContainer.classList.remove("hive-compact-active");
+    }
+  }
+}
+
+function toggleCompactMode() {
+  const url = new URL(window.location);
+  const nextState = !isCompactMode();
+
+  if (nextState) {
+    url.searchParams.set("compact", "true");
+    url.searchParams.delete("density");
+    try { localStorage.setItem(STORAGE_KEY_COMPACT, "true"); } catch {}
+  } else {
+    url.searchParams.delete("compact");
+    url.searchParams.delete("density");
+    try { localStorage.setItem(STORAGE_KEY_COMPACT, "false"); } catch {}
+  }
+
+  window.history.replaceState({}, "", url);
+  updateCompactViewUI();
+  renderTable();
+}
+
 function updateDuplicateFilterUI() {
   const btn = document.getElementById("dupe-filter-btn");
   const label = document.getElementById("dupe-filter-label");
@@ -134,6 +195,7 @@ try {
 document.addEventListener("DOMContentLoaded", () => {
   updateTimeFilterUI();
   updateDuplicateFilterUI();
+  updateCompactViewUI();
   if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
@@ -369,6 +431,22 @@ function renderStep8Podium(winners) {
       </div>
     `;
   });
+
+  const compact = isCompactMode();
+  if (compact) {
+    container.innerHTML = `
+      <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-xl px-3 py-1.5 flex items-center justify-between gap-3 shadow-md mb-1 text-xs">
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-base leading-none">🏆</span>
+          <span class="font-extrabold text-amber-300 text-[11px] uppercase tracking-wider">Step 8 Champions Podium</span>
+        </div>
+        <div class="flex items-center gap-2 overflow-x-auto min-w-0 py-0.5">
+          ${chipsHtml}
+        </div>
+      </div>
+    `;
+    return;
+  }
 
   container.innerHTML = `
     <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl mb-1">
