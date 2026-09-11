@@ -153,10 +153,15 @@ cp .env.dist .env
 
 ### 2. ⏱️ Launch Terraform Infrastructure Asynchronously
 
-Navigate to the `iac/` directory and initialize Terraform:
+Navigate to the `iac/` directory, create a GCS bucket for Terraform state, and initialize:
 ```bash
 cd iac
-terraform init
+
+# Create a GCS bucket for Terraform remote state
+gcloud storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-tfstate --location=$GOOGLE_CLOUD_REGION 2>/dev/null || true
+
+# Initialize Terraform with remote backend
+terraform init -backend-config="bucket=${GOOGLE_CLOUD_PROJECT}-tfstate"
 terraform apply -auto-approve
 cd ..
 ```
@@ -311,8 +316,8 @@ Open the generated Cloud Run URL in your browser!
    - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
 
 > 🐝 **Join the Live Workshop Hive Leaderboard!**
-> Se sei online e il tuo proctor sta mostrando la leaderboard, e vuoi far parte della leaderboard, aggiungi il tuo Cloud Run URL qui:
-> 👉 [**Registra il tuo Cloud Run sulla Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
+> If you are online and your proctor is showing the leaderboard, and you want to join it, add your Cloud Run URL here:
+> 👉 [**Register your Cloud Run on the Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
 
@@ -422,7 +427,7 @@ Re-deploy our application with GCS enabled:
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
 ```
 
 ### 4. ✨ The Surviving Image & The Cloud Stamp
@@ -472,12 +477,42 @@ just workshop-eval 4
 
 By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database and inject our secrets into **Google Cloud Secret Manager**.
 
+### 0. Bootstrap Environment Variables
+
+Before proceeding, export all required shell variables from your Terraform outputs:
+
+```bash
+# Core project variables (should already be set from Step 0)
+export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
+
+# Compute runtime service account
+export PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
+export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+# Cloud SQL instance name (from Terraform output, NOT hardcoded)
+export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
+
+# Database password (from Terraform output)
+export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "CHANGE_ME")
+
+# GCS bucket names
+export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
+
+echo "✅ Environment variables set:"
+echo "   RUN_SA=$RUN_SA"
+echo "   SQL_INSTANCE_NAME=$SQL_INSTANCE_NAME"
+echo "   GCS_BUCKET=$GCS_BUCKET"
+```
+
 ### 1. Verifying Cloud SQL Instance
 
 Check the state of your Cloud SQL instance:
 
 ```bash
-gcloud sql instances describe rails-postgres --format="value(state)"
+# Discover the actual instance name from Terraform output
+export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
+echo "Cloud SQL instance: $SQL_INSTANCE_NAME"
+gcloud sql instances describe $SQL_INSTANCE_NAME --format="value(state)"
 ```
 
 The output should be `RUNNABLE`.
@@ -567,13 +602,17 @@ The production deployment runs three coordinated containers sharing the same loc
 Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job:
 
 ```bash
-# Create migration job
+# Get the latest blog image from Cloud Run (jobs don't support --source)
+export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
+
+# Create migration job using the existing blog image
 gcloud run jobs create rails-migrate \
-  --source . \
+  --image=$BLOG_IMAGE \
   --command "bin/rails" \
-  --args "db:migrate,db:seed" \
+  --args "db:prepare" \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
-  --set-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres" \
+  --set-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}" \
+  --service-account=$RUN_SA \
   --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
 
 # Execute migration job
@@ -590,8 +629,8 @@ gcloud run deploy blog \
   --region $GOOGLE_CLOUD_REGION \
   --allow-unauthenticated \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
-  --add-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres" \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google
+  --add-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}" \
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
 ```
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**
@@ -662,7 +701,7 @@ Let's use the Rails console to rescue it and attach it to a Cloud SQL post:
 
 ```bash
 # Connect to your production database via Rails console and Cloud SQL Proxy
-cloud-sql-proxy --port 5432 ${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:rails-postgres &
+cloud-sql-proxy --port 5432 ${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME} &
 DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production bin/rails c
 ```
 

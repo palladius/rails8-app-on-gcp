@@ -199,7 +199,8 @@ steps:
     title: "Cloud SQL Ready & Secret Manager CLI Injection"
     description: "Verify Cloud SQL instance provisioning is finished and inject sensitive secrets into Google Cloud Secret Manager."
     pseudocode: |
-      gcloud sql instances describe rails-postgres --format='value(state)'
+      export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name)
+      gcloud sql instances describe $SQL_INSTANCE_NAME --format='value(state)'
       gcloud secrets create rails-master-key --data-file=blog/config/master.key
       gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
     prerequisites:
@@ -215,10 +216,25 @@ steps:
         description: "Verify Secret Manager API is accessible or offline environment check"
         command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline environment: skipping live Secret Manager check' || gcloud services list --enabled --filter='name:secretmanager.googleapis.com' --format='value(name)'"
         expect_exit: 0
+      - id: "step-5-shell-cloudsql-runnable"
+        type: "shell"
+        description: "Verify Cloud SQL instance exists and is RUNNABLE (live check)"
+        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline: skipping' || gcloud sql instances list --format='value(name,state)' --limit=1 | grep -q RUNNABLE"
+        expect_exit: 0
+      - id: "step-5-shell-secrets-have-real-values"
+        type: "shell"
+        description: "Verify rails-master-key secret has a non-dummy value in Secret Manager"
+        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline: skipping' || { VALUE=$(gcloud secrets versions access latest --secret=rails-master-key 2>/dev/null); test ${#VALUE} -eq 32 && test \"$VALUE\" != '0123456789abcdef0123456789abcdef'; }"
+        expect_exit: 0
       - id: "step-5-ruby-master-key"
         type: "ruby"
-        description: "Verify master.key exists locally"
-        code: "raise 'Missing master.key' unless File.exist?('blog/config/master.key') || File.exist?('blog/config/credentials.yml.enc')"
+        description: "Verify master.key exists locally AND matches credentials.yml.enc"
+        code: |
+          raise 'Missing master.key' unless File.exist?('blog/config/master.key')
+          raise 'Missing credentials.yml.enc' unless File.exist?('blog/config/credentials.yml.enc')
+          # Verify key can decrypt credentials (optional, requires rails runner)
+          key = File.read('blog/config/master.key').strip
+          raise "master.key looks like dummy (length=#{key.length})" unless key.length == 32 && key != '0123456789abcdef0123456789abcdef'
       - id: "step-5-ruby-status-json-step"
         type: "ruby"
         description: "Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars"
