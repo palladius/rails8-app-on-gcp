@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.44] - 2026-09-11
+### Fixed
+- ⚡ **Cloud Build API Enabled Up Front (PR #124, closes #123)**:
+  - Step 3's first `gcloud run deploy --source .` warned `The following APIs are not enabled on project [...]: cloudbuild.googleapis.com`. Source deploys build with Cloud Build, so the API is mandatory for the workshop's very first deploy.
+  - `iac/` already enabled six APIs but never this one: the only occurrence of `cloudbuild.googleapis.com` in the whole repo was in `docs/plans/2026-08-28-friction-log-workshop-execution.md`, a plan from an **earlier friction-log run** that listed it among the APIs to enable and was never implemented (`TODOs.md:36` records the same gap in general form).
+  - Added `google_project_service.cloudbuild` to `iac/cicd.tf` beside the Artifact Registry one, so Step 1's `terraform apply` enables it long before Step 3.
+  - Also gave `google_cloudbuild_trigger.deploy_on_push` a `depends_on` for it: the trigger is a Cloud Build resource that was being declared in a project where the API was never enabled — a latent ordering bug.
+
 ## [0.2.43] - 2026-09-11
 ### Fixed
 - 🐳 **Anonymous Volumes for `log/` and `tmp/` in `blog/compose.yaml` (closes #119)**:
