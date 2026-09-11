@@ -1,5 +1,12 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.43] - 2026-09-11
+### Fixed
+- 🐳 **Anonymous Volumes for `log/` and `tmp/` in `blog/compose.yaml` (closes #119)**:
+  - `compose.yaml` ran `web` and `worker` as root (`user: "0:0"`) into a bind mount of the host directory (`- .:/rails`), leaving root-owned `blog/log/development.log` and `blog/tmp/pids/server.pid` on the attendee's host filesystem.
+  - This prevented subsequent native runs (`bin/dev` or `just dev`) from booting due to permission denied errors on logs and spurious `A server is already running (pid: 1)` warnings that required `sudo` to remove.
+  - Added anonymous volume mounts (`/rails/tmp` and `/rails/log`) to `web` and `worker` services so all container-generated pids, sockets, and logs remain isolated inside the container lifecycle.
+
 ## [0.2.42] - 2026-09-11
 ### Fixed
 - 🌍 **Region Unified on `europe-west1` (PR #122, closes #121)**:
