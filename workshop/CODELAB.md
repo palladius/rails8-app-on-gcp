@@ -261,12 +261,27 @@ Run seed with your admin email:
 GOOGLE_CLOUD_ACCOUNT="myname@gmail.com" bin/rails db:seed
 ```
 
-Boot the services (still from `blog/`):
+Boot the services. **Pick one mode — they are mutually exclusive**, because both bind port 3000 on purpose (see the "Anti-POLA" note in `README.md`):
+
+**Mode A — Docker Compose (what this step assumes).** The rest of Step 2 needs it: Mailpit (`:8025`) and Adminer (`:8081`) only exist here.
 ```bash
-docker compose up
-# (Or run bin/dev if running directly on your host machine)
-# From the repo root, the equivalent is: just compose-up
+docker compose up -d     # still from blog/ — or `just compose-up` from the repo root
 ```
+The app is now served at http://localhost:3000 by the container. **Do not also run `just dev` / `bin/dev`** — the app is already up.
+
+**Mode B — Native on your host.** Only with the Docker stack down, and you lose Mailpit and Adminer:
+```bash
+just compose-down        # from the repo root
+just dev                 # or: bin/dev
+```
+
+> 🧯 **Ran both by mistake?** You will see `A server is already running (pid: 1, ...)` and `Unable to access log file`. The `pid: 1` is the process **inside** the container — `compose.yaml` bind-mounts your working tree and runs as root, so the container leaves root-owned files in `blog/`. Recover with:
+> ```bash
+> just compose-down
+> sudo rm -f blog/tmp/pids/server.pid        # sudo: the container created it as root
+> sudo chown -R "$USER" blog/log blog/tmp    # same reason
+> ```
+> Then start again with a single mode.
 
 ### 3. The Mailpit Experience & Console Workout
 
