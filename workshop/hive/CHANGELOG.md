@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.1.6] - 2026-09-11
+### Added & Improved
+- 🏷️ **Version Badge in Footer**:
+  - Embedded version badge (`v0.1.6`) in the leaderboard footer with dynamic API fallback.
+  - Added `version` attribute to `/up` and `/api/leaderboard` JSON endpoints.
+- 🎨 **Status Code Formatting**:
+  - Replaced `H503` with `/503` (and `/<code>` generally) for HTTP error status indicators across standard and compact table views.
+
+## [0.1.5] - 2026-09-11
+
+## [0.1.4] - 2026-09-11
+### Added & Improved
+- 📐 **High-Density 50+ Compact View (Issue #47 / Single-Line Row Mode)**:
+  - Added dedicated **Compact Mode** (`View: Compact (50+)` / `View: Full`) toggle button in the Hive header toolbar with `localStorage` persistence.
+  - Added URL query parameter support (`?compact=true`, `?compact=1`, or `?density=compact`) with automatic `window.history.replaceState` synchronization.
+  - Implemented strict **Single-Line Student Rows** (`whitespace-nowrap`, row height `30px`, `py-1`):
+    - Status Dot (🟢/🔴) with latency in ms inline.
+    - `HH:MM` timestamp, student nickname (truncated with hover tooltip), and medals/trophies.
+    - 8-segment progress bar.
+    - Cloud Run direct link with service logo.
+    - Raw `/status.json` endpoint direct link.
+    - Ruby & Rails version chips, Rails environment badge (`prod`/`dev`), and GCP Triad indicators (`🐘 ☁️ 🍌`).
+    - Posts count and Cloud Run revision tag.
+  - Adapted Step 8 Champions Podium to a low-profile slim strip in compact mode, maximizing vertical screen real estate for 50+ students on a single screen without scrolling.
+  - Added automated layout verification in `test/verify_compact_50_students.mjs`.
+
 ## [0.1.3] - 2026-09-11
 ### Fixed & Improved
 - 🏆 **Step 8 Champions Podium & Ranked Medals (Issue #89 / Hall of Fame)**:

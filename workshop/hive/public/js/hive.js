@@ -88,6 +88,67 @@ function shouldShowDuplicates() {
          params.get("show_duplicatees_true") === "true";
 }
 
+const STORAGE_KEY_COMPACT = "hive_compact_mode";
+
+function isCompactMode() {
+  const params = new URLSearchParams(window.location.search);
+  const paramVal = params.get("compact") || params.get("density");
+  if (paramVal === "true" || paramVal === "1" || paramVal === "compact" || params.has("compact_true")) {
+    return true;
+  }
+  if (paramVal === "false" || paramVal === "0" || paramVal === "full" || paramVal === "expanded") {
+    return false;
+  }
+  try {
+    return localStorage.getItem(STORAGE_KEY_COMPACT) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function updateCompactViewUI() {
+  const btn = document.getElementById("compact-view-btn");
+  const label = document.getElementById("compact-view-label");
+  const compact = isCompactMode();
+  if (btn) {
+    if (compact) {
+      btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm flex items-center gap-1";
+      if (label) label.textContent = "View: Compact (50+)";
+    } else {
+      btn.className = "px-2.5 py-0.5 rounded transition-all font-semibold cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent flex items-center gap-1";
+      if (label) label.textContent = "View: Full";
+    }
+  }
+
+  const mainContainer = document.querySelector("main");
+  if (mainContainer) {
+    if (compact) {
+      mainContainer.classList.add("hive-compact-active");
+    } else {
+      mainContainer.classList.remove("hive-compact-active");
+    }
+  }
+}
+
+function toggleCompactMode() {
+  const url = new URL(window.location);
+  const nextState = !isCompactMode();
+
+  if (nextState) {
+    url.searchParams.set("compact", "true");
+    url.searchParams.delete("density");
+    try { localStorage.setItem(STORAGE_KEY_COMPACT, "true"); } catch {}
+  } else {
+    url.searchParams.delete("compact");
+    url.searchParams.delete("density");
+    try { localStorage.setItem(STORAGE_KEY_COMPACT, "false"); } catch {}
+  }
+
+  window.history.replaceState({}, "", url);
+  updateCompactViewUI();
+  renderTable();
+}
+
 function updateDuplicateFilterUI() {
   const btn = document.getElementById("dupe-filter-btn");
   const label = document.getElementById("dupe-filter-label");
@@ -134,6 +195,7 @@ try {
 document.addEventListener("DOMContentLoaded", () => {
   updateTimeFilterUI();
   updateDuplicateFilterUI();
+  updateCompactViewUI();
   if (cachedLeaderboard.length > 0) {
     document.getElementById("stat-total-students").textContent = cachedLeaderboard.length;
     const healthyCount = Object.values(cachedHealth).filter(c => c.status === "up").length;
@@ -204,7 +266,10 @@ async function fetchLeaderboard() {
     if (previousStudentsCount > 0 && newEntries.length > previousStudentsCount) {
       playArrivalChime();
     }
-    previousStudentsCount = newEntries.length;
+    if (data.version) {
+      const badge = document.getElementById("hive-version-badge");
+      if (badge) badge.textContent = data.version;
+    }
 
     cachedLeaderboard = newEntries;
     try {
@@ -370,6 +435,22 @@ function renderStep8Podium(winners) {
     `;
   });
 
+  const compact = isCompactMode();
+  if (compact) {
+    container.innerHTML = `
+      <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-xl px-3 py-1.5 flex items-center justify-between gap-3 shadow-md mb-1 text-xs">
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-base leading-none">🏆</span>
+          <span class="font-extrabold text-amber-300 text-[11px] uppercase tracking-wider">Step 8 Champions Podium</span>
+        </div>
+        <div class="flex items-center gap-2 overflow-x-auto min-w-0 py-0.5">
+          ${chipsHtml}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = `
     <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl mb-1">
       <div class="flex items-center gap-3">
@@ -398,6 +479,8 @@ function renderStep8Podium(winners) {
 function renderTable() {
   const tbody = document.getElementById("leaderboard-tbody");
   if (!tbody) return;
+
+  const compact = isCompactMode();
 
   const step8Winners = computeStep8Winners();
   renderStep8Podium(step8Winners);
@@ -436,7 +519,7 @@ function renderTable() {
       latencyBadge = `<span class="font-mono text-[9px] text-emerald-400/90 font-normal tracking-tight leading-none">${check.latency_ms}ms</span>`;
     } else if (isDown) {
       dotHtml = `<a href="${escapeHtml(upUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block" title="DOWN — click to test /up"><span class="w-3.5 h-3.5 rounded-full bg-rose-500 blink-down inline-block ring-2 ring-rose-500/30"></span></a>`;
-      latencyBadge = `<span class="font-mono text-[9px] text-rose-400/90 font-normal tracking-tight leading-none">${check.http_code ? 'H' + check.http_code : 'FAIL'}</span>`;
+      latencyBadge = `<span class="font-mono text-[9px] text-rose-400/90 font-normal tracking-tight leading-none">${check.http_code ? '/' + check.http_code : 'FAIL'}</span>`;
     }
 
 
@@ -699,56 +782,152 @@ function renderTable() {
     }
 
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-slate-800/30 transition-colors";
 
-    tr.innerHTML = `
-      <!-- COLONNA 1: Live Dot + Sotto la latenza -->
-      <td class="py-2 px-2.5 text-center whitespace-nowrap align-middle">
-        <div class="flex flex-col items-center justify-center gap-0.5">
-          ${dotHtml}
-          ${latencyBadge}
-        </div>
-      </td>
+    if (compact) {
+      tr.className = "hover:bg-slate-800/40 transition-colors border-b border-slate-800/30 text-xs";
+      const dotHtmlCompact = isUp
+        ? `<a href="${escapeHtml(upUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block" title="200 OK — click to open /up"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 blink-up inline-block ring-1 ring-emerald-500/40"></span></a>`
+        : (isDown
+            ? `<a href="${escapeHtml(upUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-block" title="DOWN — click to test /up"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 blink-down inline-block ring-1 ring-rose-500/40"></span></a>`
+            : `<span class="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block"></span>`);
 
-      <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
-      <td class="py-2.5 px-3 align-middle w-[440px] overflow-hidden">
-        <div class="flex items-center justify-between gap-2 w-full overflow-hidden">
-          <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-            <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
-            ${trophyHtml ? `<span class="shrink-0 inline-flex items-center text-sm">${trophyHtml}</span>` : ''}
-            <span class="font-bold text-amber-400 text-sm truncate" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
-            ${t.admin_email ? `
-              <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
-                <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
-              </a>
-            ` : ''}
+      const latencyBadgeCompact = isUp
+        ? `<span class="font-mono text-[10px] text-emerald-400 font-normal leading-none">${check.latency_ms}ms</span>`
+        : (isDown
+            ? `<span class="font-mono text-[10px] text-rose-400 font-normal leading-none">${check.http_code ? '/' + check.http_code : 'FAIL'}</span>`
+            : `<span class="font-mono text-[10px] text-slate-500 leading-none">-</span>`);
+
+      const trophyHtmlCompact = winner
+        ? (questUrl
+            ? `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="${escapeHtml(rankTitle)} — Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-xs leading-none">${winner.medal}</span></a>`
+            : `<span class="text-xs leading-none shrink-0" title="${escapeHtml(rankTitle)}">${winner.medal}</span>`)
+        : (stepNum === 8
+            ? '<span class="text-xs leading-none shrink-0" title="Step 8 Complete!">🏆</span>'
+            : (isReviewPending && questUrl
+                ? `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="⏳ Quest submitted on GitHub! Awaiting proctor review"><span class="text-[11px] leading-none animate-pulse">⏳</span></a>`
+                : ''));
+
+      tr.innerHTML = `
+        <!-- COLONNA 1: Live Dot + Latency inline -->
+        <td class="py-1 px-2 text-center whitespace-nowrap align-middle">
+          <div class="flex items-center justify-center gap-1 font-mono">
+            ${dotHtmlCompact}
+            ${latencyBadgeCompact}
           </div>
+        </td>
 
-          <div class="shrink-0">
-            ${stepBarHtml}
+        <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
+        <td class="py-1 px-2.5 align-middle w-[320px] overflow-hidden whitespace-nowrap">
+          <div class="flex items-center justify-between gap-1.5 w-full overflow-hidden">
+            <div class="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
+              <span class="text-[10px] font-mono text-slate-500 shrink-0">${escapeHtml(hhmm)}</span>
+              ${trophyHtmlCompact ? `<span class="shrink-0 inline-flex items-center">${trophyHtmlCompact}</span>` : ''}
+              <span class="font-bold text-amber-400 text-xs truncate max-w-[130px]" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
+              ${t.admin_email ? `
+                <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="ADMIN_EMAIL: ${escapeHtml(t.admin_email)}">
+                  <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3 h-3 inline-block opacity-90" alt="Gmail">
+                </a>
+              ` : ''}
+            </div>
+
+            <div class="shrink-0">
+              ${stepBarHtml}
+            </div>
           </div>
-        </div>
-      </td>
+        </td>
 
-      <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
-      <td class="py-2.5 px-4 align-middle overflow-hidden">
-        <div class="flex flex-col gap-1 min-w-0">
-          <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
-          <div class="flex items-center gap-2 min-w-0">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 truncate max-w-full" title="${escapeHtml(student.url)}">
-              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm shrink-0" alt="Cloud Run" title="Google Cloud Run">
-              <span class="font-medium truncate">${escapeHtml(student.url)}</span>
+        <!-- COLONNA 3: URL, JSON, Stack (Ruby/Rails) TUTTO IN UNA RIGA -->
+        <td class="py-1 px-3 align-middle overflow-hidden whitespace-nowrap">
+          <div class="flex items-center gap-2.5 min-w-0 overflow-hidden font-mono text-[11px]">
+            <!-- Cloud Run Link -->
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 truncate shrink-0 max-w-[210px]" title="${escapeHtml(student.url)}">
+              <img src="/cloud_run_icon.png" class="w-3.5 h-3.5 object-contain shrink-0" alt="Cloud Run" title="Google Cloud Run">
+              <span class="truncate font-medium">${escapeHtml(student.url.replace(/^https?:\/\//, ''))}</span>
             </a>
-          </div>
 
-          <!-- Riga 2: Stack Ruby/Rails, Metriche, JSON icon e Delta Revision affiancati -->
-          <div class="flex flex-wrap items-center gap-2.5">
-            ${stackHtml}
-            ${metricsHtml}
+            <!-- JSON Link -->
+            <a href="${escapeHtml(statusJsonUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:scale-125 transition-transform shrink-0" title="Inspect raw JSON (/status.json)">
+              <img src="/json_icon.png" class="w-3.5 h-3.5 object-contain" alt="JSON">
+            </a>
+
+            <!-- Stack Badges (Ruby, Env, Rails, GCP Triad) -->
+            ${hasTelemetry ? `
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="inline-flex items-center gap-0.5 text-rose-300 font-medium" title="Ruby ${rubyVersion}">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg" class="w-3 h-3 inline-block" alt="Ruby">
+                  <span>${rubyVersion}</span>
+                </span>
+                ${envBadge}
+                <span class="inline-flex items-center gap-0.5 text-red-300 font-medium" title="Rails ${railsVersion}">
+                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3 h-3 inline-block" alt="Rails">
+                  <span>${railsVersion}</span>
+                </span>
+                ${gcpTriadHtml}
+              </div>
+            ` : `
+              <span class="text-[10px] text-slate-500 italic shrink-0">Awaiting stack...</span>
+            `}
+
+            <!-- Compact Metrics (Posts, Delta Rev) -->
+            ${t.posts_count !== undefined ? `<span class="text-slate-400 text-[10px] shrink-0 border-l border-slate-800 pl-2">📝 ${t.posts_count}p</span>` : ''}
+            ${jobsBadge}
+            ${failedJobsBadge}
+            ${deltaRevBadge}
           </div>
-        </div>
-      </td>
-    `;
+        </td>
+      `;
+    } else {
+      tr.className = "hover:bg-slate-800/30 transition-colors";
+
+      tr.innerHTML = `
+        <!-- COLONNA 1: Live Dot + Sotto la latenza -->
+        <td class="py-2 px-2.5 text-center whitespace-nowrap align-middle">
+          <div class="flex flex-col items-center justify-center gap-0.5">
+            ${dotHtml}
+            ${latencyBadge}
+          </div>
+        </td>
+
+        <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
+        <td class="py-2.5 px-3 align-middle w-[320px] overflow-hidden">
+          <div class="flex items-center justify-between gap-2 w-full overflow-hidden">
+            <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+              <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
+              ${trophyHtml ? `<span class="shrink-0 inline-flex items-center text-sm">${trophyHtml}</span>` : ''}
+              <span class="font-bold text-amber-400 text-sm truncate" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
+              ${t.admin_email ? `
+                <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
+                  <img src="https://mailmeteor.com/logos/assets/PNG/Gmail_Logo_512px.png" class="w-3.5 h-3.5 inline-block opacity-90 hover:opacity-100" alt="Gmail">
+                </a>
+              ` : ''}
+            </div>
+
+            <div class="shrink-0">
+              ${stepBarHtml}
+            </div>
+          </div>
+        </td>
+
+        <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
+        <td class="py-2.5 px-4 align-middle overflow-hidden">
+          <div class="flex flex-col gap-1 min-w-0">
+            <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
+            <div class="flex items-center gap-2 min-w-0">
+              <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 truncate max-w-full" title="${escapeHtml(student.url)}">
+                <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm shrink-0" alt="Cloud Run" title="Google Cloud Run">
+                <span class="font-medium truncate">${escapeHtml(student.url)}</span>
+              </a>
+            </div>
+
+            <!-- Riga 2: Stack Ruby/Rails, Metriche, JSON icon e Delta Revision affiancati -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              ${stackHtml}
+              ${metricsHtml}
+            </div>
+          </div>
+        </td>
+      `;
+    }
 
     tbody.appendChild(tr);
   });

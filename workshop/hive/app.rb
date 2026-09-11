@@ -174,10 +174,12 @@ module WorkshopHive
     end
 
     get "/up" do
+      version = (File.read(File.join(__dir__, "VERSION")).strip rescue "0.1.1")
       content_type :json
       {
         status: "ok",
         service: "workshop-hive",
+        version: version,
         timestamp: Time.now.utc.iso8601
       }.to_json
     end
@@ -197,9 +199,11 @@ module WorkshopHive
       deduplicate = !show_dupes
       authorizer = ServiceAccountLoader.load_authorizer
       entries = SheetsReader.fetch_entries(credentials: authorizer, max_age: max_age, deduplicate: deduplicate)
+      version = (File.read(File.join(__dir__, "VERSION")).strip rescue "0.1.1")
 
       {
         status: "ok",
+        version: version,
         total_students: entries.size,
         max_age: max_age,
         show_duplicates: show_dupes,

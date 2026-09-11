@@ -145,6 +145,18 @@ class AppLeaderboardApiTest < Minitest::Test
     assert_includes body_str, "/js/hive.js"
   end
 
+  def test_serves_index_html_with_compact_view_controls
+    env = Rack::MockRequest.env_for("/", method: "GET")
+    status, headers, body = app.call(env)
+
+    assert_equal 200, status
+    body_str = ""
+    body.each { |part| body_str += part }
+    assert_includes body_str, 'id="compact-view-btn"'
+    assert_includes body_str, 'id="compact-view-label"'
+    assert_includes body_str, "toggleCompactMode()"
+  end
+
   def test_get_index_json_endpoint
     env = Rack::MockRequest.env_for("/index.json?event_name=test-conf&event_start=2026-09-09T09:00:00Z&max_age=24h", method: "GET")
     status, headers, body = app.call(env)

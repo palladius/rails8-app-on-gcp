@@ -1,133 +1,39 @@
 All notable changes to this project will be documented in this file.
 
-## [0.2.36] - 2026-09-11
-### Added
-- 🪫 **Antigravity Out-of-Credits Guidance (PR #110, closes #107)**:
-  - Attendees who exhausted Antigravity's free credits were hard-blocked with nowhere to look: `grep -ri antigravity` across the slides, `CODELAB.md`, `SKELETON.md` and the landing page returned **not one line** about credits, quota or rate limits.
-  - Added an "⚡ Out of Antigravity free credits?" box to slide 3 (`slides/index.md`) leading with the trap — **the redeemed Cloud credits do not refill Antigravity**, since its quota sits on Google AI plans while vouchers land on a Cloud Billing account — followed by a four-step ladder: switch model pool (Claude/GPT-OSS have an independent, free-tier-eligible quota), pick a Flash model, Antigravity CLI with a free AI Studio key, then weekly refresh or Google AI Pro/Ultra.
-  - Added a matching `### 5. 🪫 If Antigravity Runs Out of Free Credits` section to Step 0 of `workshop/CODELAB.md` with the exact CLI bring-your-own-key steps (`modelProvider: gemini` + `GEMINI_API_KEY` + `agy`) and their documented gotchas — BYOK is unsupported in the IDE, the CLI is the only documented exception.
-  - Slide 3 reflowed to fit: the redundant plaintext link bullet was dropped, the QR tightened to 128px and the "Localhost first" callout folded into the bullet list; verified by rendering the deck to PNG and inspecting the slide for overflow.
-### Fixed
-- 💎 **Ruby Version Pinned to 3.4.5 in Constitution (PR #109, closes #108)**:
-  - Updated `blog/Dockerfile` and `blog/config/deploy.yml` to pin Ruby to 3.4.5 across all environments.
-  - Ratified Constitution Section 7 in `docs/CONSTITUTION.md` (bumped to v1.2.0) with rationale from FL006 (avoiding Ruby 4.0 URI parser breaking changes on Cloud SQL Auth Proxy socket paths).
-
-## [0.2.35] - 2026-09-11
-### Added
-- 🎨 **Cloud SQL Proxy Custom Vector Icon**:
-  - Generated official Google Cloud SQL blue hexagon badge with integrated golden key/lock using Nano Banana Pro (`nano-banana-ricc`), rendering crisp 14px, 20px, and 64px transparent vector icons (`assets/icons/cloud_sql_proxy_14.png`).
-- 📊 **DevOps & Observability with Cloud Logging (Issue #82)**:
-  - Integrated `S8. Cloud Logging (Ruby native JSON)` node with a red dashed event stream (`JSON Logs (#82)`) originating from `S1. Cloud Run`, highlighting zero-gem structured JSON logging and Cloud Error Reporting.
-
-### Changed
-- ↔️ **Bidirectional ActiveStorage Edge**:
-  - Connected `rails_app` to `S3. Cloud Storage` with bidirectional arrowheads (`reverse=True`), representing both blob streaming and signed URL generation.
-- 🗄️ **Compact Cluster Labels**:
-  - Renamed `Google Cloud Persistence` to `GCP Persistence` across all canonical and progressive evolution milestone diagrams.
-
-## [0.2.34] - 2026-09-11
-### Fixed & Improved
-- 🏎️ **Author Attribution & Showcase Alignment (Emiliano First!)**:
-  - Corrected Emiliano's surname in `docs/WORKSHOP_BRAG_DOCUMENT.md` and `slides/why-different.md` to **Emiliano Della Casa** 🍝🏎️.
-  - Placed Emiliano first in the author header of `slides/why-different.md` aligning with the application footer (*"Made with ❤️ by Emiliano & Riccardo"*).
-
-## [0.2.33] - 2026-09-11
-### Fixed
-- 🔗 **Slide Links Open in a New Tab (PR #105, closes #104)**:
-  - Added `target="_blank" rel="noopener noreferrer"` to all **9** external links in `slides/index.md` — none of them had it, so clicking any one (the **🎟️ Claim GCP Credits** button, the Antigravity download, the LinkedIn profiles, the Lyria MP3s) navigated away and **replaced the running deck**, forcing the presenter to hit Back mid-talk.
-  - This was a repeat report: the first bullet of the previous friction log already flagged the Antigravity download link, and it resurfaced on the Reclaim Credits slide.
-### Added
-- ✅ **Slide Link Regression Test**:
-  - `test/test_slides.rb` now asserts every `<a href="http…">` across `slides/*.md` carries `target="_blank"`, so a new slide with a bare external link fails the suite instead of surfacing on stage.
-
-## [0.2.32] - 2026-09-11
-### Fixed
-- 📋 **`just` Documented as a Prerequisite (PR #103, closes #102)**:
-  - `just` is the very first command of the workshop (`just install`) and drives every step, but it was listed as a prerequisite **nowhere**: not in `README.md` (which had no prerequisites section at all), not in the Step 0 checklist of `workshop/CODELAB.md`, not in `step-0.prerequisites` of `workshop/skeleton.yaml`, and not among the step-0 evals — which had `step-0-shell-git`, `-gcloud` and `-adc` but no `-just`.
-  - Added a `## ✅ Prerequisites` section to `README.md` with install one-liners (upstream installer, Homebrew, apt) and a tool/check/why table covering just, Ruby & Rails, Docker, gcloud, Terraform and Node.
-  - Added a `just` entry at the top of the Step 0 Prerequisites Checklist in `workshop/CODELAB.md`, with the same install snippets and a `just --list` smoke check.
-  - Added `just` to `step-0.prerequisites` in `workshop/skeleton.yaml` and recompiled `workshop/SKELETON.md` via `just build-skeleton`.
-### Added
-- 🧪 **`step-0-shell-just` Eval**:
-  - New step-0 eval running `just --version && just --summary > /dev/null`, so `just workshop-eval 0` now fails fast on a missing `just` *or* on a justfile that does not parse on the attendee's version — the exact failure behind #100.
-
-## [0.2.31] - 2026-09-11
-### Fixed
-- 📖 **Codelab & Workshop Curriculum Hardening (PR #99, closes #96)**:
-  - Added GCS bucket creation for Terraform state in Step 1 (`gs://${GOOGLE_CLOUD_PROJECT}-tfstate`).
-  - Translated Workshop Hive callout in Step 3 from Italian to English.
-  - Added explicit `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` environment variable injection in Cloud Run deploy commands.
-  - Dynamically discovered `SQL_INSTANCE_NAME` from Terraform output or `gcloud sql instances list` before running `describe`.
-  - Updated `workshop/skeleton.yaml` step evaluations and requirements.
-- 🧰 **Justfile Parses Again on Distro-Shipped `just` (PR #101, closes #100)**:
-  - Gave the variadic parameter a default in `screenshots`, `screenshots-force` and `generate-screenshots` (`filter="" *flags="":`), removing the last "Non-default parameter `flags` follows default parameter" parse failures.
-  - This was a **whole-file** failure, not a per-recipe one: `just` aborts at parse time, so on `just` < 1.40.0 (Debian/Ubuntu ship 1.21) *every* recipe died — `just slides`, `just dev`, even `just --list` — while the error pointed at an unrelated `screenshots` recipe.
-  - `*flags=""` parses on both old and new `just` and keeps argument passthrough identical, unlike the parameter reordering used in #97/PR #98 (which only fixed `workshop-dev`).
-### Added
-- ✅ **Justfile Regression Lint (`just test-justfile`)**:
-  - Added `test/test_justfile.rb`, failing whenever a required parameter follows a defaulted one, and asserting `just --summary` actually parses the justfile when `just` is installed.
-
-## [0.2.30] - 2026-09-11
-### Fixed
-- 🛠️ **Justfile Recipe Parameter Order (PR #98, closes #97)**:
-  - Swapped `*flags` before `port="8080"` in the `workshop-dev` recipe (`workshop-dev *flags port="8080":`), fixing a parse error where non-default variadic parameter followed a default parameter on stricter `just` versions.
-
-## [0.2.29] - 2026-09-11
-### Added & Improved
-- 🏆 **Workshop Hive Step 8 Champions Podium & Ranked Medals (Issue #89 / Hall of Fame)**:
-  - Added dedicated **Step 8 Champions Podium** strip above the leaderboard table, chronologically ranking finishers by victory timestamp (`won_at`).
-  - Added ranked medal badges to the left of the student nickname: `🥇` (1st place), `🥈` (2nd place), `🥉` (3rd place), and `🏆` (subsequent finishers) with rich hover tooltips.
-  - Added pulsating `⏳` review-pending indicator for quest submissions awaiting proctor approval.
-  - Added `step_8_podium` array to JSON endpoints (`/index.json`, `/status.json`, `/metastatus.json`).
-- 🍯 **Comprehensive Telemetry JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
-  - Implemented `GET /index.json`, `GET /status.json`, and `GET /metastatus.json` exposing aggregated student telemetry with direct links to student Cloud Run endpoints (`url`), status JSONs (`status_url`), and up healthchecks (`up_url`).
-  - Added HTTP content negotiation on `GET /` returning JSON when `Accept: application/json` is requested.
-  - Added event metadata tracking (`event_name`, `event_start`, `elapsed_minutes`, `cinderella_hours_remaining`).
-- 🐝 **Duplicate Cloud Run URL Deduplication & Toggle**:
-  - Automatically deduplicates Cloud Run URL submissions by taking the latest submission by default.
-  - Added `&show_duplicates=true` parameter and interactive toggle pill (`👯 Dupes: Off/ON`).
-- 📐 **Rigid `table-fixed` Layout & Column Width Rebalancing**:
-  - Widened Student & Step column to `440px` and table min-width to `900px`, giving long nicknames ample breathing room without truncation.
-  - Locked 8-segment progress bar dimensions to a strictly fixed `w-[96px]` pill with `shrink-0` bars.
-  - Replaced `break-all` on Cloud Run URLs with `truncate max-w-full`.
-  - Bumped Workshop Hive to v0.1.3 (`workshop/hive/VERSION`).
-
-## [0.2.28] - 2026-09-11
-### Fixed
-- 🐝 **Workshop Hive String Coercion**:
-  - Fixed `formatHHMM` in `workshop/hive/public/js/hive.js` to coerce timestamp inputs to String before matching regex patterns.
-  - Bumped Workshop Hive to `0.1.2`.
-
 ## [0.2.27] - 2026-09-11
-### Added
-- 🔍 **Codelab Visualizer Debug Mode & Internal Docs Toggling**:
-  - Added `-d / --debug` flag, `?debug=1` parameter, `DEBUG=1` environment variable, and cookie persistence (`codelab_debug`) to `workshop/visualizer/server.rb`.
-  - Hides internal developer documents (Constitution, Skeleton) by default for workshop attendees while retaining instant access when explicitly navigated or in debug mode.
-  - Added automated Sinatra test suite `test/test_workshop_visualizer.rb` and added `just test-visualizer` recipe to `justfile`.
+### Added & Improved
+- 🏷️ **Workshop Hive Leaderboard Footer Version & Status Formatting**:
+  - Embedded version badge (`v0.1.6`) directly into the leaderboard footer for instant visual verification.
+  - Formatted down HTTP codes as `/<code >` (e.g. `/503`) instead of `H503` for sleeker telemetry display.
+  - Bumped `workshop/hive/VERSION` to `0.1.6`.
 
 ## [0.2.26] - 2026-09-11
-### Changed
-- 🎨 **Deterministic Architecture Diagram Polish**:
-  - Removed internal blue arrow between Cloud Run logo and the multi-container pod for an uncluttered side-by-side presentation.
-  - Formatted multi-container table into a unified CLI-style monospace block without vertical dividing lines and with 4-character aligned ports (`8080`, `5432`, `----`).
-  - Added official tiny 14px Ruby on Rails icon to `rails_app` and red solid CoreUI queue icon to `solid_queue`.
-  - Moved `rails_app` to the top row position with smooth parallel routing to downstream persistence/AI services.
-  - Enabled dynamic node sizing (`fixedsize="false"`) so the container table sits comfortably inside the `Google Cloud Run` cluster box.
+### Fixed
+- 🐞 **Workshop Hive Leaderboard Client-Side Compact Scope Fix**:
+  - Resolved `ReferenceError: compact is not defined` in `renderTable()` by scoping `const compact = isCompactMode()` properly across student row loops.
+  - Bumped `workshop/hive/VERSION` to `0.1.5`.
 
 ## [0.2.25] - 2026-09-11
-### Changed
-- 🐝 **Workshop Hive UI Layout Refinements**:
-  - Moved `⏳ GHI #XX review pending` badge directly underneath the student's nickname instead of horizontally adjacent to the step bar, preserving fixed column alignments.
-  - Set student nickname font color to vibrant yellow (`text-yellow-300`).
-  - Added a trophy 🏆 directly next to the student's nickname when achieving Stage 8.
-  - Added cache-buster `?v=0.1.2` to `hive.js` script tag in `index.html`.
-  - Bumped Workshop Hive to v0.1.2 (`workshop/hive/VERSION`).
+### Added & Improved
+- 📐 **Workshop Hive Leaderboard High-Density 50+ Compact View (Single-Line Row Mode)**:
+  - Added dedicated **Compact Mode** (`View: Compact (50+)` / `View: Full`) toggle button in `workshop/hive` header toolbar with `localStorage` persistence and URL sync (`?compact=true`).
+  - Implemented strict **Single-Line Student Rows** (`whitespace-nowrap`, row height `30px`, `py-1`):
+    - Inline status dot (🟢/🔴) + latency in ms.
+    - `HH:MM` timestamp, student nickname (truncated with hover tooltip), and medals/trophies.
+    - 8-segment progress bar.
+    - Cloud Run direct link with service logo.
+    - Raw `/status.json` endpoint direct link.
+    - Ruby & Rails version chips, Rails environment badge (`prod`/`dev`), and GCP Triad indicators (`🐘 ☁️ 🍌`).
+  - Adapted Step 8 Champions Podium to a low-profile slim strip in compact mode, maximizing vertical screen real estate for 50+ students on a single screen without scrolling.
+  - Bumped `workshop/hive/VERSION` to `0.1.4`.
 
 ## [0.2.24] - 2026-09-11
-### Fixed
-- 🐝 **Workshop Hive Frontend String Coercion**:
-  - Coerced values to `String(str)` in `escapeHtml` (`workshop/hive/public/js/hive.js`) to handle numeric telemetry fields (such as GitHub issue numbers), preventing a `TypeError: str.replace is not a function` during table rendering.
-  - Bumped Workshop Hive to v0.1.1 (`workshop/hive/VERSION`).
+### Added
+- 🍯 **Workshop Hive Structured Telemetry JSON Endpoints (`/index.json`, `/status.json`, `/metastatus.json`)**:
+  - Added `GET /index.json`, `GET /status.json`, and `GET /metastatus.json` to Workshop Hive, exposing aggregated student telemetry with direct links to student Cloud Run endpoints (`url`), status JSONs (`status_url`), and up healthcheck endpoints (`up_url`).
+  - Added HTTP content negotiation on `GET /` to return JSON when `Accept: application/json` is requested.
+  - Implemented query string persistence (`query_params: params`) and event metadata tracking (`event_name`, `event_start`, `elapsed_minutes`, `cinderella_hours_remaining`).
+  - Added unit test suite in `test_api_leaderboard.rb`.
 
 ## [0.2.23] - 2026-09-11
 ### Fixed & Added
