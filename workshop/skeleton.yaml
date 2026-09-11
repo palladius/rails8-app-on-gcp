@@ -15,7 +15,7 @@ steps:
       - "Google Cloud Account with active credits or billing account"
       - "Git 2.30+ for cloning and branching repository"
       - "just task runner installed and able to parse the justfile (every workshop command is a just recipe)"
-      - "Installed CLIs: just, git, gcloud, terraform, docker, ruby 3.3+, rails 8"
+      - "Installed CLIs: just, git, gcloud, terraform, docker, ruby 3.4.5 (exact, pinned by blog/.ruby-version), rails 8"
       - "Google Antigravity IDE or Gemini CLI environment"
     postrequisites:
       - "Authenticated gcloud and Application Default Credentials (ADC)"
@@ -44,8 +44,8 @@ steps:
         expect_exit: 0
       - id: "step-0-ruby-env"
         type: "ruby"
-        description: "Check Ruby version is 3.3 or higher"
-        code: "raise 'Ruby too old' if RUBY_VERSION < '3.3.0'"
+        description: "Check the harness Ruby is 3.4+ (blog/ pins 3.4.5 exactly — verify it yourself with: cd blog && ruby -v)"
+        code: "raise 'Ruby too old' if RUBY_VERSION < '3.4.0'"
 
   - id: "step-1"
     number: 1

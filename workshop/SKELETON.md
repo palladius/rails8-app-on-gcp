@@ -16,7 +16,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Google Cloud Account with active credits or billing account
   - Git 2.30+ for cloning and branching repository
   - just task runner installed and able to parse the justfile (every workshop command is a just recipe)
-  - Installed CLIs: just, git, gcloud, terraform, docker, ruby 3.3+, rails 8
+  - Installed CLIs: just, git, gcloud, terraform, docker, ruby 3.4.5 (exact, pinned by blog/.ruby-version), rails 8
   - Google Antigravity IDE or Gemini CLI environment
 - **`pseudocode`**:
   ```bash
@@ -34,7 +34,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[SHELL]` Verify git CLI is installed and returns valid version
   - `[SHELL]` Verify gcloud CLI is installed and returns valid version
   - `[SHELL]` Verify Application Default Credentials file exists or can print token
-  - `[RUBY]` Check Ruby version is 3.3 or higher
+  - `[RUBY]` Check the harness Ruby is 3.4+ (blog/ pins 3.4.5 exactly — verify it yourself with: cd blog && ruby -v)
 
 ---
 

@@ -76,7 +76,21 @@ Before we begin, ensure you have the following tools available in your environme
 - **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
 - **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
 - **Docker & Docker Compose:** Installed and running locally.
-- **Ruby 3.3+ & Rails 8:** (`ruby -v`, `rails -v`).
+- **Ruby `3.4.5` exactly & Rails 8:** (`ruby -v`, `rails -v`). Not "3.3 or newer" — `blog/.ruby-version` pins **3.4.5**, and `blog/Dockerfile` builds on the same (`ARG RUBY_VERSION=3.4.5`). With any other version active in `blog/`, `bundle install` and every `bin/rails` command fail before they start:
+
+  ```console
+  rbenv: version `3.4.5' is not installed (set by .../blog/.ruby-version)
+  ```
+
+  Install it with whichever version manager you use:
+
+  ```bash
+  rbenv install 3.4.5     # rbenv
+  rvm install 3.4.5       # rvm
+  asdf install ruby 3.4.5 # asdf
+  ```
+
+  Then confirm it activates **inside `blog/`**, which is where it matters: `cd blog && ruby -v` must print `3.4.5`.
 - **Google Antigravity IDE / Gemini CLI:** Your autonomous AI pair programming assistant ([Download Google Antigravity](https://antigravity.google/download)).
 
 ### 2. Google Cloud Authentication, Dedicated Configuration & ADC
@@ -238,12 +252,15 @@ Our starting point is a clean, modern Rails 8 blog application running on localh
 
 > 📁 **Mind the directory!** This repo holds the Rails app in **`blog/`** and the Terraform in `iac/`. Step 1 left you in the repo root, so **every command in Step 2 runs from `blog/`** — `Gemfile`, `bin/rails` and `compose.yaml` all live there. Running them from the root fails with `no configuration file provided: not found` or a missing `Gemfile`.
 
-Move into the Rails app and start the local development stack:
+Move into the Rails app, confirm you are on the pinned Ruby, then install the gems and set up the database:
 ```bash
 cd blog
+ruby -v          # must print 3.4.5 — see Step 0 if it does not
 bundle install
 bin/rails db:setup
 ```
+
+> 🧯 **`rbenv: version '3.4.5' is not installed`?** You skipped the Ruby install in Step 0 — run `rbenv install 3.4.5` (or `rvm install 3.4.5`, `asdf install ruby 3.4.5`), then re-run the block above. `bundle install` and every `bin/rails` command below, `db:seed` included, need the pinned interpreter.
 
 > 💡 Prefer not to think about it? `just install` and `just compose-up` from the repo root do the `cd blog` for you.
 

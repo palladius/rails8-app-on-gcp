@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.40] - 2026-09-11
+### Fixed
+- 💎 **Ruby 3.4.5 Named as the Real Prerequisite (PR #117, closes #116)**:
+  - Step 2 asks for `bundle install`, `bin/rails db:setup` and `bin/rails db:seed`, but nothing ever told attendees to install the pinned Ruby — all three die with ``rbenv: version `3.4.5' is not installed (set by .../blog/.ruby-version)``.
+  - The prerequisite was not merely missing, it was **wrong**: Step 0 and `skeleton.yaml` both said "Ruby 3.3+", while `blog/.ruby-version` and `blog/Dockerfile` pin **exactly 3.4.5**. Someone on 3.3 or 4.0 ticks the box and is still blocked the moment they `cd blog`.
+  - Step 0 now names 3.4.5, shows the failure, gives `rbenv` / `rvm` / `asdf` install one-liners and says to verify **inside `blog/`**; Step 2 adds `ruby -v` to the first block plus a recovery callout quoting the rbenv error verbatim.
+  - Corrected the `step-0-ruby-env` eval description, which claimed to check the project's Ruby but measures the harness interpreter: `bin/workshop_eval.rb` runs `eval(code)` in its own process, so `RUBY_VERSION` is whatever launched the harness — a machine defaulting to 4.0.5 scored 6/6 green while `cd blog` failed.
+  - Documented in #116 why this cannot be converted into a shell eval: rbenv prepends the concrete version's bin directory to `PATH` for the running process, so every child `ruby` resolves to the harness interpreter and never consults `blog/.ruby-version`; unsetting `RBENV_VERSION`, `RBENV_DIR`, `RUBYLIB` or `RUBYOPT` does not change it.
+
 ## [0.2.39] - 2026-09-11
 ### Fixed
 - 📁 **Step 2 Now Says `cd blog` (PR #115, closes #114)**:
