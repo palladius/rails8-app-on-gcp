@@ -2,8 +2,9 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.22] - 2026-09-11
 ### Changed
-- 📐 **Codelab Page 1 Layout Modernization**:
+- 📐 **Codelab Page 1 Layout Modernization & Diagram Refinements**:
   - Reordered Page 1 (Overview) in `workshop/CODELAB.md` to place the Target Reference Architecture (**Variant 1: Clean Flat Vector Enterprise**) and evolution GIF prominently *above* the "What you'll learn" section.
+  - Refined deterministic architecture diagram generator (`diagrams/generate_diagrams.py`) with compact service identifiers (`S1`..`S7`), cleaner edge routing, and updated canonical diagram assets (`assets/arch_diagram.png`).
 
 ## [0.2.21] - 2026-09-10
 ### Added

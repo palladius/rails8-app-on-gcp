@@ -37,6 +37,8 @@ GRAPH_ATTRS = {
     "bgcolor": "white",
     "pad": "0.6",
     "splines": "spline",
+    "nodesep": "0.8",
+    "ranksep": "1.3",
 }
 
 NODE_ATTRS = {
@@ -81,41 +83,41 @@ def generate_canonical():
         edge_attr=EDGE_ATTRS,
         outformat="png",
     ):
-        users = Users("Web & Mobile\nUsers")
+        users = Users("Web Users")
 
-        with Cluster("Google Cloud Run (1. Billable Serverless Service)"):
-            cloud_run = Run("Cloud Run\n(Serverless Pod)")
+        with Cluster("Google Cloud Run"):
+            cloud_run = Run("S1. Cloud Run")
             containers = Node(label=CONTAINERS_TABLE_HTML, shape="none")
-            cloud_run >> Edge(label=":8080", color="#1a73e8") >> containers
+            cloud_run - Edge(style="invis") - containers
 
-        with Cluster("Google Cloud Managed Persistence (Billable)"):
-            db = SQL("Cloud SQL PostgreSQL\n(2. Managed DB Instance)")
-            gcs = Storage("Google Cloud Storage\n(3. Private Media Bucket)")
+        with Cluster("Google Cloud Persistence"):
+            db = SQL("S2. Cloud SQL - pgsql")
+            gcs = Storage("S3. Cloud Storage")
 
-        sm = SecretManager("Secret Manager\n(4. Runtime Secrets)")
-        vertex = VertexAI("Vertex AI\n(5. Nano Banana & Gemini)")
+        sm = SecretManager("S4. Secret Manager")
+        vertex = VertexAI("S5. Vertex AI")
 
-        with Cluster("DevOps & CI/CD Pipeline (Billable)"):
-            cb = Build("Cloud Build\n(6. CI/CD Pipeline)")
-            ar = ContainerRegistry("Artifact Registry\n(7. OCI Containers)")
+        with Cluster("DevOps & CI/CD"):
+            cb = Build("S6. Cloud Build")
+            ar = ContainerRegistry("S7. Artifact Registry")
 
         # Ingress traffic
-        users >> Edge(label="HTTPS Ingress", color="#1a73e8", style="bold") >> cloud_run
+        users >> Edge(label="HTTPS :8080", color="#1a73e8", style="bold") >> containers
 
         # Database connections via localhost Cloud SQL proxy
-        containers >> Edge(label="mTLS Encrypted Tunnel\n(No Public IP)", color="#188038", style="bold") >> db
+        containers >> Edge(label="mTLS Tunnel", color="#188038", style="bold", minlen="2") >> db
 
         # Object Storage
-        containers >> Edge(label="ActiveStorage (Signed URLs)", color="#4285F4") >> gcs
+        containers >> Edge(label="ActiveStorage", color="#4285F4", minlen="2") >> gcs
 
         # Secret injection
-        sm >> Edge(label="Runtime Secret Injection", color="#d93025", style="dotted") >> cloud_run
+        sm >> Edge(label="Secrets", color="#d93025", style="dotted") >> containers
 
         # GenAI Async Pipeline
-        containers >> Edge(label="Nano Banana Imagen 3\n& Audio Summaries", color="#a142f4", style="bold") >> vertex
+        containers >> Edge(label="GenAI Pipeline", color="#a142f4", style="bold", minlen="2") >> vertex
 
         # CI/CD deployment
-        cb >> Edge(label="Build Containers") >> ar >> Edge(label="Deploy Revision") >> cloud_run
+        cb >> Edge(label="Build") >> ar >> Edge(label="Deploy") >> cloud_run
 
     generated_png = OUTPUT_TMP_DIR / "arch_diagram.png"
     if not generated_png.exists():
