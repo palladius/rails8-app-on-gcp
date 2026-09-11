@@ -124,7 +124,35 @@ cd rails8-app-on-gcp
 
 Open this directory in **Google Antigravity**. Antigravity will automatically inspect the repository, read `AGENTS.md`, and stand by as your pair programmer.
 
-### 5. Automated Step 0 Validation
+### 5. 🪫 If Antigravity Runs Out of Free Credits
+
+> ⚠️ **The Cloud credits you just redeemed do NOT refill Antigravity.** They are two separate billing surfaces: Antigravity's quota sits on **Google AI plans** (Google One), while vouchers and Cloud credits land on a **Cloud Billing account**. Linking a billing account to your GCP project will not give you a single extra Antigravity prompt.
+
+If the agent stops with a quota message, work down this ladder — the first two are free and instant:
+
+1. **Switch model pool.** Quota is tracked *per model family*, and Antigravity shows two independent pools (Gemini models vs. Claude/GPT models). Claude and GPT-OSS models are available on the free tier, so a drained Gemini pool often leaves the other one untouched. Use the model selector under the prompt box.
+2. **Pick a Flash model instead of Pro.** Rate limits correlate with how much work the agent does per request, so a lighter model stretches what is left.
+3. **Use the Antigravity CLI with your own Gemini API key.** Bring-your-own-key is **not supported in the Antigravity IDE** — the CLI is the documented exception. Create a key in [Google AI Studio](https://aistudio.google.com/apikey) (a free-tier key needs a project but **no billing account**), then:
+
+   ```bash
+   # 1. Set the provider in ~/.gemini/antigravity-cli/settings.json
+   {
+     "modelProvider": "gemini"
+   }
+
+   # 2. Export the key — this exact variable name
+   export GEMINI_API_KEY="your-api-key"
+
+   # 3. Start the CLI
+   agy
+   ```
+
+   The header shows `Gemini API key` instead of your account email. ⚠️ Gotchas: setting `GEMINI_API_KEY` **alone has no effect** without `modelProvider`; `GOOGLE_API_KEY` and `.env` files are **ignored**; an invalid key only surfaces on your first conversation.
+4. **Wait, or upgrade.** Free-tier quota refreshes **weekly** (the error message states your reset date). Google AI Pro/Ultra is the only documented way to raise the baseline inside the desktop app; those plans refresh every five hours and can spend purchased AI credits on overage.
+
+> 💡 **Presenter note:** exact free-tier quota numbers are deliberately not published by Google and change over time, so plan for step 1 as the primary in-room fallback rather than a specific prompt budget.
+
+### 6. Automated Step 0 Validation
 
 Verify that your Step 0 environment is 100% compliant with the evaluation suite:
 ```bash
