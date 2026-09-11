@@ -265,9 +265,142 @@ function formatHHMM(isoOrStr) {
   return "--:--";
 }
 
+function getVictoryTimestamp(student, t) {
+  if (t && t.proctor_approved_at) return t.proctor_approved_at;
+  if (t && t.checked_at) return t.checked_at;
+  return student.timestamp;
+}
+
+function computeStep8Winners() {
+  const winners = [];
+  cachedLeaderboard.forEach(student => {
+    const check = cachedHealth[student.url] || {};
+    const t = check.telemetry || {};
+    const isProctorApproved = (t.proctor_status === 'lgtm_approved');
+    const rawStep = t.step_number || student.step_number || 1;
+    const stepNum = isProctorApproved ? 8 : Math.max(1, Math.min(8, parseInt(rawStep, 10) || 1));
+
+    if (stepNum === 8) {
+      const wonAtStr = getVictoryTimestamp(student, t);
+      const wonDate = new Date(wonAtStr);
+      winners.push({
+        url: student.url,
+        nickname: student.nickname || "Anonymous",
+        wonAt: wonAtStr,
+        wonAtTime: !isNaN(wonDate.getTime()) ? wonDate.getTime() : 9999999999999,
+        hhmm: formatHHMM(wonAtStr),
+        proctor_reviewer: t.proctor_reviewer,
+        quest_ghi_issue: t.quest_ghi_issue,
+        quest_ghi_url: t.quest_ghi_url || (t.quest_ghi_issue ? `https://github.com/palladius/rails8-app-on-gcp/issues/${t.quest_ghi_issue}` : null)
+      });
+    }
+  });
+
+  // Sort ascending: first to reach Step 8 gets Rank 1!
+  winners.sort((a, b) => a.wonAtTime - b.wonAtTime);
+
+  return winners.map((w, idx) => {
+    const rank = idx + 1;
+    const medal = (rank === 1) ? '🥇' : ((rank === 2) ? '🥈' : ((rank === 3) ? '🥉' : '🏆'));
+    const suffix = (rank === 1) ? 'st' : ((rank === 2) ? 'nd' : ((rank === 3) ? 'rd' : 'th'));
+    return {
+      ...w,
+      rank,
+      medal,
+      suffix
+    };
+  });
+}
+
+function renderStep8Podium(winners) {
+  const container = document.getElementById("step8-podium-container");
+  if (!container) return;
+
+  if (!winners || winners.length === 0) {
+    container.classList.add("hidden");
+    container.innerHTML = "";
+    return;
+  }
+
+  container.classList.remove("hidden");
+
+  let chipsHtml = "";
+  winners.forEach(w => {
+    let rankBadgeClass = "";
+    let borderClass = "";
+    let bgClass = "";
+    let medalBg = "";
+
+    if (w.rank === 1) {
+      bgClass = "bg-gradient-to-r from-amber-500/20 via-yellow-500/15 to-amber-600/10";
+      borderClass = "border-amber-400/70 shadow-[0_0_12px_rgba(251,191,36,0.3)]";
+      rankBadgeClass = "text-amber-200 font-extrabold";
+      medalBg = "bg-amber-950/80 text-amber-300 border-amber-500/40";
+    } else if (w.rank === 2) {
+      bgClass = "bg-slate-400/15";
+      borderClass = "border-slate-400/60 shadow-[0_0_8px_rgba(148,163,184,0.25)]";
+      rankBadgeClass = "text-slate-200 font-bold";
+      medalBg = "bg-slate-900/80 text-slate-300 border-slate-500/40";
+    } else if (w.rank === 3) {
+      bgClass = "bg-amber-700/20";
+      borderClass = "border-amber-600/60 shadow-[0_0_8px_rgba(217,119,6,0.25)]";
+      rankBadgeClass = "text-amber-300 font-bold";
+      medalBg = "bg-amber-950/80 text-amber-400 border-amber-700/40";
+    } else {
+      bgClass = "bg-purple-950/30";
+      borderClass = "border-purple-500/40";
+      rankBadgeClass = "text-purple-300 font-medium";
+      medalBg = "bg-purple-900/40 text-purple-200 border-purple-500/30";
+    }
+
+    const reviewerText = w.proctor_reviewer ? ` (Approved by @${escapeHtml(w.proctor_reviewer)})` : "";
+    const titleText = `${w.rank}${w.suffix} Place! Completed Step 8 at ${w.hhmm}${reviewerText}`;
+
+    chipsHtml += `
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl ${bgClass} border ${borderClass} transition-all hover:scale-[1.03] shadow-sm" title="${escapeHtml(titleText)}">
+        <span class="text-lg leading-none">${w.medal}</span>
+        <div class="flex items-baseline gap-1.5 font-mono">
+          <span class="text-xs ${rankBadgeClass}">${escapeHtml(w.nickname)}</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded border ${medalBg} font-semibold">${escapeHtml(w.hhmm)}</span>
+        </div>
+        ${w.quest_ghi_issue ? `
+          <a href="${escapeHtml(w.quest_ghi_url)}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-amber-400/80 hover:text-amber-300 hover:underline" title="View Issue #${escapeHtml(w.quest_ghi_issue)}">#${escapeHtml(w.quest_ghi_issue)}</a>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="bg-gradient-to-r from-amber-500/10 via-purple-500/15 to-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl mb-1">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-2xl shadow-inner">
+          🏆
+        </div>
+        <div>
+          <div class="text-xs font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+            <span>Step 8 Champions Podium</span>
+            <span class="text-slate-600">•</span>
+            <span class="text-[10px] font-mono text-purple-300 font-normal">First to Finish (Victory Chronology)</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">
+            Students who completed the final quest, ranked strictly by timestamp of victory!
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 flex-wrap">
+        ${chipsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function renderTable() {
   const tbody = document.getElementById("leaderboard-tbody");
   if (!tbody) return;
+
+  const step8Winners = computeStep8Winners();
+  renderStep8Podium(step8Winners);
 
   if (cachedLeaderboard.length === 0) {
     const filterMsg = (activeMaxAge && activeMaxAge !== "all")
@@ -344,13 +477,22 @@ function renderTable() {
 
     let trophyHtml = "";
     let glowingBorderClass = "border-slate-700/60 hover:border-amber-500/50";
-    if (stepNum === 8 && isProctorApproved) {
-      glowingBorderClass = "border-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+
+    const winnerIndex = step8Winners.findIndex(w => w.url === student.url);
+    const winner = (winnerIndex !== -1) ? step8Winners[winnerIndex] : null;
+
+    if (winner) {
+      glowingBorderClass = (winner.rank === 1)
+        ? "border-amber-400/90 shadow-[0_0_12px_rgba(251,191,36,0.35)] bg-amber-950/40 ring-1 ring-amber-400/50"
+        : "border-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.35)] bg-purple-950/40 ring-1 ring-purple-500/50";
+
       const reviewerText = t.proctor_reviewer ? ` by @${escapeHtml(t.proctor_reviewer)}` : "";
+      const rankTitle = `🎓 ${winner.rank}${winner.suffix} Place Champion! Completed Step 8 at ${winner.hhmm}${reviewerText}`;
+
       if (questUrl) {
-        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="🎓 Graduation Approved${reviewerText}! Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-sm leading-none">🏆</span></a>`;
+        trophyHtml = `<a href="${escapeHtml(questUrl)}" target="_blank" rel="noopener noreferrer" class="hover:scale-125 transition-transform inline-flex items-center shrink-0" title="${escapeHtml(rankTitle)} — Click to view Issue #${escapeHtml(t.quest_ghi_issue)}"><span class="text-sm leading-none">${winner.medal}</span></a>`;
       } else {
-        trophyHtml = `<span class="text-sm leading-none shrink-0" title="🎓 Graduation Approved${reviewerText}!">🏆</span>`;
+        trophyHtml = `<span class="text-sm leading-none shrink-0" title="${escapeHtml(rankTitle)}">${winner.medal}</span>`;
       }
     } else if (stepNum === 8) {
       glowingBorderClass = "border-purple-500/60 bg-purple-950/30";
@@ -558,12 +700,12 @@ function renderTable() {
         </div>
       </td>
 
-      <!-- COLONNA 2: HH:MM Nome a sx con eventuale 🏆 + Step badge a dx con larghezza fissa -->
-      <td class="py-2 px-3 align-middle w-72 min-w-[280px] max-w-[300px]">
-        <div class="flex items-center justify-between gap-2 w-full">
-          <div class="flex items-center gap-1.5 min-w-0 flex-1">
+      <!-- COLONNA 2: HH:MM [Medaglia/Coppa] Nome + Step Bar fissa a destra -->
+      <td class="py-2.5 px-3 align-middle w-[320px] overflow-hidden">
+        <div class="flex items-center justify-between gap-2 w-full overflow-hidden">
+          <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
             <span class="text-[11px] font-mono text-slate-400 font-medium shrink-0">${escapeHtml(hhmm)}</span>
-            ${trophyHtml ? `<span class="shrink-0 inline-flex items-center">${trophyHtml}</span>` : ''}
+            ${trophyHtml ? `<span class="shrink-0 inline-flex items-center text-sm">${trophyHtml}</span>` : ''}
             <span class="font-bold text-amber-400 text-sm truncate" title="${escapeHtml(nickname)}">${escapeHtml(nickname)}</span>
             ${t.admin_email ? `
               <a href="mailto:${escapeHtml(t.admin_email)}" class="inline-flex items-center text-xs hover:scale-125 transition-transform shrink-0 ml-0.5" title="⚠️ Publicly exposed ADMIN_EMAIL: ${escapeHtml(t.admin_email)} (Ask Antigravity about Secret Manager hardening!)">
@@ -572,18 +714,20 @@ function renderTable() {
             ` : ''}
           </div>
 
-          ${stepBarHtml}
+          <div class="shrink-0">
+            ${stepBarHtml}
+          </div>
         </div>
       </td>
 
       <!-- COLONNA 3: Riga 1 URL pulito con icona Cloud Run a sinistra; Riga 2 Stack Ruby/Rails + Metriche + JSON + Delta Revision -->
-      <td class="py-2 px-3 align-middle">
-        <div class="flex flex-col gap-1">
+      <td class="py-2.5 px-4 align-middle overflow-hidden">
+        <div class="flex flex-col gap-1 min-w-0">
           <!-- Riga 1: Icona Cloud Run a inizio URL + URL -->
-          <div class="flex items-center gap-2">
-            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 break-all" title="${escapeHtml(student.url)}">
-              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm flex-shrink-0" alt="Cloud Run" title="Google Cloud Run">
-              <span class="font-medium">${escapeHtml(student.url)}</span>
+          <div class="flex items-center gap-2 min-w-0">
+            <a href="${escapeHtml(student.url)}" target="_blank" rel="noopener noreferrer" class="font-mono text-xs text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1.5 truncate max-w-full" title="${escapeHtml(student.url)}">
+              <img src="/cloud_run_icon.png" class="w-4 h-4 object-contain inline-block drop-shadow-sm shrink-0" alt="Cloud Run" title="Google Cloud Run">
+              <span class="font-medium truncate">${escapeHtml(student.url)}</span>
             </a>
           </div>
 

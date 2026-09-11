@@ -2,11 +2,16 @@
 
 ## [0.1.3] - 2026-09-11
 ### Fixed & Improved
-- 🏆 **Leaderboard Column Alignment & Fixed-Width Step Bars**:
-  - Moved graduation trophy 🏆 (and pending ⏳ indicator) to the **left** of the student nickname (`HH:MM [🏆] [Nickname]`).
-  - Implemented automatic cropping (`truncate` with ellipsis and full tooltip hover `title`) for long student nicknames, preventing row elongation.
-  - Locked Student & Step column width (`w-72 min-w-[280px] max-w-[300px]`) in both table header and rows.
-  - Fixed 8-segment progress bar dimensions to a strictly fixed `w-[98px]` pill with `shrink-0` bars, removing the internal trophy that previously caused Step 8 rows to expand and rob width from the stack telemetry column.
+- 🏆 **Step 8 Champions Podium & Ranked Medals (Issue #89 / Hall of Fame)**:
+  - Added dedicated **Step 8 Champions Podium** strip above the table, ranking finishers chronologically by timestamp of victory (`won_at`).
+  - Added ranked medal badges to the left of the student nickname: `🥇` (1st place), `🥈` (2nd place), `🥉` (3rd place), and `🏆` (subsequent finishers) with rich hover tooltips.
+  - Added pulsating `⏳` review-pending indicator for quest submissions awaiting proctor approval.
+  - Added `step_8_podium` array to JSON endpoints (`/index.json`, `/status.json`, `/metastatus.json`).
+- 📐 **Rigid `table-fixed` Layout & Zero-Overlap Column Isolation**:
+  - Converted table to `table-fixed` with explicit widths (`w-14` for status, `w-[320px]` for Student & Step, `w-auto` for App URL & Metrics) to strictly prevent cells from overflowing into adjacent columns.
+  - Applied `truncate block` with full `title` tooltip to student nicknames, ensuring long names never push the progress bar.
+  - Locked 8-segment progress bar dimensions to a strictly fixed `w-[96px]` pill with `shrink-0` bars, removing internal trophies.
+  - Replaced `break-all` on Cloud Run URLs with `truncate max-w-full` to eliminate multi-line URL wrapping.
   - Added automatic `gh auth token` fallback in `ProctorReviewer` when `GITHUB_TOKEN` is unset.
 
 ## [0.1.2] - 2026-09-11

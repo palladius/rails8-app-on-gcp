@@ -92,9 +92,35 @@ module WorkshopHive
             k_service: tel[:k_service],
             k_revision: tel[:k_revision],
             proctor_status: tel[:proctor_status],
+            proctor_reviewer: tel[:proctor_reviewer],
+            proctor_approved_at: tel[:proctor_approved_at],
+            quest_ghi_issue: tel[:quest_ghi_issue],
             registered_at: entry[:timestamp],
             checked_at: check[:checked_at]
           }
+        end
+
+        step_8_winners = items.select { |it| it[:step_number] == 8 }.map do |it|
+          won_at = it[:proctor_approved_at] || it[:checked_at] || it[:registered_at]
+          {
+            nickname: it[:nickname],
+            url: it[:url],
+            status_url: it[:status_url],
+            won_at: won_at,
+            proctor_reviewer: it[:proctor_reviewer],
+            quest_ghi_issue: it[:quest_ghi_issue]
+          }
+        end.sort_by { |w| w[:won_at].to_s }
+
+        step_8_podium = step_8_winners.each_with_index.map do |w, idx|
+          rank = idx + 1
+          medal = case rank
+                  when 1 then "🥇"
+                  when 2 then "🥈"
+                  when 3 then "🥉"
+                  else "🏆"
+                  end
+          w.merge(rank: rank, medal: medal)
         end
 
         {
@@ -115,7 +141,8 @@ module WorkshopHive
           summary: {
             total_students: entries.size,
             total_up: total_up,
-            step_distribution: step_counts
+            step_distribution: step_counts,
+            step_8_podium: step_8_podium
           },
           entries: items
         }
