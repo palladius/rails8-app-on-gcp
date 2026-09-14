@@ -63,21 +63,7 @@ Before we begin, ensure you have the following tools available in your environme
 - **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
 - **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
 - **Docker & Docker Compose:** Installed and running locally.
-- **Ruby `3.4.5` exactly & Rails 8:** (`ruby -v`, `rails -v`). Not "3.3 or newer" — `blog/.ruby-version` pins **3.4.5**, and `blog/Dockerfile` builds on the same (`ARG RUBY_VERSION=3.4.5`). With any other version active in `blog/`, `bundle install` and every `bin/rails` command fail before they start:
-
-  ```console
-  rbenv: version `3.4.5' is not installed (set by .../blog/.ruby-version)
-  ```
-
-  Install it with whichever version manager you use:
-
-  ```bash
-  rbenv install 3.4.5     # rbenv
-  rvm install 3.4.5       # rvm
-  asdf install ruby 3.4.5 # asdf
-  ```
-
-  Then confirm it activates **inside `blog/`**, which is where it matters: `cd blog && ruby -v` must print `3.4.5`.
+- **Ruby `3.4.5` & Rails 8:** (`ruby -v`, `rails -v` — pinned by `blog/.ruby-version`; ask your AI harness to install `3.4.5` if missing).
 - **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)).
 
 ### 2. Google Cloud Authentication, Dedicated Configuration & ADC

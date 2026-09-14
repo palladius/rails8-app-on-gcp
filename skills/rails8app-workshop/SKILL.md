@@ -67,3 +67,12 @@ sudo apt update && sudo apt install -y just
 ```
 
 Verify the justfile parses cleanly on the installed version with `just --list`.
+
+If Ruby `3.4.5` is not active inside `blog/` (`cd blog && ruby -v`), install it using the student's active version manager:
+
+```bash
+rbenv install 3.4.5     # rbenv
+rvm install 3.4.5       # rvm
+asdf install ruby 3.4.5 # asdf
+mise use ruby@3.4.5     # mise
+```

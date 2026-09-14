@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.50] - 2026-09-14
+### Changed
+- 💎 **Streamline Ruby 3.4.5 Prerequisite to One-Liner**:
+  - Condensed the multi-line Ruby `3.4.5` installation instructions in `CODELAB.md` (Step 0) into a crisp one-liner bullet, moving the version manager installation recipes (`rbenv`, `rvm`, `asdf`, `mise`) into `skills/rails8app-workshop/SKILL.md` for AI harnesses.
+
 ## [0.2.49] - 2026-09-14
 ### Changed
 - 🚀 **Streamline Step 0 Prerequisites & Promote Google Antigravity 2.0**:
