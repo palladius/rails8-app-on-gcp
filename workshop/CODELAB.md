@@ -58,18 +58,7 @@ Let's get started!
 ### 1. Prerequisites Checklist
 
 Before we begin, ensure you have the following tools available in your environment:
-- **`just` (1.21+, 1.40+ recommended):** (`just --version`) the task runner — **every single command in this workshop is a `just` recipe**, so this one comes first. The Debian/Ubuntu package is still on 1.21; that works, but upstream is newer.
-
-  ```bash
-  # Recommended: latest upstream release
-  curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
-  # macOS
-  brew install just
-  # Debian/Ubuntu (ships 1.21 — supported, just older)
-  sudo apt install just
-  ```
-
-  Verify the justfile parses on your version with `just --list` — it should print the full recipe list.
+- **`just` (1.21+):** (`just --version`) the task runner — **every single command in this workshop is a `just` recipe** (ask your AI harness to install it, or see [`skills/rails8app-workshop`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop)).
 - **Git (2.30+):** (`git --version`) for version control, branching, and cloning the repository.
 - **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
 - **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
@@ -89,7 +78,7 @@ Before we begin, ensure you have the following tools available in your environme
   ```
 
   Then confirm it activates **inside `blog/`**, which is where it matters: `cd blog && ruby -v` must print `3.4.5`.
-- **Google Antigravity IDE / Gemini CLI:** Your autonomous AI pair programming assistant ([Download Google Antigravity](https://antigravity.google/download)).
+- **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)).
 
 ### 2. Google Cloud Authentication, Dedicated Configuration & ADC
 

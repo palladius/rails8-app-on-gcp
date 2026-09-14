@@ -17,7 +17,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Git 2.30+ for cloning and branching repository
   - just task runner installed and able to parse the justfile (every workshop command is a just recipe)
   - Installed CLIs: just, git, gcloud, terraform, docker, ruby 3.4.5 (exact, pinned by blog/.ruby-version), rails 8
-  - Google Antigravity IDE or Gemini CLI environment
+  - Google Antigravity 2.0 environment
 - **`pseudocode`**:
   ```bash
   gcloud config configurations create rails8-on-gcp-workshop --activate 2>/dev/null || gcloud config configurations activate rails8-on-gcp-workshop

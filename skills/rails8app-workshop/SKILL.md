@@ -48,4 +48,22 @@ This skill guides AI assistants on pedagogical rules, repository architecture, c
 
 👉 **[`skills/workshop-troubleshooting/`](../workshop-troubleshooting/)**
 
+---
 
+## 🛠️ Prerequisites Auto-Installation (for AI Harnesses)
+
+If the student or user does not have `just` installed (`just --version` fails), install it immediately using the appropriate OS recipe:
+
+```bash
+# Recommended: latest upstream release (Linux/macOS user-local install)
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
+
+# macOS (Homebrew)
+brew install just
+
+# Debian / Ubuntu
+sudo apt update && sudo apt install -y just
+```
+
+Verify the justfile parses cleanly on the installed version with `just --list`.

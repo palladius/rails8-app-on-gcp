@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.49] - 2026-09-14
+### Changed
+- 🚀 **Streamline Step 0 Prerequisites & Promote Google Antigravity 2.0**:
+  - Condensed the `just` installation block in `CODELAB.md` (Step 0) into a concise one-liner, delegating detailed OS installation commands (upstream curl, Homebrew, Debian/Ubuntu apt) to `skills/rails8app-workshop/SKILL.md` for AI harnesses.
+  - Updated the AI harness prerequisite across `CODELAB.md`, `skeleton.yaml`, and `SKELETON.md` to explicitly target **Google Antigravity 2.0** (removing legacy Gemini CLI references).
+
 ## [0.2.48] - 2026-09-14
 ### Fixed
 - 🍌 **Remove Cluttered Nano Banana Architecture Caption (`CODELAB.md`)**:
