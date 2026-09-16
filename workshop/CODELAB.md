@@ -703,7 +703,7 @@ After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
 # Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
 gcloud run jobs update rails-migrate \
   --command "bash" \
-  --args "-c,bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
+  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
   --region $GOOGLE_CLOUD_REGION
 
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait

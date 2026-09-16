@@ -43,7 +43,7 @@ Check it works with `just --list`: it should print the full recipe list — if i
 | :--- | :--- | :--- |
 | [**just**](https://just.systems) (1.21+, 1.40+ recommended) | `just --version` | every command in this repo and in the workshop |
 | [**Git**](https://git-scm.com/downloads) (2.30+) | `git --version` | cloning the repo, branching, version control |
-| [**Ruby 3.3+**](https://www.ruby-lang.org/en/downloads/) & [**Rails 8**](https://rubyonrails.org/) | `ruby -v`, `rails -v` | `just install`, `just dev` |
+| [**Ruby 3.4.5**](https://www.ruby-lang.org/en/downloads/) & [**Rails 8**](https://rubyonrails.org/) | `ruby -v`, `rails -v` | `just install`, `just dev` |
 | [**Docker**](https://docs.docker.com/get-docker/) & [**Docker Compose**](https://docs.docker.com/compose/install/) | `docker compose version` | `just compose-up` |
 | [**Google Cloud SDK**](https://cloud.google.com/sdk/docs/install) (`gcloud` CLI) | `gcloud version` | deployment, `just workshop-test` |
 | [**Terraform**](https://developer.hashicorp.com/terraform/install) (1.5+) | `terraform -version` | `just terraform-apply` |

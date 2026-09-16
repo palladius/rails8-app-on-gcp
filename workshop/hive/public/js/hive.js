@@ -607,7 +607,7 @@ function renderTable() {
 
     // 3. Colonna 3 (Riga 1): URL che occupa molto spazio
     //    Colonna 3 (Riga 2): Loghi Ruby/Rails + Metriche (Posts / Users / Images) di fianco!
-    const rubyVersion = t.ruby_version || "3.3.8";
+    const rubyVersion = t.ruby_version || "3.4.5";
     const railsVersion = t.rails_version || "8.1.3";
     const railsEnv = (t.rails_env || "").trim();
     const hasTelemetry = !!t.ruby_version;

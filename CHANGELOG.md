@@ -1,5 +1,16 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.51] - 2026-09-16
+### Fixed
+- 🔴 **Default Compute SA Roles in Terraform (FL007-02)**:
+  - Added declarative IAM bindings (`roles/storage.admin`, `roles/logging.logWriter`, `roles/artifactregistry.writer`, `roles/cloudbuild.builds.builder`) to `iac/cicd.tf` for Default Compute SA so virgin projects provision required build permissions during Step 1 `terraform apply`.
+- 🔴 **Cloud Run Migration Job Protected Environment Check (FL007-03)**:
+  - Updated `CODELAB.md` Step 6 §3 multi-db schema load job to pass `DISABLE_DATABASE_ENVIRONMENT_CHECK=1` before `bin/rails db:schema:load:queue ...` to prevent `ActiveRecord::ProtectedEnvironmentError` in production.
+- 🟡 **Strict Ruby 3.4.5 Alignment Across Codebase & Docs (FL007-01)**:
+  - Synchronized Ruby 3.4.5 across `README.md`, `workshop/landing-page/README.md`, `workshop/landing-page/README.it.md`, `.github/workflows/deploy-pages.yml`, `workshop/hive/Dockerfile`, and `workshop/hive/public/js/hive.js`.
+- 🟡 **Fix Step 7 Broken Images Eval Precedence Bug (FL007-04)**:
+  - Rewrote `step-7-ruby-no-broken-images` in `workshop/skeleton.yaml` using proper `begin/rescue` blocks inside `Post.all.select` to prevent boolean `true` returns from crashing `broken.any?`.
+
 ## [0.2.50] - 2026-09-14
 ### Changed
 - 💎 **Streamline Ruby 3.4.5 Prerequisite to One-Liner**:
