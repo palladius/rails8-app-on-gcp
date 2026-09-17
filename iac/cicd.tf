@@ -21,6 +21,30 @@ resource "google_project_service" "cloudbuild" {
   disable_on_destroy = false
 }
 
+# Fetch project metadata for Default Compute SA
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
+# Modern GCP projects enforce least privilege on Default Compute SA, breaking `gcloud run deploy --source`.
+# Grant the essential roles so source builds and deployments succeed seamlessly out of the box.
+resource "google_project_iam_member" "default_compute_sa_cloudbuild" {
+  for_each = toset([
+    "roles/storage.admin",
+    "roles/logging.logWriter",
+    "roles/artifactregistry.writer",
+    "roles/cloudbuild.builds.builder",
+  ])
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+
+  depends_on = [
+    google_project_service.cloudbuild,
+    google_project_service.artifactregistry
+  ]
+}
+
 # Artifact Registry for Docker images
 resource "google_artifact_registry_repository" "docker" {
   location      = var.region

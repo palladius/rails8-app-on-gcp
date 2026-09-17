@@ -703,7 +703,7 @@ After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
 # Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
 gcloud run jobs update rails-migrate \
   --command "bash" \
-  --args "-c,bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
+  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
   --region $GOOGLE_CLOUD_REGION
 
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
@@ -714,13 +714,17 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 Deploy the full multi-container service:
 
 ```bash
+export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
+export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
+export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
+
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
   --allow-unauthenticated \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
-  --add-cloudsql-instances="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}" \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
+  --add-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
+  --set-env-vars="GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT},GCS_BUCKET=${GCS_BUCKET},ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL}"
 ```
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**

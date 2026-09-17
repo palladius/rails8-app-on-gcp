@@ -35,7 +35,7 @@ You downloaded **Google Antigravity 2.0**, logged in with your Google account, a
 ### Step 0: The Local Environment Foundation ("La Valle delle Lacrime" Solved!)
 Before we touch the cloud, we need our local tools ready. You need:
 1. **Git** (for version control, cloning, and branching)
-2. **Ruby 3.3+** (Rails 8 runtime)
+2. **Ruby 3.4.5** (Rails 8 runtime, pinned by `blog/.ruby-version`)
 3. **Google Cloud SDK (`gcloud`)** (authenticated with your account)
 4. **Docker** (for local services & Mailpit)
 5. **Just** (command runner)
@@ -49,7 +49,7 @@ Before we touch the cloud, we need our local tools ready. You need:
 brew install just terraform google-cloud-sdk
 # Ruby via rbenv:
 brew install rbenv
-rbenv install 3.3.8 && rbenv global 3.3.8
+rbenv install 3.4.5 && rbenv global 3.4.5
 ```
 
 ##### 🐧 Linux / Debian / Ubuntu:
@@ -61,13 +61,14 @@ curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -
 # Ruby via rbenv:
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 ~/.rbenv/bin/rbenv init
-# Install Ruby 3.3+
+# Install Ruby 3.4.5:
+rbenv install 3.4.5 && rbenv global 3.4.5
 ```
 
 ##### ☁️ Google Cloud Shell / VM:
 ```bash
 # Cloud Shell has gcloud, Docker, and Terraform pre-installed!
-# Just verify or install Ruby 3.3+ using rbenv or chruby.
+# Just verify or install Ruby 3.4.5 using rbenv or chruby.
 ```
 
 ---

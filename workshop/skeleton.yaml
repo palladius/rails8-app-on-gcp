@@ -45,7 +45,7 @@ steps:
       - id: "step-0-ruby-env"
         type: "ruby"
         description: "Check the harness Ruby is 3.4+ (blog/ pins 3.4.5 exactly — verify it yourself with: cd blog && ruby -v)"
-        code: "raise 'Ruby too old' if RUBY_VERSION < '3.4.0'"
+        code: "raise 'Ruby too old — Ruby 3.4.5 required per Constitution' if RUBY_VERSION < '3.4.0'"
 
   - id: "step-1"
     number: 1
@@ -416,8 +416,18 @@ steps:
         description: "Verify no posts have broken ActiveStorage cover image attachments (orphan blobs)"
         code: |
           require 'open3'
-          runner_code = <<~RUBY
-            broken = Post.all.select { |p| p.cover_image.attached? && !p.cover_image.blob&.service&.exist?(p.cover_image.blob.key) rescue true }
+          runner_code = <<~'RUBY'
+            broken = Post.all.select do |p|
+              if p.cover_image.attached?
+                begin
+                  !p.cover_image.blob&.service&.exist?(p.cover_image.blob.key)
+                rescue StandardError
+                  true
+                end
+              else
+                false
+              end
+            end
             if broken.any?
               puts "BROKEN: #{broken.map(&:id).join(',')}"
               exit 1
