@@ -93,6 +93,6 @@
 
 ---
 
-- [ ] **Track: Friction Log Telemetry & Data Structure (FL0–FL7 Timeline, Metrics & Visualizations) (Issue #134)**
+- [~] **Track: Friction Log Telemetry & Data Structure (FL0–FL7 Timeline, Metrics & Visualizations) (Issue #134)**
 *Link: [tracks/fl_telemetry_20260916/index.md](tracks/fl_telemetry_20260916/index.md)*
 
