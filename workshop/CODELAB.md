@@ -254,9 +254,9 @@ The database seed (`db/seeds.rb`) features **Smart Environment Auto-Discovery**:
   - Out-of-the-box local sad image attachment (`local_sad_image.png`) with watermark informing you that local disk storage is ephemeral.
 - It automatically triggers a password reset email via ActionMailer.
 
-Run seed with your admin email:
+Verify or re-run the seed (automatically uses your `GOOGLE_CLOUD_ACCOUNT` from `.env`):
 ```bash
-GOOGLE_CLOUD_ACCOUNT="myname@gmail.com" bin/rails db:seed
+bin/rails db:seed    # or from repo root: just seed
 ```
 
 Boot the services. **Pick one mode — they are mutually exclusive**, because both bind port 3000 on purpose (see the "Anti-POLA" note in `README.md`):

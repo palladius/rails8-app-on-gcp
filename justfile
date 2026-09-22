@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 # default recipe
 default:
     @just --list
@@ -157,8 +159,9 @@ project-status:
 cloud-run-status url="":
     @./bin/cloud_run_status.sh {{url}}
 
+# seed the database using admin email from .env
 seed:
-	cd blog && rake db:seed
+    cd blog && just seed
 
 # configure gcloud CLI with project, region, and account from .env
 gcloud-config:
@@ -186,9 +189,13 @@ gcloud-config:
 conductor-status:
 	./conductor/bin/conductor-inspector --all --short
 
-# apply terraform changes
+# create GCS bucket for Terraform remote state idempotently
+create-tfstate-bucket:
+	iac/bin/create-tfstate-bucket.sh
+
+# initialize and apply terraform changes with remote state backend
 terraform-apply:
-	cd iac && terraform apply
+	iac/bin/terraform-apply.sh
 
 # compile workshop/SKELETON.md from workshop/skeleton.yaml
 build-skeleton:
