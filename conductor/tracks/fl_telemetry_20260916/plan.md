@@ -6,11 +6,11 @@ Source of Truth: `conductor/tracks/fl_telemetry_20260916/spec.md`
 ## Phase 1: Telemetry Data Model & Dataset Foundation
 - [x] Task 1.1: Write failing unit tests for Friction Log schema and validator (Red Phase) [11ae16e]
     - [x] Create `test/test_friction_log_telemetry.rb` asserting validation rules, timestamp parsing, step enumeration (0..8), and pause calculations.
-- [~] Task 1.2: Implement Friction Log parser and validator model (Green Phase)
-    - [ ] Create `workshop/telemetry/friction_log.rb` with schema attributes, timestamp validators, duration helpers, and consistency invariants.
-- [ ] Task 1.3: Compile and seed comprehensive telemetry dataset for FL000 through FL007
-    - [ ] Create `workshop/telemetry/friction_logs.yaml` capturing real data for FL000–FL007 (links, timestamps, pauses, step durations, errors, commit SHAs).
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task 1.2: Implement Friction Log parser and validator model (Green Phase) [ec28c89]
+    - [x] Create `workshop/telemetry/friction_log.rb` with schema attributes, timestamp validators, duration helpers, and consistency invariants.
+- [x] Task 1.3: Compile and seed comprehensive telemetry dataset for FL000 through FL007 [ec28c89]
+    - [x] Create `workshop/telemetry/friction_logs.yaml` capturing real data for FL000–FL007 (links, timestamps, pauses, step durations, errors, commit SHAs).
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [ec28c89]
 
 ## Phase 2: Visualizer Engine & Multi-Chart Generation
 - [ ] Task 2.1: Write failing tests for SVG and Chart generators (Red Phase)
