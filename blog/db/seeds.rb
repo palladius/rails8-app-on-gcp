@@ -30,7 +30,7 @@ admin_user.update!(created_via: "seed", description: "Default seeded blog admini
 # which will be intercepted locally by Mailpit on port 8025 (SMTP: 1025).
 if Rails.env.development? || ENV["SEND_ADMIN_RESET_EMAIL"] == "true"
   puts "* Dispatching password reset email to #{admin_email} (Catch on Mailpit: http://localhost:8025)"
-  PasswordsMailer.reset(admin_user).deliver_later rescue puts("  (Mailer skipped: #{$!.message})")
+  PasswordsMailer.reset(admin_user).deliver_now rescue puts("  (Mailer skipped: #{$!.message})")
 end
 
 # --- Smart Environment & Stage Auto-Discovery (Issue #25 & Constitution §5) ---
