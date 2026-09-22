@@ -160,6 +160,28 @@ cloud-run-status url="":
 seed:
 	cd blog && rake db:seed
 
+# configure gcloud CLI with project, region, and account from .env
+gcloud-config:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f .env ]; then
+        set -a && . ./.env && set +a
+    fi
+    CONFIG_NAME="${GCLOUD_CONFIG:-fl100-rails8}"
+    PROJECT="${GCP_PROJECT_ID:-${PROJECT_ID:-rails8-fl-20260907b-xm8ko4}}"
+    REGION="${GCP_REGION:-${REGION:-europe-west1}}"
+    ACCOUNT="${GCP_ACCOUNT:-${ACCOUNT:-ricc@google.com}}"
+    echo "⚙️ Configuring gcloud profile [${CONFIG_NAME}]..."
+    gcloud config configurations create "${CONFIG_NAME}" 2>/dev/null || gcloud config configurations activate "${CONFIG_NAME}"
+    echo "  👤 Account: ${ACCOUNT}"
+    gcloud config set account "${ACCOUNT}"
+    echo "  📦 Project: ${PROJECT}"
+    gcloud config set project "${PROJECT}"
+    echo "  🌍 Region: ${REGION}"
+    gcloud config set compute/region "${REGION}"
+    gcloud config set auth/impersonate_service_account ""
+    echo "✅ gcloud profile [${CONFIG_NAME}] configured and active!"
+
 # check the status of conductor tracks
 conductor-status:
 	./conductor/bin/conductor-inspector --all --short

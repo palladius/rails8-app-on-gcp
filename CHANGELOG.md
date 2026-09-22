@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.52] - 2026-09-22
+### Added
+- ⚙️ **Added `just gcloud-config` Recipe**:
+  - Added declarative `gcloud-config` task to `justfile` that idempotently creates or activates the target gcloud configuration profile and syncs account, project, region, and disabled impersonation from `.env` or defaults.
+
 ## [0.2.51] - 2026-09-16
 ### Fixed
 - 🔴 **Default Compute SA Roles in Terraform (FL007-02)**:
