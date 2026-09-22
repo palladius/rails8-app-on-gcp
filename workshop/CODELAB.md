@@ -314,6 +314,8 @@ Verify your local baseline and admin setup:
 just workshop-eval 2
 ```
 
+![just workshop-eval 2 verification output](assets/images/eval_2_success.png)
+
 
 ### 5. The Catch: Stateless Containers
 
