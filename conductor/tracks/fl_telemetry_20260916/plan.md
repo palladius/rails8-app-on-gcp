@@ -29,7 +29,7 @@ Source of Truth: `conductor/tracks/fl_telemetry_20260916/spec.md`
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [5a02a68]
 
 ## Phase 4: Remote Branch Immortalization & Artifact Publication
-- [ ] Task 4.1: Establish safety guard documentation in `workshop/telemetry/README.md` declaring branch immortalization (`donotdelete/friction-log-data-structure`) and preventing merge to `main`.
-- [ ] Task 4.2: Rename / push branch `donotdelete/friction-log-data-structure` to remote `origin`.
+- [x] Task 4.1: Establish safety guard documentation in `workshop/telemetry/README.md` declaring branch immortalization (`donotdelete/friction-log-data-structure`) and preventing merge to `main`. [4e47df0]
+- [~] Task 4.2: Rename / push branch `donotdelete/friction-log-data-structure` to remote `origin`.
 - [ ] Task 4.3: Post comprehensive summary with generated charts and metrics to GHI #134 and open draft PR.
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
