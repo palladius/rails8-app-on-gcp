@@ -263,6 +263,9 @@ Boot the local development stack via Docker Compose:
 ```bash
 docker compose up -d     # from blog/ — or `just compose-up` from the repo root
 ```
+
+![Docker Compose starting Rails, Mailpit, and local stack](assets/images/docker_compose_up_success.png)
+
 The application, local Mailpit SMTP server, and Adminer database viewer are now running together in isolated containers:
 - **Rails App**: http://localhost:3000
 - **Mailpit Web UI**: http://localhost:8025
@@ -278,7 +281,9 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
 
 ### 3. The Mailpit Experience & Admin Login
 
-1. **Catch Outgoing Emails with Mailpit**: Open `http://localhost:8025` in your browser. Look at the local inbox! During `db:seed`, ActionMailer dispatched an admin onboarding email which Mailpit safely captured locally without touching external email servers or credentials.
+1. **Catch Outgoing Emails with Mailpit**: Open `http://localhost:8025` in your browser. Look at the local inbox! During `db:seed`, ActionMailer dispatched an admin onboarding email which Mailpit safely captured locally without touching external email servers or credentials:
+
+![Mailpit web UI displaying intercepted password reset email](assets/images/mailpit_intercepted_email.png)
 2. **Log into the Blog**: Open `http://localhost:3000` in your browser.
    - You can click the password reset link directly inside the Mailpit email to set your password.
    - Alternatively, log in using your Google Cloud account email (from `.env`) and the default seeded password: `Ch4ng3m3!!1`.
