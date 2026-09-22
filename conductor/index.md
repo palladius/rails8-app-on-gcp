@@ -111,3 +111,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 - [x] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
 *Link: [./tracks/hive_compact_view_20260911/index.md](./tracks/hive_compact_view_20260911/index.md)*
 
+---
+
+- [ ] **Track: Friction Log Telemetry & Data Structure (FL0–FL7 Timeline, Metrics & Visualizations) (Issue #134)**
+*Link: [./tracks/fl_telemetry_20260916/index.md](./tracks/fl_telemetry_20260916/index.md)*
+
