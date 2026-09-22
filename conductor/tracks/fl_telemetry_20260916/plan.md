@@ -24,9 +24,9 @@ Source of Truth: `conductor/tracks/fl_telemetry_20260916/spec.md`
 ## Phase 3: UAT Concurrency Validation (FL006 vs FL007)
 - [x] Task 3.1: Write UAT test asserting temporal overlap and dual PR generation between FL006 and FL007 (Red Phase) [bd505b6]
     - [x] Create `test/test_fl_concurrency_uat.rb` asserting overlap of FL006 and FL007 runs and shared codebase ancestor commit.
-- [~] Task 3.2: Implement dedicated concurrency inspector script and visual output (Green Phase)
-    - [ ] Create `workshop/bin/verify_fl_concurrency.rb` displaying detailed execution overlap, delta, and PR provenance.
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task 3.2: Implement dedicated concurrency inspector script and visual output (Green Phase) [5a02a68]
+    - [x] Create `workshop/bin/verify_fl_concurrency.rb` displaying detailed execution overlap, delta, and PR provenance.
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [5a02a68]
 
 ## Phase 4: Remote Branch Immortalization & Artifact Publication
 - [ ] Task 4.1: Establish safety guard documentation in `workshop/telemetry/README.md` declaring branch immortalization (`donotdelete/friction-log-data-structure`) and preventing merge to `main`.
