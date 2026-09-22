@@ -11,7 +11,7 @@
 ![Rails on Google Cloud](assets/images/rails_gcp_logo.jpg)
 -->
 
-Welcome to the [**Rails 8**](https://rubyonrails.org/2024/11/7/rails-8-no-paas-required) **on Google Cloud** workshop! In this hands-on codelab, you will take a modern Rails 8 application from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
+Welcome to the [**Rails 8**](https://rubyonrails.org/2024/11/7/rails-8-no-paas-required) **on Google Cloud** workshop! In this hands-on codelab, you will take [**a modern Rails 8 application**](https://github.com/palladius/rails8-app-on-gcp/) from a simple local SQLite baseline to a production-grade, enterprise-ready reference architecture on Google Cloud.
 
 In this workshop we don't just deploy an app — we execute an **opinionated, production-grade cloud modernization** (*lift-and-shift done right!*).
 
@@ -58,13 +58,13 @@ Let's get started!
 ### 1. Prerequisites Checklist
 
 Before we begin, ensure you have the following tools available in your environment:
-- **`just` (1.21+):** (`just --version`) the task runner — **every single command in this workshop is a `just` recipe** (ask your AI harness to install it, or see [`skills/rails8app-workshop`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop)).
+- **[`just`](https://github.com/casey/just) (1.21+):** (`just --version`) the task runner — **every single command in this workshop is a `just` recipe** (ask your AI harness to install it, or see [`skills/rails8app-workshop`](https://github.com/palladius/rails8-app-on-gcp/tree/main/skills/rails8app-workshop)).
 - **Git (2.30+):** (`git --version`) for version control, branching, and cloning the repository.
-- **Google Cloud SDK (`gcloud` CLI):** Installed and up to date.
-- **Terraform CLI (1.5+):** For declarative infrastructure provisioning.
-- **Docker & Docker Compose:** Installed and running locally.
-- **Ruby `3.4.5` & Rails 8:** (`ruby -v`, `rails -v` — pinned by `blog/.ruby-version`; ask your AI harness to install `3.4.5` if missing).
-- **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)).
+- **[Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (`gcloud` CLI):** Installed and up to date.
+- **[Terraform](https://developer.hashicorp.com/terraform/install)** CLI (1.5+): For declarative infrastructure provisioning.
+- **[`docker`](https://docs.docker.com/get-started/get-docker/)** & **[`docker-compose`](https://docs.docker.com/compose/)**: Installed and running locally.
+- **Ruby `3.4.5`:** (`ruby -v` — pinned by `blog/.ruby-version`; ask your AI harness to install `3.4.5` if missing). Rails 8 is declared in the `Gemfile` and installed automatically by `bundle install`.
+- **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)). You'll login with your personal Gmail — no API token needed.
 
 ### 2. Google Cloud Authentication, Dedicated Configuration & ADC
 
@@ -89,21 +89,23 @@ gcloud config set compute/region europe-west1
 
 ![Active gcloud configuration](assets/images/gcloud_config_configurations_list.png)
 
-### 3. 🚨 Mandatory Guard Gate: GCP Billing Verification
+### 3. 🚨 GCP Billing Verification
 
-> ⚠️ **CRITICAL GUARD GATE:** Google Cloud SQL and Cloud Run deployments require an active linked billing account or valid workshop educational credits. Checking this now prevents cryptic quota or billing failures halfway through the lab!
-
-Run the billing verification check:
+> ⚠️ **Note**: Google Cloud SQL and Cloud Run deployments require an active linked billing account or valid workshop educational credits. Let's make sure your setup is correct now. To do so, run the billing verification check:
 ```bash
 gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
 ```
-Ensure `billingEnabled: true` is returned. If billing is disabled, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
+Ensure `billingEnabled: true` is returned. You can also list all your billing accounts:
+```bash
+gcloud billing accounts list
+```
+Make sure at least one of them shows `OPEN: True`. If none are active, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
 
 ![Active GCP Billing Account](assets/images/gcp_billing_account_active.png)
 
-### 4. Clone the Repository & Pair with Antigravity
+### 4. Clone [the Repository](https://github.com/palladius/rails8-app-on-gcp) & Pair with Antigravity
 
-Clone the repository and enter the directory. Notice that we stay entirely on **`main`**:
+Clone the [repository](https://github.com/palladius/rails8-app-on-gcp) and enter the directory. Notice that we stay entirely on **`main`**:
 ```bash
 git clone https://github.com/palladius/rails8-app-on-gcp.git
 cd rails8-app-on-gcp
@@ -118,26 +120,13 @@ Open this directory in **Google Antigravity**. Antigravity will automatically in
 If the agent stops with a quota message, work down this ladder — the first two are free and instant:
 
 1. **Switch model pool.** Quota is tracked *per model family*, and Antigravity shows two independent pools (Gemini models vs. Claude/GPT models). Claude and GPT-OSS models are available on the free tier, so a drained Gemini pool often leaves the other one untouched. Use the model selector under the prompt box.
+
+   ![Antigravity model selector — switch between Gemini, Claude and GPT-OSS pools](assets/images/antigravity_model_selector.png)
+
 2. **Pick a Flash model instead of Pro.** Rate limits correlate with how much work the agent does per request, so a lighter model stretches what is left.
-3. **Use the Antigravity CLI with your own Gemini API key.** Bring-your-own-key is **not supported in the Antigravity IDE** — the CLI is the documented exception. Create a key in [Google AI Studio](https://aistudio.google.com/apikey) (a free-tier key needs a project but **no billing account**), then:
-
-   ```bash
-   # 1. Set the provider in ~/.gemini/antigravity-cli/settings.json
-   {
-     "modelProvider": "gemini"
-   }
-
-   # 2. Export the key — this exact variable name
-   export GEMINI_API_KEY="your-api-key"
-
-   # 3. Start the CLI
-   agy
-   ```
-
-   The header shows `Gemini API key` instead of your account email. ⚠️ Gotchas: setting `GEMINI_API_KEY` **alone has no effect** without `modelProvider`; `GOOGLE_API_KEY` and `.env` files are **ignored**; an invalid key only surfaces on your first conversation.
-4. **Wait, or upgrade.** Free-tier quota refreshes **weekly** (the error message states your reset date). Google AI Pro/Ultra is the only documented way to raise the baseline inside the desktop app; those plans refresh every five hours and can spend purchased AI credits on overage.
-
-> 💡 **Presenter note:** exact free-tier quota numbers are deliberately not published by Google and change over time, so plan for step 1 as the primary in-room fallback rather than a specific prompt budget.
+3. **Use the [Antigravity CLI](https://antigravity.google/download) with your own Gemini API key.** Bring-your-own-key is **not supported in the Antigravity IDE** — the CLI is the documented alternative. Create a free key in [Google AI Studio](https://aistudio.google.com/apikey) (needs a project but **no billing account**), then download and configure the Antigravity CLI.
+4. **Wait, or [upgrade](https://gemini.google/subscriptions/).** Free-tier quota refreshes **weekly** (the error message states your reset date). Google AI Pro/Ultra is the only documented way to raise the baseline inside the desktop app; those plans refresh every five hours and can spend purchased AI credits on overage.
+5. *While this is an Antigravity workshop, most AI coding harnesses should also work — just point yours at the `AGENTS.md` and `skills/` directory in the repo.*
 
 ### 6. Automated Step 0 Validation
 
@@ -165,7 +154,7 @@ This script (`bin/workshop_diagnostics.rb`):
 - Validates Application Default Credentials (ADC) for Vertex AI.
 - Confirms the ActiveStorage canary seed image (`blog/app/assets/images/gcs_dev_image.jpg`).
 
-> 📸 **TODO(riccardo): add screenshot of 'just workshop-test' running in terminal with all-green checkmarks**
+![just workshop-test diagnostics output](assets/images/just_workshop_test_output.png)
 
 If `.env` is missing, copy it from the documented template:
 ```bash
@@ -180,40 +169,53 @@ cp .env.dist .env
 
 ### 2. ⏱️ Launch Terraform Infrastructure Asynchronously
 
-Navigate to the `iac/` directory, create a GCS bucket for Terraform state, and initialize:
+Run the one-step Terraform recipe, which creates the remote backend state bucket and triggers the infrastructure deployment:
 ```bash
+just terraform-apply
+```
+
+![Terraform successfully initialized](assets/images/terraform_init_success.png)
+
+<details>
+<summary>Manual alternative (or run `iac/bin/terraform-apply.sh` directly)</summary>
+
+```bash
+# Fall back to active gcloud config if environment variables are unset
+GOOGLE_CLOUD_PROJECT="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project)}"
+GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
+
+# Create remote state bucket idempotently
+gcloud storage buckets create "gs://${GOOGLE_CLOUD_PROJECT}-tfstate" --location="$GOOGLE_CLOUD_REGION" 2>/dev/null || \
+  gcloud storage buckets describe "gs://${GOOGLE_CLOUD_PROJECT}-tfstate" >/dev/null
+
 cd iac
-
-# Create a GCS bucket for Terraform remote state
-gcloud storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-tfstate --location=$GOOGLE_CLOUD_REGION 2>/dev/null || true
-
-# Initialize Terraform with remote backend
 terraform init -backend-config="bucket=${GOOGLE_CLOUD_PROJECT}-tfstate"
-terraform apply -auto-approve
+terraform apply -auto-approve -var="project_id=${GOOGLE_CLOUD_PROJECT}" -var="region=${GOOGLE_CLOUD_REGION}"
 cd ..
 ```
-*(Or use the top-level shorthand: `just terraform-apply`)*
+</details>
 
 **What Terraform Provisions:**
 - **Google Cloud Storage Bucket:** Created with private access and IAM Credentials signing (`iam: true`).
 - **Canary Test Image:** Uploads `gcs_dev_image.jpg` to the bucket to enable end-to-end blob verification.
 - **Google Cloud SQL PostgreSQL Instance:** Initiates background provisioning (~10-12 minutes).
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud SQL Console showing rails-postgres instance in state 'Creating' (cooking in background)**
+![Cloud SQL PostgreSQL instance in Google Cloud Console](assets/images/cloud_sql_instance_ready.png)
 
-### 3. Automated Step 1 Validation & Fast UAT
+> 💡 **Note:** You can safely ignore the warning about missing automated backups — we won't need them for this workshop database (although automated daily backups are an essential best practice for any real production database!).
 
-Verify that Step 1 prerequisites and configurations pass:
+![Terraform apply completed successfully with outputs](assets/images/terraform_apply_outputs.png)
+
+> 📝 **Take note of your Cloud Run URL:** The Terraform apply should succeed and print your infrastructure outputs. Note down your `cloud_run_url` (or copy it to your clipboard) — you'll need it in later steps when verifying your live service!
+
+### 3. Automated Step 1 Validation (Optional)
+
+Verify that your Step 1 prerequisites and configurations pass:
 ```bash
 just workshop-eval 1
 ```
 
-Want to see how an automated grader or clean CI runner evaluates this step in an isolated clone? Run our fast UAT harness:
-```bash
-just workshop-uat 1
-```
-
-✨ **The Wow Moment:** One command launches heavy enterprise infrastructure cooking in Google Cloud while you immediately proceed to local development without waiting!
+> ⏱️ **Note:** This evaluation checks live cloud resources and may take a couple of minutes to finish. It is completely optional — while it runs in your terminal, you can immediately proceed to the next step without waiting!
 
 ## Step 2: The Local Baseline, Mailpit & Admin Onboarding
 
@@ -233,7 +235,13 @@ bundle install
 bin/rails db:setup
 ```
 
-> 🧯 **`rbenv: version '3.4.5' is not installed`?** You skipped the Ruby install in Step 0 — run `rbenv install 3.4.5` (or `rvm install 3.4.5`, `asdf install ruby 3.4.5`), then re-run the block above. `bundle install` and every `bin/rails` command below, `db:seed` included, need the pinned interpreter.
+> 🧯 **Permission error writing to `/var/lib/gems/` or `ruby -v` shows system Ruby (e.g. 3.3.x)?**
+> Vanilla Linux system Ruby completely ignores `.ruby-version` files and attempts to install gems system-wide! Make sure `rbenv` is loaded in your active terminal shell:
+> ```bash
+> eval "$(rbenv init - bash)"   # or: eval "$(rbenv init - zsh)"
+> ruby -v                       # confirm it now outputs 3.4.5!
+> ```
+> *Note:* If you skipped installing 3.4.5 in Step 0, run `rbenv install 3.4.5`. Or simply use **Mode A (Docker Compose)** below (`just compose-up`), which runs the pinned Ruby stack completely inside containers without touching host gems!
 
 > 💡 Prefer not to think about it? `just install` and `just compose-up` from the repo root do the `cd blog` for you.
 
