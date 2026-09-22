@@ -1,5 +1,6 @@
 ENV["RAILS_ENV"] ||= "test"
 ENV.delete("GEMINI_API_KEY") # Keep test suite offline and deterministic
+ENV.delete("IAP_ALLOWED_USERS") # Keep test suite independent of developer .env allowlists
 require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"

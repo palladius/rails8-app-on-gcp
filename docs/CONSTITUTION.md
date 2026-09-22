@@ -62,3 +62,9 @@ The project is frozen to **Ruby 3.4.5**. This version **MUST** be consistent acr
 2. `AGENTS.md` / `GEMINI.md` (Agent Operational Directives)
 3. `workshop/SKELETON.md` & `workshop/CODELAB.md` (Workshop Curriculum Specification & Step Contracts)
 4. Derived artifacts, scripts, and documentation
+
+### 9. Single Canonical Path: No "Forking Roads" (Mode A vs Mode B) in Core Progression
+Never present the learner with a bifurcated choice between two development modes (e.g. "Choose Mode A or Mode B") during the core build-up of the application.
+- **The Proctor Invariant:** If learners diverge into separate tracks (such as host-native vs Docker Compose), workshop proctors and teaching assistants cannot effectively diagnose or unblock students without first asking: *"In Step 2, did you pick A or B?"*
+- **The Core Rule:** Choose the single highest-value canonical path (e.g. Docker Compose with Mailpit and Adminer) that guarantees reproducibility and identical mental models across all attendees.
+- **The Capstone Exception:** Divergence and free-form creative choices are welcomed **only in the final capstone step**, where students can pick an optional challenge or feature of their choice *after* the canonical codelab architecture is fully built and deployed.

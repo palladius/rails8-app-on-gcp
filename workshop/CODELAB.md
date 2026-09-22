@@ -259,53 +259,32 @@ Verify or re-run the seed (automatically uses your `GOOGLE_CLOUD_ACCOUNT` from `
 bin/rails db:seed    # or from repo root: just seed
 ```
 
-Boot the services. **Pick one mode — they are mutually exclusive**, because both bind port 3000 on purpose (see the "Anti-POLA" note in `README.md`):
-
-**Mode A — Docker Compose (what this step assumes).** The rest of Step 2 needs it: Mailpit (`:8025`) and Adminer (`:8081`) only exist here.
+Boot the local development stack via Docker Compose:
 ```bash
-docker compose up -d     # still from blog/ — or `just compose-up` from the repo root
+docker compose up -d     # from blog/ — or `just compose-up` from the repo root
 ```
-The app is now served at http://localhost:3000 by the container. **Do not also run `just dev` / `bin/dev`** — the app is already up.
+The application, local Mailpit SMTP server, and Adminer database viewer are now running together in isolated containers:
+- **Rails App**: http://localhost:3000
+- **Mailpit Web UI**: http://localhost:8025
+- **Adminer DB UI**: http://localhost:8081
 
-**Mode B — Native on your host.** Only with the Docker stack down, and you lose Mailpit and Adminer:
-```bash
-just compose-down        # from the repo root
-just dev                 # or: bin/dev
-```
-
-> 🧯 **Ran both by mistake?** You will see `A server is already running (pid: 1, ...)` and `Unable to access log file`. The `pid: 1` is the process **inside** the container — `compose.yaml` bind-mounts your working tree and runs as root, so the container leaves root-owned files in `blog/`. Recover with:
+> 🧯 **Port 3000 conflict or `server.pid` error?**
+> If you previously started a native dev server (`bin/dev`), stop it with `Ctrl+C`. If Docker complains that port 3000 is already allocated or finds a leftover `server.pid`, clean up with:
 > ```bash
 > just compose-down
-> sudo rm -f blog/tmp/pids/server.pid        # sudo: the container created it as root
-> sudo chown -R "$USER" blog/log blog/tmp    # same reason
+> rm -f blog/tmp/pids/server.pid
+> just compose-up
 > ```
-> Then start again with a single mode.
 
-### 3. The Mailpit Experience & Console Workout
+### 3. The Mailpit Experience & Admin Login
 
-1. **Catch Outgoing Emails**: Open `http://localhost:8025` in your browser. You will see **Mailpit** running locally. The initial seed or password reset dispatches an ActionMailer notification captured right here in the local inbox without touching real email servers!
-
-> 📸 **TODO(riccardo): add screenshot of Mailpit web UI (http://localhost:8025) displaying the intercepted admin password reset email**
-
-2. **Interactive `rails console`**: Test your Rails muscle memory by dropping into the console:
-   ```bash
-   bin/rails console
-   ```
-   Inspect your seeded admin user and practice resetting credentials in Ruby:
-   ```ruby
-   user = User.find_by(email_address: "myname@gmail.com")
-   user.update!(password: "SuperSecret2026!")
-   exit
-   ```
-3. **Log in to the Blog**: Open `http://localhost:3000` and log in with your updated admin credentials.
-4. **Observe the Telemetry Badges:** Check the footer and UI header:
-   - Notice the badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
-   - Notice the post watermark: The local casetta stamp (`nanobanana_stamp_local.png` in the bottom-right corner).
-
-> 📸 **TODO(riccardo): add screenshot of the local blog homepage showing the yellow [EPHEMERAL DB / STORAGE] badge and the casetta stamp in the bottom-right of the cover image**
-
-<!-- workshop-screenshot: id="step-2-home-ephemeral" -->
-![Blog Homepage with Ephemeral DB Badge](assets/auto-screenshots/step-2-home-ephemeral.png)
+1. **Catch Outgoing Emails with Mailpit**: Open `http://localhost:8025` in your browser. Look at the local inbox! During `db:seed`, ActionMailer dispatched an admin onboarding email which Mailpit safely captured locally without touching external email servers or credentials.
+2. **Log into the Blog**: Open `http://localhost:3000` in your browser.
+   - You can click the password reset link directly inside the Mailpit email to set your password.
+   - Alternatively, log in using your Google Cloud account email (from `.env`) and the default seeded password: `Ch4ng3m3!!1`.
+3. **Observe the Visual Telemetry Badges:**
+   - Notice the yellow environment badge in the UI: `[EPHEMERAL DB / STORAGE] 💾 Local`
+   - Notice the post watermark: The local casetta stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
 
 ### 4. Automated Step 2 Validation
 
@@ -314,7 +293,6 @@ Verify your local baseline and admin setup:
 just workshop-eval 2
 ```
 
-✨ **The Wow Moment:** Out-of-the-box rich-text editing, instant image drag-and-drop, email interception via Mailpit, and interactive Rails console mastery in under 5 minutes!
 
 ### 5. The Catch: Stateless Containers
 
