@@ -83,6 +83,20 @@ test-visualizer:
 test-justfile:
     ruby test/test_justfile.rb
 
+# run Friction Log telemetry tests and UAT concurrency checks
+test-telemetry:
+    ruby test/test_friction_log_telemetry.rb
+    ruby test/test_friction_log_visualizer.rb
+    ruby test/test_fl_concurrency_uat.rb
+
+# render all Friction Log telemetry visualizations (SVGs, PNGs, and HTML)
+telemetry:
+    ruby workshop/bin/render_fl_telemetry.rb
+
+# verify concurrency between FL006 and FL007
+verify-concurrency:
+    ruby workshop/bin/verify_fl_concurrency.rb
+
 # generate canonical GCP architecture diagram (assets/arch_diagram.png)
 diagram:
     cd diagrams && UV_INDEX_URL="https://pypi.org/simple" uv run python generate_diagrams.py --canonical
