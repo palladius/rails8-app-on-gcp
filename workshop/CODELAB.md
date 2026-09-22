@@ -288,8 +288,24 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
    - You can click the password reset link directly inside the Mailpit email to set your password.
    - Alternatively, log in using your Google Cloud account email (from `.env`) and the default seeded password: `Ch4ng3m3!!1`.
 3. **Observe the Visual Telemetry Badges:**
-   - Notice the yellow environment badge in the UI: `[EPHEMERAL DB / STORAGE] 💾 Local`
+   - Notice the yellow environment banner and badges in the UI: `Notice: Ephemeral Database Active (POSTGRESQL)` and `[EPHEMERAL DB / STORAGE] 💾 Local`.
    - Notice the post watermark: The local casetta stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
+
+![Local blog homepage displaying ephemeral telemetry notices and badges](assets/images/step_2_homepage_ephemeral.png)
+
+> 💡 **Optional Pro-Tip: Rails Console Workout**
+> Curious how Rails interacts with your seeded data from the CLI? Drop into the interactive console:
+> ```bash
+> bin/rails console
+> ```
+> Inspect your seeded admin user dynamically using your environment variable:
+> ```ruby
+> user = User.find_by(email_address: ENV.fetch("GOOGLE_CLOUD_ACCOUNT"))
+> # Or simply grab the first user:
+> user = User.first
+> puts "Admin email: #{user.email_address} (created via: #{user.created_via})"
+> exit
+> ```
 
 ### 4. Automated Step 2 Validation
 
