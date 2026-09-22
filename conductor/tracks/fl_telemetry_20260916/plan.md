@@ -13,9 +13,9 @@ Source of Truth: `conductor/tracks/fl_telemetry_20260916/spec.md`
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [ec28c89]
 
 ## Phase 2: Visualizer Engine & Multi-Chart Generation
-- [ ] Task 2.1: Write failing tests for SVG and Chart generators (Red Phase)
-    - [ ] Create `test/workshop/friction_log_visualizer_test.rb` verifying SVG structure, Gantt timeline bars, pause shading, and step duration math.
-- [ ] Task 2.2: Implement Ruby visualizer script (Green Phase)
+- [x] Task 2.1: Write failing tests for SVG and Chart generators (Red Phase) [bb832d0]
+    - [x] Create `test/test_friction_log_visualizer.rb` verifying SVG structure, Gantt timeline bars, pause shading, and step duration math.
+- [~] Task 2.2: Implement Ruby visualizer script (Green Phase)
     - [ ] Create `workshop/bin/render_fl_telemetry.rb` generating multi-track Gantt timeline, FL006/FL007 concurrency chart, step durations stacked chart, and bug trend chart.
 - [ ] Task 2.3: Generate SVG & PNG chart artifacts and self-contained HTML dashboard
     - [ ] Output artifacts to `workshop/telemetry/output/` and render `index.html`.
