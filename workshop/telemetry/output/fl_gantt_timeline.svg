@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 538" width="1200" height="538">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="42" fill="#f0f6fc" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700">📊 Friction Log Telemetry: FL000–FL007 End-to-End Timeline</text>
+<text x="30" y="68" fill="#8b949e" font-family="system-ui, -apple-system, sans-serif" font-size="13">Chronological execution tracks with active run periods, pause intervals, and evaluation maturity.</text>
+<line x1="180.0" y1="95" x2="180.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="180.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Jul 24</text>
+<line x1="302.5" y1="95" x2="302.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="302.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Jul 31</text>
+<line x1="425.0" y1="95" x2="425.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="425.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 06</text>
+<line x1="547.5" y1="95" x2="547.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="547.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 13</text>
+<line x1="670.0" y1="95" x2="670.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="670.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 20</text>
+<line x1="792.5" y1="95" x2="792.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="792.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 27</text>
+<line x1="915.0" y1="95" x2="915.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="915.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 02</text>
+<line x1="1037.5" y1="95" x2="1037.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="1037.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 09</text>
+<line x1="1160.0" y1="95" x2="1160.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="1160.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 16</text>
+<rect x="20" y="106" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="126" r="6" fill="#3fb950"/>
+<text x="50" y="130" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL000</text>
+<text x="110" y="130" fill="#8b949e" font-family="monospace" font-size="11">N/A (Pre-eval era)</text>
+<rect class="run-bar" x="180.0" y="115" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL000: Initial Exploration, Architecture Discovery &amp; Baseline Setup
+Active: 240.0m | Wall: 4.0h</title>
+</rect>
+<text x="191.0" y="130" fill="#8b949e" font-family="sans-serif" font-size="11">240m</text>
+<rect x="20" y="152" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="172" r="6" fill="#f85149"/>
+<text x="50" y="176" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL001</text>
+<text x="110" y="176" fill="#8b949e" font-family="monospace" font-size="11">Fatal Crash (&lt;60s)</text>
+<rect class="run-bar" x="670.5" y="161" width="8.0" height="22" rx="4" fill="url(#active-grad-blue)" opacity="0.9">
+<title>FL001: First Cloud Run Prototype &amp; Branch Confusion Crash
+Active: 180.0m | Wall: 3.0h</title>
+</rect>
+<text x="680.7" y="176" fill="#8b949e" font-family="sans-serif" font-size="11">180m</text>
+<rect x="20" y="198" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="218" r="6" fill="#d29922"/>
+<text x="50" y="222" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL002</text>
+<text x="110" y="222" fill="#8b949e" font-family="monospace" font-size="11">Infra Only Pass</text>
+<rect class="run-bar" x="818.6" y="207" width="8.0" height="22" rx="4" fill="url(#active-grad-blue)" opacity="0.9">
+<title>FL002: IaC Provider 5.x Syntax &amp; Cloud Build BYOSA Debugging
+Active: 150.0m | Wall: 2.5h</title>
+</rect>
+<text x="828.5" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">150m</text>
+<rect x="20" y="244" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="264" r="6" fill="#3fb950"/>
+<text x="50" y="268" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL003</text>
+<text x="110" y="268" fill="#8b949e" font-family="monospace" font-size="11">20/20 ✅</text>
+<rect class="run-bar" x="1013.9" y="253" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL003: Zero-Branch Time Machine &amp; First Automated Eval Suite
+Active: 120.0m | Wall: 2.0h</title>
+</rect>
+<text x="1023.4" y="268" fill="#8b949e" font-family="sans-serif" font-size="11">120m</text>
+<rect x="20" y="290" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="310" r="6" fill="#3fb950"/>
+<text x="50" y="314" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL004</text>
+<text x="110" y="314" fill="#8b949e" font-family="monospace" font-size="11">20/20 ✅</text>
+<rect class="run-bar" x="1038.4" y="299" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL004: Virgin Project Automation &amp; Best-Timed Speed Run
+Active: 47.9m | Wall: 0.8h</title>
+</rect>
+<text x="1047.0" y="314" fill="#8b949e" font-family="sans-serif" font-size="11">48m</text>
+<rect x="20" y="336" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="356" r="6" fill="#3fb950"/>
+<text x="50" y="360" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL005</text>
+<text x="110" y="360" fill="#8b949e" font-family="monospace" font-size="11">26/26 ✅</text>
+<rect class="run-bar" x="1050.6" y="345" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL005: Full E2E with Hive Leaderboard &amp; 26/26 Virgin Project Evals
+Active: 73.0m | Wall: 1.2h</title>
+</rect>
+<text x="1059.5" y="360" fill="#8b949e" font-family="sans-serif" font-size="11">73m</text>
+<rect x="20" y="382" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="402" r="6" fill="#3fb950"/>
+<text x="50" y="406" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL006</text>
+<text x="110" y="406" fill="#8b949e" font-family="monospace" font-size="11">69/69 ✅ 🏆</text>
+<rect class="run-bar" x="1072.5" y="391" width="87.5" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL006: Step 0–8 Full Workshop &amp; URI Parser Workarounds (Interrupted &amp; Resumed)
+Active: 180.0m | Wall: 115.8h</title>
+</rect>
+<rect class="pause-bar" x="1075.1" y="391" width="84.3" height="22" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.2">
+<title>Pause: Interrupted over weekend (Thu/Fri pause) due to Ruby 4.0.5 URI parser bug triage; resumed Monday morning and finished in a flash</title>
+</rect>
+<text x="1168.0" y="406" fill="#8b949e" font-family="sans-serif" font-size="11">180m active (116h wall)</text>
+<rect x="20" y="428" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="448" r="6" fill="#3fb950"/>
+<text x="50" y="452" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL007</text>
+<text x="110" y="452" fill="#8b949e" font-family="monospace" font-size="11">69/69 ✅ 🏆</text>
+<rect class="run-bar" x="1074.0" y="437" width="86.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL007: Concurrent Clean Run: Compute SA IAM, Schema Load Protected Env &amp; Ruby 3.4.5 Pin
+Active: 165.0m | Wall: 113.8h</title>
+</rect>
+<rect class="pause-bar" x="1075.5" y="437" width="83.5" height="22" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.2">
+<title>Pause: Paused over weekend; resumed Monday morning concurrently alongside FL006</title>
+</rect>
+<text x="1168.0" y="452" fill="#8b949e" font-family="sans-serif" font-size="11">165m active (114h wall)</text>
+<g transform="translate(180, 518)">
+<rect x="0" y="-10" width="16" height="12" rx="2" fill="url(#active-grad-green)"/>
+<text x="22" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Active Execution</text>
+<rect x="140" y="-10" width="16" height="12" rx="2" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1"/>
+<text x="162" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Paused / Interrupted Interval</text>
+<circle cx="340" cy="-4" r="5" fill="#3fb950"/>
+<text x="352" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Success</text>
+<circle cx="420" cy="-4" r="5" fill="#f85149"/>
+<text x="432" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Blocked</text>
+</g>
+</svg>

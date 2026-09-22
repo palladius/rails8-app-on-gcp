@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friction Log Telemetry &amp; Retrospective (FL000–FL007)</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-yellow: #d29922;
+      --accent-red: #f85149;
+    }
+    body {
+      margin: 0;
+      padding: 30px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: var(--text-primary);
+    }
+    .header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .badge-green { background: #238636; color: #fff; }
+    .badge-blue { background: #1f6feb; color: #fff; }
+    .badge-yellow { background: #9e6a03; color: #fff; }
+    .badge-red { background: #da3633; color: #fff; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background-color: #21262d;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    tr:hover {
+      background-color: #1c2128;
+    }
+    a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .chart-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    .code-sha {
+      font-family: monospace;
+      background: #21262d;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Friction Log Telemetry &amp; Retrospective (FL000–FL007)</h1>
+      <p style="color: var(--text-secondary);">
+        End-to-end operational telemetry, step bottlenecks, pause tracking, and Git provenance for the Rails 8 on Google Cloud workshop.
+      </p>
+      <div>
+        <span class="badge badge-green">8 Total Runs</span>
+        <span class="badge badge-blue">Zero-Branch Architecture</span>
+        <span class="badge badge-yellow">Concurrent FL006 &amp; FL007 Validation</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⏱️ Full Multi-Track Gantt Timeline</h2>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 538" width="1200" height="538">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="42" fill="#f0f6fc" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700">📊 Friction Log Telemetry: FL000–FL007 End-to-End Timeline</text>
+<text x="30" y="68" fill="#8b949e" font-family="system-ui, -apple-system, sans-serif" font-size="13">Chronological execution tracks with active run periods, pause intervals, and evaluation maturity.</text>
+<line x1="180.0" y1="95" x2="180.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="180.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Jul 24</text>
+<line x1="302.5" y1="95" x2="302.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="302.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Jul 31</text>
+<line x1="425.0" y1="95" x2="425.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="425.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 06</text>
+<line x1="547.5" y1="95" x2="547.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="547.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 13</text>
+<line x1="670.0" y1="95" x2="670.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="670.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 20</text>
+<line x1="792.5" y1="95" x2="792.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="792.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Aug 27</text>
+<line x1="915.0" y1="95" x2="915.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="915.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 02</text>
+<line x1="1037.5" y1="95" x2="1037.5" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="1037.5" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 09</text>
+<line x1="1160.0" y1="95" x2="1160.0" y2="503" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="1160.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 16</text>
+<rect x="20" y="106" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="126" r="6" fill="#3fb950"/>
+<text x="50" y="130" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL000</text>
+<text x="110" y="130" fill="#8b949e" font-family="monospace" font-size="11">N/A (Pre-eval era)</text>
+<rect class="run-bar" x="180.0" y="115" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL000: Initial Exploration, Architecture Discovery &amp; Baseline Setup
+Active: 240.0m | Wall: 4.0h</title>
+</rect>
+<text x="191.0" y="130" fill="#8b949e" font-family="sans-serif" font-size="11">240m</text>
+<rect x="20" y="152" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="172" r="6" fill="#f85149"/>
+<text x="50" y="176" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL001</text>
+<text x="110" y="176" fill="#8b949e" font-family="monospace" font-size="11">Fatal Crash (&lt;60s)</text>
+<rect class="run-bar" x="670.5" y="161" width="8.0" height="22" rx="4" fill="url(#active-grad-blue)" opacity="0.9">
+<title>FL001: First Cloud Run Prototype &amp; Branch Confusion Crash
+Active: 180.0m | Wall: 3.0h</title>
+</rect>
+<text x="680.7" y="176" fill="#8b949e" font-family="sans-serif" font-size="11">180m</text>
+<rect x="20" y="198" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="218" r="6" fill="#d29922"/>
+<text x="50" y="222" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL002</text>
+<text x="110" y="222" fill="#8b949e" font-family="monospace" font-size="11">Infra Only Pass</text>
+<rect class="run-bar" x="818.6" y="207" width="8.0" height="22" rx="4" fill="url(#active-grad-blue)" opacity="0.9">
+<title>FL002: IaC Provider 5.x Syntax &amp; Cloud Build BYOSA Debugging
+Active: 150.0m | Wall: 2.5h</title>
+</rect>
+<text x="828.5" y="222" fill="#8b949e" font-family="sans-serif" font-size="11">150m</text>
+<rect x="20" y="244" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="264" r="6" fill="#3fb950"/>
+<text x="50" y="268" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL003</text>
+<text x="110" y="268" fill="#8b949e" font-family="monospace" font-size="11">20/20 ✅</text>
+<rect class="run-bar" x="1013.9" y="253" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL003: Zero-Branch Time Machine &amp; First Automated Eval Suite
+Active: 120.0m | Wall: 2.0h</title>
+</rect>
+<text x="1023.4" y="268" fill="#8b949e" font-family="sans-serif" font-size="11">120m</text>
+<rect x="20" y="290" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="310" r="6" fill="#3fb950"/>
+<text x="50" y="314" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL004</text>
+<text x="110" y="314" fill="#8b949e" font-family="monospace" font-size="11">20/20 ✅</text>
+<rect class="run-bar" x="1038.4" y="299" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL004: Virgin Project Automation &amp; Best-Timed Speed Run
+Active: 47.9m | Wall: 0.8h</title>
+</rect>
+<text x="1047.0" y="314" fill="#8b949e" font-family="sans-serif" font-size="11">48m</text>
+<rect x="20" y="336" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="356" r="6" fill="#3fb950"/>
+<text x="50" y="360" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL005</text>
+<text x="110" y="360" fill="#8b949e" font-family="monospace" font-size="11">26/26 ✅</text>
+<rect class="run-bar" x="1050.6" y="345" width="8.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL005: Full E2E with Hive Leaderboard &amp; 26/26 Virgin Project Evals
+Active: 73.0m | Wall: 1.2h</title>
+</rect>
+<text x="1059.5" y="360" fill="#8b949e" font-family="sans-serif" font-size="11">73m</text>
+<rect x="20" y="382" width="1160" height="42" rx="6" fill="#161b22" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="402" r="6" fill="#3fb950"/>
+<text x="50" y="406" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL006</text>
+<text x="110" y="406" fill="#8b949e" font-family="monospace" font-size="11">69/69 ✅ 🏆</text>
+<rect class="run-bar" x="1072.5" y="391" width="87.5" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL006: Step 0–8 Full Workshop &amp; URI Parser Workarounds (Interrupted &amp; Resumed)
+Active: 180.0m | Wall: 115.8h</title>
+</rect>
+<rect class="pause-bar" x="1075.1" y="391" width="84.3" height="22" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.2">
+<title>Pause: Interrupted over weekend (Thu/Fri pause) due to Ruby 4.0.5 URI parser bug triage; resumed Monday morning and finished in a flash</title>
+</rect>
+<text x="1168.0" y="406" fill="#8b949e" font-family="sans-serif" font-size="11">180m active (116h wall)</text>
+<rect x="20" y="428" width="1160" height="42" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="0.5"/>
+<circle cx="35" cy="448" r="6" fill="#3fb950"/>
+<text x="50" y="452" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="bold">FL007</text>
+<text x="110" y="452" fill="#8b949e" font-family="monospace" font-size="11">69/69 ✅ 🏆</text>
+<rect class="run-bar" x="1074.0" y="437" width="86.0" height="22" rx="4" fill="url(#active-grad-green)" opacity="0.9">
+<title>FL007: Concurrent Clean Run: Compute SA IAM, Schema Load Protected Env &amp; Ruby 3.4.5 Pin
+Active: 165.0m | Wall: 113.8h</title>
+</rect>
+<rect class="pause-bar" x="1075.5" y="437" width="83.5" height="22" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.2">
+<title>Pause: Paused over weekend; resumed Monday morning concurrently alongside FL006</title>
+</rect>
+<text x="1168.0" y="452" fill="#8b949e" font-family="sans-serif" font-size="11">165m active (114h wall)</text>
+<g transform="translate(180, 518)">
+<rect x="0" y="-10" width="16" height="12" rx="2" fill="url(#active-grad-green)"/>
+<text x="22" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Active Execution</text>
+<rect x="140" y="-10" width="16" height="12" rx="2" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1"/>
+<text x="162" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Paused / Interrupted Interval</text>
+<circle cx="340" cy="-4" r="5" fill="#3fb950"/>
+<text x="352" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Success</text>
+<circle cx="420" cy="-4" r="5" fill="#f85149"/>
+<text x="432" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="11">Blocked</text>
+</g>
+</svg>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Concurrency Overlap: FL006 vs FL007</h2>
+      <p style="color: var(--text-secondary); font-size: 13px;">
+        Both FL006 and FL007 initiated runs from the same codebase baseline (<span class="code-sha">4a2f81a</span>), paused in tandem over the weekend, and resumed Monday morning producing parallel PRs.
+      </p>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 420" width="1100" height="420">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="42" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">⚡ Concurrency &amp; Dual PR Overlap: FL006 vs FL007</text>
+<text x="30" y="68" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Demonstrating parallel run tracks starting from identical ancestor commit, pausing in tandem, and generating concurrent PR pairs.</text>
+<line x1="180.0" y1="95" x2="180.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="180.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 11 (Thu)</text>
+<line x1="352.0" y1="95" x2="352.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="352.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 12 (Fri)</text>
+<line x1="524.0" y1="95" x2="524.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="524.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 13 (Sat)</text>
+<line x1="696.0" y1="95" x2="696.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="696.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 14 (Sun)</text>
+<line x1="868.0" y1="95" x2="868.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="868.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 15 (Mon)</text>
+<line x1="1040.0" y1="95" x2="1040.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="1040.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 16 (Tue)</text>
+<rect x="266.0" y="105" width="516.0" height="250" fill="#161b22" opacity="0.6"/>
+<text x="524.0" y="125" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">⏸️ Interrupted / Weekend Pause Window</text>
+<text x="30" y="171" fill="#58a6ff" font-family="monospace" font-size="16" font-weight="bold">FL006</text>
+<text x="30" y="189" fill="#8b949e" font-family="monospace" font-size="11">rails8-fl006-20260911</text>
+<rect x="194.3" y="155" width="829.7" height="28" rx="6" fill="#58a6ff" opacity="0.85"/>
+<rect class="pause-bar" x="219.4" y="155" width="799.1" height="28" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.5">
+<title>Pause: Interrupted over weekend (Thu/Fri pause) due to Ruby 4.0.5 URI parser bug triage; resumed Monday morning and finished in a flash</title>
+</rect>
+<circle cx="194.3" cy="169" r="5" fill="#d29922"/>
+<text x="186.3" y="149" fill="#d29922" font-family="monospace" font-size="10" text-anchor="end">Branch Base: 4a2f81a</text>
+<text x="1036.0" y="165" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #99 (8 fixes)</text>
+<text x="1036.0" y="181" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #109 (Ruby 3.4.5)</text>
+<text x="1036.0" y="197" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #113 (7 fixes)</text>
+<text x="30" y="261" fill="#bc8cff" font-family="monospace" font-size="16" font-weight="bold">FL007</text>
+<text x="30" y="279" fill="#8b949e" font-family="monospace" font-size="11">rails8-fl007-20260916</text>
+<rect x="208.7" y="245" width="815.5" height="28" rx="6" fill="#bc8cff" opacity="0.85"/>
+<rect class="pause-bar" x="223.0" y="245" width="791.9" height="28" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.5">
+<title>Pause: Paused over weekend; resumed Monday morning concurrently alongside FL006</title>
+</rect>
+<circle cx="208.7" cy="259" r="5" fill="#d29922"/>
+<text x="200.7" y="239" fill="#d29922" font-family="monospace" font-size="10" text-anchor="end">Branch Base: 4a2f81a</text>
+<text x="1036.2" y="255" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #130 (Project env)</text>
+<text x="1036.2" y="271" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #133 (SA IAM + Schema load)</text>
+<rect x="30" y="375" width="1040" height="32" rx="4" fill="#161b22" stroke="#30363d"/>
+<text x="45" y="395" fill="#3fb950" font-family="monospace" font-size="12">✅ UAT Invariant Validated: FL006 and FL007 shared starting commit 4a2f81a and produced parallel PRs independently resolving overlapping step friction.</text>
+</svg>
+    </div>
+
+    <div class="card">
+      <h2>⏱️ Step Duration Analysis &amp; Speedup Trend</h2>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" width="1100" height="500">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="40" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">⏱️ Active Resolution Time by Workshop Step (Steps 0–8)</text>
+<text x="30" y="64" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Demonstrating step-by-step resolution speedup across iterations (in minutes).</text>
+<line x1="120" y1="420.0" x2="860" y2="420.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="424.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">0m</text>
+<line x1="120" y1="335.0" x2="860" y2="335.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="339.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">60m</text>
+<line x1="120" y1="250.0" x2="860" y2="250.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="254.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">120m</text>
+<line x1="120" y1="165.0" x2="860" y2="165.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="169.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">180m</text>
+<line x1="120" y1="80.0" x2="860" y2="80.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="84.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">240m</text>
+<rect x="140" y="377.5" width="90" height="42.5" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="335.0" width="90" height="42.5" fill="#34a853">
+<title>Step 1: Terraform IaC: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="306.7" width="90" height="28.3" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 20.0m (completed)</title>
+</rect>
+<rect x="140" y="250.0" width="90" height="56.7" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 40.0m (completed)</title>
+</rect>
+<rect x="140" y="207.5" width="90" height="42.5" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="150.8" width="90" height="56.7" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 40.0m (completed)</title>
+</rect>
+<rect x="140" y="122.5" width="90" height="28.3" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 20.0m (completed)</title>
+</rect>
+<rect x="140" y="101.3" width="90" height="21.3" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 15.0m (skipped)</title>
+</rect>
+<rect x="140" y="80.0" width="90" height="21.3" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 15.0m (skipped)</title>
+</rect>
+<text x="185.0" y="74.00000000000004" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">240m</text>
+<text x="185.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL000</text>
+<text x="185.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="260" y="398.8" width="90" height="21.3" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 15.0m (completed)</title>
+</rect>
+<rect x="260" y="356.3" width="90" height="42.5" fill="#34a853">
+<title>Step 1: Terraform IaC: 30.0m (completed)</title>
+</rect>
+<rect x="260" y="335.0" width="90" height="21.3" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 15.0m (completed)</title>
+</rect>
+<rect x="260" y="250.0" width="90" height="85.0" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 60.0m (failed)</title>
+</rect>
+<rect x="260" y="228.8" width="90" height="21.3" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 15.0m (skipped)</title>
+</rect>
+<rect x="260" y="207.5" width="90" height="21.3" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 15.0m (skipped)</title>
+</rect>
+<rect x="260" y="193.3" width="90" height="14.2" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 10.0m (skipped)</title>
+</rect>
+<rect x="260" y="179.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (skipped)</title>
+</rect>
+<rect x="260" y="165.0" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (skipped)</title>
+</rect>
+<text x="305.0" y="159.00000000000003" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">180m</text>
+<text x="305.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL001</text>
+<text x="305.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="380" y="405.8" width="90" height="14.2" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="320.8" width="90" height="85.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 60.0m (completed)</title>
+</rect>
+<rect x="380" y="306.7" width="90" height="14.2" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="264.2" width="90" height="42.5" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 30.0m (completed)</title>
+</rect>
+<rect x="380" y="250.0" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="235.8" width="90" height="14.2" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 10.0m (skipped)</title>
+</rect>
+<rect x="380" y="221.7" width="90" height="14.2" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 10.0m (skipped)</title>
+</rect>
+<rect x="380" y="214.6" width="90" height="7.1" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 5.0m (skipped)</title>
+</rect>
+<rect x="380" y="207.5" width="90" height="7.1" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 5.0m (skipped)</title>
+</rect>
+<text x="425.0" y="201.49999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">150m</text>
+<text x="425.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL002</text>
+<text x="425.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="500" y="412.9" width="90" height="7.1" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 5.0m (completed)</title>
+</rect>
+<rect x="500" y="384.6" width="90" height="28.3" fill="#34a853">
+<title>Step 1: Terraform IaC: 20.0m (completed)</title>
+</rect>
+<rect x="500" y="377.5" width="90" height="7.1" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 5.0m (completed)</title>
+</rect>
+<rect x="500" y="356.3" width="90" height="21.3" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 15.0m (completed)</title>
+</rect>
+<rect x="500" y="342.1" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="500" y="306.7" width="90" height="35.4" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 25.0m (completed)</title>
+</rect>
+<rect x="500" y="278.3" width="90" height="28.3" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 20.0m (completed)</title>
+</rect>
+<rect x="500" y="264.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (completed)</title>
+</rect>
+<rect x="500" y="250.0" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (completed)</title>
+</rect>
+<text x="545.0" y="244.00000000000003" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">120m</text>
+<text x="545.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL003</text>
+<text x="545.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="620" y="416.3" width="90" height="3.7" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 2.6m (completed)</title>
+</rect>
+<rect x="620" y="393.3" width="90" height="23.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 16.3m (completed)</title>
+</rect>
+<rect x="620" y="392.6" width="90" height="0.7" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 0.5m (completed)</title>
+</rect>
+<rect x="620" y="391.2" width="90" height="1.4" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 1.0m (completed)</title>
+</rect>
+<rect x="620" y="390.6" width="90" height="0.6" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 0.4m (completed)</title>
+</rect>
+<rect x="620" y="389.6" width="90" height="0.9" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 0.7m (completed)</title>
+</rect>
+<rect x="620" y="388.8" width="90" height="0.8" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 0.6m (completed)</title>
+</rect>
+<rect x="620" y="385.9" width="90" height="2.9" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 2.0m (completed)</title>
+</rect>
+<rect x="620" y="352.1" width="90" height="33.8" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 23.9m (completed)</title>
+</rect>
+<text x="665.0" y="346.11805555555554" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">48m</text>
+<text x="665.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL004</text>
+<text x="665.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="740" y="417.2" width="90" height="2.8" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 2.0m (completed)</title>
+</rect>
+<rect x="740" y="391.2" width="90" height="26.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 18.3m (completed)</title>
+</rect>
+<rect x="740" y="389.8" width="90" height="1.4" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 1.0m (completed)</title>
+</rect>
+<rect x="740" y="382.7" width="90" height="7.1" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 5.0m (completed)</title>
+</rect>
+<rect x="740" y="378.4" width="90" height="4.3" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 3.0m (completed)</title>
+</rect>
+<rect x="740" y="368.5" width="90" height="9.9" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 7.0m (completed)</title>
+</rect>
+<rect x="740" y="361.4" width="90" height="7.1" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 5.0m (completed)</title>
+</rect>
+<rect x="740" y="352.0" width="90" height="9.4" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 6.7m (completed)</title>
+</rect>
+<rect x="740" y="316.6" width="90" height="35.4" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 25.0m (completed)</title>
+</rect>
+<text x="785.0" y="310.5833333333333" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">73m</text>
+<text x="785.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL005</text>
+<text x="785.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="860" y="418.0" width="90" height="2.0" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 1.4m (completed)</title>
+</rect>
+<rect x="860" y="396.8" width="90" height="21.3" fill="#34a853">
+<title>Step 1: Terraform IaC: 15.0m (completed)</title>
+</rect>
+<rect x="860" y="389.7" width="90" height="7.1" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 5.0m (completed)</title>
+</rect>
+<rect x="860" y="375.5" width="90" height="14.2" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="361.4" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="276.4" width="90" height="85.0" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 60.0m (completed)</title>
+</rect>
+<rect x="860" y="191.4" width="90" height="85.0" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 60.0m (completed)</title>
+</rect>
+<rect x="860" y="177.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="165.0" width="90" height="12.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 8.6m (completed)</title>
+</rect>
+<text x="905.0" y="158.99999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">180m</text>
+<text x="905.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL006</text>
+<text x="905.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="980" y="418.3" width="90" height="1.7" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 1.2m (completed)</title>
+</rect>
+<rect x="980" y="398.3" width="90" height="20.1" fill="#34a853">
+<title>Step 1: Terraform IaC: 14.2m (completed)</title>
+</rect>
+<rect x="980" y="392.6" width="90" height="5.7" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 4.0m (completed)</title>
+</rect>
+<rect x="980" y="381.3" width="90" height="11.3" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 8.0m (completed)</title>
+</rect>
+<rect x="980" y="371.8" width="90" height="9.4" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 6.7m (completed)</title>
+</rect>
+<rect x="980" y="305.7" width="90" height="66.1" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 46.7m (completed)</title>
+</rect>
+<rect x="980" y="230.2" width="90" height="75.6" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 53.3m (completed)</title>
+</rect>
+<rect x="980" y="200.4" width="90" height="29.7" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 21.0m (completed)</title>
+</rect>
+<rect x="980" y="186.2" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (completed)</title>
+</rect>
+<text x="1025.0" y="180.24999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">165m</text>
+<text x="1025.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL007</text>
+<text x="1025.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<g transform="translate(890, 100)">
+<text x="0" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="12" font-weight="bold">Workshop Steps</text>
+<rect x="0" y="10" width="12" height="12" rx="2" fill="#4285f4"/>
+<text x="18" y="20" fill="#8b949e" font-family="sans-serif" font-size="11">Step 0</text>
+<rect x="0" y="32" width="12" height="12" rx="2" fill="#34a853"/>
+<text x="18" y="42" fill="#8b949e" font-family="sans-serif" font-size="11">Step 1</text>
+<rect x="0" y="54" width="12" height="12" rx="2" fill="#fbbc05"/>
+<text x="18" y="64" fill="#8b949e" font-family="sans-serif" font-size="11">Step 2</text>
+<rect x="0" y="76" width="12" height="12" rx="2" fill="#ea4335"/>
+<text x="18" y="86" fill="#8b949e" font-family="sans-serif" font-size="11">Step 3</text>
+<rect x="0" y="98" width="12" height="12" rx="2" fill="#a142f4"/>
+<text x="18" y="108" fill="#8b949e" font-family="sans-serif" font-size="11">Step 4</text>
+<rect x="0" y="120" width="12" height="12" rx="2" fill="#24c1e0"/>
+<text x="18" y="130" fill="#8b949e" font-family="sans-serif" font-size="11">Step 5</text>
+<rect x="0" y="142" width="12" height="12" rx="2" fill="#ff7043"/>
+<text x="18" y="152" fill="#8b949e" font-family="sans-serif" font-size="11">Step 6</text>
+<rect x="0" y="164" width="12" height="12" rx="2" fill="#78909c"/>
+<text x="18" y="174" fill="#8b949e" font-family="sans-serif" font-size="11">Step 7</text>
+<rect x="0" y="186" width="12" height="12" rx="2" fill="#00bfa5"/>
+<text x="18" y="196" fill="#8b949e" font-family="sans-serif" font-size="11">Step 8</text>
+</g>
+</svg>
+    </div>
+
+    <div class="card">
+      <h2>🐛 Bug Evolution &amp; Friction Log Triage</h2>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="40" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">🐛 Bugs Uncovered &amp; Triage Volume across Iterations</text>
+<text x="30" y="64" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Evolution of frictions logged and resolved per Friction Log run.</text>
+<line x1="100" y1="330.0" x2="960" y2="330.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="334.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">0</text>
+<line x1="100" y1="280.0" x2="960" y2="280.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="284.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">5</text>
+<line x1="100" y1="230.0" x2="960" y2="230.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="234.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">10</text>
+<line x1="100" y1="180.0" x2="960" y2="180.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="184.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">15</text>
+<line x1="100" y1="130.0" x2="960" y2="130.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="134.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">20</text>
+<line x1="100" y1="80.0" x2="960" y2="80.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="84.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">25</text>
+<rect x="133.75" y="210.0" width="40" height="120.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="153.75" y="202.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">12</text>
+<text x="153.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL000</text>
+<rect x="241.25" y="240.0" width="40" height="90.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="261.25" y="232.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">9</text>
+<text x="261.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL001</text>
+<rect x="348.75" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="368.75" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="368.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL002</text>
+<rect x="456.25" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="476.25" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="476.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL003</text>
+<rect x="563.75" y="280.0" width="40" height="50.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="583.75" y="272.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">5</text>
+<text x="583.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL004</text>
+<rect x="671.25" y="270.0" width="40" height="60.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="691.25" y="262.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">6</text>
+<text x="691.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL005</text>
+<rect x="778.75" y="130.0" width="40" height="200.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="798.75" y="122.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">20</text>
+<text x="798.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL006</text>
+<rect x="886.25" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="906.25" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="906.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL007</text>
+<polyline points="153.8,210.0 261.3,240.0 368.8,290.0 476.3,290.0 583.8,280.0 691.3,270.0 798.8,130.0 906.3,290.0" fill="none" stroke="#d29922" stroke-width="2.5"/>
+<circle cx="153.8" cy="210.0" r="4" fill="#d29922"/>
+<circle cx="261.3" cy="240.0" r="4" fill="#d29922"/>
+<circle cx="368.8" cy="290.0" r="4" fill="#d29922"/>
+<circle cx="476.3" cy="290.0" r="4" fill="#d29922"/>
+<circle cx="583.8" cy="280.0" r="4" fill="#d29922"/>
+<circle cx="691.3" cy="270.0" r="4" fill="#d29922"/>
+<circle cx="798.8" cy="130.0" r="4" fill="#d29922"/>
+<circle cx="906.3" cy="290.0" r="4" fill="#d29922"/>
+</svg>
+    </div>
+
+    <div class="card">
+      <h2>📋 Friction Log Master Scorecard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Runner</th>
+            <th>GCP Project</th>
+            <th>Active / Wall Duration</th>
+            <th>Bugs</th>
+            <th>Eval Score</th>
+            <th>Provenance (Code / Workshop)</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+  <td><strong>FL000</strong> <span class="badge badge-green">success</span></td>
+  <td>Initial Exploration, Architecture Discovery &amp; Baseline Setup</td>
+  <td>palladius</td>
+  <td><span class="code-sha">rails8-app-on-gcp-dev</span></td>
+  <td>240m</td>
+  <td><strong>12</strong></td>
+  <td>N/A (Pre-eval era)</td>
+  <td>
+    Code: <span class="code-sha">a8b21c4</span><br>
+    Workshop: <span class="code-sha">b9c32d5</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/2" target="_blank">#2</a><br>PRs: —</td>
+</tr>
+
+<tr>
+  <td><strong>FL001</strong> <span class="badge badge-red">blocked</span></td>
+  <td>First Cloud Run Prototype &amp; Branch Confusion Crash</td>
+  <td>palladius</td>
+  <td><span class="code-sha">rails8-fl001-test</span></td>
+  <td>180m</td>
+  <td><strong>9</strong></td>
+  <td>Fatal Crash (<60s)</td>
+  <td>
+    Code: <span class="code-sha">c9103e5</span><br>
+    Workshop: <span class="code-sha">da214f6</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/39" target="_blank">#39</a><br>PRs: —</td>
+</tr>
+
+<tr>
+  <td><strong>FL002</strong> <span class="badge badge-yellow">partial</span></td>
+  <td>IaC Provider 5.x Syntax &amp; Cloud Build BYOSA Debugging</td>
+  <td>palladius</td>
+  <td><span class="code-sha">rails8-fl002-infra</span></td>
+  <td>150m</td>
+  <td><strong>4</strong></td>
+  <td>Infra Only Pass</td>
+  <td>
+    Code: <span class="code-sha">d1487ea</span><br>
+    Workshop: <span class="code-sha">e2598fb</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/40" target="_blank">#40</a><br>PRs: —</td>
+</tr>
+
+<tr>
+  <td><strong>FL003</strong> <span class="badge badge-green">success</span></td>
+  <td>Zero-Branch Time Machine &amp; First Automated Eval Suite</td>
+  <td>palladius</td>
+  <td><span class="code-sha">rails8-fl003-timemachine</span></td>
+  <td>120m</td>
+  <td><strong>4</strong></td>
+  <td>20/20 ✅</td>
+  <td>
+    Code: <span class="code-sha">e2501ab</span><br>
+    Workshop: <span class="code-sha">f3612bc</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/54" target="_blank">#54</a><br>PRs: —</td>
+</tr>
+
+<tr>
+  <td><strong>FL004</strong> <span class="badge badge-green">success</span></td>
+  <td>Virgin Project Automation &amp; Best-Timed Speed Run</td>
+  <td>antigravity-bot</td>
+  <td><span class="code-sha">rails8-fl004-virgin</span></td>
+  <td>48m</td>
+  <td><strong>5</strong></td>
+  <td>20/20 ✅</td>
+  <td>
+    Code: <span class="code-sha">f3612bc</span><br>
+    Workshop: <span class="code-sha">a4723cd</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/55" target="_blank">#55</a><br>PRs: <a href="https://github.com/palladius/rails8-app-on-gcp/pull/55" target="_blank">#55</a></td>
+</tr>
+
+<tr>
+  <td><strong>FL005</strong> <span class="badge badge-green">success</span></td>
+  <td>Full E2E with Hive Leaderboard &amp; 26/26 Virgin Project Evals</td>
+  <td>antigravity-bot</td>
+  <td><span class="code-sha">rails8-fl005-hive</span></td>
+  <td>73m</td>
+  <td><strong>6</strong></td>
+  <td>26/26 ✅</td>
+  <td>
+    Code: <span class="code-sha">9a871cd</span><br>
+    Workshop: <span class="code-sha">b1982de</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/72" target="_blank">#72</a><br>PRs: —</td>
+</tr>
+
+<tr>
+  <td><strong>FL006</strong> <span class="badge badge-green">success</span></td>
+  <td>Step 0–8 Full Workshop &amp; URI Parser Workarounds (Interrupted &amp; Resumed)</td>
+  <td>antigravity-bot</td>
+  <td><span class="code-sha">rails8-fl006-20260911</span></td>
+  <td>180m / 116h wall</td>
+  <td><strong>20</strong></td>
+  <td>69/69 ✅ 🏆</td>
+  <td>
+    Code: <span class="code-sha">4a2f81a</span><br>
+    Workshop: <span class="code-sha">8d1b32e</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/95" target="_blank">#95</a><br>PRs: <a href="https://github.com/palladius/rails8-app-on-gcp/pull/99" target="_blank">#99</a>, <a href="https://github.com/palladius/rails8-app-on-gcp/pull/109" target="_blank">#109</a>, <a href="https://github.com/palladius/rails8-app-on-gcp/pull/113" target="_blank">#113</a></td>
+</tr>
+
+<tr>
+  <td><strong>FL007</strong> <span class="badge badge-green">success</span></td>
+  <td>Concurrent Clean Run: Compute SA IAM, Schema Load Protected Env &amp; Ruby 3.4.5 Pin</td>
+  <td>antigravity-bot</td>
+  <td><span class="code-sha">rails8-fl007-20260916</span></td>
+  <td>165m / 114h wall</td>
+  <td><strong>4</strong></td>
+  <td>69/69 ✅ 🏆</td>
+  <td>
+    Code: <span class="code-sha">4a2f81a</span><br>
+    Workshop: <span class="code-sha">8d1b32e</span>
+  </td>
+  <td>Issue: <a href="https://github.com/palladius/rails8-app-on-gcp/issues/132" target="_blank">#132</a><br>PRs: <a href="https://github.com/palladius/rails8-app-on-gcp/pull/130" target="_blank">#130</a>, <a href="https://github.com/palladius/rails8-app-on-gcp/pull/133" target="_blank">#133</a></td>
+</tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 500" width="1100" height="500">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="40" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">⏱️ Active Resolution Time by Workshop Step (Steps 0–8)</text>
+<text x="30" y="64" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Demonstrating step-by-step resolution speedup across iterations (in minutes).</text>
+<line x1="120" y1="420.0" x2="860" y2="420.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="424.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">0m</text>
+<line x1="120" y1="335.0" x2="860" y2="335.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="339.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">60m</text>
+<line x1="120" y1="250.0" x2="860" y2="250.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="254.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">120m</text>
+<line x1="120" y1="165.0" x2="860" y2="165.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="169.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">180m</text>
+<line x1="120" y1="80.0" x2="860" y2="80.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="110" y="84.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">240m</text>
+<rect x="140" y="377.5" width="90" height="42.5" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="335.0" width="90" height="42.5" fill="#34a853">
+<title>Step 1: Terraform IaC: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="306.7" width="90" height="28.3" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 20.0m (completed)</title>
+</rect>
+<rect x="140" y="250.0" width="90" height="56.7" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 40.0m (completed)</title>
+</rect>
+<rect x="140" y="207.5" width="90" height="42.5" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 30.0m (completed)</title>
+</rect>
+<rect x="140" y="150.8" width="90" height="56.7" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 40.0m (completed)</title>
+</rect>
+<rect x="140" y="122.5" width="90" height="28.3" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 20.0m (completed)</title>
+</rect>
+<rect x="140" y="101.3" width="90" height="21.3" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 15.0m (skipped)</title>
+</rect>
+<rect x="140" y="80.0" width="90" height="21.3" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 15.0m (skipped)</title>
+</rect>
+<text x="185.0" y="74.00000000000004" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">240m</text>
+<text x="185.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL000</text>
+<text x="185.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="260" y="398.8" width="90" height="21.3" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 15.0m (completed)</title>
+</rect>
+<rect x="260" y="356.3" width="90" height="42.5" fill="#34a853">
+<title>Step 1: Terraform IaC: 30.0m (completed)</title>
+</rect>
+<rect x="260" y="335.0" width="90" height="21.3" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 15.0m (completed)</title>
+</rect>
+<rect x="260" y="250.0" width="90" height="85.0" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 60.0m (failed)</title>
+</rect>
+<rect x="260" y="228.8" width="90" height="21.3" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 15.0m (skipped)</title>
+</rect>
+<rect x="260" y="207.5" width="90" height="21.3" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 15.0m (skipped)</title>
+</rect>
+<rect x="260" y="193.3" width="90" height="14.2" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 10.0m (skipped)</title>
+</rect>
+<rect x="260" y="179.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (skipped)</title>
+</rect>
+<rect x="260" y="165.0" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (skipped)</title>
+</rect>
+<text x="305.0" y="159.00000000000003" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">180m</text>
+<text x="305.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL001</text>
+<text x="305.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="380" y="405.8" width="90" height="14.2" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="320.8" width="90" height="85.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 60.0m (completed)</title>
+</rect>
+<rect x="380" y="306.7" width="90" height="14.2" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="264.2" width="90" height="42.5" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 30.0m (completed)</title>
+</rect>
+<rect x="380" y="250.0" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="380" y="235.8" width="90" height="14.2" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 10.0m (skipped)</title>
+</rect>
+<rect x="380" y="221.7" width="90" height="14.2" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 10.0m (skipped)</title>
+</rect>
+<rect x="380" y="214.6" width="90" height="7.1" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 5.0m (skipped)</title>
+</rect>
+<rect x="380" y="207.5" width="90" height="7.1" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 5.0m (skipped)</title>
+</rect>
+<text x="425.0" y="201.49999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">150m</text>
+<text x="425.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL002</text>
+<text x="425.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="500" y="412.9" width="90" height="7.1" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 5.0m (completed)</title>
+</rect>
+<rect x="500" y="384.6" width="90" height="28.3" fill="#34a853">
+<title>Step 1: Terraform IaC: 20.0m (completed)</title>
+</rect>
+<rect x="500" y="377.5" width="90" height="7.1" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 5.0m (completed)</title>
+</rect>
+<rect x="500" y="356.3" width="90" height="21.3" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 15.0m (completed)</title>
+</rect>
+<rect x="500" y="342.1" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="500" y="306.7" width="90" height="35.4" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 25.0m (completed)</title>
+</rect>
+<rect x="500" y="278.3" width="90" height="28.3" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 20.0m (completed)</title>
+</rect>
+<rect x="500" y="264.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (completed)</title>
+</rect>
+<rect x="500" y="250.0" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (completed)</title>
+</rect>
+<text x="545.0" y="244.00000000000003" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">120m</text>
+<text x="545.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL003</text>
+<text x="545.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">palladius</text>
+<rect x="620" y="416.3" width="90" height="3.7" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 2.6m (completed)</title>
+</rect>
+<rect x="620" y="393.3" width="90" height="23.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 16.3m (completed)</title>
+</rect>
+<rect x="620" y="392.6" width="90" height="0.7" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 0.5m (completed)</title>
+</rect>
+<rect x="620" y="391.2" width="90" height="1.4" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 1.0m (completed)</title>
+</rect>
+<rect x="620" y="390.6" width="90" height="0.6" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 0.4m (completed)</title>
+</rect>
+<rect x="620" y="389.6" width="90" height="0.9" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 0.7m (completed)</title>
+</rect>
+<rect x="620" y="388.8" width="90" height="0.8" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 0.6m (completed)</title>
+</rect>
+<rect x="620" y="385.9" width="90" height="2.9" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 2.0m (completed)</title>
+</rect>
+<rect x="620" y="352.1" width="90" height="33.8" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 23.9m (completed)</title>
+</rect>
+<text x="665.0" y="346.11805555555554" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">48m</text>
+<text x="665.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL004</text>
+<text x="665.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="740" y="417.2" width="90" height="2.8" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 2.0m (completed)</title>
+</rect>
+<rect x="740" y="391.2" width="90" height="26.0" fill="#34a853">
+<title>Step 1: Terraform IaC: 18.3m (completed)</title>
+</rect>
+<rect x="740" y="389.8" width="90" height="1.4" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 1.0m (completed)</title>
+</rect>
+<rect x="740" y="382.7" width="90" height="7.1" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 5.0m (completed)</title>
+</rect>
+<rect x="740" y="378.4" width="90" height="4.3" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 3.0m (completed)</title>
+</rect>
+<rect x="740" y="368.5" width="90" height="9.9" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 7.0m (completed)</title>
+</rect>
+<rect x="740" y="361.4" width="90" height="7.1" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 5.0m (completed)</title>
+</rect>
+<rect x="740" y="352.0" width="90" height="9.4" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 6.7m (completed)</title>
+</rect>
+<rect x="740" y="316.6" width="90" height="35.4" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 25.0m (completed)</title>
+</rect>
+<text x="785.0" y="310.5833333333333" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">73m</text>
+<text x="785.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL005</text>
+<text x="785.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="860" y="418.0" width="90" height="2.0" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 1.4m (completed)</title>
+</rect>
+<rect x="860" y="396.8" width="90" height="21.3" fill="#34a853">
+<title>Step 1: Terraform IaC: 15.0m (completed)</title>
+</rect>
+<rect x="860" y="389.7" width="90" height="7.1" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 5.0m (completed)</title>
+</rect>
+<rect x="860" y="375.5" width="90" height="14.2" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="361.4" width="90" height="14.2" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="276.4" width="90" height="85.0" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 60.0m (completed)</title>
+</rect>
+<rect x="860" y="191.4" width="90" height="85.0" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 60.0m (completed)</title>
+</rect>
+<rect x="860" y="177.2" width="90" height="14.2" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 10.0m (completed)</title>
+</rect>
+<rect x="860" y="165.0" width="90" height="12.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 8.6m (completed)</title>
+</rect>
+<text x="905.0" y="158.99999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">180m</text>
+<text x="905.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL006</text>
+<text x="905.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<rect x="980" y="418.3" width="90" height="1.7" fill="#4285f4">
+<title>Step 0: Setup &amp; Prereqs: 1.2m (completed)</title>
+</rect>
+<rect x="980" y="398.3" width="90" height="20.1" fill="#34a853">
+<title>Step 1: Terraform IaC: 14.2m (completed)</title>
+</rect>
+<rect x="980" y="392.6" width="90" height="5.7" fill="#fbbc05">
+<title>Step 2: Local Docker/SQLite: 4.0m (completed)</title>
+</rect>
+<rect x="980" y="381.3" width="90" height="11.3" fill="#ea4335">
+<title>Step 3: Cloud Run Baseline: 8.0m (completed)</title>
+</rect>
+<rect x="980" y="371.8" width="90" height="9.4" fill="#a142f4">
+<title>Step 4: ActiveStorage GCS: 6.7m (completed)</title>
+</rect>
+<rect x="980" y="305.7" width="90" height="66.1" fill="#24c1e0">
+<title>Step 5: Cloud SQL Postgres: 46.7m (completed)</title>
+</rect>
+<rect x="980" y="230.2" width="90" height="75.6" fill="#ff7043">
+<title>Step 6: Puma + Solid Queue: 53.3m (completed)</title>
+</rect>
+<rect x="980" y="200.4" width="90" height="29.7" fill="#78909c">
+<title>Step 7: GenAI Vertex / Nano Banana: 21.0m (completed)</title>
+</rect>
+<rect x="980" y="186.2" width="90" height="14.2" fill="#00bfa5">
+<title>Step 8: Hive &amp; Graduation Trophy: 10.0m (completed)</title>
+</rect>
+<text x="1025.0" y="180.24999999999997" fill="#f0f6fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">165m</text>
+<text x="1025.0" y="440" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL007</text>
+<text x="1025.0" y="456" fill="#8b949e" font-family="sans-serif" font-size="10" text-anchor="middle">agy-bot</text>
+<g transform="translate(890, 100)">
+<text x="0" y="0" fill="#f0f6fc" font-family="sans-serif" font-size="12" font-weight="bold">Workshop Steps</text>
+<rect x="0" y="10" width="12" height="12" rx="2" fill="#4285f4"/>
+<text x="18" y="20" fill="#8b949e" font-family="sans-serif" font-size="11">Step 0</text>
+<rect x="0" y="32" width="12" height="12" rx="2" fill="#34a853"/>
+<text x="18" y="42" fill="#8b949e" font-family="sans-serif" font-size="11">Step 1</text>
+<rect x="0" y="54" width="12" height="12" rx="2" fill="#fbbc05"/>
+<text x="18" y="64" fill="#8b949e" font-family="sans-serif" font-size="11">Step 2</text>
+<rect x="0" y="76" width="12" height="12" rx="2" fill="#ea4335"/>
+<text x="18" y="86" fill="#8b949e" font-family="sans-serif" font-size="11">Step 3</text>
+<rect x="0" y="98" width="12" height="12" rx="2" fill="#a142f4"/>
+<text x="18" y="108" fill="#8b949e" font-family="sans-serif" font-size="11">Step 4</text>
+<rect x="0" y="120" width="12" height="12" rx="2" fill="#24c1e0"/>
+<text x="18" y="130" fill="#8b949e" font-family="sans-serif" font-size="11">Step 5</text>
+<rect x="0" y="142" width="12" height="12" rx="2" fill="#ff7043"/>
+<text x="18" y="152" fill="#8b949e" font-family="sans-serif" font-size="11">Step 6</text>
+<rect x="0" y="164" width="12" height="12" rx="2" fill="#78909c"/>
+<text x="18" y="174" fill="#8b949e" font-family="sans-serif" font-size="11">Step 7</text>
+<rect x="0" y="186" width="12" height="12" rx="2" fill="#00bfa5"/>
+<text x="18" y="196" fill="#8b949e" font-family="sans-serif" font-size="11">Step 8</text>
+</g>
+</svg>

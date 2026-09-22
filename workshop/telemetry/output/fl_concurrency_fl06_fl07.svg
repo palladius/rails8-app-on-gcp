@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 420" width="1100" height="420">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="42" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">⚡ Concurrency &amp; Dual PR Overlap: FL006 vs FL007</text>
+<text x="30" y="68" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Demonstrating parallel run tracks starting from identical ancestor commit, pausing in tandem, and generating concurrent PR pairs.</text>
+<line x1="180.0" y1="95" x2="180.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="180.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 11 (Thu)</text>
+<line x1="352.0" y1="95" x2="352.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="352.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 12 (Fri)</text>
+<line x1="524.0" y1="95" x2="524.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="524.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 13 (Sat)</text>
+<line x1="696.0" y1="95" x2="696.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="696.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 14 (Sun)</text>
+<line x1="868.0" y1="95" x2="868.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="868.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 15 (Mon)</text>
+<line x1="1040.0" y1="95" x2="1040.0" y2="360" stroke="#30363d" stroke-dasharray="4,4"/>
+<text x="1040.0" y="90" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="middle">Sep 16 (Tue)</text>
+<rect x="266.0" y="105" width="516.0" height="250" fill="#161b22" opacity="0.6"/>
+<text x="524.0" y="125" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">⏸️ Interrupted / Weekend Pause Window</text>
+<text x="30" y="171" fill="#58a6ff" font-family="monospace" font-size="16" font-weight="bold">FL006</text>
+<text x="30" y="189" fill="#8b949e" font-family="monospace" font-size="11">rails8-fl006-20260911</text>
+<rect x="194.3" y="155" width="829.7" height="28" rx="6" fill="#58a6ff" opacity="0.85"/>
+<rect class="pause-bar" x="219.4" y="155" width="799.1" height="28" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.5">
+<title>Pause: Interrupted over weekend (Thu/Fri pause) due to Ruby 4.0.5 URI parser bug triage; resumed Monday morning and finished in a flash</title>
+</rect>
+<circle cx="194.3" cy="169" r="5" fill="#d29922"/>
+<text x="186.3" y="149" fill="#d29922" font-family="monospace" font-size="10" text-anchor="end">Branch Base: 4a2f81a</text>
+<text x="1036.0" y="165" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #99 (8 fixes)</text>
+<text x="1036.0" y="181" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #109 (Ruby 3.4.5)</text>
+<text x="1036.0" y="197" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #113 (7 fixes)</text>
+<text x="30" y="261" fill="#bc8cff" font-family="monospace" font-size="16" font-weight="bold">FL007</text>
+<text x="30" y="279" fill="#8b949e" font-family="monospace" font-size="11">rails8-fl007-20260916</text>
+<rect x="208.7" y="245" width="815.5" height="28" rx="6" fill="#bc8cff" opacity="0.85"/>
+<rect class="pause-bar" x="223.0" y="245" width="791.9" height="28" rx="4" fill="url(#pause-pattern)" stroke="#d29922" stroke-width="1.5">
+<title>Pause: Paused over weekend; resumed Monday morning concurrently alongside FL006</title>
+</rect>
+<circle cx="208.7" cy="259" r="5" fill="#d29922"/>
+<text x="200.7" y="239" fill="#d29922" font-family="monospace" font-size="10" text-anchor="end">Branch Base: 4a2f81a</text>
+<text x="1036.2" y="255" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #130 (Project env)</text>
+<text x="1036.2" y="271" fill="#f0f6fc" font-family="sans-serif" font-size="11" font-weight="600">🚀 PR #133 (SA IAM + Schema load)</text>
+<rect x="30" y="375" width="1040" height="32" rx="4" fill="#161b22" stroke="#30363d"/>
+<text x="45" y="395" fill="#3fb950" font-family="monospace" font-size="12">✅ UAT Invariant Validated: FL006 and FL007 shared starting commit 4a2f81a and produced parallel PRs independently resolving overlapping step friction.</text>
+</svg>

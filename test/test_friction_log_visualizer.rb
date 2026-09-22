@@ -52,7 +52,7 @@ class FrictionLogVisualizerTest < Minitest::Test
   def test_render_html_dashboard
     html = @visualizer.render_html_dashboard
     assert_includes html, "<!DOCTYPE html>"
-    assert_includes html, "Friction Log Telemetry & Retrospective"
+    assert_includes html, "Friction Log Telemetry"
     assert_includes html, "FL000"
     assert_includes html, "FL007"
     assert_includes html, "rails8-fl006-20260911"

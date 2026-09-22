@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400">
+<defs>
+  <linearGradient id="active-grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#34a853"/>
+    <stop offset="100%" stop-color="#2bb24c"/>
+  </linearGradient>
+  <linearGradient id="active-grad-blue" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="100%" stop-color="#1a73e8"/>
+  </linearGradient>
+  <pattern id="pause-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="8" stroke="#d29922" stroke-width="2.5" opacity="0.8"/>
+  </pattern>
+</defs>
+
+<rect width="100%" height="100%" fill="#0d1117"/>
+<text x="30" y="40" fill="#f0f6fc" font-family="system-ui, sans-serif" font-size="22" font-weight="700">🐛 Bugs Uncovered &amp; Triage Volume across Iterations</text>
+<text x="30" y="64" fill="#8b949e" font-family="system-ui, sans-serif" font-size="13">Evolution of frictions logged and resolved per Friction Log run.</text>
+<line x1="100" y1="330.0" x2="960" y2="330.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="334.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">0</text>
+<line x1="100" y1="280.0" x2="960" y2="280.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="284.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">5</text>
+<line x1="100" y1="230.0" x2="960" y2="230.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="234.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">10</text>
+<line x1="100" y1="180.0" x2="960" y2="180.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="184.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">15</text>
+<line x1="100" y1="130.0" x2="960" y2="130.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="134.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">20</text>
+<line x1="100" y1="80.0" x2="960" y2="80.0" stroke="#30363d" stroke-dasharray="3,3"/>
+<text x="90" y="84.0" fill="#8b949e" font-family="monospace" font-size="11" text-anchor="end">25</text>
+<rect x="133.75" y="210.0" width="40" height="120.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="153.75" y="202.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">12</text>
+<text x="153.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL000</text>
+<rect x="241.25" y="240.0" width="40" height="90.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="261.25" y="232.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">9</text>
+<text x="261.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL001</text>
+<rect x="348.75" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="368.75" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="368.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL002</text>
+<rect x="456.25" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="476.25" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="476.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL003</text>
+<rect x="563.75" y="280.0" width="40" height="50.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="583.75" y="272.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">5</text>
+<text x="583.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL004</text>
+<rect x="671.25" y="270.0" width="40" height="60.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="691.25" y="262.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">6</text>
+<text x="691.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL005</text>
+<rect x="778.75" y="130.0" width="40" height="200.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="798.75" y="122.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">20</text>
+<text x="798.75" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL006</text>
+<rect x="886.25" y="290.0" width="40" height="40.0" rx="4" fill="#f85149" opacity="0.75"/>
+<text x="906.25" y="282.0" fill="#f85149" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">4</text>
+<text x="906.25" y="352" fill="#58a6ff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">FL007</text>
+<polyline points="153.8,210.0 261.3,240.0 368.8,290.0 476.3,290.0 583.8,280.0 691.3,270.0 798.8,130.0 906.3,290.0" fill="none" stroke="#d29922" stroke-width="2.5"/>
+<circle cx="153.8" cy="210.0" r="4" fill="#d29922"/>
+<circle cx="261.3" cy="240.0" r="4" fill="#d29922"/>
+<circle cx="368.8" cy="290.0" r="4" fill="#d29922"/>
+<circle cx="476.3" cy="290.0" r="4" fill="#d29922"/>
+<circle cx="583.8" cy="280.0" r="4" fill="#d29922"/>
+<circle cx="691.3" cy="270.0" r="4" fill="#d29922"/>
+<circle cx="798.8" cy="130.0" r="4" fill="#d29922"/>
+<circle cx="906.3" cy="290.0" r="4" fill="#d29922"/>
+</svg>
