@@ -22,9 +22,9 @@ Source of Truth: `conductor/tracks/fl_telemetry_20260916/spec.md`
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [b8099c8]
 
 ## Phase 3: UAT Concurrency Validation (FL006 vs FL007)
-- [ ] Task 3.1: Write UAT test asserting temporal overlap and dual PR generation between FL006 and FL007 (Red Phase)
-    - [ ] Create `test/workshop/fl_concurrency_uat_test.rb` asserting overlap of FL006 and FL007 runs and shared codebase ancestor commit.
-- [ ] Task 3.2: Implement dedicated concurrency inspector script and visual output (Green Phase)
+- [x] Task 3.1: Write UAT test asserting temporal overlap and dual PR generation between FL006 and FL007 (Red Phase) [bd505b6]
+    - [x] Create `test/test_fl_concurrency_uat.rb` asserting overlap of FL006 and FL007 runs and shared codebase ancestor commit.
+- [~] Task 3.2: Implement dedicated concurrency inspector script and visual output (Green Phase)
     - [ ] Create `workshop/bin/verify_fl_concurrency.rb` displaying detailed execution overlap, delta, and PR provenance.
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
