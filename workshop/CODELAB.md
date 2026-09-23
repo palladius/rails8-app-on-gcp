@@ -556,7 +556,9 @@ gcloud run deploy blog \
    gcloud storage ls -l -r gs://$GCS_BUCKET/
    ```
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud Storage Console showing uploaded image blobs safely stored in the private bucket gs://$GCS_BUCKET**
+Here is a list of uploaded blobs and media objects you might see on the [Google Cloud Storage Browser Console](https://console.cloud.google.com/storage/browser) in your **production** bucket (`gs://$GCS_BUCKET`):
+
+![Google Cloud Storage Console bucket details showing persistent image blobs](assets/images/gcs_bucket_details_prod.png)
 
 ### 5. ⚠️ The POLA Catch: Stuck Jobs Warning Banner
 
