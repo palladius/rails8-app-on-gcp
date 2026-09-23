@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.78] - 2026-09-23
+### Changed
+- 🎯 **Step 7 Clarity & Structure Refactor (FL100-84)**:
+  - Replaced bulky pipeline graphic with clean Mermaid architectural sequence diagram showing the asynchronous Solid Queue $\to$ Vertex AI $\to$ GCS $\to$ Turbo Streams pipeline.
+  - Clarified that Section 1 (NanoBanana Cover Generator) is already fully implemented and ready to test with zero code modifications (via Web UI or CLI runner).
+  - Clarified that Section 2 (Bilingual Podcastifier) is an intentional empty scaffold stub (`COMPLETE_ME`) designed for hands-on Antigravity pair programming.
+  - Marked Section 3 (The GCS Treasure Hunt) as strictly `[OPTIONAL]` and added an upfront `cloud-sql-proxy` CLI installation check.
+
 ## [0.2.77] - 2026-09-23
 ### Changed
 - 🍌 **NanoBanana Magic Mascot (FL100-83)**: Replaced outdated pixel-art mascot in Step 7 with high-res 3D Pixar-style Cosmic Wizard Banana casting glowing binary code and Ruby gems (`nano_banana_mascot.jpg`).

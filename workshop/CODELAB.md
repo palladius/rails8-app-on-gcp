@@ -909,37 +909,106 @@ just workshop-eval 6
 
 With Solid Queue running in a dedicated container and Google Cloud Storage active, we can unleash asynchronous Generative AI!
 
-### 1. The NanoBanana Vintage Cover Generator
+### 1. The NanoBanana Vintage Cover Generator (Ready-to-Use GenAI Pipeline)
 
-![NanoBanana AI Image Generation Pipeline](assets/images/nanobanana_ai_image_pipeline.jpg)
+Good news: **this functionality is already fully implemented in the codebase!** You don't need to write any code — your task here is to trigger and observe an asynchronous cloud GenAI pipeline in action.
 
-When an article is created without a cover image, `GenerateCoverImageJob` automatically triggers via Solid Queue:
-- It calls **Gemini 2.5 Flash Image / Imagen** on Vertex AI using **Application Default Credentials** (`roles/aiplatform.user`). Zero API keys required!
-- It generates a custom vintage 1960s Italian film poster (*"Locandina di un film 1960"*) with a cameo banana and a shiny ruby "8".
-- Test it: Create an article titled *"Serverless Architecture with Ruby on Rails"* and leave the cover image blank. Within seconds, the Solid Queue worker generates and attaches the poster!
+#### 🧠 How it Works Behind the Scenes
+- **Authentication:** Zero API keys required! It uses **Application Default Credentials** (`roles/aiplatform.user` on Vertex AI) automatically via the Cloud Run runtime service account. (Alternatively, if `GEMINI_API_KEY` is provided, it calls the Gemini API directly).
+- **The Pipeline:** When an article is created without a cover image, an `after_commit` callback enqueues `GenerateCoverImageJob` into **Solid Queue**.
+- **Model:** It prompts Google's multimodal model (**Gemini 2.5 Flash Image** / Imagen on Vertex AI) to generate an authentic vintage 1960s Italian film poster (*"Locandina di un film 1960"*) complete with a cameo banana and a shiny ruby "8".
+- **Dynamic Provenance Watermark:** Uses `libvips` to dynamically stamp a visual badge on the corner (colorful cloud stamp on GCS).
+- **Turbo Stream Hot-Swap:** When the image is attached, `Turbo::StreamsChannel.broadcast_refresh_to(post)` updates the reader's browser live without a manual page reload!
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor User as 👤 Reader / Author
+  participant Web as 🌐 Web (Puma)
+  participant DB as 🐘 Cloud SQL (Solid Queue)
+  participant Worker as ⚙️ Worker (Solid Queue)
+  participant Vertex as 🧠 Vertex AI (Gemini Flash / Imagen)
+  participant GCS as ☁️ Google Cloud Storage
+
+  User->>Web: POST /posts (Title & Body, No Cover)
+  Web->>DB: 1. Save Post & Enqueue GenerateCoverImageJob
+  Web-->>User: Redirect to Post (turbo_stream subscribed)
+
+  Worker->>DB: 2. Dequeue GenerateCoverImageJob
+  Worker->>Vertex: 3. Prompt for 1960s Italian Poster (ADC auth)
+  Vertex-->>Worker: 4. Raw Image Buffer
+  Worker->>Worker: 5. Stamp Provenance Watermark (libvips)
+  Worker->>GCS: 6. Attach Blob via ActiveStorage (IAM signBlob)
+  Worker->>Web: 7. Turbo::StreamsChannel.broadcast_refresh_to(post)
+  Web-->>User: ⚡ Live UI Hot-Swap: Poster magically appears!
+```
+
+#### 🧪 Try It Live!
+You can trigger it in two ways:
+- **Option A (Web UI):** Click **New post**, enter a title like *"Serverless Architecture with Ruby on Rails 8"*, write some content, and leave the cover image file input **empty**. Click **Create Post**.
+- **Option B (CLI Runner):** Run from your terminal:
+  ```bash
+  bin/rails runner 'Post.create!(title: "Serverless Rails on Google Cloud", body: "Exploring asynchronous AI pipelines with Solid Queue and NanoBanana!")'
+  ```
+
+Wait ~15–30 seconds: watch the Solid Queue worker logs in Cloud Run. The vintage poster will appear directly on your post!
 
 > 📸 **TODO(riccardo): add screenshot of a blog post with an AI-generated vintage 1960s Italian movie poster featuring a cameo banana and ruby 8**
 
-### 2. The Bilingual Podcastifier Quest (TTS Synthesis Exercise)
+---
 
-In this hands-on workshop exercise, you pair program with **Google Antigravity** to implement audio podcasts for your articles:
-- Ask Antigravity: *"Help me implement a PodcastifierJob that uses Google Cloud Text-to-Speech with voice 'it-IT-Wavenet-A' to generate an Italian audio overview and attach it via ActiveStorage!"*
-- Ensure your synthesizer specifies the canonical Italian voice: `voice: "it-IT-Wavenet-A"` and language code: `it-IT` using Application Default Credentials.
-- Add a **"🎙️ Generate Audio Podcast"** button to the post view and render an HTML5 `<audio controls>` player when attached.
-- When you click generate, Solid Queue executes the synthesis in the background without blocking web requests!
+### 2. The Bilingual Podcastifier Quest (Hands-On Antigravity Coding Exercise)
+
+⚠️ **Important Notice:** Unlike the Cover Generator above, **this feature is NOT yet implemented!** 
+
+If you open `blog/app/jobs/podcastifier_job.rb`, you will find an empty scaffold stub:
+```ruby
+class PodcastifierJob < ApplicationJob
+  queue_as :default
+
+  def perform(post_id)
+    # TODO(student): COMPLETE_ME — Pair program with Google Antigravity to implement
+    # Italian TTS podcast generation using voice 'it-IT-Wavenet-A' via Cloud TTS / ADC!
+  end
+end
+```
+
+Your mission in this hands-on exercise is to pair-program with **Google Antigravity** to complete this feature:
+1. **Prompt Antigravity:** 
+   > *"Help me implement PodcastifierJob in `app/jobs/podcastifier_job.rb`. It should fetch the Post, translate or synthesize an Italian audio overview using Google Cloud Text-to-Speech (voice 'it-IT-Wavenet-A' with language code 'it-IT' via ADC credentials), and attach the audio file to `post.podcast_audio_it` using ActiveStorage!"*
+2. **Add Player to View:** In `app/views/posts/show.html.erb`, add an HTML5 `<audio controls>` player when `@post.podcast_audio_it.attached?`.
+3. **Trigger Synthesis:** When saved, Solid Queue will execute the text-to-speech job asynchronously in the background.
 
 <!-- workshop-screenshot: id="step-7-podcastifier-ui" -->
 ![Podcastifier Bilingual UI with Dual Audio Players](assets/auto-screenshots/step-7-podcastifier-ui.png)
 
-> 🎧 **Listen to Real Podcastifier Outputs Generated via Cloud TTS:**
+> 🎧 **Sample Podcastifier Outputs:**
 > - 🇮🇹 [Italian Overview (`it-IT-Wavenet-A`)](assets/audio/podcastifier_italian_overview.mp3)
 > - 🇬🇧 [English Overview (`en-US-Wavenet-D`)](assets/audio/podcastifier_english_overview.mp3)
 
-> 💡 **Reference Implementation Branch:**
-> If you get stuck or want to inspect a complete reference solution, check out the dedicated branch:
-> [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier) (`git checkout solutions/podcastifier`).
+> 💡 **Need Help or Got Stuck?**
+> A complete, battle-tested reference solution is available on branch [`solutions/podcastifier`](https://github.com/palladius/rails8-app-on-gcp/tree/solutions/podcastifier). You can inspect it anytime with `git diff solutions/podcastifier`.
 
-### 3. 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
+---
+
+### 3. [OPTIONAL] 🏴‍☠️ The GCS Treasure Hunt (Console Blob Recovery)
+
+> ℹ️ **Prerequisite Check: Local `cloud-sql-proxy` CLI Required**
+> This optional exercise connects your local laptop directly to Google Cloud SQL via an encrypted mTLS tunnel.
+> Check if you have the CLI proxy installed:
+> ```bash
+> which cloud-sql-proxy
+> ```
+> - **If installed:** Proceed below!
+> - **If NOT installed and you want to do this quest:** Install it with:
+>   ```bash
+>   # Linux (x86_64)
+>   curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.0/cloud-sql-proxy.linux.amd64
+>   chmod +x /tmp/cloud-sql-proxy && sudo mv /tmp/cloud-sql-proxy /usr/local/bin/cloud-sql-proxy
+>   # macOS (Homebrew)
+>   brew install cloud-sql-proxy
+>   ```
+> - **Otherwise:** Feel free to skip to the Step 7 automated validation!
 
 Remember that photo you uploaded back in Step 4 before the container restart wiped out the ephemeral SQLite database? That image file is still sitting safely in your private GCS bucket as an "orphaned blob"!
 
