@@ -645,7 +645,8 @@ echo -n "$DB_PASSWORD" | gcloud secrets create rails-db-password --data-file=- 2
   echo -n "$DB_PASSWORD" | gcloud secrets versions add rails-db-password --data-file=-
 ```
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud Secret Manager Console listing rails-master-key and rails-db-password with Secret Accessor role bindings**
+<!-- TODO this should be automateable! -->
+![Google Cloud Secret Manager Console listing configured application secrets](assets/images/secret_manager_secrets_list.png)
 
 ### 3. Granting Secret Accessor Permissions
 
