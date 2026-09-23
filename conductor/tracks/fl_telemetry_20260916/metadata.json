@@ -2,7 +2,7 @@
   "id": "fl_telemetry_20260916",
   "title": "Friction Log Telemetry & Data Structure (FL0–FL7 Timeline, Metrics & Visualizations)",
   "type": "feature",
-  "status": "new",
+  "status": "complete",
   "created_at": "2026-09-16T12:00:00Z",
   "updated_at": "2026-09-16T12:00:00Z",
   "issue_url": "https://github.com/palladius/rails8-app-on-gcp/issues/134",
