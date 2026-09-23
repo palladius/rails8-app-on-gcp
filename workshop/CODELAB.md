@@ -566,10 +566,9 @@ When you uploaded the image, ActiveStorage enqueued an analysis job (`ActiveStor
 
 However, Cloud Run is currently running only **one single web container** (`puma`). In Rails 8, **Solid Queue** stores background jobs in the database, but nobody is executing `bundle exec rails solid_queue:start`!
 
-Look at the top of your blog page: you will see a bright warning banner rendered by `blog/app/views/layouts/_check_stuck_jobs.html.erb`:
+Look at the top of your blog page: you will see a bright warning banner rendered by `blog/app/views/layouts/_check_stuck_jobs.html.erb`.
 
-> ⚠️ **POLA Warning: Background Jobs Queued with No Worker!**
-> *"Pending jobs detected in Solid Queue, but no worker process is running. In a single-container deployment, background workers compete with or starve web requests. Ask Antigravity why background jobs require dedicated sidecar containers!"*
+We are going to solve this properly in **Step 6**, when we graduate to a production-grade multi-container sidecar architecture with a dedicated `worker` container running Solid Queue independently from web traffic!
 
 <!-- workshop-screenshot: id="step-4-gcs-stuck-jobs-warning" -->
 ![GCS ActiveStorage with Stuck Jobs Warning Banner](assets/auto-screenshots/step-4-gcs-stuck-jobs-warning.png)
