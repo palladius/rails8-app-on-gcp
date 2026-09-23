@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.81] - 2026-09-23
+### Added
+- 🌍 **Step 0 Antigravity Multilingual Kickoff Prompt (Step 0 §4)**:
+  - Added copy-pasteable pairing prompt under Step 0 Section 4 instructing attendees how to bootstrap their pairing session in their native language (🇬🇧 EN, 🇮🇹 IT, 🇫🇷 FR, 🇧🇷 BR_PT, 🇩🇪 DE) pointing directly to the landing page README.
+
 ## [0.2.80] - 2026-09-23
 ### Changed
 - 📐 **Diagram Clarity & Option Title Sync (FL100-86)**:

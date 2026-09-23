@@ -113,6 +113,17 @@ cd rails8-app-on-gcp
 
 Open this directory in **Google Antigravity**. Antigravity will automatically inspect the repository, read `AGENTS.md`, and stand by as your pair programmer.
 
+Once inside, open the prompt box and kick off your pairing session with this prompt:
+
+```text
+I am attending the Rails 8 on Google Cloud workshop.
+Please inspect:
+https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md
+and guide me step-by-step through the workshop in [YOUR LANGUAGE]!
+```
+
+Antigravity will ingest the repository directives, guide you step-by-step through the codelab, and speak with you in your favorite language (🇬🇧 English, 🇮🇹 Italian, 🇫🇷 French, 🇧🇷 Portuguese, 🇩🇪 German)!
+
 ### 5. 🪫 If Antigravity Runs Out of Free Credits
 
 > ⚠️ **The Cloud credits you just redeemed do NOT refill Antigravity.** They are two separate billing surfaces: Antigravity's quota sits on **Google AI plans** (Google One), while vouchers and Cloud credits land on a **Cloud Billing account**. Linking a billing account to your GCP project will not give you a single extra Antigravity prompt.
