@@ -454,7 +454,7 @@ just workshop-eval 3
 - Heavy background workers belong in a dedicated **sidecar container** (Step 6).
 
 
-## Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+## Step 4: Deploy 3 — GCS Persistent Storage & POLA Warning
 
 *Duration: 15min*
 
@@ -499,12 +499,6 @@ google:
   <<: *google_prod
 ```
 
-> 💡 **Design Decision — Why `iam: true` instead of `public: true`?**
-> Making a bucket public (`allUsers:objectViewer`) is a hazardous security anti-pattern. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
-
-> 💡 **Design Decision — Why no `GCS_BUCKET` env var?**
-> The bucket name follows a deterministic convention: `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`. If you know your project ID, you know your bucket. The Terraform provisioner uses the same convention — zero extra configuration needed.
-
 ![GCS IAM Signing Architecture](assets/images/gcs_iam_signing_diagram.jpg)
 
 ### 2. Granting IAM Storage & Signing Permissions
@@ -527,7 +521,7 @@ gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
   --role="roles/iam.serviceAccountTokenCreator"
 ```
 
-### 3. Deploy 2 to Cloud Run with GCS Attached
+### 3. Deploy 3 to Cloud Run with GCS Attached
 
 Re-deploy with GCS enabled. Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (master key, IAP config, etc.):
 
@@ -672,7 +666,7 @@ just workshop-eval 5
 ```
 
 
-## Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
+## Step 6: Deploy 4 — Enterprise Multi-Container Sidecars (The Gold Standard)
 
 *Duration: 20min*
 
@@ -757,7 +751,7 @@ gcloud run jobs update rails-migrate \
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
 
-### 4. Deploy 3: Deploying Multi-Container Cloud Run
+### 4. Deploy 4: Deploying Multi-Container Cloud Run
 
 Deploy the full multi-container service:
 
