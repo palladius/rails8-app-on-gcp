@@ -841,7 +841,7 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 
 
 
-### 4. Deploy 4: Deploying Multi-Container Cloud Run
+### 4. Fourth Deploy: Deploying Multi-Container Cloud Run
 
 Deploy the full multi-container service:
 
