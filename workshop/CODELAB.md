@@ -861,16 +861,25 @@ gcloud run deploy blog \
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**
 
-### 5. ✨ The Wow Moment & Telemetry Validation
+### 5. ✨ The Wow Moment: Zero Warnings & Full Cloud Persistence!
+
+Take a deep breath and marvel at your screen: **all warning banners have vanished!** 🪄
+
+The application is now officially **Production-Grade & Cloud-Native**:
+- Backed by managed **Google Cloud SQL** (PostgreSQL) via secure mTLS tunneling.
+- Media safely stored in private **Google Cloud Storage** with IAM blob signing.
+- Zero ephemeral storage warnings and zero stuck jobs alerts.
+
+![Production Blog on Cloud Run with Zero Warnings and Cloud Persistent Post](assets/images/step6_cloud_persistent_clean_ui.png)
+*The production Rails 8 blog: pristine UI, zero warning banners, and persistent Cloud SQL state!*
 
 Open your Cloud Run URL:
 1. Look at the telemetry badges:
-   - **`[CLOUD PERSISTENT 🐘 ☁️]`** turns emerald green!
-   - The stuck jobs warning banner is **gone**, because the `worker` container is actively draining Solid Queue in the background!
+   - **`[CLOUD PERSISTENT 🐘 ☁️]`** is verified in your database seed!
+   - Both **Google Cloud Run** and **GCS** badges in the footer shine green!
+   - The stuck jobs warning banner is **completely gone**!
 2. Create blog posts and comments.
 3. Restart or redeploy as many times as you like: your data, posts, comments, and assets survive forever in Cloud SQL and GCS!
-
-> 📸 **TODO(riccardo): add screenshot of the production blog showing the emerald green [CLOUD PERSISTENT 🐘 ☁️] badge with stuck jobs banner gone and permanent articles**
 
 ### 6. Automated Step 6 Validation
 

@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.73] - 2026-09-23
+### Added
+- FL100-79: Embedded real screenshot `step6_cloud_persistent_clean_ui.png` and celebratory text into Step 6 Section 5 (*The Wow Moment: Zero Warnings & Full Cloud Persistence!*). Removed obsolete TODO.
+
 ## [0.2.54] - 2026-09-23
 ### Added
 - FL100-55: Curiosity Box "Getting a Live Rails Console on Cloud Run" in Step 8
