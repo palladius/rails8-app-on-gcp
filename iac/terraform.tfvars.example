@@ -19,11 +19,8 @@ developers = [
 # Optional: Allowed Google accounts for Identity-Aware Proxy (IAP)
 # NOTE: Must be valid Google or Google Workspace accounts!
 # iap_allowed_users = [
-#   "ricc@google.com",
-#   "emiliano.dellacasa@gmail.com",
-#   "palladiusbonton@gmail.com",
-#   "riccardo.and.kate@gmail.com",
-#   "riccardo.carlesso@gmail.com",
+#   "admin@example.com",
+#   "developer@example.com",
 # ]
 
 

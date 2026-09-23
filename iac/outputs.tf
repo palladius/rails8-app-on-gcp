@@ -96,3 +96,13 @@ output "region" {
   description = "The GCP region"
   value       = var.region
 }
+
+output "cloud_sql_ip" {
+  description = "The public IP address of the Cloud SQL PostgreSQL instance"
+  value       = google_sql_database_instance.main.public_ip_address
+}
+
+output "cloud_sql_connection_name" {
+  description = "The Cloud SQL connection name (PROJECT:REGION:INSTANCE)"
+  value       = google_sql_database_instance.main.connection_name
+}

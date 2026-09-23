@@ -91,3 +91,9 @@
 - [x] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
 *Link: [tracks/hive_compact_view_20260911/index.md](tracks/hive_compact_view_20260911/index.md)*
 
+---
+
+- [ ] **Track: Harden Access to Cloud Run (Milestone 2: Post-Modena - Issue #136)**
+*Link: [tracks/harden_cloud_run_access_20260922/index.md](tracks/harden_cloud_run_access_20260922/index.md)*
+
+

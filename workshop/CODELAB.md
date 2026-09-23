@@ -344,9 +344,12 @@ just workshop-rewind 1
 
 ### 2. Deploying Single-Container Puma to Cloud Run
 
-Deploy directly from source code to Cloud Run. Google Cloud automatically detects Rails 8, builds the container image with Google Cloud Buildpacks/Docker, and provisions a managed serverless service:
+Deploy directly from source code to Cloud Run. Modern Rails 8 automatically generates an official, production-ready `Dockerfile` out of the box (with multi-stage builds, jemalloc, and non-root security). When you deploy from the `blog/` folder, Google Cloud Build detects this native `Dockerfile` directly and provisions a managed serverless service:
 
 ```bash
+# Ensure you are inside the Rails application directory
+cd blog
+
 # Ensure default region is set
 export GOOGLE_CLOUD_REGION="europe-west1"
 
@@ -358,7 +361,16 @@ gcloud run deploy blog \
   --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1
 ```
 
-> 🧯 **`PERMISSION_DENIED: Build failed because the default service account is missing required IAM permissions`?** Two different causes wear the same error:
+You should see progress output similar to this:
+
+![gcloud run deploy building and deploying container](assets/images/gcloud_run_deploy_in_progress.png)
+
+⏳ *This should take a couple of minutes while Cloud Build packages your container and provisions the Cloud Run revision.*
+
+
+#### 🧯 Troubleshooting & Common Caveats
+
+> **`PERMISSION_DENIED: Build failed because the default service account is missing required IAM permissions`?** Two different causes wear the same error:
 >
 > 1. **gcloud just enabled an API for you.** If the deploy printed `The following APIs are not enabled ... cloudbuild.googleapis.com` and you answered `Y`, the build may have started before the new permissions finished propagating — gcloud's own prompt warns "this will take a few minutes". **Wait a minute and re-run the exact same command**; it usually succeeds. Step 1's `terraform apply` normally enables this API for you, so you should not see the prompt at all.
 > 2. **The Default Compute SA really is missing roles.** Modern GCP projects enforce least privilege on it, which breaks source deploys. Fix it with:
@@ -366,6 +378,7 @@ gcloud run deploy blog \
 >    just project-status   # grants storage.admin, logging.logWriter, artifactregistry.writer, cloudbuild.builds.builder
 >    ```
 >    `just workshop-test` also reports this now, so it is worth re-running if the deploy keeps failing.
+
 
 During deployment:
 1. Cloud Run builds your Rails container image.
@@ -377,7 +390,11 @@ During deployment:
 Open the generated Cloud Run URL in your browser!
 
 1. Your modern Rails 8 application is live on Google Cloud!
-2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and `APP_ADMIN_PASSWORD`).
+2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and `APP_ADMIN_PASSWORD`). If you find no login button, click on **"New Post"** and it will prompt for user and password first:
+
+   ![Rails 8 Sign In page with ephemeral telemetry banners](assets/images/sign_in_page_ephemeral.png)
+
+
 3. Click **"New Post"**, write an article titled *"My First Cloud Run Post"*, attach a picture, and click **Create Post**.
 4. Your post is published with full formatting, and your image is rendered.
 5. Notice the visual telemetry:
@@ -388,19 +405,22 @@ Open the generated Cloud Run URL in your browser!
 > If you are online and your proctor is showing the leaderboard, and you want to join it, add your Cloud Run URL here:
 > 👉 [**Register your Cloud Run on the Leaderboard**](https://docs.google.com/forms/d/e/1FAIpQLSf9iN_m8O5LVMeo7Z80OTo3t0IKv_UrOgEndZDmzdB5qwBa2A/viewform)
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console showing the 'blog' service details and the live https://blog-xxx.a.run.app public URL**
+![Google Cloud Run Console blog service revision details](assets/images/cloud_run_blog_service_details.png)
+
 
 ### 4. 💥 The Catch: The Stateless Shock & The "Puma Workaround" Trap
 
 Cloud Run is a **stateless, serverless platform**. When web traffic drops to zero, Cloud Run scales down to zero container instances to save money. When a new HTTP request arrives or a new container revision is deployed, Cloud Run starts a brand new, clean container image.
 
-#### The First Hint: Stuck Jobs Banner
+#### Stuck Jobs Banner
 When you create a post or attach an image in a single-container deployment, Rails enqueues ActiveJob tasks (like image dimension analysis or metadata indexing). But since nobody is running a background worker, you will see the warning banner:
-> ⚠️ **Notice: background jobs currently pending execution.**
-> *Solid Queue worker is not running in this single-container deployment.*
+
+![Notice: 8 background jobs currently pending execution](assets/images/stuck_jobs_alert_banner.png)
+
 
 #### The Tempting Fix: Running Solid Queue inside Puma
-A clever developer might say: *"Wait! In Rails 8, Puma has a plugin to run Solid Queue directly inside the web server process! Let's just turn on `SOLID_QUEUE_IN_PUMA=true`!"*
+A clever developer might say: *"Wait! Rails 8 lets us run Solid Queue directly inside the Puma web server process by enabling the `SOLID_QUEUE_IN_PUMA=true` environment variable!"*
+
 
 Let's test this workaround on Cloud Run:
 
@@ -418,12 +438,7 @@ Now, go back to your browser and **refresh the page**:
 2. **The Cold Shower (The Catch!):**
    - Because Cloud Run deployed a new revision, the previous container instance was replaced!
    - The article you wrote and the SQLite database file on disk **were completely wiped out**!
-   - You see the pedagogical in-app alert banner:
-     > ⚠️ **`[EPHEMERAL CONTAINER RESET DETECTED]`**
-     > *"Container restarted! Ephemeral SQLite database and local disk uploads were lost. Ask Antigravity why serverless containers require external persistence!"*
 3. **The Architectural Lesson:** Running background workers inside Puma consumes precious web thread CPU/RAM, and *still does not solve persistence*.
-
-> 📸 **TODO(riccardo): add screenshot of the live Cloud Run blog showing the [EPHEMERAL CONTAINER RESET DETECTED] alert banner after container restart**
 
 ### 5. Automated Step 3 Validation
 
@@ -872,7 +887,7 @@ Now that you have mastered the canonical reference architecture, choose your gra
      iap_allowed_users = [var.google_cloud_account]
      ```
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud Identity-Aware Proxy (IAP) toggle and OAuth access screen**
+![Login recognized by IAP banner](assets/images/iap_login_banner.png)
 
 ---
 

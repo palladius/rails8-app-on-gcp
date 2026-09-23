@@ -1,5 +1,15 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.53] - 2026-09-23
+### Changed
+- 🧹 **Pruned Ephemeral Reset Banner (FL100-52)**:
+  - Removed unneeded `[EPHEMERAL CONTAINER RESET DETECTED]` alert text and TODO placeholder from `CODELAB.md` and DevSite `index.lab.md`. The Stateless Shock is communicated directly by the empty database and wiped post.
+- 🐘 **Solid Queue In Puma Telemetry & Memory Stability (FL100-53)**:
+  - Exposed `in_puma` in `/status.json` and added `SOLID_QUEUE_IN_PUMA` to `safe_env_inspection`.
+  - Documented 512 MiB -> 1Gi memory requirement when running Puma + Solid Queue worker in single container.
+- 🛡️ **IAP Screenshot in Step 8 (FL100-54)**:
+  - Added real screenshot `iap_login_banner.png` showing active Google IAP authentication banner in Quest 1.
+
 ## [0.2.52] - 2026-09-22
 ### Added
 - ⚙️ **Added `just gcloud-config` Recipe**:
