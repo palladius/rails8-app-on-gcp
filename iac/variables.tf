@@ -9,6 +9,12 @@ variable "region" {
   default     = "europe-west1"
 }
 
+variable "admin_account" {
+  description = "The primary Google account for admin tasks and default blog administrator email."
+  type        = string
+  default     = ""
+}
+
 variable "developers" {
   description = "List of developer identities (e.g. 'user:you@gmail.com') allowed to sign GCS blob URLs locally via IAM signBlob."
   type        = list(string)
@@ -21,16 +27,16 @@ variable "enable_iap" {
   default     = false
 }
 
+variable "allow_unauthenticated" {
+  description = "Whether to allow public unauthenticated access (allUsers) to Cloud Run. Defaults to false to avoid Org Policy violations."
+  type        = bool
+  default     = false
+}
+
 variable "iap_allowed_users" {
-  description = "List of Google accounts allowed to access the Cloud Run app through IAP."
+  description = "List of Google accounts allowed to access the Cloud Run app through IAP or as authenticated invokers."
   type        = list(string)
-  default = [
-    "ricc@google.com",
-    "emiliano.dellacasa@gmail.com",
-    "palladiusbonton@gmail.com",
-    "riccardo.and.kate@gmail.com",
-    "riccardo.carlesso@gmail.com"
-  ]
+  default     = []
 }
 
 variable "iap_client_id" {

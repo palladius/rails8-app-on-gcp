@@ -5,22 +5,18 @@ services:
       dockerfile: Dockerfile
     x-google-cloudrun:
       ingress-container: true
-      min-instances: 1
-      startup-probe:
-        http-get:
-          path: /up
-          port: 8080
-        period-seconds: 10
-        timeout-seconds: 5
-        failure-threshold: 30
-        initial-delay-seconds: 5
     environment:
       RAILS_ENV: production
-      PORT: "8080"
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GCS_BUCKET: ${GCS_BUCKET}
+      ACTIVE_STORAGE_SERVICE: ${ACTIVE_STORAGE_SERVICE:-google}
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
       DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     ports:
       - "8080:8080"
@@ -37,7 +33,13 @@ services:
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GCS_BUCKET: ${GCS_BUCKET}
+      ACTIVE_STORAGE_SERVICE: ${ACTIVE_STORAGE_SERVICE:-google}
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
       DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
     depends_on:
       - cloudsql-proxy

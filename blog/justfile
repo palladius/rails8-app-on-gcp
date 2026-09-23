@@ -1,9 +1,15 @@
+set dotenv-load := true
+
 default:
     @just --list
 
 install:
     bundle install
     bin/rails db:prepare
+    bin/rails db:seed
+
+# seed the database using admin email from .env
+seed:
     bin/rails db:seed
 
 dev:

@@ -1,5 +1,71 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.80] - 2026-09-23
+### Changed
+- 📐 **Diagram Clarity & Option Title Sync (FL100-86)**:
+  - Replaced squished/unreadable raw Mermaid block in Step 7 with a high-resolution, crisp standalone PNG image (`nanobanana_sequence_diagram.png`) while keeping the Mermaid source code preserved inside a clean collapsible `<details>` element.
+  - Synchronized post title in Option B to `"Serverless Architecture with Ruby on Rails 8"`, matching Option A and the expected AI-generated vintage poster screenshot prompt.
+
+## [0.2.79] - 2026-09-23
+### Changed
+- 🍌 **Mascot Placement (FL100-85)**: Relocated `nano_banana_mascot.jpg` directly under subsection *1. The NanoBanana Vintage Cover Generator* for tighter visual coherence.
+
+## [0.2.78] - 2026-09-23
+### Changed
+- 🎯 **Step 7 Clarity & Structure Refactor (FL100-84)**:
+  - Replaced bulky pipeline graphic with clean Mermaid architectural sequence diagram showing the asynchronous Solid Queue $\to$ Vertex AI $\to$ GCS $\to$ Turbo Streams pipeline.
+  - Clarified that Section 1 (NanoBanana Cover Generator) is already fully implemented and ready to test with zero code modifications (via Web UI or CLI runner).
+  - Clarified that Section 2 (Bilingual Podcastifier) is an intentional empty scaffold stub (`COMPLETE_ME`) designed for hands-on Antigravity pair programming.
+  - Marked Section 3 (The GCS Treasure Hunt) as strictly `[OPTIONAL]` and added an upfront `cloud-sql-proxy` CLI installation check.
+
+## [0.2.77] - 2026-09-23
+### Changed
+- 🍌 **NanoBanana Magic Mascot (FL100-83)**: Replaced outdated pixel-art mascot in Step 7 with high-res 3D Pixar-style Cosmic Wizard Banana casting glowing binary code and Ruby gems (`nano_banana_mascot.jpg`).
+
+## [0.2.76] - 2026-09-23
+### Added
+- FL100-82: Added explanatory note in Step 6 regarding the Google Cloud Console UI glitch that labels `cloudsql-proxy` as ingress container, linking to GitHub Issue #149. Updated cropped screenshot.
+
+## [0.2.75] - 2026-09-23
+### Added
+- FL100-81: Embedded real screenshot `step6_cloud_run_three_containers.png` showing all 3 sidecar containers (`cloudsql-proxy`, `web`, `worker`) in the Google Cloud Run Console Containers tab. Replaced the last remaining Step 6 TODO.
+
+## [0.2.74] - 2026-09-23
+### Changed
+- 🏛️ **Constitution Principle 10 & Multi-Container Cloud Run (FL100-80)**:
+  - Ratified Constitution Principle 10 mandating multi-container sidecar production deployment via `compose.prod.yaml` on Cloud Run.
+  - Removed reserved `PORT` environment variable from `blog/compose.prod.yaml` that blocked Cloud Run deployment.
+  - Added GCS and 4-database URL environment bindings to both `web` and `worker` in `compose.prod.yaml`.
+  - Updated Step 6 Section 4 in `CODELAB.md` to deploy directly via `gcloud run compose up compose.prod.yaml` with self-healing secret fallbacks.
+  - Updated `rails-migrate` job caption and hidden deep RFC 3986 callout behind HTML comments.
+
+## [0.2.73] - 2026-09-23
+### Added
+- FL100-79: Embedded real screenshot `step6_cloud_persistent_clean_ui.png` and celebratory text into Step 6 Section 5 (*The Wow Moment: Zero Warnings & Full Cloud Persistence!*). Removed obsolete TODO.
+
+## [0.2.54] - 2026-09-23
+### Added
+- FL100-55: Curiosity Box "Getting a Live Rails Console on Cloud Run" in Step 8
+- FL100-56: Fixed RBENV_VERSION=3.4.5 missing in skeleton.yaml step 4 shell eval (was causing workshop-eval 4 to always fail with GemNotFound)
+
+### Fixed
+- workshop/skeleton.yaml: step-4-shell-stuck-jobs-test now uses `RBENV_VERSION=3.4.5 bundle exec rails test` instead of bare `bin/rails test`
+
+## [0.2.53] - 2026-09-23
+### Changed
+- 🧹 **Pruned Ephemeral Reset Banner (FL100-52)**:
+  - Removed unneeded `[EPHEMERAL CONTAINER RESET DETECTED]` alert text and TODO placeholder from `CODELAB.md` and DevSite `index.lab.md`. The Stateless Shock is communicated directly by the empty database and wiped post.
+- 🐘 **Solid Queue In Puma Telemetry & Memory Stability (FL100-53)**:
+  - Exposed `in_puma` in `/status.json` and added `SOLID_QUEUE_IN_PUMA` to `safe_env_inspection`.
+  - Documented 512 MiB -> 1Gi memory requirement when running Puma + Solid Queue worker in single container.
+- 🛡️ **IAP Screenshot in Step 8 (FL100-54)**:
+  - Added real screenshot `iap_login_banner.png` showing active Google IAP authentication banner in Quest 1.
+
+## [0.2.52] - 2026-09-22
+### Added
+- ⚙️ **Added `just gcloud-config` Recipe**:
+  - Added declarative `gcloud-config` task to `justfile` that idempotently creates or activates the target gcloud configuration profile and syncs account, project, region, and disabled impersonation from `.env` or defaults.
+
 ## [0.2.51] - 2026-09-16
 ### Fixed
 - 🔴 **Default Compute SA Roles in Terraform (FL007-02)**:

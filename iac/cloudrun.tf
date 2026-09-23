@@ -122,7 +122,7 @@ resource "google_cloud_run_v2_service" "rails_app" {
 
       env {
         name  = "GOOGLE_CLOUD_ACCOUNT"
-        value = length(var.developers) > 0 ? replace(var.developers[0], "user:", "") : "rubycon.italy@gmail.com"
+        value = var.admin_account != "" ? var.admin_account : (length(var.developers) > 0 ? replace(var.developers[0], "user:", "") : "admin@example.com")
       }
 
       env {
@@ -158,10 +158,42 @@ resource "google_cloud_run_v2_service" "rails_app" {
   ]
 }
 
+# ==============================================================================
+# 🔐 Cloud Run Access Architecture:
+# ------------------------------------------------------------------------------
+# 👉 WORKSHOP MODE (Default):
+#    We grant 'roles/run.invoker' to specific authenticated accounts in
+#    'var.iap_allowed_users'. This avoids breaking under corporate Org Policies
+#    (e.g., constraints/iam.allowedPolicyMemberDomains blocking allUsers).
+#
+# 👉 OPTIONAL PUBLIC MODE:
+#    Set 'allow_unauthenticated = true' if running in a personal unmanaged GCP
+#    project where public unauthenticated web access is desired.
+#
+# 👉 PRODUCTION HARDENED ZERO-TRUST MODE (Step 8):
+#    For enterprise security, enable IAP by setting 'enable_iap = true' (iac/iap.tf).
+#    This routes all traffic through an HTTPS Application Load Balancer protected
+#    by Identity-Aware Proxy (IAP) and OAuth2 consent, keeping Cloud Run ingress
+#    restricted to internal-and-cloud-load-balancing only.
+# ==============================================================================
+
+# Public access (only if explicitly enabled and not blocked by Org Policy)
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
+  count    = var.allow_unauthenticated ? 1 : 0
   project  = google_cloud_run_v2_service.rails_app.project
   location = google_cloud_run_v2_service.rails_app.location
   name     = google_cloud_run_v2_service.rails_app.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+# Authenticated invoker access for workshop attendees (safe under Org Policy)
+resource "google_cloud_run_v2_service_iam_member" "authenticated_invokers" {
+  for_each = toset(var.iap_allowed_users)
+  project  = google_cloud_run_v2_service.rails_app.project
+  location = google_cloud_run_v2_service.rails_app.location
+  name     = google_cloud_run_v2_service.rails_app.name
+  role     = "roles/run.invoker"
+  member   = "user:${each.value}"
+}
+

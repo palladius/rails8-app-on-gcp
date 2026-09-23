@@ -9,10 +9,11 @@ module IapAuthenticatable
 
   def authenticate_via_iap
     raw_header = request.headers["X-Goog-Authenticated-User-Email"]
-    # Allow local/test simulation via ENV
-    if raw_header.blank? && (Rails.env.development? || Rails.env.test?) && ENV["IAP_MOCK_EMAIL"].present?
+    # Allow local/test/proxy simulation via ENV
+    if raw_header.blank? && ENV["IAP_MOCK_EMAIL"].present?
       raw_header = ENV["IAP_MOCK_EMAIL"]
     end
+
     return if raw_header.blank?
 
     # IAP sends format: 'accounts.google.com:user@gmail.com' or raw 'user@gmail.com'

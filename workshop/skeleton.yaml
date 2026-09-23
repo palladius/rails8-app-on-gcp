@@ -66,7 +66,7 @@ steps:
       - id: "step-1-shell-diagnostics"
         type: "shell"
         description: "Run automated pre-flight workshop diagnostics"
-        command: "ruby test/test_workshop_diagnostics.rb"
+        command: "ruby bin/workshop_diagnostics.rb"
         expect_exit: 0
       - id: "step-1-ruby-terraform-config"
         type: "ruby"
@@ -189,7 +189,7 @@ steps:
       - id: "step-4-shell-stuck-jobs-test"
         type: "shell"
         description: "Verify integration test for stuck jobs banner passes"
-        command: "cd blog && bin/rails test test/integration/stuck_jobs_warning_test.rb"
+        command: "cd blog && RBENV_VERSION=3.4.5 bundle exec rails test test/integration/stuck_jobs_warning_test.rb"
         expect_exit: 0
     screenshots:
       - id: "step-4-gcs-stuck-jobs-warning"
@@ -271,11 +271,11 @@ steps:
   - id: "step-6"
     number: 6
     title: "Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)"
-    description: "Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar."
+    description: "Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar via compose.prod.yaml."
     pseudocode: |
       just workshop-restore-gold
-      gcloud run deploy blog --source . # multi-container compose.prod.yaml
-      bin/rails db:migrate
+      gcloud run jobs execute rails-migrate --wait
+      gcloud alpha run compose up compose.prod.yaml
     prerequisites:
       - "Step 5 completed"
       - "Cloud SQL and Secret Manager configured"

@@ -258,7 +258,8 @@ elsif !master_key_env.to_s.strip.empty?
   puts "✅ RAILS_MASTER_KEY configured in environment".green
 else
   puts "⚠️  [WARNING] Neither config/master.key nor RAILS_MASTER_KEY found!".yellow
-  puts "   👉 If starting fresh, run: cd blog && bin/rails credentials:edit"
+  puts "   ℹ️  Normal for Step 0! Only needed later in Step 5 (Secret Manager)."
+  puts "   👉 To generate when ready: cd blog && bundle install && bin/rails credentials:edit"
   warnings_count += 1
 end
 

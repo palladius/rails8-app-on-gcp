@@ -22,7 +22,8 @@ Rails.application.configure do
   # config.asset_host = "http://assets.example.com"
 
   # Store uploaded files on the local file system or cloud (see config/storage.yml for options).
-  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "google_prod").to_sym
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
+
 
   # Serve blobs via proxy instead of signed URL redirect.
   # Cloud Run Workload Identity can't sign GCS URLs (no private key),
@@ -100,4 +101,11 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Allow local proxy development (gcloud run services proxy / port forwarding)
+  # without CSRF origin mismatch 422 errors
+  if ENV["ALLOW_LOCAL_PROXY_CSRF"] == "true"
+    config.action_controller.forgery_protection_origin_check = false
+  end
 end
+

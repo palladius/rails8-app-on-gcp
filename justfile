@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 # default recipe
 default:
     @just --list
@@ -157,16 +159,43 @@ project-status:
 cloud-run-status url="":
     @./bin/cloud_run_status.sh {{url}}
 
+# seed the database using admin email from .env
 seed:
-	cd blog && rake db:seed
+    cd blog && just seed
+
+# configure gcloud CLI with project, region, and account from .env
+gcloud-config:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f .env ]; then
+        set -a && . ./.env && set +a
+    fi
+    CONFIG_NAME="${GCLOUD_CONFIG:-fl100-rails8}"
+    PROJECT="${GCP_PROJECT_ID:-${PROJECT_ID:-rails8-fl-20260907b-xm8ko4}}"
+    REGION="${GCP_REGION:-${REGION:-europe-west1}}"
+    ACCOUNT="${GCP_ACCOUNT:-${ACCOUNT:-ricc@google.com}}"
+    echo "⚙️ Configuring gcloud profile [${CONFIG_NAME}]..."
+    gcloud config configurations create "${CONFIG_NAME}" 2>/dev/null || gcloud config configurations activate "${CONFIG_NAME}"
+    echo "  👤 Account: ${ACCOUNT}"
+    gcloud config set account "${ACCOUNT}"
+    echo "  📦 Project: ${PROJECT}"
+    gcloud config set project "${PROJECT}"
+    echo "  🌍 Region: ${REGION}"
+    gcloud config set compute/region "${REGION}"
+    gcloud config set auth/impersonate_service_account ""
+    echo "✅ gcloud profile [${CONFIG_NAME}] configured and active!"
 
 # check the status of conductor tracks
 conductor-status:
 	./conductor/bin/conductor-inspector --all --short
 
-# apply terraform changes
+# create GCS bucket for Terraform remote state idempotently
+create-tfstate-bucket:
+	iac/bin/create-tfstate-bucket.sh
+
+# initialize and apply terraform changes with remote state backend
 terraform-apply:
-	cd iac && terraform apply
+	iac/bin/terraform-apply.sh
 
 # compile workshop/SKELETON.md from workshop/skeleton.yaml
 build-skeleton:

@@ -157,15 +157,15 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 ---
 
 ### Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
-- **`description`**: Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar.
+- **`description`**: Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar via compose.prod.yaml.
 - **`prerequisites`**:
   - Step 5 completed
   - Cloud SQL and Secret Manager configured
 - **`pseudocode`**:
   ```bash
   just workshop-restore-gold
-  gcloud run deploy blog --source . # multi-container compose.prod.yaml
-  bin/rails db:migrate
+  gcloud run jobs execute rails-migrate --wait
+  gcloud alpha run compose up compose.prod.yaml
   ```
 - **`postrequisites`**:
   - Production-grade multi-container sidecar architecture running serverlessly on Cloud Run
