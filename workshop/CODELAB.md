@@ -547,7 +547,7 @@ gcloud run deploy blog \
 3. Look at the bottom-right corner of the image:
    - The 🏠 stamp is gone!
    - It is replaced by the colorful **Cloud GCS Stamp** (`nanobanana_stamp_cloud.png`).
-4. Force another container restart:
+4. Force another container restart (which should trigger a fourth revision):
    ```bash
    gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars RESTART_TRIGGER=$(date +%s)
    ```
