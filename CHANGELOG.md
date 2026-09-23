@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.82] - 2026-09-23
+### Changed
+- 🔗 **Documentation & Codelab Link Refresh**:
+  - Removed deprecated ephemeral dev/prod Cloud Run links from root `README.md`.
+  - Promoted the official Google Codelab ([codelabs.developers.google.com/codelabs/rails8-on-google-cloud](https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0)) to top prominent callout in `README.md`, `workshop/landing-page/README.md`, and `workshop/landing-page/README.it.md`.
+
 ## [0.2.81] - 2026-09-23
 ### Added
 - 🌍 **Step 0 Antigravity Multilingual Kickoff Prompt (Step 0 §4)**:

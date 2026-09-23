@@ -2,19 +2,15 @@
 
 A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cloud Run, ...)
 
+> 📖 **Official Google Codelab:** Follow the official Google developer tutorial step-by-step at [codelabs.developers.google.com/codelabs/rails8-on-google-cloud](https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0).
+
 ![Production Reference Architecture](assets/arch_diagram.png)
-
-### 🔗 Live Environments
-
-| Env | URL |
-| :--- | :--- |
-| 🟢 **Dev** | [palladius-genai-rails-app-**dev**-….run.app](https://palladius-genai-rails-app-dev-272932496670.europe-west1.run.app/) |
-| 🔴 **Prod** | [palladius-genai-rails-app-**prod**-….run.app](https://palladius-genai-rails-app-prod-272932496670.europe-west1.run.app/) |
 
 ### 📚 Workshop & Docs
 
 | Resource | URL |
 | :--- | :--- |
+| 🌟 **Official Google Codelab** | [codelabs.developers.google.com/…/rails8-on-google-cloud](https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0) |
 | 🌐 Workshop Portal | [palladius.github.io/rails8-app-on-gcp/](https://palladius.github.io/rails8-app-on-gcp/) |
 | 🚀 Presentation Slides | [palladius.github.io/…/slides/](https://palladius.github.io/rails8-app-on-gcp/slides/) |
 | 📖 Workshop Codelab | [palladius.github.io/…/codelab/](https://palladius.github.io/rails8-app-on-gcp/codelab/) |

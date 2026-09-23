@@ -17,6 +17,8 @@
 
 ## 👋 Benvenuto al Workshop Rails 8 su Google Cloud!
 
+> 📖 **Codelab Ufficiale Google:** [codelabs.developers.google.com/codelabs/rails8-on-google-cloud](https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0)
+
 Benvenuto! Che tu sia uno sviluppatore Ruby esperto o un cloud engineer che non ha mai visto una riga di Ruby prima d'ora, questo workshop è pensato apposta per te.
 
 Costruiremo insieme una piattaforma blog cloud-native di livello enterprise con **Ruby on Rails 8** e la distribuiremo su **Google Cloud Platform (GCP)** sfruttando la moderna architettura serverless.
