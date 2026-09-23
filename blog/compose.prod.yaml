@@ -18,6 +18,7 @@ services:
       DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
       DB_POOL: "5"
+      IAP_MOCK_EMAIL: ${IAP_MOCK_EMAIL:-ricc@google.com}
     ports:
       - "8080:8080"
     depends_on:
