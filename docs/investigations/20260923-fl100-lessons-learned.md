@@ -19,16 +19,21 @@ This document codifies the **8 Fundamental Sins** of automated friction logging 
 
 ## 💥 The 8 Fundamental Sins of Automated Friction Logs
 
-### 1. The Tautology Trap: Testing the Script, Not the Promise
+### 1. The Tautology Trap & Semantic Drift: Testing the Script, Not the Promise
 * **The Reality:** The workshop's crown jewel—promised on Page 1 and Slide 1—was deploying modern Rails 8 using **Docker Compose multi-container sidecars** on Cloud Run (`web` + `worker` + `cloudsql-proxy`). Yet in Step 6, the codelab actually ran:
   ```bash
   gcloud run deploy blog --source .
   ```
   A plain, single-container monolithic deploy!
-* **Why 7 AI runs missed it:** The AI agent read `gcloud run deploy blog`, executed it, got `Exit code: 0`, and stamped `🟢 GREEN`. It was a compliant drone verifying command syntax, not an engineer verifying whether the **pedagogical and architectural promise** was fulfilled.
-* **The Rule for v2.0:** The evaluation spec (`skeleton.yaml`) must test **state and architecture**, not just command exits:
+* **Why 7 AI runs missed it (The Blind Executor Fallacy):** The AI agent read `gcloud run deploy blog`, executed it, got `Exit code: 0`, and stamped `🟢 GREEN`. It acted as a compliant drone verifying command syntax, completely blind to the fact that the command contradicted the stated narrative goal.
+* **The Rule for v2.0 (The Semantic Drift Check in Thinking Mode):**
+  When reviewing or testing any step, an AI agent with high thinking mode MUST contrast:
+  1. **Narrative Promise:** What does the page title, introduction, diagram, or educational goal declare?
+  2. **Executed Mechanism:** What command is actually invoked? Does the command match the claimed architecture?
+  - If the text promises Docker Compose multi-container sidecars, but the command runs a basic monolithic deploy, the agent must detect the discrepancy and flag a **P1 Semantic Drift Defect**.
+  - Assertions must evaluate underlying platform state (e.g., container count, IAM policies, volume mounts), never merely command exit status:
   ```bash
-  # v2.0 Assertion: verify the actual multi-container deployment
+  # v2.0 Empirical State Assertion: verify the actual multi-container deployment
   gcloud run services describe blog --format="value(spec.template.spec.containers[].name)" | grep cloudsql-proxy
   ```
 
