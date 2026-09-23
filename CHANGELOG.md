@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.76] - 2026-09-23
+### Added
+- FL100-82: Added explanatory note in Step 6 regarding the Google Cloud Console UI glitch that labels `cloudsql-proxy` as ingress container, linking to GitHub Issue #149. Updated cropped screenshot.
+
 ## [0.2.75] - 2026-09-23
 ### Added
 - FL100-81: Embedded real screenshot `step6_cloud_run_three_containers.png` showing all 3 sidecar containers (`cloudsql-proxy`, `web`, `worker`) in the Google Cloud Run Console Containers tab. Replaced the last remaining Step 6 TODO.

@@ -870,6 +870,8 @@ gcloud run compose up compose.prod.yaml \
 ![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)
 *Google Cloud Run Console: 'Containers' tab displaying all three sidecar containers (`cloudsql-proxy`, `web`, `worker`)*
 
+> 💡 **UI Curiosity / Console Glitch:** In the Console dropdown, you may notice Cloud Run labels the top entry as `Ingress container: cloudsql-proxy`. Don't worry! This is purely a visual UI glitch in the Google Cloud Console (tracked in [#149](https://github.com/palladius/rails8-app-on-gcp/issues/149)) caused by container dependency ordering. In reality, `web` is the only container listening on HTTP port 8080 and handles 100% of ingress web traffic, while `cloudsql-proxy` strictly serves private PostgreSQL traffic on port 5432!
+
 ### 5. ✨ The Wow Moment: Zero Warnings & Full Cloud Persistence!
 
 Take a deep breath and marvel at your screen: **all warning banners have vanished!** 🪄
