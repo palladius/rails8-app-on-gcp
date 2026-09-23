@@ -769,8 +769,10 @@ Cloud Run Jobs connect to Cloud SQL using the native Unix socket proxy (`/clouds
 postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJECT:REGION:INSTANCE
 ```
 
+<!--
 > 🔬 **Why not `postgresql://user:pass@PROJECT:REGION:INSTANCE/db`?**
 > Google Cloud SQL connection names contain colons (`:`). Starting in **Ruby 3.4+** (including our version **Ruby 3.4.5** with the bundled `uri-1.1.1` gem), the Ruby URI parser enforces strict compliance with **RFC 3986**. It considers colons invalid characters within an unbracketed host authority, raising `URI::InvalidURIError: bad URI`. The triple-slash format (`///`) omits the host authority completely and moves the Unix socket path to the query parameter `?host=...`, ensuring seamless parsing across all modern Ruby versions!
+-->
 
 ```bash
 # Core environment variables for database migration & initial admin seed
@@ -833,7 +835,7 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
 
 ![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
-*Output of gcloud run jobs executions describe JOBNAME*
+*In the figure above, you can see a possible output of `gcloud run jobs executions describe $JOBNAME`*
 
 ![Google Cloud Run Jobs Console showing rails-migrate job Succeeded](assets/images/rails_migrate_job_succeeded.png)
 *Google Cloud Run Jobs Console showing `rails-migrate` execution Succeeded*
@@ -841,22 +843,28 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 
 
 
-### 4. Fourth Deploy: Deploying Multi-Container Cloud Run
+### 4. Fourth Deploy: Deploying Multi-Container Cloud Run via Docker Compose
 
-Deploy the full multi-container service:
+Now deploy the genuine 3-container production stack (`web`, `worker`, `cloudsql-proxy`) directly from `compose.prod.yaml`:
 
 ```bash
+# 1. Self-healing environment exports (guarantees no missing master key or DB password)
+export RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-$(cat config/master.key 2>/dev/null || gcloud secrets versions access latest --secret=rails-master-key)}"
 export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
-export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
-export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
+export CLOUDSQL_INSTANCE_CONNECTION_NAME="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
 
-gcloud run deploy blog \
-  --source . \
-  --region $GOOGLE_CLOUD_REGION \
-  --allow-unauthenticated \
-  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \
-  --add-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
-  --set-env-vars="GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT},GCS_BUCKET=${GCS_BUCKET},ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL}"
+# 2. Database credentials & GCS attachments
+export DB_USER="rails_user"
+export DB_NAME="rails_production"
+export GCS_BUCKET="${GCS_BUCKET}"
+export ACTIVE_STORAGE_SERVICE="google"
+export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
+export GEMINI_API_KEY="${GEMINI_API_KEY:-dummy-key}"
+
+# 3. Deploy the full multi-container sidecar architecture to Cloud Run
+gcloud run compose up compose.prod.yaml \
+  --region=$GOOGLE_CLOUD_REGION \
+  --allow-unauthenticated
 ```
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**
@@ -865,13 +873,13 @@ gcloud run deploy blog \
 
 Take a deep breath and marvel at your screen: **all warning banners have vanished!** 🪄
 
+![Production Blog on Cloud Run with Zero Warnings and Cloud Persistent Post](assets/images/step6_cloud_persistent_clean_ui.png)
+*The production Rails 8 blog: pristine UI, zero warning banners, and persistent Cloud SQL state!*
+
 The application is now officially **Production-Grade & Cloud-Native**:
 - Backed by managed **Google Cloud SQL** (PostgreSQL) via secure mTLS tunneling.
 - Media safely stored in private **Google Cloud Storage** with IAM blob signing.
 - Zero ephemeral storage warnings and zero stuck jobs alerts.
-
-![Production Blog on Cloud Run with Zero Warnings and Cloud Persistent Post](assets/images/step6_cloud_persistent_clean_ui.png)
-*The production Rails 8 blog: pristine UI, zero warning banners, and persistent Cloud SQL state!*
 
 Open your Cloud Run URL:
 1. Look at the telemetry badges:

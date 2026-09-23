@@ -1,5 +1,14 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.74] - 2026-09-23
+### Changed
+- 🏛️ **Constitution Principle 10 & Multi-Container Cloud Run (FL100-80)**:
+  - Ratified Constitution Principle 10 mandating multi-container sidecar production deployment via `compose.prod.yaml` on Cloud Run.
+  - Removed reserved `PORT` environment variable from `blog/compose.prod.yaml` that blocked Cloud Run deployment.
+  - Added GCS and 4-database URL environment bindings to both `web` and `worker` in `compose.prod.yaml`.
+  - Updated Step 6 Section 4 in `CODELAB.md` to deploy directly via `gcloud run compose up compose.prod.yaml` with self-healing secret fallbacks.
+  - Updated `rails-migrate` job caption and hidden deep RFC 3986 callout behind HTML comments.
+
 ## [0.2.73] - 2026-09-23
 ### Added
 - FL100-79: Embedded real screenshot `step6_cloud_persistent_clean_ui.png` and celebratory text into Step 6 Section 5 (*The Wow Moment: Zero Warnings & Full Cloud Persistence!*). Removed obsolete TODO.

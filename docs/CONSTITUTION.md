@@ -68,3 +68,9 @@ Never present the learner with a bifurcated choice between two development modes
 - **The Proctor Invariant:** If learners diverge into separate tracks (such as host-native vs Docker Compose), workshop proctors and teaching assistants cannot effectively diagnose or unblock students without first asking: *"In Step 2, did you pick A or B?"*
 - **The Core Rule:** Choose the single highest-value canonical path (e.g. Docker Compose with Mailpit and Adminer) that guarantees reproducibility and identical mental models across all attendees.
 - **The Capstone Exception:** Divergence and free-form creative choices are welcomed **only in the final capstone step**, where students can pick an optional challenge or feature of their choice *after* the canonical codelab architecture is fully built and deployed.
+
+### 10. Multi-Container Production Deploy via Docker Compose (`compose.prod.yaml`)
+The canonical production deployment on Google Cloud Run **MUST** be deployed using declarative multi-container specifications via `gcloud [alpha] run compose up compose.prod.yaml` (or its direct declarative equivalent):
+- **Three-Container Invariant:** Production Cloud Run must run all three coordinated sidecars: `web` (Puma ingress on port 8080), `worker` (Solid Queue processor), and `cloudsql-proxy` (mTLS Auth Proxy).
+- **No Deceptive Single-Container Shortcuts:** Deploying production via standard single-container CLI commands (`gcloud run deploy --source .`) while teaching a 3-container architecture is strictly forbidden. The learner's live Cloud Run Console "Containers" tab must genuinely display the 3 distinct sidecar containers.
+
