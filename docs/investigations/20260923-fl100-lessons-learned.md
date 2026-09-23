@@ -1,4 +1,4 @@
-# 🦖 FL100 Retrospective: The 6 Sins of Automated Friction Logs & The Genesis of FL v2.0
+# 🦖 FL100 Retrospective: The 7 Sins of Automated Friction Logs & The Genesis of FL v2.0
 
 > **Context:** Post-Mortem & Architectural Lessons Learned from Friction Log FL100 (September 2026).  
 > **Authors:** Riccardo Carlesso (Supreme Leader & Advocate 🦖) & Antigravity (AI Pair Programmer 🤖)  
@@ -13,11 +13,11 @@ Between August and September 2026, 7 automated friction logs (`FL001` through `F
 
 Yet, when Riccardo sat down to actually run the workshop from start to finish as a human user in **FL100**, the reality was shocking: **major architectural gaps, unreadable diagrams, phantom commands, and confusing AI bloat had survived all 7 runs completely undetected.**
 
-This document codifies the **6 Fundamental Sins** of automated friction logging and defines the principles for **Friction Logging v2.0**.
+This document codifies the **7 Fundamental Sins** of automated friction logging and defines the principles for **Friction Logging v2.0**.
 
 ---
 
-## 💥 The 6 Fundamental Sins of Automated Friction Logs
+## 💥 The 7 Fundamental Sins of Automated Friction Logs
 
 ### 1. The Tautology Trap: Testing the Script, Not the Promise
 * **The Reality:** The workshop's crown jewel—promised on Page 1 and Slide 1—was deploying modern Rails 8 using **Docker Compose multi-container sidecars** on Cloud Run (`web` + `worker` + `cloudsql-proxy`). Yet in Step 6, the codelab actually ran:
@@ -81,6 +81,16 @@ This document codifies the **6 Fundamental Sins** of automated friction logging 
 
 ---
 
+### 7. The Self-Talking AI & The "Fake Wow": Tone Sobriety & Typography Restraint
+* **The Reality:** The previous automated friction logs read like an AI talking to itself inside an echo chamber. Full of hyperbolic claims like *"Here is the WOW moment!"*, self-congratulatory chatter, and indiscriminate use of **BOLD** text for marketing excitement.
+* **Is it really a "Wow Moment" for the human student?** When an AI labels a mundane command or a half-working step as a "wow moment", it damages credibility and alienates students. Experienced developers roll their eyes, while struggling novice students feel inadequate because they aren't experiencing that declared "wow".
+* **The Rule for v2.0:**
+  - **Sober, Professional, Grounded Tone:** Cut artificial hype, fake wonder, and conversational filler. Be direct, clear, and measured.
+  - **Typography Restraint:** **Bold formatting is reserved strictly for technical entities** (flags, file paths, commands, environment variables, critical warning labels). Never use bold for emotional emphasis or marketing flair (e.g., avoid `**Amazing!**`, `**The WOW moment!**`).
+  - **Talk to the Human, Not Yourself:** Every log entry, note, and message must be written from the perspective of an external human attendee trying to learn, not an LLM admiring its own execution trace.
+
+---
+
 ## 🛠️ Friction Logging v2.0: The New Workflow Engine
 
 ```mermaid
@@ -101,12 +111,15 @@ flowchart TD
     D -- User Friction / Env Bug --> H[💡 Self-Healing Fix: Auto-load env / Actionable bash advice]
     H --> C
     
-    D -- Step Completed --> I[Empirical Assertion: Test Architecture, Not Just Exit Code]
-    I --> J{All Assertions Passed?}
-    J -- No --> K[Investigate & Patch Codebase / Skeleton]
-    K --> I
-    J -- Yes --> L[Next Step]
-    L --> M[Publish Dual-Track: PR to GitHub + CL to Google3]
+    D -- AI Hyperbole / Noise --> I[🔇 Tone Check: Strip Fake Wows & Restrict BOLD to Tech Terms]
+    I --> C
+    
+    D -- Step Completed --> J[Empirical Assertion: Test Architecture, Not Just Exit Code]
+    J --> K{All Assertions Passed?}
+    K -- No --> L[Investigate & Patch Codebase / Skeleton]
+    L --> J
+    K -- Yes --> M[Next Step]
+    M --> N[Publish Dual-Track: PR to GitHub + CL to Google3]
 ```
 
 ---
@@ -118,4 +131,5 @@ flowchart TD
 3. **Be the Photographer:** Never leave a `TODO(...) screenshot` behind. If you have the state, take the picture.
 4. **Enforce IaC Single Source of Truth:** Terraform owns infrastructure provisioning; the codelab CLI commands only inspect and deploy application code.
 5. **Empathize with the Windows & Novice User:** Eliminate manual `.env` sourcing, provide self-healing error messages with exact copy-paste remedies, and keep cognitive load at a minimum.
-6. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
+6. **Sober Tone & Typographic Restraint:** Eliminate "fake wow moments" and AI self-talk. Reserve **bold** strictly for technical entities, flags, paths, and critical safety warnings.
+7. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
