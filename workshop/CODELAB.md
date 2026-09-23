@@ -925,6 +925,62 @@ Now that you have mastered the canonical reference architecture, choose your gra
 
 ---
 
+### 🤔 Curiosity Box: Getting a Live Rails Console on Cloud Run
+
+> 💡 **The Question:** On traditional VMs or Heroku-style PaaS platforms, developers commonly SSH into a running instance or use `heroku run rails console` to inspect or fix production data live. What is the Cloud Run-native equivalent, and how do you harden it?
+
+**Why `gcloud run exec` doesn't exist for Cloud Run Services**
+
+Cloud Run is a *serverless* platform: your container may be running as zero, one, or hundreds of identical instances, with no stable identity or addressable shell. This is fundamentally different from Kubernetes (`kubectl exec`), where a specific pod has a named socket you can attach to.
+
+```bash
+# ❌ This does NOT exist for Cloud Run Services:
+gcloud run services exec blog --region europe-west1 -- rails console
+
+# ✅ This exists for Cloud Run JOBS (non-interactive, one-shot tasks):
+gcloud run jobs execute my-job --region europe-west1 --wait
+```
+
+**The Four GCP-Native Patterns**
+
+| Pattern | Command | Interactive? | Security |
+|---|---|---|---|
+| **1. Local proxy + remote DB** | `DATABASE_URL=... rails console` | ✅ Full | 🔒 Cloud SQL Auth Proxy mTLS |
+| **2. Cloud Run Job (one-shot)** | `gcloud run jobs execute --wait` | ❌ Script only | 🔒 IAM role required |
+| **3. Web Console gem + IAP** | Browser → `/rails/console` | ✅ Full | 🛡️ IAP Zero-Trust |
+| **4. Cloud Shell + Proxy** | Cloud Shell → `bin/rails c` | ✅ Full | 🔒 Google identity |
+
+**Pattern 1 (Recommended for data inspection):** Run a local Rails console that talks directly to your Cloud SQL PostgreSQL via the Cloud SQL Auth Proxy:
+
+```bash
+# In one terminal: start the auth proxy
+cloud-sql-proxy rails8-fl-20260907b-xm8ko4:europe-west1:your-instance
+
+# In another terminal: open a read-write or sandbox console
+DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production \
+  bin/rails console --sandbox
+```
+
+You get full IRB interactivity with zero network exposure — the Cloud SQL Proxy uses mTLS over a Unix domain socket or loopback.
+
+**Pattern 3 (Web Console + IAP Zero-Trust, the hardened browser path):**
+
+The [`web-console` gem](https://github.com/rails/web-console) provides a browser-based IRB session. Without protection it is a **critical security vulnerability** — never expose it publicly. But combined with Google IAP (Quest 1), the Attack surface collapses: only verified Google identities on your allowlist can reach the `/rails/console` endpoint.
+
+```ruby
+# Gemfile — only load in development/staging, never production without IAP!
+gem "web-console", group: :development
+
+# config/environments/production.rb — if IAP is enabled:
+config.web_console.allowed_ips = ["0.0.0.0/0"]  # IAP terminates auth before us
+```
+
+> ⚠️ **Pattern 3 requires Quest 1 (IAP) to be enabled first.** Without it, `/rails/console` on a public URL is equivalent to leaving your server room unlocked. With IAP, it becomes a powerful operator tool hardened by Google-grade Zero-Trust.
+
+**Ask Antigravity:** *"Show me how to run `rails console --sandbox` against my Cloud SQL production database safely using the Cloud SQL Auth Proxy."*
+
+---
+
 ### 🏆 Graduating on The Hive: Proctor-Validated Proof-of-Work
 
 Once you have completed your chosen quest, claim your **Step 8 Graduation Trophy 🏆** on **The Hive Leaderboard**:

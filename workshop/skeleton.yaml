@@ -189,7 +189,7 @@ steps:
       - id: "step-4-shell-stuck-jobs-test"
         type: "shell"
         description: "Verify integration test for stuck jobs banner passes"
-        command: "cd blog && bin/rails test test/integration/stuck_jobs_warning_test.rb"
+        command: "cd blog && RBENV_VERSION=3.4.5 bundle exec rails test test/integration/stuck_jobs_warning_test.rb"
         expect_exit: 0
     screenshots:
       - id: "step-4-gcs-stuck-jobs-warning"

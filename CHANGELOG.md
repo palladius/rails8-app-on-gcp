@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.54] - 2026-09-23
+### Added
+- FL100-55: Curiosity Box "Getting a Live Rails Console on Cloud Run" in Step 8
+- FL100-56: Fixed RBENV_VERSION=3.4.5 missing in skeleton.yaml step 4 shell eval (was causing workshop-eval 4 to always fail with GemNotFound)
+
+### Fixed
+- workshop/skeleton.yaml: step-4-shell-stuck-jobs-test now uses `RBENV_VERSION=3.4.5 bundle exec rails test` instead of bare `bin/rails test`
+
 ## [0.2.53] - 2026-09-23
 ### Changed
 - 🧹 **Pruned Ephemeral Reset Banner (FL100-52)**:
