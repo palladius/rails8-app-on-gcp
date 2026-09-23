@@ -154,4 +154,6 @@ flowchart TD
 5. **Empathize with the Windows & Novice User:** Eliminate manual `.env` sourcing, provide self-healing error messages with exact copy-paste remedies, and keep cognitive load at a minimum.
 6. **Sober Tone & Typographic Restraint:** Eliminate "fake wow moments" and AI self-talk. Reserve **bold** strictly for technical entities, flags, paths, and critical safety warnings.
 7. **The 6-Question Step Audit & Mandatory Gatekeeping:** Audit every step for teleological purpose, placement, and duplicate work. If mandatory steps fail, abort and log RED immediately.
-8. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
+8. **Strict TDD & Cumulative Test Growth:** Every bug fix requires a failing automated test first. Every FL iteration must leave the test suite with more tests than before (`tests_count(FL_{N}) > tests_count(FL_{N-1})`).
+9. **Spec & Constitution Compliance + 160-Char Tweet Checkpoint:** Verify execution against `docs/CONSTITUTION.md` and `docs/SPEC.md`. Conclude every step with a 160-char compliance tweet.
+10. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
