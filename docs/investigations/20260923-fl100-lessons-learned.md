@@ -1,4 +1,4 @@
-# 🦖 FL100 Retrospective: The 7 Sins of Automated Friction Logs & The Genesis of FL v2.0
+# 🦖 FL100 Retrospective: The 8 Sins of Automated Friction Logs & The Genesis of FL v2.0
 
 > **Context:** Post-Mortem & Architectural Lessons Learned from Friction Log FL100 (September 2026).  
 > **Authors:** Riccardo Carlesso (Supreme Leader & Advocate 🦖) & Antigravity (AI Pair Programmer 🤖)  
@@ -13,11 +13,11 @@ Between August and September 2026, 7 automated friction logs (`FL001` through `F
 
 Yet, when Riccardo sat down to actually run the workshop from start to finish as a human user in **FL100**, the reality was shocking: **major architectural gaps, unreadable diagrams, phantom commands, and confusing AI bloat had survived all 7 runs completely undetected.**
 
-This document codifies the **7 Fundamental Sins** of automated friction logging and defines the principles for **Friction Logging v2.0**.
+This document codifies the **8 Fundamental Sins** of automated friction logging and defines the principles for **Friction Logging v2.0**.
 
 ---
 
-## 💥 The 7 Fundamental Sins of Automated Friction Logs
+## 💥 The 8 Fundamental Sins of Automated Friction Logs
 
 ### 1. The Tautology Trap: Testing the Script, Not the Promise
 * **The Reality:** The workshop's crown jewel—promised on Page 1 and Slide 1—was deploying modern Rails 8 using **Docker Compose multi-container sidecars** on Cloud Run (`web` + `worker` + `cloudsql-proxy`). Yet in Step 6, the codelab actually ran:
@@ -91,35 +91,51 @@ This document codifies the **7 Fundamental Sins** of automated friction logging 
 
 ---
 
+### 8. Structural Teleology: Steps Without Justification & The 6-Question Step Audit
+* **The Reality:** In FL100, we realized that **Step 5 had virtually no reason to exist as a standalone workshop step!** Why? Because 7 automated friction logs simply followed the skeleton like sheep without questioning the teleological purpose (*why does this page exist?*). If an entire step can be deleted or merged into a 30-second pre-flight check without losing learning value, its existence is an architectural bug.
+* **The Mainstream Curriculum Principle:**
+  > *"Every extra word and redundant page dilutes focus and scares students away. The curriculum must be ruthlessly trimmed to what 100% of mainstream students need to understand."*
+* **The Rule for v2.0: The Mandatory 6-Question Step Audit:**
+  Before executing and certifying each page `N`, the FL agent must perform this structural audit:
+  1. **Prerequisite Integrity Check:** What was supposed to be finished in Page `N-1`? Did we actually finish it cleanly, or did we carry over half-baked state?
+  2. **Teleological Purpose & Scope:** What is the exact delta and learning outcome of THIS page? Separate strictly **Mandatory Steps** from **Optional Sidebars**.
+  3. **Strict Gatekeeping on Mandatory Parts:** Did the mandatory commands succeed? If not, **ABORT IMMEDIATELY, mark the step RED**, and pause or prompt for human intervention. Never fudge or sweep mandatory failures under the rug.
+  4. **Optional Delta Accounting:** If optional parts failed or were skipped, log why with empirical notes.
+  5. **Structural Placement Audit:**
+     - *Could this step have been anticipated 2 steps earlier?*
+     - *Should it be postponed or merged into the next step?*
+     - *Is it doing duplicate work already handled by IaC/Terraform or earlier scripts?*
+  6. **Audience Alignment & Density Check:**
+     - *Did we explain difficult concepts simply, or are we spending 3 paragraphs on a trivia detail that only 1 student in 20 will ever encounter?*
+
+---
+
 ## 🛠️ Friction Logging v2.0: The New Workflow Engine
 
 ```mermaid
 flowchart TD
     A[Start FLv2 Campaign] --> B[Virgin GCP Project + Billing Verification]
-    B --> C[Run Step via Golden Highway]
-    C --> D{Encountered Issue or TODO?}
+    B --> C[Page N: Run 6-Question Structural Audit]
+    C --> D{Prerequisites & Purpose Clear?}
+    D -- No --> E[🚨 Flag Step Redundancy / Skeleton Misalignment]
     
-    D -- Screenshot TODO --> E[📸 Actively Capture & Embed Real Screenshot]
-    E --> C
+    D -- Yes --> F[Execute Mandatory Core Highway]
+    F --> G{Mandatory Commands Green?}
+    G -- No --> H[🔴 ABORT STEP: Log RED Blocker & Request Human/Fix]
     
-    D -- Rare Edge Case --> F[🚫 DO NOT bloat Codelab! Add to Agent Skill / Code Test]
-    F --> C
+    G -- Yes --> I[Evaluate Optional Sidebars & Edge Cases]
+    I --> J{Encountered Screenshot TODO?}
+    J -- Yes --> K[📸 Proactively Capture & Embed Real Screenshot]
     
-    D -- Terraform Collision --> G[🚨 Flag P1 Design Defect: Transform to Inspection Check]
-    G --> C
-
-    D -- User Friction / Env Bug --> H[💡 Self-Healing Fix: Auto-load env / Actionable bash advice]
-    H --> C
+    I --> L{Encountered Rare Warning?}
+    L -- Yes --> M[🚫 Rule of Heavy Heart: Patch Code or Agent Skill, NOT Codelab]
     
-    D -- AI Hyperbole / Noise --> I[🔇 Tone Check: Strip Fake Wows & Restrict BOLD to Tech Terms]
-    I --> C
+    I --> N{Tone / Typography Check}
+    N -- Hyperbole Found --> O[🔇 Strip Fake Wows & Restrict BOLD to Tech Terms]
     
-    D -- Step Completed --> J[Empirical Assertion: Test Architecture, Not Just Exit Code]
-    J --> K{All Assertions Passed?}
-    K -- No --> L[Investigate & Patch Codebase / Skeleton]
-    L --> J
-    K -- Yes --> M[Next Step]
-    M --> N[Publish Dual-Track: PR to GitHub + CL to Google3]
+    I --> P[Empirical Architecture Assertion: Test State, Not Exit 0]
+    P --> Q{Step Verified Green?}
+    Q -- Yes --> R[Page N+1 or Final Synthesis]
 ```
 
 ---
@@ -132,4 +148,5 @@ flowchart TD
 4. **Enforce IaC Single Source of Truth:** Terraform owns infrastructure provisioning; the codelab CLI commands only inspect and deploy application code.
 5. **Empathize with the Windows & Novice User:** Eliminate manual `.env` sourcing, provide self-healing error messages with exact copy-paste remedies, and keep cognitive load at a minimum.
 6. **Sober Tone & Typographic Restraint:** Eliminate "fake wow moments" and AI self-talk. Reserve **bold** strictly for technical entities, flags, paths, and critical safety warnings.
-7. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
+7. **The 6-Question Step Audit & Mandatory Gatekeeping:** Audit every step for teleological purpose, placement, and duplicate work. If mandatory steps fail, abort and log RED immediately.
+8. **Dual-Track Verification:** A fix does not exist until it is merged in GitHub (`CODELAB.md`) AND mailed in Google3 (`index.lab.md`).
