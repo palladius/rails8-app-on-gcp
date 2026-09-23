@@ -658,6 +658,28 @@ gcloud secrets list --filter="name:rails-"
 <!-- TODO this should be automateable! -->
 ![Google Cloud Secret Manager Console listing configured application secrets](assets/images/secret_manager_secrets_list.png)
 
+#### 🔑 Syncing `master.key` to Your Laptop (Local Sync)
+
+Because `blog/config/master.key` is gitignored for security, your local clone might not have it yet. Run this friendly self-healing snippet to pull it from Secret Manager so your local Rails tools can decrypt credentials:
+
+```bash
+if [ ! -f blog/config/master.key ]; then
+  echo "📥 Pulling rails-master-key from Secret Manager to local blog/config/master.key..."
+  gcloud secrets versions access latest --secret=rails-master-key > blog/config/master.key
+  echo "🔑 Created local blog/config/master.key! 🎉"
+else
+  echo "✅ Local blog/config/master.key already exists! 🚀"
+fi
+```
+
+> 🧪 **Playground: Want to create a custom secret just to see how easy it is?**
+> Secret Manager isn't just for Rails! You can create any secret in one simple CLI command:
+> ```bash
+> echo -n "MySuperSecretValue123!" | gcloud secrets create workshop-fun-secret --data-file=-
+> echo "✨ Created workshop-fun-secret in Secret Manager! 🪄"
+> ```
+
+
 ### 4. Verifying Secret Accessor Permissions
 
 In order for Cloud Run containers to mount these secrets as environment variables or volume mounts at boot, the runtime service account (`$RUN_SA`) needs the `roles/secretmanager.secretAccessor` role on each secret.
