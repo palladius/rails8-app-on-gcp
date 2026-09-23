@@ -460,6 +460,19 @@ just workshop-eval 3
 
 In this step, we decouple media and file storage from the container disk by switching ActiveStorage to **Google Cloud Storage (GCS)**, using short-lived signed URLs via the IAM Credentials API (`iam: true`).
 
+**Before you touch any config, understand the three things Rails needs to talk to GCS:**
+
+**① Project ID + Bucket name** — Rails must know *where* to store blobs. The app reads `GOOGLE_CLOUD_PROJECT` from the environment and derives the bucket name as `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`. Your Terraform from Step 1 already created this bucket — no extra work needed.
+
+**② A Service Account with the right permissions** — Cloud Run runs as the *Compute Engine default service account* (`PROJECT_NUMBER-compute@developer.gserviceaccount.com`). This SA needs two IAM roles on the bucket:
+- `roles/storage.objectAdmin` — to upload and serve blobs
+- `roles/iam.serviceAccountTokenCreator` on *itself* — to call the IAM Credentials `signBlob` API and generate short-lived signed URLs
+
+> ⚠️ **The Tempting Shortcut — `public: true`**
+> The fastest way to get GCS working is to set `public: true` in `storage.yml` and grant `allUsers:objectViewer` on the bucket. Images load instantly, no signing needed. **Do not do this.** A public bucket leaks all uploaded user media to the open internet, forever. Our blueprint uses `iam: true` to keep the bucket 100% private — every image URL is a signed, expiring token generated on the fly by the IAM Credentials API.
+
+**③ `ACTIVE_STORAGE_SERVICE=google`** — the single env var that flips Rails from local disk to GCS at runtime. No code change, no redeploy of application logic — just one environment variable toggle.
+
 ### 1. The Time-Machine Rewind
 
 Advance the time machine to Stage 2:
@@ -468,18 +481,29 @@ Advance the time machine to Stage 2:
 just workshop-rewind 2
 ```
 
-Inspect `blog/config/storage.yml`:
+Inspect `blog/config/storage.yml` — you'll see the app defines **three named GCS environments** (dev / test / prod), all using the same secure pattern:
 
 ```yaml
-google:
+<% gcp_project = ENV.fetch("GOOGLE_CLOUD_PROJECT") { Rails.application.credentials.dig(:gcs, :project) } %>
+<% gcs_signer_sa = ENV.fetch("GCS_SIGNER_SA_EMAIL") { "rails-cloudrun-sa@#{gcp_project}.iam.gserviceaccount.com" } %>
+
+google_prod: &google_prod
   service: GCS
-  project: <%= ENV.fetch("GOOGLE_CLOUD_PROJECT") %>
-  bucket: <%= ENV.fetch("GCS_BUCKET") %>
-  iam: true  # Sign URLs via IAM Credentials signBlob API (zero private key JSON files required!)
+  project: <%= gcp_project %>
+  bucket: <%= gcp_project %>-activestorage-prod  # ← derived from project ID, no extra env var!
+  iam: true        # Sign URLs via IAM Credentials signBlob API (no private key JSON required!)
+  gsa_email: <%= gcs_signer_sa %>
+
+# Convenience alias — ACTIVE_STORAGE_SERVICE=google points here
+google:
+  <<: *google_prod
 ```
 
 > 💡 **Design Decision — Why `iam: true` instead of `public: true`?**
 > Making a bucket public (`allUsers:objectViewer`) is a hazardous security anti-pattern. With `iam: true`, your bucket remains **100% private**, and Rails generates secure, short-lived signed URLs on the fly via the IAM Credentials API.
+
+> 💡 **Design Decision — Why no `GCS_BUCKET` env var?**
+> The bucket name follows a deterministic convention: `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`. If you know your project ID, you know your bucket. The Terraform provisioner uses the same convention — zero extra configuration needed.
 
 ![GCS IAM Signing Architecture](assets/images/gcs_iam_signing_diagram.jpg)
 
@@ -490,7 +514,7 @@ Ensure your Cloud Run runtime service account has permissions to sign URLs and u
 ```bash
 export PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
 export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-dev"
+export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
 
 # Grant Storage Object Admin
 gcloud storage buckets add-iam-policy-binding gs://$GCS_BUCKET \
@@ -505,13 +529,13 @@ gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
 
 ### 3. Deploy 2 to Cloud Run with GCS Attached
 
-Re-deploy our application with GCS enabled:
+Re-deploy with GCS enabled. Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (master key, IAP config, etc.):
 
 ```bash
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
+  --update-env-vars ACTIVE_STORAGE_SERVICE=google
 ```
 
 ### 4. ✨ The Surviving Image & The Cloud Stamp
