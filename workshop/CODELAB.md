@@ -773,6 +773,10 @@ postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJ
 > Google Cloud SQL connection names contain colons (`:`). Starting in **Ruby 3.4+** (including our version **Ruby 3.4.5** with the bundled `uri-1.1.1` gem), the Ruby URI parser enforces strict compliance with **RFC 3986**. It considers colons invalid characters within an unbracketed host authority, raising `URI::InvalidURIError: bad URI`. The triple-slash format (`///`) omits the host authority completely and moves the Unix socket path to the query parameter `?host=...`, ensuring seamless parsing across all modern Ruby versions!
 
 ```bash
+# Core environment variables for database migration & initial admin seed
+export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
+echo "Admin user will be seeded for: $GOOGLE_CLOUD_ACCOUNT"
+
 # Get the latest blog image from Cloud Run (jobs don't support --source)
 export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
 
@@ -796,6 +800,22 @@ gcloud run jobs create rails-migrate \
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
 
+<!-- 
+NOTE FOR MENTORS / WORKSHOP AUTHORS:
+We believe this should NOT happen with the new auto-exported GOOGLE_CLOUD_ACCOUNT changes above, but if db:prepare ever exits with code 1 due to db:seed aborting, un-comment this snippet:
+
+> 💡 **Troubleshooting: Did `db:prepare` fail with `exit(1)`?**
+> If `db:prepare` failed during seeding because your email was unset, re-run just the seed step:
+> ```bash
+> gcloud run jobs update rails-migrate \
+>   --command "bin/rails" \
+>   --args "db:seed" \
+>   --update-env-vars "GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}" \
+>   --region $GOOGLE_CLOUD_REGION
+> gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
+> ```
+-->
+
 > 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
 > All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
 > Solid Queue/Cache/Cable tables won't be created.
@@ -814,6 +834,11 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 
 ![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
 *Output of gcloud run jobs executions describe JOBNAME*
+
+![Google Cloud Run Jobs Console showing rails-migrate job Succeeded](assets/images/rails_migrate_job_succeeded.png)
+*Google Cloud Run Jobs Console showing `rails-migrate` execution Succeeded*
+
+
 
 
 ### 4. Deploy 4: Deploying Multi-Container Cloud Run
