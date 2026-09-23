@@ -289,7 +289,7 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
    - Alternatively, log in using your Google Cloud account email (from `.env`) and the default seeded password: `Ch4ng3m3!!1`.
 3. **Observe the Visual Telemetry Badges:**
    - Notice the yellow environment banner and badges in the UI: `Notice: Ephemeral Database Active (POSTGRESQL)` and `[EPHEMERAL DB / STORAGE] 💾 Local`.
-   - Notice the post watermark: The local casetta stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
+   - Notice the post watermark: The 🏠 stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
 
 ![Local blog homepage displaying ephemeral telemetry notices and badges](assets/images/step_2_homepage_ephemeral.png)
 
@@ -399,7 +399,7 @@ Open the generated Cloud Run URL in your browser!
 4. Your post is published with full formatting, and your image is rendered.
 5. Notice the visual telemetry:
    - Header badge: `[EPHEMERAL DB / STORAGE] 💾 Local`
-   - Image watermark: The local casetta stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
+   - Image watermark: The 🏠 stamp (`127.0.0.1` ephemeral disk badge in the bottom-right corner).
 
 > 🐝 **Join the Live Workshop Hive Leaderboard!**
 > If you are online and your proctor is showing the leaderboard, and you want to join it, add your Cloud Run URL here:
@@ -537,7 +537,7 @@ gcloud run deploy blog \
 1. Refresh your blog URL.
 2. Create a new blog post titled *"Surviving the Cloud"* and upload a photo.
 3. Look at the bottom-right corner of the image:
-   - The casetta stamp is gone!
+   - The 🏠 stamp is gone!
    - It is replaced by the colorful **Cloud GCS Stamp** (`nanobanana_stamp_cloud.png`).
 4. Force another container restart:
    ```bash
