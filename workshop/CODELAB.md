@@ -867,7 +867,8 @@ gcloud run compose up compose.prod.yaml \
   --allow-unauthenticated
 ```
 
-> 📸 **TODO(riccardo): add screenshot of Google Cloud Run Console 'Containers' tab displaying the 3 sidecar containers (web, worker, cloudsql-proxy)**
+![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)
+*Google Cloud Run Console: 'Containers' tab displaying all three sidecar containers (`cloudsql-proxy`, `web`, `worker`)*
 
 ### 5. ✨ The Wow Moment: Zero Warnings & Full Cloud Persistence!
 
