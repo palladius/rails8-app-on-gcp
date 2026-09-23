@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.83] - 2026-09-23
+### Changed
+- 🧹 **Streamline Prerequisites in README**:
+  - Condensed the bulky `just` multi-line installation paragraph and OS bash snippets into a clean row in the prerequisites table.
+
 ## [0.2.82] - 2026-09-23
 ### Changed
 - 🔗 **Documentation & Codelab Link Refresh**:

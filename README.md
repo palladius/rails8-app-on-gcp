@@ -20,24 +20,11 @@ A golden Rails App optimized for GCP (ActiveStorage on GCS, docker-compose on Cl
 
 ## ✅ Prerequisites
 
-Every command below is a [`just`](https://just.systems) recipe, so **install `just` first** — without it nothing in this repo runs:
-
-```bash
-# Recommended: latest upstream release (1.40+)
-curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
-
-# macOS
-brew install just
-
-# Debian/Ubuntu — ships 1.21; supported, but older than upstream
-sudo apt install just
-```
-
-Check it works with `just --list`: it should print the full recipe list — if it prints a parse error instead, your `just` is too old for the justfile (see `just test-justfile`). Then make sure you also have:
+Make sure you have the following tools installed locally (commands in this repo are orchestrated via [`just`](https://just.systems)):
 
 | Tool | Check | Needed for |
 | :--- | :--- | :--- |
-| [**just**](https://just.systems) (1.21+, 1.40+ recommended) | `just --version` | every command in this repo and in the workshop |
+| [**just**](https://just.systems) (1.21+) | `just --version` | command runner for all repository and workshop recipes |
 | [**Git**](https://git-scm.com/downloads) (2.30+) | `git --version` | cloning the repo, branching, version control |
 | [**Ruby 3.4.5**](https://www.ruby-lang.org/en/downloads/) & [**Rails 8**](https://rubyonrails.org/) | `ruby -v`, `rails -v` | `just install`, `just dev` |
 | [**Docker**](https://docs.docker.com/get-docker/) & [**Docker Compose**](https://docs.docker.com/compose/install/) | `docker compose version` | `just compose-up` |
