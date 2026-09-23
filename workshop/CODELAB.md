@@ -521,16 +521,24 @@ gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
   --role="roles/iam.serviceAccountTokenCreator"
 ```
 
-### 3. Deploy 3 to Cloud Run with GCS Attached
+### 3. Third Deploy to Cloud Run with GCS Attached
 
-Re-deploy with GCS enabled. Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (master key, IAP config, etc.):
+Re-deploy with GCS enabled. Make sure you are inside the `blog/` folder (otherwise Cloud Run attempts to build using Buildpacks instead of the Rails 8 `Dockerfile`, causing build failures).
+
+Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (master key, IAP config, etc.):
 
 ```bash
+cd blog
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
   --update-env-vars ACTIVE_STORAGE_SERVICE=google
 ```
+
+> 💡 **Tip:** If the deployment fails, click on the Cloud Build logs link conveniently provided in your terminal output (as shown in the figure below). You can also ask Antigravity for help deciphering and fixing the error!
+
+![Cloud Build failure log link in terminal output](assets/images/step4_deploy_build_fail_link.png)
+
 
 ### 4. ✨ The Surviving Image & The Cloud Stamp
 
@@ -545,7 +553,7 @@ gcloud run deploy blog \
    ```
 5. Refresh the page: while the SQLite database reset, **the image binary is safe and sound in Google Cloud Storage**! Verify via CLI:
    ```bash
-   gcloud storage ls gs://$GCS_BUCKET/
+   gcloud storage ls -l -r gs://$GCS_BUCKET/
    ```
 
 > 📸 **TODO(riccardo): add screenshot of Google Cloud Storage Console showing uploaded image blobs safely stored in the private bucket gs://$GCS_BUCKET**
