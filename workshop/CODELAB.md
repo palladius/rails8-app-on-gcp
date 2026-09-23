@@ -625,25 +625,20 @@ gcloud sql instances describe $SQL_INSTANCE_NAME --format="value(state)"
 
 The output must be `RUNNABLE`.
 
-### 2. Testing Database Connectivity (mTLS via Cloud CLI)
+### 2. (Optional) Testing Database Connectivity from your Laptop
 
 In production, Cloud Run containers connect securely to Cloud SQL via an encrypted sidecar proxy (`127.0.0.1:5432`) without exposing the database to the public internet (`0.0.0.0/0`).
 
-You can test connectivity right now from your own terminal using the built-in `gcloud sql connect` wrapper:
+> ℹ️ **Note:** This step is completely optional! In Cloud Run, the official Cloud SQL Auth Proxy sidecar container handles mTLS connectivity automatically. You do **not** need to install anything locally to complete the workshop.
+
+If you have `cloud-sql-proxy` and `psql` installed on your machine and want to verify direct connectivity from your laptop:
 
 ```bash
-# Connect to your PostgreSQL database securely over Google-managed mTLS
+# Optional: test connectivity via Google-managed mTLS proxy
 gcloud sql connect $SQL_INSTANCE_NAME --user=rails_user --database=rails_production
 ```
+*(If prompted for a password, enter `$DB_PASSWORD`. Otherwise, feel free to skip directly to Step 3 below!)*
 
-When prompted for the password, enter `$DB_PASSWORD`. Once in the `psql` shell, run:
-
-```sql
-SELECT version();
-\q
-```
-
-You are connected directly to your managed PostgreSQL 16 cluster via an ephemeral, authenticated proxy tunnel!
 
 ### 3. Inspecting Terraform-Provisioned Secrets
 
