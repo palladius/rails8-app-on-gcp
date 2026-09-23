@@ -579,15 +579,17 @@ just workshop-eval 4
 ```
 
 
-## Step 5: Cloud SQL Ready & Secret Manager Inspection
+## Step 5: Pre-Flight Checklist: Cloud SQL, Secrets & DB Connectivity
 
-*Duration: 10min*
+*Duration: 5min*
 
-By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database connectivity and inspect the secrets managed by **Google Cloud Secret Manager**.
+While you mastered stateless containers and Google Cloud Storage in Steps 3 and 4, **Terraform has finished cooking your production backend in the background**! 
+
+Before deploying our full 3-container production sidecar architecture (Deploy 4 in Step 6), this step acts as a fast **Pre-Flight Inspection** to verify database health, connectivity, and secret access.
 
 ### 0. Bootstrap Environment Variables
 
-Before proceeding, export all required shell variables from your Terraform outputs:
+Export all required shell variables directly from your Terraform outputs:
 
 ```bash
 # Core project variables (should already be set from Step 0)
@@ -606,31 +608,48 @@ export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || 
 # GCS bucket names
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
 
-echo "✅ Environment variables set:"
+echo "✅ Pre-flight environment variables ready:"
 echo "   RUN_SA=$RUN_SA"
 echo "   SQL_INSTANCE_NAME=$SQL_INSTANCE_NAME"
 echo "   GCS_BUCKET=$GCS_BUCKET"
 ```
 
-### 1. Verifying Cloud SQL Instance
+### 1. Cloud SQL Health Check
 
-Check the state of your Cloud SQL instance:
+Verify that your managed PostgreSQL instance has finished initial provisioning and is healthy:
 
 ```bash
-# Discover the actual instance name from Terraform output
-export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
-echo "Cloud SQL instance: $SQL_INSTANCE_NAME"
+echo "Checking instance: $SQL_INSTANCE_NAME"
 gcloud sql instances describe $SQL_INSTANCE_NAME --format="value(state)"
 ```
 
-The output should be `RUNNABLE`.
+The output must be `RUNNABLE`.
 
-### 2. Inspecting Terraform-Provisioned Secrets
+### 2. Testing Database Connectivity (mTLS via Cloud CLI)
+
+In production, Cloud Run containers connect securely to Cloud SQL via an encrypted sidecar proxy (`127.0.0.1:5432`) without exposing the database to the public internet (`0.0.0.0/0`).
+
+You can test connectivity right now from your own terminal using the built-in `gcloud sql connect` wrapper:
+
+```bash
+# Connect to your PostgreSQL database securely over Google-managed mTLS
+gcloud sql connect $SQL_INSTANCE_NAME --user=rails_user --database=rails_production
+```
+
+When prompted for the password, enter `$DB_PASSWORD`. Once in the `psql` shell, run:
+
+```sql
+SELECT version();
+\q
+```
+
+You are connected directly to your managed PostgreSQL 16 cluster via an ephemeral, authenticated proxy tunnel!
+
+### 3. Inspecting Terraform-Provisioned Secrets
 
 Never store plain-text database passwords, API keys, or Rails master keys in git or in container environment variables. In modern cloud architecture, we use **Google Cloud Secret Manager** for zero-trust runtime injection.
 
-> ℹ️ **Good News: Terraform Already Handled This!**
-> During **Step 1**, Terraform provisioned three managed secrets for you automatically:
+> ℹ️ **Terraform Handled This for You in Step 1:**
 > 1. `rails-master-key` — for decrypting Rails credentials at runtime.
 > 2. `rails-db-password` — a cryptographically secure random password matching the Cloud SQL user.
 > 3. `rails-admin-password` — a secure password for your initial administrator user.
@@ -644,14 +663,7 @@ gcloud secrets list --filter="name:rails-"
 <!-- TODO this should be automateable! -->
 ![Google Cloud Secret Manager Console listing configured application secrets](assets/images/secret_manager_secrets_list.png)
 
-> 💡 **What if you need to update a secret manually later?**
-> If you ever rotate a database password or update your Rails master key, you don't need to re-run Terraform. You can add a new secret version via the CLI:
-> ```bash
-> # Example: update or rotate a secret version
-> echo -n "NEW_SECRET_VALUE" | gcloud secrets versions add rails-db-password --data-file=-
-> ```
-
-### 3. Verifying Secret Accessor Permissions
+### 4. Verifying Secret Accessor Permissions
 
 In order for Cloud Run containers to mount these secrets as environment variables or volume mounts at boot, the runtime service account (`$RUN_SA`) needs the `roles/secretmanager.secretAccessor` role on each secret.
 
@@ -671,23 +683,11 @@ ROLE                                 MEMBERS
 roles/secretmanager.secretAccessor   serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com
 ```
 
-> 💡 **Self-Healing Tip:** If for any reason the role is missing (for instance, if you provisioned without Terraform), you can grant it manually in one command:
-> ```bash
-> gcloud secrets add-iam-policy-binding rails-master-key \
->   --member="serviceAccount:$RUN_SA" \
->   --role="roles/secretmanager.secretAccessor"
-> gcloud secrets add-iam-policy-binding rails-db-password \
->   --member="serviceAccount:$RUN_SA" \
->   --role="roles/secretmanager.secretAccessor"
-> ```
-
 ![Cloud SQL Auth Proxy Security Comparison](assets/images/cloud_sql_proxy_comparison.jpg)
 
+### 5. Automated Pre-Flight Validation
 
-
-### 4. Automated Step 5 Validation
-
-Verify secret manager configuration:
+Run the automated Step 5 test suite to confirm that your database is runnable, secrets are non-empty, and IAM permissions are green:
 
 ```bash
 just workshop-eval 5
