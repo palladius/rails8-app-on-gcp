@@ -1,5 +1,11 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.80] - 2026-09-23
+### Changed
+- 📐 **Diagram Clarity & Option Title Sync (FL100-86)**:
+  - Replaced squished/unreadable raw Mermaid block in Step 7 with a high-resolution, crisp standalone PNG image (`nanobanana_sequence_diagram.png`) while keeping the Mermaid source code preserved inside a clean collapsible `<details>` element.
+  - Synchronized post title in Option B to `"Serverless Architecture with Ruby on Rails 8"`, matching Option A and the expected AI-generated vintage poster screenshot prompt.
+
 ## [0.2.79] - 2026-09-23
 ### Changed
 - 🍌 **Mascot Placement (FL100-85)**: Relocated `nano_banana_mascot.jpg` directly under subsection *1. The NanoBanana Vintage Cover Generator* for tighter visual coherence.

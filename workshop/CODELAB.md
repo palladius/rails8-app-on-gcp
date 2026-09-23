@@ -920,6 +920,11 @@ Good news: **this functionality is already fully implemented in the codebase!** 
 - **Dynamic Provenance Watermark:** Uses `libvips` to dynamically stamp a visual badge on the corner (colorful cloud stamp on GCS).
 - **Turbo Stream Hot-Swap:** When the image is attached, `Turbo::StreamsChannel.broadcast_refresh_to(post)` updates the reader's browser live without a manual page reload!
 
+![NanoBanana AI Asynchronous Architecture Sequence Diagram](assets/images/nanobanana_sequence_diagram.png)
+
+<details>
+<summary>📐 View Mermaid Sequence Diagram Source</summary>
+
 ```mermaid
 sequenceDiagram
   autonumber
@@ -943,12 +948,14 @@ sequenceDiagram
   Web-->>User: ⚡ Live UI Hot-Swap: Poster magically appears!
 ```
 
+</details>
+
 #### 🧪 Try It Live!
 You can trigger it in two ways:
 - **Option A (Web UI):** Click **New post**, enter a title like *"Serverless Architecture with Ruby on Rails 8"*, write some content, and leave the cover image file input **empty**. Click **Create Post**.
 - **Option B (CLI Runner):** Run from your terminal:
   ```bash
-  bin/rails runner 'Post.create!(title: "Serverless Rails on Google Cloud", body: "Exploring asynchronous AI pipelines with Solid Queue and NanoBanana!")'
+  bin/rails runner 'Post.create!(title: "Serverless Architecture with Ruby on Rails 8", body: "Exploring asynchronous AI pipelines with Solid Queue and NanoBanana!")'
   ```
 
 Wait ~15–30 seconds: watch the Solid Queue worker logs in Cloud Run. The vintage poster will appear directly on your post!
