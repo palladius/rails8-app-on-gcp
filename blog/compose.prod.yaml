@@ -5,15 +5,6 @@ services:
       dockerfile: Dockerfile
     x-google-cloudrun:
       ingress-container: true
-      min-instances: 1
-      startup-probe:
-        http-get:
-          path: /up
-          port: 8080
-        period-seconds: 10
-        timeout-seconds: 5
-        failure-threshold: 30
-        initial-delay-seconds: 5
     environment:
       RAILS_ENV: production
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."

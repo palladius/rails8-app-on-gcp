@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.77] - 2026-09-23
+### Changed
+- 🍌 **NanoBanana Magic Mascot (FL100-83)**: Replaced outdated pixel-art mascot in Step 7 with high-res 3D Pixar-style Cosmic Wizard Banana casting glowing binary code and Ruby gems (`nano_banana_mascot.jpg`).
+
 ## [0.2.76] - 2026-09-23
 ### Added
 - FL100-82: Added explanatory note in Step 6 regarding the Google Cloud Console UI glitch that labels `cloudsql-proxy` as ingress container, linking to GitHub Issue #149. Updated cropped screenshot.
