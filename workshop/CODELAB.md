@@ -905,11 +905,11 @@ just workshop-eval 6
 
 *Duration: 15min*
 
-![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
-
 With Solid Queue running in a dedicated container and Google Cloud Storage active, we can unleash asynchronous Generative AI!
 
 ### 1. The NanoBanana Vintage Cover Generator (Ready-to-Use GenAI Pipeline)
+
+![NanoBanana Mascot](assets/images/nano_banana_mascot.jpg)
 
 Good news: **this functionality is already fully implemented in the codebase!** You don't need to write any code — your task here is to trigger and observe an asynchronous cloud GenAI pipeline in action.
 

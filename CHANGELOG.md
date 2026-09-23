@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.79] - 2026-09-23
+### Changed
+- 🍌 **Mascot Placement (FL100-85)**: Relocated `nano_banana_mascot.jpg` directly under subsection *1. The NanoBanana Vintage Cover Generator* for tighter visual coherence.
+
 ## [0.2.78] - 2026-09-23
 ### Changed
 - 🎯 **Step 7 Clarity & Structure Refactor (FL100-84)**:
