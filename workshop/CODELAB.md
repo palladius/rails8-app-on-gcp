@@ -579,11 +579,11 @@ just workshop-eval 4
 ```
 
 
-## Step 5: Cloud SQL Ready & Secret Manager CLI Injection
+## Step 5: Cloud SQL Ready & Secret Manager Inspection
 
 *Duration: 10min*
 
-By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database and inject our secrets into **Google Cloud Secret Manager**.
+By now, the Cloud SQL PostgreSQL instance provisioned by Terraform in Step 1 has finished cooking in the background! In this step, we verify our database connectivity and inspect the secrets managed by **Google Cloud Secret Manager**.
 
 ### 0. Bootstrap Environment Variables
 
@@ -625,44 +625,65 @@ gcloud sql instances describe $SQL_INSTANCE_NAME --format="value(state)"
 
 The output should be `RUNNABLE`.
 
-### 2. Google Cloud Secret Manager Injection
+### 2. Inspecting Terraform-Provisioned Secrets
 
-Never store plain-text database passwords, API keys, or Rails master keys in git or in container environment variables. We use **Google Cloud Secret Manager** for zero-trust runtime injection.
+Never store plain-text database passwords, API keys, or Rails master keys in git or in container environment variables. In modern cloud architecture, we use **Google Cloud Secret Manager** for zero-trust runtime injection.
 
-![Secret Manager Workflow](assets/images/secret_manager_workflow.jpg)
+> ℹ️ **Good News: Terraform Already Handled This!**
+> During **Step 1**, Terraform provisioned three managed secrets for you automatically:
+> 1. `rails-master-key` — for decrypting Rails credentials at runtime.
+> 2. `rails-db-password` — a cryptographically secure random password matching the Cloud SQL user.
+> 3. `rails-admin-password` — a secure password for your initial administrator user.
 
-Store your secrets via the Google Cloud CLI:
+Verify that your secrets are present and active in Secret Manager:
 
 ```bash
-# 1. Store Rails Master Key
-gcloud secrets create rails-master-key --data-file=blog/config/master.key 2>/dev/null || \
-  gcloud secrets versions add rails-master-key --data-file=blog/config/master.key
-
-# 2. Store Cloud SQL Database Password (from Step 1 Terraform output)
-export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "RailsWorkshopSecure2026!")
-
-echo -n "$DB_PASSWORD" | gcloud secrets create rails-db-password --data-file=- 2>/dev/null || \
-  echo -n "$DB_PASSWORD" | gcloud secrets versions add rails-db-password --data-file=-
+gcloud secrets list --filter="name:rails-"
 ```
 
 <!-- TODO this should be automateable! -->
 ![Google Cloud Secret Manager Console listing configured application secrets](assets/images/secret_manager_secrets_list.png)
 
-### 3. Granting Secret Accessor Permissions
+> 💡 **What if you need to update a secret manually later?**
+> If you ever rotate a database password or update your Rails master key, you don't need to re-run Terraform. You can add a new secret version via the CLI:
+> ```bash
+> # Example: update or rotate a secret version
+> echo -n "NEW_SECRET_VALUE" | gcloud secrets versions add rails-db-password --data-file=-
+> ```
 
-Grant the Cloud Run runtime service account permission to read these secrets:
+### 3. Verifying Secret Accessor Permissions
+
+In order for Cloud Run containers to mount these secrets as environment variables or volume mounts at boot, the runtime service account (`$RUN_SA`) needs the `roles/secretmanager.secretAccessor` role on each secret.
+
+Terraform already granted this during Step 1! Verify the IAM policy binding on `rails-master-key`:
 
 ```bash
-gcloud secrets add-iam-policy-binding rails-master-key \
-  --member="serviceAccount:$RUN_SA" \
-  --role="roles/secretmanager.secretAccessor"
-
-gcloud secrets add-iam-policy-binding rails-db-password \
-  --member="serviceAccount:$RUN_SA" \
-  --role="roles/secretmanager.secretAccessor"
+# Verify that Cloud Run runtime SA has Secret Accessor role
+gcloud secrets get-iam-policy rails-master-key \
+  --flatten="bindings[].members" \
+  --format="table(bindings.role,bindings.members)" \
+  --filter="bindings.members:$RUN_SA"
 ```
 
+You should see:
+```text
+ROLE                                 MEMBERS
+roles/secretmanager.secretAccessor   serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com
+```
+
+> 💡 **Self-Healing Tip:** If for any reason the role is missing (for instance, if you provisioned without Terraform), you can grant it manually in one command:
+> ```bash
+> gcloud secrets add-iam-policy-binding rails-master-key \
+>   --member="serviceAccount:$RUN_SA" \
+>   --role="roles/secretmanager.secretAccessor"
+> gcloud secrets add-iam-policy-binding rails-db-password \
+>   --member="serviceAccount:$RUN_SA" \
+>   --role="roles/secretmanager.secretAccessor"
+> ```
+
 ![Cloud SQL Auth Proxy Security Comparison](assets/images/cloud_sql_proxy_comparison.jpg)
+
+
 
 ### 4. Automated Step 5 Validation
 
