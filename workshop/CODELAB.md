@@ -570,9 +570,6 @@ Look at the top of your blog page: you will see a bright warning banner rendered
 
 We are going to solve this properly in **Step 6**, when we graduate to a production-grade multi-container sidecar architecture with a dedicated `worker` container running Solid Queue independently from web traffic!
 
-<!-- workshop-screenshot: id="step-4-gcs-stuck-jobs-warning" -->
-![GCS ActiveStorage with Stuck Jobs Warning Banner](assets/auto-screenshots/step-4-gcs-stuck-jobs-warning.png)
-
 ### 6. Automated Step 4 Validation
 
 Verify your GCS configuration and stuck jobs telemetry:
