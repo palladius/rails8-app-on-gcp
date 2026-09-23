@@ -746,15 +746,31 @@ The production deployment runs three coordinated containers sharing the same loc
 
 ### 3. Running Database Migrations via Cloud Run Job
 
-Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job.
+Before routing web traffic to our new deployment, we must run database migrations and initial seeding against Cloud SQL. 
 
-> ⚠️ **Critical: DATABASE_URL Format for Cloud SQL Auth Proxy**
->
-> Cloud Run Jobs use a Unix socket proxy (not TCP). The `DATABASE_URL` **must** use the triple-slash format:
-> ```
-> postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJECT:REGION:INSTANCE
-> ```
-> The traditional `postgresql://user:pass@host/db` format **will fail** with `URI::InvalidURIError` due to colons in the Cloud SQL connection name. This affects Ruby 3.4+ (`uri-1.1.1` gem).
+#### ⚖️ How to Run Migrations in Containers: Two Strategies
+
+In containerized cloud environments, there are two common approaches to executing database migrations:
+
+- **Option A: Automatic inside Docker Entrypoint** (`entrypoint.sh` executes `db:migrate` on container boot)
+  - *Pros:* Fully automated; developers don't have to remember to run a command.
+  - *Cons:* Hazardous in serverless autoscaling! When Cloud Run scales up to 10 instances simultaneously under high traffic, 10 containers race to run migrations concurrently, causing database locking, schema race conditions, or boot timeouts.
+- **Option B: Explicit via Cloud Run Job (Our Architectural Choice)**
+  - *Pros:* Complete control, transactional safety, and zero race conditions. Runs as a dedicated one-shot container task completely detached from serving web traffic. If a migration fails, web serving is unaffected.
+  - *Cons:* Requires triggering a CLI job or CI/CD step before deployment.
+
+We choose **Option B** for maximum production reliability.
+
+#### ⚠️ Critical: `DATABASE_URL` Format & Ruby 3.4.5 RFC 3986 Strictness
+
+Cloud Run Jobs connect to Cloud SQL using the native Unix socket proxy (`/cloudsql/PROJECT:REGION:INSTANCE`). The `DATABASE_URL` **must** use the triple-slash format:
+
+```text
+postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJECT:REGION:INSTANCE
+```
+
+> 🔬 **Why not `postgresql://user:pass@PROJECT:REGION:INSTANCE/db`?**
+> Google Cloud SQL connection names contain colons (`:`). Starting in **Ruby 3.4+** (including our version **Ruby 3.4.5** with the bundled `uri-1.1.1` gem), the Ruby URI parser enforces strict compliance with **RFC 3986**. It considers colons invalid characters within an unbracketed host authority, raising `URI::InvalidURIError: bad URI`. The triple-slash format (`///`) omits the host authority completely and moves the Unix socket path to the query parameter `?host=...`, ensuring seamless parsing across all modern Ruby versions!
 
 ```bash
 # Get the latest blog image from Cloud Run (jobs don't support --source)
@@ -765,12 +781,12 @@ export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-pas
 export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
 export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
 
-# Create migration job — note ALL 4 database URL env vars for Rails 8 multi-database
+# Create migration job — note ALL 4 database URL env vars and GOOGLE_CLOUD_ACCOUNT for seed user creation
 gcloud run jobs create rails-migrate \
   --image=$BLOG_IMAGE \
   --command "bin/rails" \
   --args "db:prepare" \
-  --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}" \
+  --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT}" \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
   --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
   --service-account=$RUN_SA \
@@ -795,6 +811,10 @@ gcloud run jobs update rails-migrate \
 
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
+
+![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
+*Output of gcloud run jobs executions describe JOBNAME*
+
 
 ### 4. Deploy 4: Deploying Multi-Container Cloud Run
 
