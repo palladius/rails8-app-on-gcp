@@ -560,7 +560,7 @@ Here is a list of uploaded blobs and media objects you might see on the [Google 
 
 ![Google Cloud Storage Console bucket details showing persistent image blobs](assets/images/gcs_bucket_details_prod.png)
 
-### 5. ⚠️ The POLA Catch: Stuck Jobs Warning Banner
+### 5. ⚠️ The Catch: Stuck Jobs Warning Banner
 
 When you uploaded the image, ActiveStorage enqueued an analysis job (`ActiveStorage::AnalyzeJob`) to extract dimensions and metadata.
 
