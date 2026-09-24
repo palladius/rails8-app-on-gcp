@@ -38,7 +38,14 @@ resource "google_secret_manager_secret" "rails_master_key" {
 
 resource "google_secret_manager_secret_version" "rails_master_key" {
   secret      = google_secret_manager_secret.rails_master_key.id
-  secret_data = fileexists("${path.module}/../blog/config/master.key") ? trimspace(file("${path.module}/../blog/config/master.key")) : random_id.rails_master_key.hex
+  secret_data = trimspace(file("${path.module}/../blog/config/master.key"))
+
+  lifecycle {
+    precondition {
+      condition     = fileexists("${path.module}/../blog/config/master.key") && can(regex("^[0-9a-f]{32}$", trimspace(file("${path.module}/../blog/config/master.key")))) && !startswith(trimspace(file("${path.module}/../blog/config/master.key")), "0123456789abcdef")
+      error_message = "blog/config/master.key is missing or dummy! Run: ruby ../bin/ensure_workshop_credentials.rb (or use ./bin/terraform-apply.sh)"
+    }
+  }
 }
 
 # Admin Password

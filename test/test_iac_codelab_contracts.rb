@@ -106,4 +106,57 @@ class IacCodelabContractsTest < Minitest::Test
                    "step-#{step_num}-ruby-status-json-step must set RBENV_VERSION => 3.4.5 in env hash")
     end
   end
+
+  # Review Fix C1 ("Computer 2" scenario):
+  # When a custom credentials.yml.enc is already present in git (MD5 != SAMPLE_APP_CREDENTIALS)
+  # and master.key is missing locally, pulling the matching key from GCP must ONLY restore master.key
+  # and MUST NOT overwrite credentials.yml.enc!
+  def test_c1_computer_2_restores_key_without_overwriting_custom_credentials_yml_enc
+    Dir.mktmpdir do |fake_repo|
+      config_dir = File.join(fake_repo, "blog", "config")
+      FileUtils.mkdir_p(config_dir)
+      temp_creds = File.join(config_dir, "credentials.yml.enc")
+      temp_master = File.join(config_dir, "master.key")
+      computer_1_key = "11223344556677889900aabbccddeeff"
+
+      WorkshopCredentialsManager.write_encrypted_credentials!(computer_1_key, temp_creds)
+      custom_md5_before = Digest::MD5.file(temp_creds).hexdigest
+      refute_equal WorkshopCredentialsManager::SAMPLE_APP_CREDENTIALS, custom_md5_before
+
+      # Stub fetch_gcp_secret_key and push_gcp_secret_key for Computer 2
+      WorkshopCredentialsManager.singleton_class.class_eval do
+        alias_method :orig_fetch_gcp, :fetch_gcp_secret_key
+        alias_method :orig_push_gcp, :push_gcp_secret_key
+        define_method(:fetch_gcp_secret_key) { |*_args| computer_1_key }
+        define_method(:push_gcp_secret_key) { |*_args| true }
+      end
+
+      begin
+        result = WorkshopCredentialsManager.ensure!(repo_root: fake_repo, sync_gcp: true, quiet: true)
+        assert_equal :restored_key_only, result[:status], "Computer 2 must return :restored_key_only"
+        assert_equal custom_md5_before, Digest::MD5.file(temp_creds).hexdigest,
+                     "Computer 2 MUST NOT overwrite existing custom credentials.yml.enc!"
+        assert_equal computer_1_key, File.read(temp_master).strip
+      ensure
+        WorkshopCredentialsManager.singleton_class.class_eval do
+          alias_method :fetch_gcp_secret_key, :orig_fetch_gcp
+          alias_method :push_gcp_secret_key, :orig_push_gcp
+        end
+      end
+    end
+  end
+
+  # Review Fix C2, C3, M4:
+  # - No project-wide roles/secretmanager.secretAccessor or roles/storage.objectAdmin in cloudrun.tf
+  # - Bucket-scoped google_storage_bucket_iam_member in cloudrun.tf
+  # - Lifecycle precondition on rails_master_key in secrets.tf
+  def test_c2_c3_m4_least_privilege_iam_and_terraform_precondition
+    refute_match(/roles\/secretmanager\.secretAccessor/, @cloudrun_tf,
+                 "iac/cloudrun.tf must NOT grant project-wide roles/secretmanager.secretAccessor (scoped per-secret in secrets.tf)")
+    assert_match(/resource\s+"google_storage_bucket_iam_member"/, @cloudrun_tf,
+                 "iac/cloudrun.tf must scope roles/storage.objectAdmin per-bucket via google_storage_bucket_iam_member")
+    assert_match(/precondition\s*\{/, @secrets_tf,
+                 "iac/secrets.tf must enforce a lifecycle precondition verifying blog/config/master.key exists")
+  end
 end
+

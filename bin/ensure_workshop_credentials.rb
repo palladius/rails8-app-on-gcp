@@ -4,7 +4,7 @@
 # bin/ensure_workshop_credentials.rb
 # Ensures transactional consistency between:
 # 1. blog/config/master.key (32-char hex key, never dummy)
-# 2. blog/config/credentials.yml.enc (encrypted with that exact master.key, never left with maintainer MD5)
+# 2. blog/config/credentials.yml.enc (encrypted with that exact master.key, never left with SAMPLE_APP_CREDENTIALS MD5)
 # 3. Google Cloud Secret Manager 'rails-master-key' (if sync_gcp=true and secret exists)
 
 require "digest"
@@ -23,7 +23,8 @@ module WorkshopCredentialsManager
   GENESIS_CREATORS_CREDENTIALS_MD5 = SAMPLE_APP_CREDENTIALS
   WORKSHOP_FILE_MD5_EMI_RICC = SAMPLE_APP_CREDENTIALS
 
-  BLOG_DIR = File.expand_path("../blog", __dir__)
+  REPO_ROOT = File.expand_path("..", __dir__)
+  BLOG_DIR = File.join(REPO_ROOT, "blog")
   MASTER_KEY_PATH = File.join(BLOG_DIR, "config", "master.key")
   CREDENTIALS_PATH = File.join(BLOG_DIR, "config", "credentials.yml.enc")
 
@@ -65,13 +66,11 @@ module WorkshopCredentialsManager
     false
   end
 
-  # Writes a valid Rails 8 credentials.yml.enc encrypted with the given 32-char hex master key
+  # Writes a valid Rails 8 credentials.yml.enc encrypted with the given 32-char hex master key.
+  # Strictly isolated to `credentials_path` (never touches real repo files when testing in tmpdir — fixes C4).
   def write_encrypted_credentials!(hex_key, credentials_path = CREDENTIALS_PATH)
     raise ArgumentError, "Invalid 32-char hex master key" unless valid_hex_key?(hex_key)
 
-    # First try using Rails runner if available and fast, otherwise pure OpenSSL AES-128-GCM
-    # Note: Rails ActiveSupport::EncryptedFile uses AES-128-GCM with JSON or Marshal serializer.
-    # Let's use `bin/rails runner` with RBENV_VERSION=3.4.5 if bundle is ready, with a fast pure-Ruby fallback!
     yaml_payload = <<~YAML
       # Generated automatically for Rails 8 on GCP Workshop
       secret_key_base: #{SecureRandom.hex(64)}
@@ -79,38 +78,18 @@ module WorkshopCredentialsManager
         generated_at: "#{Time.now.utc.iso8601}"
     YAML
 
-    written_by_rails = false
-    if File.exist?(File.join(BLOG_DIR, "bin", "rails"))
-      FileUtils.rm_f(credentials_path)
-      File.write(MASTER_KEY_PATH, "#{hex_key.strip}\n")
-      File.chmod(0o600, MASTER_KEY_PATH) rescue nil
-      env = {
-        "RBENV_VERSION" => "3.4.5",
-        "RAILS_MASTER_KEY" => hex_key.strip,
-        "SECRET_KEY_BASE_DUMMY" => nil
-      }
-      runner_script = <<~RUBY
-        Rails.application.credentials.write(#{yaml_payload.inspect})
-      RUBY
-      _out, _err, status = Open3.capture3(env, "bin/rails", "runner", runner_script, chdir: BLOG_DIR)
-      written_by_rails = status.success? && File.exist?(credentials_path)
-    end
-
-    unless written_by_rails
-      # Pure-Ruby fallback compatible with Rails ActiveSupport::EncryptedFile (Marshal + AES-128-GCM)
-      cipher = OpenSSL::Cipher.new("aes-128-gcm")
-      cipher.encrypt
-      cipher.key = [hex_key.strip].pack("H*")
-      iv = cipher.random_iv
-      cipher.iv = iv
-      cipher.auth_data = ""
-      serialized = Marshal.dump(yaml_payload)
-      encrypted_data = cipher.update(serialized) + cipher.final
-      auth_tag = cipher.auth_tag
-      encoded = [encrypted_data, iv, auth_tag].map { |p| Base64.strict_encode64(p) }.join("--")
-      File.write(credentials_path, "#{encoded}\n")
-    end
-
+    FileUtils.mkdir_p(File.dirname(credentials_path))
+    cipher = OpenSSL::Cipher.new("aes-128-gcm")
+    cipher.encrypt
+    cipher.key = [hex_key.strip].pack("H*")
+    iv = cipher.random_iv
+    cipher.iv = iv
+    cipher.auth_data = ""
+    serialized = Marshal.dump(yaml_payload)
+    encrypted_data = cipher.update(serialized) + cipher.final
+    auth_tag = cipher.auth_tag
+    encoded = [encrypted_data, iv, auth_tag].map { |p| Base64.strict_encode64(p) }.join("--")
+    File.write(credentials_path, "#{encoded}\n")
     true
   end
 
@@ -121,14 +100,18 @@ module WorkshopCredentialsManager
     end
     return nil if project_id.empty? || project_id == "(unset)"
 
-    out, _err, status = Open3.capture3(
+    out, err, status = Open3.capture3(
       "gcloud", "secrets", "versions", "access", "latest",
       "--secret=rails-master-key", "--project=#{project_id}"
     )
-    return nil unless status.success?
+    unless status.success?
+      warn "[Credentials] gcloud secrets versions access failed: #{err.strip}" if ENV["VERBOSE"] == "1"
+      return nil
+    end
     candidate = out.strip
     valid_hex_key?(candidate) ? candidate : nil
-  rescue StandardError
+  rescue StandardError => e
+    warn "[Credentials] fetch_gcp_secret_key error: #{e.message}" if ENV["VERBOSE"] == "1"
     nil
   end
 
@@ -139,11 +122,13 @@ module WorkshopCredentialsManager
     end
     return false if project_id.empty? || project_id == "(unset)"
 
-    # Only push if secret already exists in GCP
-    _desc, _err, desc_status = Open3.capture3(
+    _desc, err, desc_status = Open3.capture3(
       "gcloud", "secrets", "describe", "rails-master-key", "--project=#{project_id}"
     )
-    return false unless desc_status.success?
+    unless desc_status.success?
+      warn "[Credentials] rails-master-key not yet created in GCP: #{err.strip}" if ENV["VERBOSE"] == "1"
+      return false
+    end
 
     current_gcp = fetch_gcp_secret_key(project_id)
     return true if current_gcp == hex_key.strip
@@ -153,11 +138,27 @@ module WorkshopCredentialsManager
       stdin.close
       wait_thr.value.success?
     end
-  rescue StandardError
+  rescue StandardError => e
+    warn "[Credentials] push_gcp_secret_key error: #{e.message}" if ENV["VERBOSE"] == "1"
     false
   end
 
   alias_method :can_decrypt?, :can_decrypt_credentials?
+
+  # Read-only diagnostic check (never mutates files — fixes M2)
+  def check(repo_root: REPO_ROOT)
+    master_key_path = File.join(repo_root, "blog", "config", "master.key")
+    credentials_path = File.join(repo_root, "blog", "config", "credentials.yml.enc")
+    local_key = File.exist?(master_key_path) ? File.read(master_key_path).strip : nil
+    is_sample_md5 = maintainer_credentials_file?(credentials_path)
+    paired = valid_hex_key?(local_key) && !is_sample_md5 && can_decrypt_credentials?(local_key, credentials_path)
+    {
+      status: paired ? :ok : :needs_setup,
+      has_valid_local_key: valid_hex_key?(local_key),
+      is_sample_app_md5: is_sample_md5,
+      can_decrypt: paired
+    }
+  end
 
   def ensure!(repo_root: REPO_ROOT, sync_gcp: false, quiet: false)
     master_key_path = File.join(repo_root, "blog", "config", "master.key")
@@ -186,8 +187,21 @@ module WorkshopCredentialsManager
                    SecureRandom.hex(16)
                  end
 
+    # Fix C1 ("Computer 2" scenario): If credentials.yml.enc is ALREADY a custom encrypted file
+    # (NOT the shipped SAMPLE_APP_CREDENTIALS) and `target_key` can already decrypt it,
+    # ONLY restore the missing local `master.key` — NEVER overwrite `credentials.yml.enc`!
+    if !is_maintainer_md5 && can_decrypt_credentials?(target_key, credentials_path)
+      msg = "✅ [Credentials] Restored local blog/config/master.key matching existing credentials.yml.enc (preserved without rewriting)."
+      block_given? ? yield(msg) : (puts msg unless quiet)
+      FileUtils.mkdir_p(File.dirname(master_key_path))
+      File.write(master_key_path, "#{target_key}\n")
+      File.chmod(0o600, master_key_path) rescue nil
+      push_gcp_secret_key(target_key) if sync_gcp
+      return { status: :restored_key_only, key: target_key, action: :restored_key_only }
+    end
+
     if is_maintainer_md5 && !quiet
-      msg = "🔄 [Credentials] Detected Genesis Creators credentials.yml.enc (MD5: #{GENESIS_CREATORS_CREDENTIALS_MD5}). Re-encrypting with your workshop master.key..."
+      msg = "🔄 [Credentials] Detected SAMPLE_APP_CREDENTIALS (MD5: #{SAMPLE_APP_CREDENTIALS}). Re-encrypting with your workshop master.key..."
       block_given? ? yield(msg) : puts(msg)
     elsif !quiet
       msg = "🔐 [Credentials] Generating paired blog/config/master.key and blog/config/credentials.yml.enc..."
@@ -211,8 +225,13 @@ module WorkshopCredentialsManager
 end
 
 if __FILE__ == $PROGRAM_NAME
-  sync_gcp = ARGV.include?("--sync-gcp")
-  quiet = ARGV.include?("--quiet")
-  res = WorkshopCredentialsManager.ensure!(sync_gcp: sync_gcp, quiet: quiet)
-  exit(res[:status] ? 0 : 1)
+  if ARGV.include?("--check")
+    res = WorkshopCredentialsManager.check
+    exit(res[:status] == :ok ? 0 : 1)
+  else
+    sync_gcp = ARGV.include?("--sync-gcp")
+    quiet = ARGV.include?("--quiet")
+    res = WorkshopCredentialsManager.ensure!(sync_gcp: sync_gcp, quiet: quiet)
+    exit([:ok, :regenerated, :restored_key_only].include?(res[:status]) ? 0 : 1)
+  end
 end

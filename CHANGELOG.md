@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2026-09-24
+### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
+- 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
+- 🔴 **C2 & M4 (`iac/cloudrun.tf`)**: Eliminated project-wide `roles/secretmanager.secretAccessor` and `roles/storage.objectAdmin` sprawl; secrets remain strictly scoped per-secret in `iac/secrets.tf` and storage access is scoped per-bucket via `google_storage_bucket_iam_member`.
+- 🔴 **C3 (`iac/secrets.tf`)**: Added a Terraform `lifecycle { precondition { ... } }` on `google_secret_manager_secret_version.rails_master_key` requiring a valid 32-char hex `blog/config/master.key`, preventing unrecoverable Cloud Run boot crashes if `terraform apply` is invoked directly.
+- 🔴 **C4 (`bin/ensure_workshop_credentials.rb`)**: Removed the `bin/rails runner` shellout from `write_encrypted_credentials!` so tmpdir tests never touch the real repository's `master.key` or `credentials.yml.enc` (and sped up the IaC contract test suite by 65x to `36ms`).
+- 🟠 **M1–M3 & m1–m4**: Scoped `queue_schema.rb` loading in `blog/bin/docker-entrypoint` to the `:queue` connection (`M1`) and sequential `.env` loading (`m2`); added read-only `WorkshopCredentialsManager.check` for `bin/workshop_diagnostics.rb` (`M2`); fixed `<details><summary>` regex in `bin/sync_devsite_codelab.rb` (`M3`); fixed CLI exit code (`m1`) and self-scoped `serviceAccountTokenCreator` (`m4`).
+
 ## [0.3.2] - 2026-09-24
 ### Added & Improved
 - 🏷️ **Codelab Versioning & Changelog Synchronization (`workshop/CODELAB_VERSION` v2.2.0 & `workshop/CODELAB_CHANGELOG.md`)**:

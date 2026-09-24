@@ -33,9 +33,10 @@ codelab_content = File.read(CODELAB_MD)
 body = codelab_content.sub(/\A.*?^(?=# Rails 8 on Google Cloud)/m, "")
 # Rewrite relative image paths from GitHub Codelab to DevSite Codelab paths
 body = body.gsub(%r{\(assets/images/([^)]+)\)}, '(/codelabs/rails8-on-google-cloud/img/\1)')
-# Convert `<details><summary>...</summary>...</details>` to standard markdown sections for DevSite parser compatibility
-body = body.gsub(%r{<details>\s*<summary><strong>(.*?)</strong></summary>(.*?)</details>}m) do
-  "#### #{Regexp.last_match(1)}\n#{Regexp.last_match(2)}"
+# Convert `<details><summary>...</summary>...</details>` to standard markdown sections for DevSite parser compatibility (fixes M3)
+body = body.gsub(%r{<details>\s*<summary>(.*?)</summary>(.*?)</details>}m) do
+  title = Regexp.last_match(1).gsub(%r{</?strong>}, "").strip
+  "#### #{title}\n#{Regexp.last_match(2)}"
 end
 
 target_paths.uniq.each do |devsite_path|

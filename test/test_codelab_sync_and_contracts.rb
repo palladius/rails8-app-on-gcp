@@ -239,6 +239,8 @@ class CodelabSyncAndContractsTest < Minitest::Test
       devsite_content = File.read(DEVSITE_LAB_PATH)
       assert_match(/\*Codelab Version: v#{Regexp.escape(codelab_version)}\b.*workshop\/CODELAB_CHANGELOG\.md.*\*/, devsite_content,
                    "DevSite index.lab.md must also contain the synced small-italic Codelab Version v#{codelab_version} footer")
+      refute_match(/<details>|<summary>/, devsite_content,
+                   "DevSite index.lab.md must not contain raw <details> or <summary> HTML tags (fixes M3)")
     end
   end
 

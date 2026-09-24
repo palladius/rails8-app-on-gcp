@@ -251,17 +251,36 @@ end
 puts "\n--- 🔑 3. Checking Rails Secrets & Keys ---".bold
 require_relative "ensure_workshop_credentials"
 begin
-  creds_result = WorkshopCredentialsManager.ensure!(
-    repo_root: File.expand_path("..", __dir__),
-    sync_gcp: false
-  ) do |msg|
-    puts "   #{msg}".cyan
-  end
-  if creds_result[:status] == :ok || creds_result[:status] == :regenerated
+  repo_root_dir = File.expand_path("..", __dir__)
+  cred_check = WorkshopCredentialsManager.check(repo_root: repo_root_dir)
+  if cred_check[:status] == :ok
     puts "✅ config/master.key and config/credentials.yml.enc verified and cryptographically paired!".green
+  elsif cred_check[:is_sample_app_md5] || !File.exist?(File.join(repo_root_dir, "blog/config/credentials.yml.enc"))
+    creds_result = WorkshopCredentialsManager.ensure!(
+      repo_root: repo_root_dir,
+      sync_gcp: true
+    ) do |msg|
+      puts "   #{msg}".cyan
+    end
+    if [:ok, :regenerated, :restored_key_only].include?(creds_result[:status])
+      puts "✅ config/master.key and config/credentials.yml.enc bootstrapped and cryptographically paired!".green
+    end
+  else
+    # Custom credentials.yml.enc exists (Computer 2 scenario): try restoring key from GCP without overwriting credentials.yml.enc
+    gcp_key = WorkshopCredentialsManager.fetch_gcp_secret_key
+    if gcp_key && WorkshopCredentialsManager.can_decrypt_credentials?(gcp_key, File.join(repo_root_dir, "blog/config/credentials.yml.enc"))
+      WorkshopCredentialsManager.ensure!(repo_root: repo_root_dir, sync_gcp: true) do |msg|
+        puts "   #{msg}".cyan
+      end
+      puts "✅ Restored config/master.key from GCP Secret Manager matching custom credentials.yml.enc!".green
+    else
+      puts "⚠️  [WARNING] Custom credentials.yml.enc detected but local config/master.key is missing or mismatched.".yellow
+      puts "   👉 Run `ruby bin/ensure_workshop_credentials.rb --sync-gcp` to restore or regenerate credentials."
+      warnings_count += 1
+    end
   end
 rescue => e
-  puts "⚠️  [WARNING] Could not auto-pair Rails credentials: #{e.message}".yellow
+  puts "⚠️  [WARNING] Could not verify Rails credentials: #{e.message}".yellow
   warnings_count += 1
 end
 
