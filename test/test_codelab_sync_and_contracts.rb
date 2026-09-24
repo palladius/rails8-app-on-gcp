@@ -7,9 +7,9 @@ class CodelabSyncAndContractsTest < Minitest::Test
   REPO_ROOT = File.expand_path("..", __dir__)
   CODELAB_PATH = File.join(REPO_ROOT, "workshop", "CODELAB.md")
   SKELETON_YAML_PATH = File.join(REPO_ROOT, "workshop", "skeleton.yaml")
-  DEVSITE_LAB_PATH = File.expand_path(
-    "../google3/third_party/devsite/codelabs/en/codelabs/rails8-on-google-cloud/index.lab.md",
-    REPO_ROOT
+  DEVSITE_LAB_PATH = ENV.fetch(
+    "DEVSITE_CODELAB_PATH",
+    File.join(REPO_ROOT, "workshop", "build", "devsite", "index.lab.md")
   )
 
   def setup
@@ -231,13 +231,23 @@ class CodelabSyncAndContractsTest < Minitest::Test
     assert_match(/\*Codelab Version: v#{Regexp.escape(codelab_version)}\b.*workshop\/CODELAB_CHANGELOG\.md.*\*/, last_page,
                  "Last page of workshop/CODELAB.md must contain small-italic Codelab Version v#{codelab_version} footer")
 
-    devsite_citc_path = "/google/src/cloud/ricc/fl100-friction-log-feedback/google3/third_party/devsite/codelabs/en/codelabs/rails8-on-google-cloud/index.lab.md"
-    if File.exist?(devsite_citc_path)
-      devsite_content = File.read(devsite_citc_path)
+    if File.exist?(DEVSITE_LAB_PATH)
+      devsite_content = File.read(DEVSITE_LAB_PATH)
       assert_match(/\*Codelab Version: v#{Regexp.escape(codelab_version)}\b.*workshop\/CODELAB_CHANGELOG\.md.*\*/, devsite_content,
-                   "Google3 DevSite index.lab.md must also contain the synced small-italic Codelab Version v#{codelab_version} footer")
+                   "DevSite index.lab.md must also contain the synced small-italic Codelab Version v#{codelab_version} footer")
     end
   end
+
+  def test_no_internal_google_paths_exfiltrated
+    forbidden_prefix = ["/google", "src/"].join("/")
+    files = `git -C #{REPO_ROOT} ls-files`.lines.map(&:strip)
+    offending = files.reject { |f| %w[AGENTS.md GEMINI.md test/test_codelab_sync_and_contracts.rb].include?(f) }.select do |rel|
+      full = File.join(REPO_ROOT, rel)
+      File.file?(full) && File.read(full, encoding: "BINARY").include?(forbidden_prefix)
+    end
+    assert_empty offending, "Public repository MUST NOT contain internal #{forbidden_prefix} references! Found in: #{offending.join(', ')}"
+  end
 end
+
 
 

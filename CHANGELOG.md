@@ -3,8 +3,8 @@ All notable changes to this project will be documented in this file.
 ## [0.3.2] - 2026-09-24
 ### Added & Improved
 - 🏷️ **Codelab Versioning & Changelog Synchronization (`workshop/CODELAB_VERSION` v2.2.0 & `workshop/CODELAB_CHANGELOG.md`)**:
-  - Added `workshop/CODELAB_VERSION` (`2.2.0`) and `workshop/CODELAB_CHANGELOG.md` to explicitly track Codelab parity between GitHub (`workshop/CODELAB.md`) and Google3 DevSite (`index.lab.md`).
-  - Added a subtle small-italic version stamp at the bottom of the last page (`Conclusion & Clean Up`) of both Codelabs, enforced by `test_codelab_version_and_changelog_synced_in_last_page_footer` (**33 new contract tests / 176 assertions total**).
+  - Added `workshop/CODELAB_VERSION` (`2.2.0`) and `workshop/CODELAB_CHANGELOG.md` to explicitly track Codelab parity between GitHub (`workshop/CODELAB.md`) and Google DevSite (`index.lab.md`).
+  - Added a subtle small-italic version stamp at the bottom of the last page (`Conclusion & Clean Up`) of both Codelabs, enforced by `test_codelab_version_and_changelog_synced_in_last_page_footer` (**34 new contract tests / 177 assertions total**).
 - 🔐 **`SAMPLE_APP_CREDENTIALS` Constant (`bin/ensure_workshop_credentials.rb`)**:
   - Named the shipped sample app credentials MD5 constant `SAMPLE_APP_CREDENTIALS` (`SAMPLE_APP_CREDENTIALS_MD5 = "7b856d06f492f293bea59a5323150d8c"`) in `WorkshopCredentialsManager` and verified end-to-end re-encryption + MD5 divergence in `test/test_iac_codelab_contracts.rb`.
 
@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file.
   - `test/test_docker_compose_contracts.rb` (**9 tests, 28 assertions**): Verifies `blog/compose.yaml` (`web`, `worker`, `mailpit`, `adminer`), `blog/bin/docker-entrypoint` (`server.pid` cleanup, `.env` sourcing, `queue_schema.rb` loading, auto `db:seed`), `blog/config/database.yml` (all 4 development databases: `primary`, `cache`, `queue`, `cable`), and `blog/db/seeds.rb`.
   - `test/test_iac_codelab_contracts.rb` (**6 tests, 28 assertions**): Verifies Terraform `iac/secrets.tf` and `iac/cloudrun.tf` IAM bindings, secret-level IAM policies on `rails-master-key`, and `WorkshopCredentialsManager` end-to-end re-encryption + MD5 divergence.
 - 🔄 **Deterministic DevSite Codelab Compiler (`bin/sync_devsite_codelab.rb`)**:
-  - Automatically compiles `workshop/CODELAB.md` into `workshop/build/devsite/index.lab.md` and syncs to the Google3 CitC DevSite workspace during `just build-ghpages`.
+  - Automatically compiles `workshop/CODELAB.md` into `workshop/build/devsite/index.lab.md` during `just build-ghpages`.
 
 ### Fixed
 - 🛠️ **Complete Resolution of Emiliano Della Casa's Friction Log Bug ([#153](https://github.com/palladius/rails8-app-on-gcp/issues/153) — `FL_E001 Magnificent FL from Emiliano`)**:

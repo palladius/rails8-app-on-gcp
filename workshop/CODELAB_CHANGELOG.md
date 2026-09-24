@@ -2,7 +2,7 @@
 
 This file tracks the synchronized changes between:
 1. **GitHub Source of Truth**: [`workshop/CODELAB.md`](./CODELAB.md) (and generated `docs/` via `just build-ghpages`)
-2. **Google3 DevSite Mirror**: `//depot/google3/third_party/devsite/codelabs/en/codelabs/rails8-on-google-cloud/index.lab.md` (synced via `ruby bin/sync_devsite_codelab.rb`)
+2. **Google DevSite Codelab Mirror**: `rails8-on-google-cloud` (`index.lab.md`, synced via `ruby bin/sync_devsite_codelab.rb`)
 
 The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedded in the last page (`Conclusion and Clean Up`) of both Codelabs in small italics and verified by automated contract tests (`test/test_codelab_sync_and_contracts.rb`).
 
