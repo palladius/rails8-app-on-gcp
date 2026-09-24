@@ -171,37 +171,33 @@ style: |
 
 ---
 
-## 3. Reclaim Credits Now 💳
+## 3. Open the Official Google Codelab 📖
 
-<div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 2px;">
+<div style="margin: 8px 0 10px 0;">
+  <a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 8px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9em;">
+    📖 Open the Codelab
+  </a>
+</div>
+
+<div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 6px;">
   <div style="flex: 1;">
-    <p style="margin: 0 0 4px 0;">Redeem your Google Cloud credits for today's workshop:</p>
-    <div style="margin: 6px 0 8px 0;">
-      <a href="https://me.developers.google.com/benefits/claim/test-workshop-rails8" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 7px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.8em;">
-        🎟️ Claim GCP Credits
-      </a>
-    </div>
+    <p style="margin: 0 0 6px 0;">Your entire workshop journey lives here:</p>
     <ul style="font-size: 0.84em; margin: 0;">
-      <li>☁️ Activates sandbox GCP Project &amp; billing.</li>
-      <li>💵 Covers Cloud Run, Cloud SQL &amp; GCS.</li>
-      <li>⚠️ <strong>Localhost first</strong> — early steps are 100% local.</li>
+      <li>📖 <strong>Step-by-step</strong> instructions from zero to production on Google Cloud.</li>
+      <li>💳 <strong>GCP Credits</strong> — redeem them on <strong>Page 2</strong> (Step 0) of the codelab.</li>
+      <li>🤖 <strong>Antigravity prompts & skills</strong> embedded in every step.</li>
+      <li>⚠️ <strong>Localhost first</strong> — early steps are 100% local, no cloud needed.</li>
     </ul>
   </div>
   <div style="text-align: center;">
-    <img src="images/reclaim-credits-qr.png" style="width: 158px; height: 158px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);" alt="Scan QR Code to Claim Credits" />
-    <p style="font-size: 0.66em; color: #5f6368; margin-top: 3px;">📱 Scan with phone camera</p>
+    <img src="images/codelab-qr.png" style="width: 158px; height: 158px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.12);" alt="Scan QR Code to open the Codelab" />
+    <p style="font-size: 0.66em; color: #5f6368; margin-top: 3px;">📱 Scan to open codelab</p>
   </div>
 </div>
 
-<div style="border: 1px solid #f9ab00; background-color: #fef7e0; border-radius: 6px; padding: 9px 14px; margin-top: 10px; font-size: 0.74em; line-height: 1.35;">
-<strong>⚡ Out of Antigravity free credits?</strong> These Cloud credits <strong>do not</strong> refill them — Antigravity bills on Google AI plans, a separate surface. Try in order:
-<ol style="margin: 3px 0 0 0; padding-left: 1.2em;">
-<li><strong>Switch model pool:</strong> Claude / GPT-OSS have their own quota and are free-tier eligible (model selector under the prompt box).</li>
-<li><strong>Pick a Flash model</strong> rather than Pro — lighter on rate limits.</li>
-<li><strong>Antigravity CLI + free Gemini API key</strong> from AI Studio — bring-your-own-key works on the <em>CLI only</em>, never in the IDE. Steps in Step 0 of the codelab.</li>
-<li><strong>Otherwise:</strong> free quota refreshes <strong>weekly</strong>, or upgrade to Google AI Pro / Ultra.</li>
-</ol>
-</div>
+<p style="font-size: 0.75em; color: #5f6368; text-align: center; margin: 10px 0 0 0;">
+  🔗 <a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0" target="_blank" rel="noopener noreferrer" style="color: #1a73e8; text-decoration: none;">codelabs.developers.google.com/codelabs/rails8-on-google-cloud</a>
+</p>
 
 ---
 
@@ -216,13 +212,12 @@ style: |
 
 <div class="prompt-box">
 "I am attending the Rails 8 on Google Cloud workshop.<br/>
-Please inspect:<br/>
-https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md<br/>
-(or workshop/landing-page/README.it.md if you prefer Italian)<br/>
-and guide me step-by-step through the workshop!"
+Please follow the official Google Codelab at:<br/>
+https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0<br/>
+and guide me step-by-step through it!"
 </div>
 
-<button class="btn-copy" onclick="navigator.clipboard.writeText('I am attending the Rails 8 on Google Cloud workshop.\nPlease inspect:\nhttps://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md\n(or workshop/landing-page/README.it.md if you prefer Italian)\nand guide me step-by-step through the workshop!'); this.innerText='✅ Copied!'; setTimeout(() => this.innerText='📋 Copy Prompt', 2000)">📋 Copy Prompt</button>
+<button class="btn-copy" onclick="navigator.clipboard.writeText('I am attending the Rails 8 on Google Cloud workshop.\nPlease follow the official Google Codelab at:\nhttps://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0\nand guide me step-by-step through it!'); this.innerText='✅ Copied!'; setTimeout(() => this.innerText='📋 Copy Prompt', 2000)">📋 Copy Prompt</button>
 
 </div>
 <div class="slide5-col-right">
@@ -265,7 +260,7 @@ and guide me step-by-step through the workshop!"
   </div>
 </div>
 <p style="margin: 0 0 8px 0;">
-👉 Start hacking at <a href="https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/landing-page/README.md" target="_blank" rel="noopener noreferrer"><code>workshop/landing-page/README.md</code></a>
+👉 Start hacking at <a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0" target="_blank" rel="noopener noreferrer"><code>Official Google Codelab</code></a>
 </p>
 
 <div style="background-color: #f1f3f4; border: 1px solid #dadce0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; font-size: 0.9em;">
