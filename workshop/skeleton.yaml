@@ -300,8 +300,8 @@ steps:
         expect_exit: 0
       - id: "step-6-shell-cloud-run-ready"
         type: "shell"
-        description: "Verify live Cloud Run service 'blog' is Ready=True when GOOGLE_CLOUD_PROJECT is set"
-        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline: skipping' || gcloud run services describe blog --project=\"$GOOGLE_CLOUD_PROJECT\" --region=\"${GOOGLE_CLOUD_REGION:-europe-west1}\" --format='value(status.url)' 2>/dev/null | grep -q '^https://'"
+        description: "Verify live Cloud Run service 'blog' is Ready=True when WORKSHOP_LIVE_EVAL=1 is set"
+        command: "test -z \"$WORKSHOP_LIVE_EVAL\" && echo 'CI/Offline mode: skipping live Cloud Run check' || test \"$(gcloud run services describe blog --project=\"$GOOGLE_CLOUD_PROJECT\" --region=\"${GOOGLE_CLOUD_REGION:-europe-west1}\" --format='value(status.conditions[0].status)' 2>/dev/null)\" = 'True'"
         expect_exit: 0
       - id: "step-6-ruby-solid-queue-active"
         type: "ruby"
