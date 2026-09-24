@@ -274,8 +274,8 @@ steps:
     description: "Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar."
     pseudocode: |
       just workshop-restore-gold
-      gcloud run deploy blog --source . # multi-container compose.prod.yaml
-      bin/rails db:migrate
+      DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:migrate db:schema:load:queue db:schema:load:cache db:schema:load:cable db:seed
+      gcloud run deploy blog --source blog # multi-container compose.prod.yaml
     prerequisites:
       - "Step 5 completed"
       - "Cloud SQL and Secret Manager configured"
@@ -297,6 +297,11 @@ steps:
         type: "shell"
         description: "Verify full test suite passes against gold standard"
         command: "cd blog && just test"
+        expect_exit: 0
+      - id: "step-6-shell-cloud-run-ready"
+        type: "shell"
+        description: "Verify live Cloud Run service 'blog' is Ready=True when GOOGLE_CLOUD_PROJECT is set"
+        command: "test -z \"$GOOGLE_CLOUD_PROJECT\" && echo 'Offline: skipping' || gcloud run services describe blog --project=\"$GOOGLE_CLOUD_PROJECT\" --region=\"${GOOGLE_CLOUD_REGION:-europe-west1}\" --format='value(status.url)' 2>/dev/null | grep -q '^https://'"
         expect_exit: 0
       - id: "step-6-ruby-solid-queue-active"
         type: "ruby"

@@ -11,10 +11,16 @@ resource "random_id" "db_suffix" {
   byte_length = 2
 }
 
-# Required GCP API for Cloud SQL Admin
+# Required GCP APIs for Cloud SQL Admin & Cloud Run Cloud SQL integration
 resource "google_project_service" "sqladmin" {
   project            = var.project_id
   service            = "sqladmin.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "sql_component" {
+  project            = var.project_id
+  service            = "sql-component.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -24,7 +30,10 @@ resource "google_sql_database_instance" "main" {
   database_version = "POSTGRES_15"
   region           = var.region
 
-  depends_on = [google_project_service.sqladmin]
+  depends_on = [
+    google_project_service.sqladmin,
+    google_project_service.sql_component,
+  ]
 
   settings {
     tier = "db-f1-micro"

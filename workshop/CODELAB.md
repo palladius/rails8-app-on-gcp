@@ -189,7 +189,7 @@ gcloud storage buckets create gs://${GOOGLE_CLOUD_PROJECT}-tfstate --location=$G
 
 # Initialize Terraform with remote backend
 terraform init -backend-config="bucket=${GOOGLE_CLOUD_PROJECT}-tfstate"
-terraform apply -auto-approve
+terraform apply -auto-approve -var="project_id=${GOOGLE_CLOUD_PROJECT}"
 cd ..
 ```
 *(Or use the top-level shorthand: `just terraform-apply`)*
@@ -343,7 +343,7 @@ export GOOGLE_CLOUD_REGION="europe-west1"
 
 # Deploy single-container service from source (with dummy key fallback if starting without credentials)
 gcloud run deploy blog \
-  --source . \
+  --source blog \
   --region $GOOGLE_CLOUD_REGION \
   --allow-unauthenticated \
   --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1
@@ -485,7 +485,7 @@ Re-deploy our application with GCS enabled:
 
 ```bash
 gcloud run deploy blog \
-  --source . \
+  --source blog \
   --region $GOOGLE_CLOUD_REGION \
   --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,GCS_BUCKET=$GCS_BUCKET,ACTIVE_STORAGE_SERVICE=google,GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
 ```
@@ -552,8 +552,8 @@ export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 # Cloud SQL instance name (from Terraform output, NOT hardcoded)
 export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
 
-# Database password (from Terraform output)
-export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "CHANGE_ME")
+# Database password (from Terraform output or Secret Manager version 1)
+export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || gcloud secrets versions access 1 --secret=rails-db-password 2>/dev/null)
 
 # GCS bucket names
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
@@ -586,12 +586,18 @@ Never store plain-text database passwords, API keys, or Rails master keys in git
 Store your secrets via the Google Cloud CLI:
 
 ```bash
-# 1. Store Rails Master Key
+# 1. Ensure a valid local master.key + credentials.yml.enc pair exists (master.key is git-ignored)
+if [ ! -f blog/config/master.key ]; then
+  rm -f blog/config/credentials.yml.enc
+  (cd blog && EDITOR=true bin/rails credentials:edit)
+fi
+
+# 2. Store Rails Master Key
 gcloud secrets create rails-master-key --data-file=blog/config/master.key 2>/dev/null || \
   gcloud secrets versions add rails-master-key --data-file=blog/config/master.key
 
-# 2. Store Cloud SQL Database Password (from Step 1 Terraform output)
-export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "RailsWorkshopSecure2026!")
+# 3. Store Cloud SQL Database Password (from Step 1 Terraform output or initial secret version)
+export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || gcloud secrets versions access 1 --secret=rails-db-password 2>/dev/null)
 
 echo -n "$DB_PASSWORD" | gcloud secrets create rails-db-password --data-file=- 2>/dev/null || \
   echo -n "$DB_PASSWORD" | gcloud secrets versions add rails-db-password --data-file=-
@@ -659,7 +665,7 @@ The production deployment runs three coordinated containers sharing the same loc
 
 ### 3. Running Database Migrations via Cloud Run Job
 
-Before routing web traffic, run migrations and database seeding against Cloud SQL using a transient Cloud Run Job.
+Before routing web traffic, run migrations, load the Solid Queue/Cache/Cable schemas, and seed the database against Cloud SQL using a transient Cloud Run Job.
 
 > ⚠️ **Critical: DATABASE_URL Format for Cloud SQL Auth Proxy**
 >
@@ -670,6 +676,9 @@ Before routing web traffic, run migrations and database seeding against Cloud SQ
 > The traditional `postgresql://user:pass@host/db` format **will fail** with `URI::InvalidURIError` due to colons in the Cloud SQL connection name. This affects Ruby 3.4+ (`uri-1.1.1` gem).
 
 ```bash
+# Ensure sql-component.googleapis.com is enabled before binding --set-cloudsql-instances
+gcloud services enable sql-component.googleapis.com --quiet
+
 # Get the latest blog image from Cloud Run (jobs don't support --source)
 export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
 
@@ -679,35 +688,34 @@ export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL
 export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
 
 # Create migration job — note ALL 4 database URL env vars for Rails 8 multi-database
+# IMPORTANT: Load queue/cache/cable schemas BEFORE db:seed so Post creation callbacks can enqueue SolidQueue jobs!
 gcloud run jobs create rails-migrate \
   --image=$BLOG_IMAGE \
-  --command "bin/rails" \
-  --args "db:prepare" \
+  --command "bash" \
+  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:migrate db:schema:load:queue db:schema:load:cache db:schema:load:cable db:seed" \
   --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}" \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
   --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
   --service-account=$RUN_SA \
-  --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
-
-# Execute migration job
-gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
-```
-
-> 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
-> All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
-> Solid Queue/Cache/Cable tables won't be created.
-
-After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
-
-```bash
-# Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
+  --region $GOOGLE_CLOUD_REGION \
+  --quiet || \
 gcloud run jobs update rails-migrate \
+  --image=$BLOG_IMAGE \
   --command "bash" \
-  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
-  --region $GOOGLE_CLOUD_REGION
+  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:migrate db:schema:load:queue db:schema:load:cache db:schema:load:cable db:seed" \
+  --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}" \
+  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
+  --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
+  --service-account=$RUN_SA \
+  --region $GOOGLE_CLOUD_REGION \
+  --quiet
 
+# Execute migration + schema load + seed job
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
+
+> 💡 **Rails 8 Multi-Database Ordering:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
+> Loading `db:schema:load:queue` **before** `db:seed` ensures `solid_queue_jobs` exists when `Post#after_create_commit` enqueues `GenerateCoverImageJob`.
 
 ### 4. Deploy 3: Deploying Multi-Container Cloud Run
 
@@ -719,7 +727,7 @@ export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL
 export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
 
 gcloud run deploy blog \
-  --source . \
+  --source blog \
   --region $GOOGLE_CLOUD_REGION \
   --allow-unauthenticated \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest" \

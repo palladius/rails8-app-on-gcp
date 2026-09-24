@@ -1,5 +1,26 @@
 All notable changes to this project will be documented in this file.
 
+## [0.2.52] - 2026-09-21
+### Fixed
+- 🔴 **Preserve Terraform Cloud SQL Password in Secret Manager (`FL008-10`)**:
+  - Added `output "sql_instance_name"` and `output "db_password" { sensitive = true }` to `iac/outputs.tf` and updated `workshop/CODELAB.md` Step 5 to fallback to Secret Manager version `1` (`gcloud secrets versions access 1 --secret=rails-db-password`) instead of `"CHANGE_ME"`, preventing `PG::ConnectionBad` password authentication failures on Step 6 Cloud Run startup.
+- 🔴 **Fix Chicken-and-Egg Multi-Database Migration & Seed Ordering (`FL008-12`)**:
+  - Updated `workshop/CODELAB.md` Step 6 §3 (`rails-migrate` Cloud Run Job) and `workshop/skeleton.yaml` to run `DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:migrate db:schema:load:queue db:schema:load:cache db:schema:load:cable db:seed` in order so `solid_queue_jobs` exists before `db:seed` creates `Post` records that enqueue `GenerateCoverImageJob`.
+- 🔴 **Eliminate Silent Infinite Hang on `sql-component.googleapis.com` Prompt (`FL008-09`)**:
+  - Added `google_project_service.sql_component` (`sql-component.googleapis.com`) to `iac/database.tf` and replaced `2>/dev/null` with `--quiet` + explicit `gcloud services enable sql-component.googleapis.com --quiet` in `workshop/CODELAB.md` Step 6 §3.
+- 🔴 **Bootstrap Missing `blog/config/master.key` on Fresh Clones (`FL008-08`)**:
+  - Updated `workshop/CODELAB.md` Step 5 §2 to initialize `blog/config/master.key` + `blog/config/credentials.yml.enc` (`EDITOR=true bin/rails credentials:edit`) when `blog/config/master.key` is absent on fresh git clones.
+- 🔴 **Support Domain Restricted Sharing (DRS) / Google Corp Organizations (`FL008-07`)**:
+  - Added `variable "allow_public_access"` (default `true`) in `iac/variables.tf` and guarded `google_cloud_run_v2_service_iam_member.public_access` (`allUsers`) in `iac/cloudrun.tf`.
+- 🔴 **Pass `-var="project_id=${GOOGLE_CLOUD_PROJECT}"` to `terraform apply -auto-approve` (`FL008-04`)**:
+  - Prevented interactive stdin hang for `var.project_id` during Step 1 §2 `terraform apply -auto-approve`.
+- 🔴 **Handle NVM / Missing `node` Binary in Pre-Flight Diagnostics (`FL008-05`)**:
+  - Wrapped `Open3.capture3("node", ...)` in `bin/workshop_diagnostics.rb` with `~/.nvm/versions/node/*/bin/node` discovery and `Errno::ENOENT` rescue.
+- 🔴 **Bootstrap `ruby-build` Plugin for `rbenv` (`FL008-02`) & Root `.ruby-version` (`FL008-03`)**:
+  - Added `.ruby-version` (`3.4.5`) at repository root and `ruby-build` plugin check in `skills/rails8app-workshop/SKILL.md`.
+- 🟡 **Use `--source blog` in Cloud Run Deploy Commands (`FL008-06`) & Live Cloud Run Eval Check (`FL008-11`)**:
+  - Updated `gcloud run deploy blog` snippets in Steps 3, 4, and 6 of `workshop/CODELAB.md` to use `--source blog` so they run cleanly from the repository root, and added `step-6-shell-cloud-run-ready` in `workshop/skeleton.yaml`.
+
 ## [0.2.51] - 2026-09-16
 ### Fixed
 - 🔴 **Default Compute SA Roles in Terraform (FL007-02)**:

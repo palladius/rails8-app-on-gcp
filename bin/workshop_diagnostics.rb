@@ -287,12 +287,22 @@ skeleton_yaml = File.expand_path("../workshop/skeleton.yaml", __dir__)
 if File.exist?(skeleton_yaml)
   runner_path = File.expand_path("../workshop/screenshots/runner.js", __dir__)
   if File.exist?(runner_path)
-    stdout, stderr, status = Open3.capture3("node", runner_path, "--dry-run")
-    if status.success?
-      puts "✅ Declarative screenshot specs and scripts verified".green
-    else
-      puts "❌ Screenshot verification failed:\n#{stderr}".red
-      errors_count += 1
+    node_bin = "node"
+    unless system("which node > /dev/null 2>&1")
+      nvm_nodes = Dir.glob(File.expand_path("~/.nvm/versions/node/*/bin/node")).sort
+      node_bin = nvm_nodes.last if nvm_nodes.any?
+    end
+    begin
+      stdout, stderr, status = Open3.capture3(node_bin, runner_path, "--dry-run")
+      if status.success?
+        puts "✅ Declarative screenshot specs and scripts verified".green
+      else
+        puts "❌ Screenshot verification failed:\n#{stderr}".red
+        errors_count += 1
+      end
+    rescue Errno::ENOENT
+      puts "⚠️  Node.js ('node') not found on PATH; skipping screenshot dry-run verification".yellow
+      warnings_count += 1
     end
   else
     puts "⚠️  workshop/screenshots/runner.js not found".yellow

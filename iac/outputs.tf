@@ -96,3 +96,14 @@ output "region" {
   description = "The GCP region"
   value       = var.region
 }
+
+output "sql_instance_name" {
+  description = "The Cloud SQL PostgreSQL instance name"
+  value       = google_sql_database_instance.main.name
+}
+
+output "db_password" {
+  description = "The generated Cloud SQL PostgreSQL password for rails_user"
+  value       = random_password.db_password.result
+  sensitive   = true
+}

@@ -52,5 +52,11 @@ variable "enable_cicd_trigger" {
   default     = false
 }
 
+variable "allow_public_access" {
+  description = "Whether to grant roles/run.invoker to allUsers on Cloud Run (set to false on Domain Restricted Sharing / Corp organizations)."
+  type        = bool
+  default     = true
+}
+
 
 

@@ -159,6 +159,7 @@ resource "google_cloud_run_v2_service" "rails_app" {
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
+  count    = var.allow_public_access ? 1 : 0
   project  = google_cloud_run_v2_service.rails_app.project
   location = google_cloud_run_v2_service.rails_app.location
   name     = google_cloud_run_v2_service.rails_app.name
