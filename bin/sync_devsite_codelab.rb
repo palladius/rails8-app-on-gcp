@@ -10,9 +10,20 @@ require "fileutils"
 REPO_ROOT = File.expand_path("..", __dir__)
 CODELAB_MD = File.join(REPO_ROOT, "workshop", "CODELAB.md")
 DEFAULT_BUILD_PATH = File.join(REPO_ROOT, "workshop", "build", "devsite", "index.lab.md")
+DOTENV_PATH = File.join(REPO_ROOT, ".env")
 
+dotenv_devsite_path = nil
+if File.exist?(DOTENV_PATH)
+  File.readlines(DOTENV_PATH).each do |line|
+    if line.strip =~ /\A(?:export\s+)?DEVSITE_CODELAB_PATH=(['"]?)(.+?)\1\s*(?:#.*)?\z/
+      dotenv_devsite_path = Regexp.last_match(2).strip
+    end
+  end
+end
+
+external_devsite_path = ENV["DEVSITE_CODELAB_PATH"] || dotenv_devsite_path
 target_paths = [DEFAULT_BUILD_PATH]
-target_paths << ENV["DEVSITE_CODELAB_PATH"] if ENV["DEVSITE_CODELAB_PATH"] && !ENV["DEVSITE_CODELAB_PATH"].empty?
+target_paths << external_devsite_path if external_devsite_path && !external_devsite_path.empty?
 
 codelab_content = File.read(CODELAB_MD)
 body = codelab_content.sub(/\A.*?^(?=# Rails 8 on Google Cloud)/m, "")

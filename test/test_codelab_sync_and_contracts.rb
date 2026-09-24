@@ -7,10 +7,14 @@ class CodelabSyncAndContractsTest < Minitest::Test
   REPO_ROOT = File.expand_path("..", __dir__)
   CODELAB_PATH = File.join(REPO_ROOT, "workshop", "CODELAB.md")
   SKELETON_YAML_PATH = File.join(REPO_ROOT, "workshop", "skeleton.yaml")
-  DEVSITE_LAB_PATH = ENV.fetch(
-    "DEVSITE_CODELAB_PATH",
-    File.join(REPO_ROOT, "workshop", "build", "devsite", "index.lab.md")
-  )
+  DOTENV_DEVSITE_PATH = begin
+    dotenv = File.join(REPO_ROOT, ".env")
+    if File.exist?(dotenv)
+      match = File.read(dotenv).match(/^(?:export\s+)?DEVSITE_CODELAB_PATH=['"]?([^'"\n#]+)['"]?/)
+      match && match[1].strip
+    end
+  end
+  DEVSITE_LAB_PATH = ENV["DEVSITE_CODELAB_PATH"] || DOTENV_DEVSITE_PATH || File.join(REPO_ROOT, "workshop", "build", "devsite", "index.lab.md")
 
   def setup
     @codelab = File.read(CODELAB_PATH)
