@@ -125,8 +125,9 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 
 ## 📦 Related Repositories
 
-This is the flagship of 3 repos for the Rails 8 on GCP workshop:
+This is the flagship of 4 repos for the Rails 8 on GCP workshop:
 - 🟢 **rails8-app-on-gcp** (THIS ONE) — Canonical app + GCP plumbing
+- 🔒 **rails8-app-on-gcp-pvt** (PRIVATE TOOLING) — Internal sync ledger, DevSite compiler, presentation slides, and Friction Log telemetry suite: [github.com/palladius/rails8-app-on-gcp-pvt](https://github.com/palladius/rails8-app-on-gcp-pvt)
 - 🟡 **rails8-turbo-chat** (THE PAST) — Original chat app, battle-tested GCP configs
 - 🔵 **rails8-turbo-chat-2026** (GCP INSPIRATION) — Emiliano's clean GCP-native fork
 - In local dev setups, these are typically located under `~/git/<REPONAME>`.
