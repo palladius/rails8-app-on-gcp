@@ -1,7 +1,7 @@
 # 📜 The Project Constitution
 
 <!--
-Current version: 1.2.0
+Current version: 1.3.0
 Ratified by: Riccardo 🦖, Emiliano 🏎️, Antigravity AI 🤖
 -->
 
@@ -22,8 +22,15 @@ All proposed constitutional changes must be documented in a Pull Request referen
 ### 0. Language Directive: English First
 All application UI, code, comments, documentation, logs, tooltips, and workshop curriculum **MUST be written in ENGLISH**. Secondary audience is Italian, so Italian translations and cameo flavor are welcome, but English remains the universal source of truth.
 
-### 1. Modern Rails 8 Reference Blueprint on GCP
-The repository serves as the definitive, production-grade reference architecture for running modern Ruby on Rails 8 applications on Google Cloud Platform.
+### 1. The Modern Secure Monolith: Rails 8 Reference Blueprint on GCP
+The repository serves as the definitive, production-grade reference architecture for running a modern, unified Ruby on Rails 8 monolith securely on Google Cloud Platform. Rather than fragmenting into premature microservices, we demonstrate how GCP elevates the classic monolith into an enterprise cloud-native deployment:
+
+* **The Persona Contract:** When evaluating application code decisions, always test against this persona: **A seasoned Rails expert who is a newcomer to Google Cloud Platform**. What do they expect to find in an official canonical Google Cloud blueprint? Does this code represent idiomatic, production-grade Rails and GCP best practices, or unnecessary complexity?
+* **The 4 Modern Monolith Pillars:**
+  1. **Docker Compose Native on Cloud Run:** Full multi-container sidecar orchestration (`web` + `worker` Solid Queue + `cloudsql-proxy`) defined declaratively via Docker Compose (`compose.prod.yaml`) and deployed serverlessly without Kubernetes overhead.
+  2. **Private ActiveStorage on GCS:** Non-public Google Cloud Storage bucket (`allUsers` strictly forbidden) with zero static service account keys in the app, using IAM Credentials API on-the-fly blob signing (`iam: true`).
+  3. **Managed Cloud SQL via Localhost Proxy:** Production database persistence backed by Cloud SQL PostgreSQL, reaching the database over standard TCP `127.0.0.1:5432` through the official Auth Proxy sidecar with zero public IP exposure (`0.0.0.0/0` strictly prohibited).
+  4. **Zero-Trust Runtime Secret Manager Injection:** Absolute elimination of committed secrets or long-lived plaintext credentials in environment variables; sensitive keys (`rails-master-key`, `rails-db-password`) are mounted directly at runtime via Google Cloud Secret Manager.
 
 ### 2. Workshop Presence & Future Migration Path
 A companion step-by-step workshop **MUST** be maintained alongside the application. It currently resides under `workshop/`, with a recognized migration path toward a dedicated public Google repository in the future.

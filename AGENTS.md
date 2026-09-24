@@ -19,6 +19,9 @@ This repository serves **TWO EQUALLY CRITICAL GOALS**:
 - `main` is the comprehensive, production-grade reference architecture for modern Rails 8 on GCP.
 - Includes all enterprise/cloud-native capabilities: Cloud SQL PostgreSQL with connection pooling, private Google Cloud Storage with IAM Credential blob signing, Secret Manager runtime injection, Cloud Run multi-container sidecars (`web` + `worker` Solid Queue + `cloudsql-proxy`), automated CI/CD via Cloud Build, and asynchronous AI jobs via Gemini / Imagen.
 - `main` represents the fully assembled, editable end-state. Workshop steps are branches/checkpoints leading up to this blueprint.
+- **The Core Architecture Heuristic for Agents:** Before proposing or editing application code (distinct from student-facing codelab prose), always ask:
+  > *"What does a Rails expert who is a newcomer to Google Cloud look for in this repository? What do they actually find? Does this feature belong in an official canonical Google Cloud blueprint, or is it an ad-hoc hack?"*
+  If it would make a senior Rails developer cringe or a Google Cloud SRE fail a security review, do not write it.
 
 ### 2. The Universal Developer Workshop (Google Cloud & Antigravity for Everyone)
 - **The Reality:** While premiering at a tech conference (Oct 3), **~90% of future workshop attendees will have zero Ruby background**. They are here to learn Google Cloud, serverless architecture, secure IAM practices, and AI pair programming with **Google Antigravity**.
