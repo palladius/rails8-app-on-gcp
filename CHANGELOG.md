@@ -1,5 +1,21 @@
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2026-09-24
+### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
+- 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
+- 🔴 **C2 & M4 (`iac/cloudrun.tf`)**: Eliminated project-wide `roles/secretmanager.secretAccessor` and `roles/storage.objectAdmin` sprawl; secrets remain strictly scoped per-secret in `iac/secrets.tf` and storage access is scoped per-bucket via `google_storage_bucket_iam_member`.
+- 🔴 **C3 (`iac/secrets.tf`)**: Added a Terraform `lifecycle { precondition { ... } }` on `google_secret_manager_secret_version.rails_master_key` requiring a valid 32-char hex `blog/config/master.key`, preventing unrecoverable Cloud Run boot crashes if `terraform apply` is invoked directly.
+- 🔴 **C4 (`bin/ensure_workshop_credentials.rb`)**: Removed the `bin/rails runner` shellout from `write_encrypted_credentials!` so tmpdir tests never touch the real repository's `master.key` or `credentials.yml.enc` (and sped up the IaC contract test suite by 65x to `36ms`).
+- 🟠 **M1–M3 & m1–m4**: Scoped `queue_schema.rb` loading in `blog/bin/docker-entrypoint` to the `:queue` connection (`M1`) and sequential `.env` loading (`m2`); added read-only `WorkshopCredentialsManager.check` for `bin/workshop_diagnostics.rb` (`M2`); fixed `<details><summary>` regex in `bin/sync_devsite_codelab.rb` (`M3`); fixed CLI exit code (`m1`) and self-scoped `serviceAccountTokenCreator` (`m4`).
+
+## [0.3.2] - 2026-09-24
+### Added & Improved
+- 🏷️ **Codelab Versioning & Changelog Synchronization (`workshop/CODELAB_VERSION` v2.2.0 & `workshop/CODELAB_CHANGELOG.md`)**:
+  - Added `workshop/CODELAB_VERSION` (`2.2.0`) and `workshop/CODELAB_CHANGELOG.md` to explicitly track Codelab parity between GitHub (`workshop/CODELAB.md`) and Google DevSite (`index.lab.md`).
+  - Added a subtle small-italic version stamp at the bottom of the last page (`Conclusion & Clean Up`) of both Codelabs, enforced by `test_codelab_version_and_changelog_synced_in_last_page_footer` (**34 new contract tests / 177 assertions total**).
+- 🔐 **`SAMPLE_APP_CREDENTIALS` Constant (`bin/ensure_workshop_credentials.rb`)**:
+  - Named the shipped sample app credentials MD5 constant `SAMPLE_APP_CREDENTIALS` (`SAMPLE_APP_CREDENTIALS_MD5 = "7b856d06f492f293bea59a5323150d8c"`) in `WorkshopCredentialsManager` and verified end-to-end re-encryption + MD5 divergence in `test/test_iac_codelab_contracts.rb`.
+
 ## [0.3.1] - 2026-09-24
 ### Added & Ratified
 - 🦖🏛️ **After the FL0–FL7 Ecatomb: The Modern Secure Monolith & Constitution v1.3.0**:
@@ -20,7 +36,7 @@ All notable changes to this project will be documented in this file.
   - `test/test_docker_compose_contracts.rb` (**9 tests, 28 assertions**): Verifies `blog/compose.yaml` (`web`, `worker`, `mailpit`, `adminer`), `blog/bin/docker-entrypoint` (`server.pid` cleanup, `.env` sourcing, `queue_schema.rb` loading, auto `db:seed`), `blog/config/database.yml` (all 4 development databases: `primary`, `cache`, `queue`, `cable`), and `blog/db/seeds.rb`.
   - `test/test_iac_codelab_contracts.rb` (**6 tests, 28 assertions**): Verifies Terraform `iac/secrets.tf` and `iac/cloudrun.tf` IAM bindings, secret-level IAM policies on `rails-master-key`, and `WorkshopCredentialsManager` end-to-end re-encryption + MD5 divergence.
 - 🔄 **Deterministic DevSite Codelab Compiler (`bin/sync_devsite_codelab.rb`)**:
-  - Automatically compiles `workshop/CODELAB.md` into `workshop/build/devsite/index.lab.md` and syncs to the Google3 CitC DevSite workspace during `just build-ghpages`.
+  - Automatically compiles `workshop/CODELAB.md` into `workshop/build/devsite/index.lab.md` during `just build-ghpages`.
 
 ### Fixed
 - 🛠️ **Complete Resolution of Emiliano Della Casa's Friction Log Bug ([#153](https://github.com/palladius/rails8-app-on-gcp/issues/153) — `FL_E001 Magnificent FL from Emiliano`)**:

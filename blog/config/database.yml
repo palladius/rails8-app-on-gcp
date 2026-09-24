@@ -1,7 +1,7 @@
-# SQLite for local development, PostgreSQL for Cloud Run.
+# SQLite for local host development, PostgreSQL for Docker Compose / Cloud Run.
 # The DATABASE_URL env var (if set) takes precedence over any adapter config.
 #
-# Local dev:  sqlite3 (no setup needed)
+# Local dev:  sqlite3 (or postgres via DATABASE_URL in Docker Compose)
 # Cloud Run:  postgres via DATABASE_URL env var pointing to Cloud SQL
 
 default: &default
@@ -9,9 +9,29 @@ default: &default
   timeout: 5000
 
 development:
-  <<: *default
-  adapter: sqlite3
-  database: storage/development.sqlite3
+  primary:
+    <<: *default
+    adapter: <%= ENV['DATABASE_URL'].present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV['DATABASE_URL'] %>
+    database: <%= ENV['DATABASE_URL'].present? ? nil : 'storage/development.sqlite3' %>
+  cache:
+    <<: *default
+    adapter: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_CACHE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/development_cache.sqlite3' %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    adapter: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_QUEUE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/development_queue.sqlite3' %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    adapter: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
+    url: <%= ENV.fetch('DATABASE_CABLE_URL', ENV['DATABASE_URL']) %>
+    database: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/development_cable.sqlite3' %>
+    migrations_paths: db/cable_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

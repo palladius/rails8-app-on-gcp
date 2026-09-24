@@ -119,6 +119,7 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 - **Deterministic Workshop Branch Naming:** When creating or managing workshop branches, use the hierarchical pattern `workshop/step-<N>-<slug>` (e.g. `workshop/step-0-setup`, `workshop/step-1-local-baseline`). The slash (`/`) creates a dedicated Git namespace grouped neatly in GitHub/GitLab.
 - **TDD:** Start with a failing test, prove it fails first, and iterate until green.
 - **No Forking Paths for Students (Single Canonical Track):** NEVER present students with alternative development tracks (e.g. "Choose Mode A or Mode B") during the core workshop progression. Divergent paths make proctoring and troubleshooting impossible because mentors must first diagnose which branch a student chose. Enforce a single canonical path (e.g. Docker Compose providing the complete stack including Mailpit and Adminer). Free-form creative choices are reserved strictly for the final capstone step.
+- **No Exfiltration of Google Internal Code/Paths:** You MUST NOT exfiltrate Google code! For instance, ensure there are no links or hardcoded paths to `/google/src/` or similar internal things. `go/` and `b/` are tolerated.
 - if USER is `ricc` or `riccardo`, search for an additional `GEMINI.riccardo.md` with personal directives. Read that file very carefully.
 ---
 

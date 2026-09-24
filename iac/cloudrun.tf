@@ -2,7 +2,12 @@
 # Cloud Run: Service + IAM + Service Account
 ###############################################################################
 
-# Cloud Run Service Account
+data "google_project" "current" {
+  project_id = var.project_id
+}
+
+# Cloud Run Service Account (Least-Privilege: secret access is scoped per-secret in secrets.tf,
+# and storage access is scoped per-bucket via google_storage_bucket_iam_member below)
 module "service_account_cloud_run" {
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v34.0.0"
   project_id   = var.project_id
@@ -10,12 +15,48 @@ module "service_account_cloud_run" {
   display_name = "Cloud Run Service Account for Rails App"
   iam_project_roles = {
     "${var.project_id}" = [
-      "roles/storage.objectAdmin",
-      "roles/secretmanager.secretAccessor",
       "roles/cloudsql.client",
       "roles/aiplatform.user" # Nano Banana cover generation on Vertex AI (issue #18)
     ]
   }
+}
+
+# Also grant minimal runtime roles to the Default Compute Service Account
+# (${PROJECT_NUMBER}-compute@developer.gserviceaccount.com) because
+# `gcloud run compose up` uses a hardcoded Go template without `serviceAccountName:`
+# and temporarily boots the initial revision under Default Compute SA before
+# `gcloud run services update blog --service-account=$RUN_SA` runs.
+resource "google_project_iam_member" "default_compute_sa_runtime_roles" {
+  for_each = toset([
+    "roles/cloudsql.client",
+    "roles/aiplatform.user",
+  ])
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+}
+
+# Bucket-scoped ActiveStorage IAM bindings (fixes M4 — avoids project-wide storage.objectAdmin sprawl)
+locals {
+  activestorage_buckets = {
+    dev  = module.gcs_dev.name
+    test = module.gcs_test.name
+    prod = module.gcs_prod.name
+  }
+}
+
+resource "google_storage_bucket_iam_member" "rails_sa_bucket_object_admin" {
+  for_each = local.activestorage_buckets
+  bucket   = each.value
+  role     = "roles/storage.objectAdmin"
+  member   = module.service_account_cloud_run.iam_email
+}
+
+resource "google_storage_bucket_iam_member" "default_compute_sa_bucket_object_admin" {
+  for_each = local.activestorage_buckets
+  bucket   = each.value
+  role     = "roles/storage.objectAdmin"
+  member   = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 }
 
 # Required GCP API for Cloud Run
@@ -61,6 +102,13 @@ resource "google_service_account_iam_member" "cloud_run_sa_signer" {
   service_account_id = module.service_account_cloud_run.id
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = module.service_account_cloud_run.iam_email
+}
+
+# Self-scoped TokenCreator on Default Compute SA (fixes m4 — no cross-SA impersonation on rails-cloudrun-sa)
+resource "google_service_account_iam_member" "default_compute_sa_self_signer" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 }
 
 # Allow developers to sign GCS blob URLs locally via `iam: true` in storage.yml.

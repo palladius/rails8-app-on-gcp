@@ -55,10 +55,14 @@ elif [ -n "${TF_VAR_admin_account}" ]; then
     export TF_VAR_developers="[\"user:${TF_VAR_admin_account}\"]"
 fi
 
-# 4. Ensure remote state bucket exists
+# 4. Ensure local master.key + credentials.yml.enc are atomically paired before Terraform uploads master.key
+echo "🔐 Ensuring local Rails master.key and credentials.yml.enc are paired..."
+"${REPO_ROOT}/bin/ensure_workshop_credentials.rb" --sync-gcp
+
+# 5. Ensure remote state bucket exists
 "${SCRIPT_DIR}/create-tfstate-bucket.sh"
 
-# 5. Initialize and apply Terraform
+# 6. Initialize and apply Terraform
 cd "${IAC_DIR}"
 echo "🔧 Initializing Terraform backend..."
 terraform init -backend-config="bucket=${PROJECT_ID}-tfstate"

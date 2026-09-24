@@ -4,9 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     user: "0:0"
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -p 3000 -b '0.0.0.0'"
+    command: ./bin/rails server -p 3000 -b 0.0.0.0
     ports:
       - "3000:3000"
+    env_file:
+      - path: ../.env
+        required: false
+      - path: .env
+        required: false
     environment:
       RAILS_ENV: development
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am the containerized app running on PostgreSQL via Docker Compose."
@@ -28,7 +33,12 @@ services:
       context: .
       dockerfile: Dockerfile
     user: "0:0"
-    command: bundle exec rails solid_queue:start
+    command: ./bin/rails solid_queue:start
+    env_file:
+      - path: ../.env
+        required: false
+      - path: .env
+        required: false
     environment:
       RAILS_ENV: development
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am the containerized app running on PostgreSQL via Docker Compose."
@@ -42,6 +52,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      web:
+        condition: service_started
 
   db:
     image: postgres:16-alpine

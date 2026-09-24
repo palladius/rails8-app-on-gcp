@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.1.0 -->
+<!-- 🏷️ Codelab Version: 2.2.0 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -66,9 +66,18 @@ Before we begin, ensure you have the following tools available in your environme
 - **Ruby `3.4.5`:** (`ruby -v` — pinned by `blog/.ruby-version`; ask your AI harness to install `3.4.5` if missing). Rails 8 is declared in the `Gemfile` and installed automatically by `bundle install`.
 - **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)). You'll login with your personal Gmail — no API token needed.
 
-### 2. Google Cloud Authentication, Dedicated Configuration & ADC
+### 2. Configure Environment Variables, Dedicated `gcloud` Profile & ADC
 
-To prevent collisions with existing corporate, personal, or multi-account gcloud setups, we strongly recommend creating a dedicated named configuration for this workshop:
+First, export your core workshop environment variables (`GOOGLE_CLOUD_ACCOUNT`, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_REGION`) before running any `gcloud` commands:
+
+```bash
+# 0. Export your workshop identity, target project ID, and Cloud Run region
+export GOOGLE_CLOUD_ACCOUNT="your-email@gmail.com"
+export GOOGLE_CLOUD_PROJECT="rails8-workshop-$(date +%m%d)-$RANDOM"
+export GOOGLE_CLOUD_REGION="europe-west1"
+```
+
+To prevent collisions with existing corporate, personal, or multi-account gcloud setups, create and activate a dedicated named configuration, authenticate, and create (or select) your GCP project:
 
 ```bash
 # 1. Create and activate dedicated workshop configuration (Fixes Issue #38)
@@ -79,27 +88,39 @@ gcloud config configurations create rails8-on-gcp-workshop --activate 2>/dev/nul
 gcloud auth login $GOOGLE_CLOUD_ACCOUNT
 gcloud auth application-default login
 
-# 3. Configure active project and region
+# 3. Create the GCP project (if it does not exist yet) and set active project + Cloud Run region
+gcloud projects create $GOOGLE_CLOUD_PROJECT --name="Rails 8 on GCP Workshop" 2>/dev/null || true
 gcloud config set project $GOOGLE_CLOUD_PROJECT
-gcloud config set compute/region europe-west1
+gcloud config set run/region $GOOGLE_CLOUD_REGION
+gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 ```
 
-> 💡 **Why a Dedicated Configuration?**
-> Using `gcloud config configurations create rails8-on-gcp-workshop` isolates all CLI settings (account, quota project, default region) specifically for this workshop. When you finish, you can switch back to your normal setup anytime with `gcloud config configurations activate default`.
+> 💡 **Why `run/region` instead of `compute/region`?**
+> Setting `compute/region` on a brand-new project triggers a prompt to enable `compute.googleapis.com` (which fails before billing is linked and isn't needed for Cloud Run). Setting `run/region` configures Cloud Run cleanly without touching Compute Engine!
 
 ![Active gcloud configuration](assets/images/gcloud_config_configurations_list.png)
 
-### 3. 🚨 GCP Billing Verification
+### 3. 🚨 GCP Billing Linkage & Verification
 
-> ⚠️ **Note**: Google Cloud SQL and Cloud Run deployments require an active linked billing account or valid workshop educational credits. Let's make sure your setup is correct now. To do so, run the billing verification check:
+> ⚠️ **Important — Having an `OPEN` Billing Account vs. Linking It to Your Project**:
+> Running `gcloud billing accounts list` and seeing `OPEN: True` only means your billing account exists — **you must still link it to `$GOOGLE_CLOUD_PROJECT`**! Also note that temporary workshop credit trials can become `SUSPENDED` (`BILLING_ISSUE`) if left overnight, so we recommend completing the cloud steps in a same-day single session.
+
+Link your active billing account to `$GOOGLE_CLOUD_PROJECT` and verify that `billingEnabled: true` is returned:
+
 ```bash
+# 1. Find your open Billing Account ID (e.g. 01ABCD-23EFGH-45IJKL)
+gcloud billing accounts list
+
+# 2. Link the billing account to your workshop project
+export BILLING_ACCOUNT_ID=$(gcloud billing accounts list --filter="open=true" --format="value(ACCOUNT_ID)" --limit=1)
+gcloud billing projects link $GOOGLE_CLOUD_PROJECT --billing-account=$BILLING_ACCOUNT_ID
+
+# 3. Confirm billingEnabled: true
 gcloud beta billing projects describe $GOOGLE_CLOUD_PROJECT
 ```
-Ensure `billingEnabled: true` is returned. You can also list all your billing accounts:
-```bash
-gcloud billing accounts list
-```
-Make sure at least one of them shows `OPEN: True`. If none are active, link a billing account or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing).
+
+You can also link or verify your project's billing account directly in the browser at:
+`https://console.cloud.google.com/billing/linkedaccount?project=$GOOGLE_CLOUD_PROJECT` (or redeem your workshop credit coupon in the [Google Cloud Console Billing Page](https://console.cloud.google.com/billing)).
 
 ![Active GCP Billing Account](assets/images/gcp_billing_account_active.png)
 
@@ -153,9 +174,17 @@ just workshop-eval 0
 
 > 💡 **The Strategy:** Managed databases like Google Cloud SQL PostgreSQL take approximately 10–12 minutes to provision. Rather than waiting idly later, we launch immutable infrastructure via Terraform **right now in the background** while we develop locally!
 
-### 1. Run Automated Pre-Flight Diagnostics Suite
+### 1. Initialize `.env` & Run Automated Pre-Flight Diagnostics Suite
 
-Before launching cloud infrastructure, run the comprehensive pre-flight test suite:
+First, create your `.env` file from the documented `.env.dist` template and populate your `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_ACCOUNT` variables:
+
+```bash
+cp .env.dist .env
+# Edit .env (or populate it from your exported shell variables) and load it:
+set -a && source .env && set +a
+```
+
+Now run the comprehensive pre-flight diagnostics suite before launching cloud infrastructure:
 ```bash
 just workshop-test
 ```
@@ -163,15 +192,10 @@ This script (`bin/workshop_diagnostics.rb`):
 - Verifies your `GOOGLE_CLOUD_ACCOUNT` identity configuration.
 - Verifies active billing and project linkage.
 - Validates Application Default Credentials (ADC) for Vertex AI.
+- Automatically ensures `blog/config/master.key` and `blog/config/credentials.yml.enc` are cryptographically paired via `bin/ensure_workshop_credentials.rb` (replacing the author-only `WORKSHOP_FILE_MD5_EMI_RICC` file before Terraform uploads `rails-master-key` to Secret Manager).
 - Confirms the ActiveStorage canary seed image (`blog/app/assets/images/gcs_dev_image.jpg`).
 
 ![just workshop-test diagnostics output](assets/images/just_workshop_test_output.png)
-
-If `.env` is missing, copy it from the documented template:
-```bash
-cp .env.dist .env
-# Edit .env and configure GOOGLE_CLOUD_ACCOUNT with your Google/Gmail account
-```
 
 > 💡 **Tip:** If `just workshop-test` reports that the billing API is disabled on your project, enable it quickly via:
 > ```bash
@@ -232,48 +256,42 @@ just workshop-eval 1
 
 *Duration: 15min*
 
-Our starting point is a clean, modern Rails 8 blog application running on localhost with SQLite, Mailpit email interception, and disk-based ActiveStorage.
+Our starting point is a clean, modern Rails 8 blog application running on localhost with Docker Compose, Mailpit email interception, and disk-based ActiveStorage.
 
-### 1. Boot the App Locally
+### 1. Boot the App Locally via Docker Compose
 
-> 📁 **Mind the directory!** This repo holds the Rails app in **`blog/`** and the Terraform in `iac/`. Step 1 left you in the repo root, so **every command in Step 2 runs from `blog/`** — `Gemfile`, `bin/rails` and `compose.yaml` all live there. Running them from the root fails with `no configuration file provided: not found` or a missing `Gemfile`.
+> 🐳 **Canonical Local Stack (`just compose-up`)**
+> Docker Compose runs the exact pinned Ruby `3.4.5` stack, PostgreSQL 16, Solid Queue worker, Mailpit, and Adminer inside isolated containers — zero host gem permission issues!
+> Our `blog/compose.yaml` automatically loads your root `.env`, removes any stale `tmp/pids/server.pid`, runs `db:prepare` across all 4 databases (`primary`, `cache`, `queue`, `cable`), and seeds your admin user (`GOOGLE_CLOUD_ACCOUNT` with password `Ch4ng3m3!!1` or `APP_ADMIN_PASSWORD`).
 
-Move into the Rails app, confirm you are on the pinned Ruby, then install the gems and set up the database:
+From the repository root (or inside `blog/`), launch the full local stack in one command:
 ```bash
-cd blog
-ruby -v          # must print 3.4.5 — see Step 0 if it does not
-bundle install
-bin/rails db:setup
+just compose-up
+# Or from inside blog/:
+# cd blog && docker compose up -d
 ```
 
-> 🧯 **Permission error writing to `/var/lib/gems/` or `ruby -v` shows system Ruby (e.g. 3.3.x)?**
-> Vanilla Linux system Ruby completely ignores `.ruby-version` files and attempts to install gems system-wide! Make sure `rbenv` is loaded in your active terminal shell:
-> ```bash
-> eval "$(rbenv init - bash)"   # or: eval "$(rbenv init - zsh)"
-> ruby -v                       # confirm it now outputs 3.4.5!
-> ```
-> *Note:* If you skipped installing 3.4.5 in Step 0, run `rbenv install 3.4.5`. Or simply use **Mode A (Docker Compose)** below (`just compose-up`), which runs the pinned Ruby stack completely inside containers without touching host gems!
+<details>
+<summary>⚙️ Optional: Running Native Host Ruby 3.4.5 via rbenv</summary>
 
-> 💡 Prefer not to think about it? `just install` and `just compose-up` from the repo root do the `cd blog` for you.
+If you also want to run Rails CLI commands natively on your host shell (`bin/rails test`, etc.) outside Docker containers, ensure `rbenv` is initialized in your shell (`eval "$(rbenv init - bash)"`) so Ruby `3.4.5` is used instead of system Ruby:
+```bash
+cd blog
+eval "$(rbenv init - bash)"   # or: eval "$(rbenv init - zsh)"
+ruby -v                       # must print 3.4.5
+bundle install
+bin/rails db:prepare db:seed
+```
+</details>
 
 ### 2. 🌱 Smart Seed Auto-Discovery & Admin Bootstrap (Issue #21 & #25)
 
 The database seed (`db/seeds.rb`) features **Smart Environment Auto-Discovery**:
 - It inspects your active database adapter (SQLite vs Postgres) and storage configuration.
-- It detects **Stage 0 (Localhost)** and automatically creates the initial admin user and seeds the pedagogical post:
+- It detects **Stage 0 (Localhost)** and automatically creates (or updates the password of) the initial admin user from `GOOGLE_CLOUD_ACCOUNT` with `APP_ADMIN_PASSWORD` (default `Ch4ng3m3!!1`), and seeds the pedagogical post:
   - `[LOCAL BASELINE] Welcome to Rails 8 on Localhost!`
   - Out-of-the-box local sad image attachment (`local_sad_image.png`) with watermark informing you that local disk storage is ephemeral.
 - It automatically triggers a password reset email via ActionMailer.
-
-Verify or re-run the seed (automatically uses your `GOOGLE_CLOUD_ACCOUNT` from `.env`):
-```bash
-bin/rails db:seed    # or from repo root: just seed
-```
-
-Boot the local development stack via Docker Compose:
-```bash
-docker compose up -d     # from blog/ — or `just compose-up` from the repo root
-```
 
 ![Docker Compose starting Rails, Mailpit, and local stack](assets/images/docker_compose_up_success.png)
 
@@ -283,10 +301,9 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
 - **Adminer DB UI**: http://localhost:8081
 
 > 🧯 **Port 3000 conflict or `server.pid` error?**
-> If you previously started a native dev server (`bin/dev`), stop it with `Ctrl+C`. If Docker complains that port 3000 is already allocated or finds a leftover `server.pid`, clean up with:
+> If you previously started a native dev server (`bin/dev`), stop it with `Ctrl+C`. `blog/bin/docker-entrypoint` automatically cleans up stale `tmp/pids/server.pid` on container boot, or you can restart cleanly anytime via:
 > ```bash
 > just compose-down
-> rm -f blog/tmp/pids/server.pid
 > just compose-up
 > ```
 
@@ -297,7 +314,7 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
 ![Mailpit web UI displaying intercepted password reset email](assets/images/mailpit_intercepted_email.png)
 2. **Log into the Blog**: Open `http://localhost:3000` in your browser.
    - You can click the password reset link directly inside the Mailpit email to set your password.
-   - Alternatively, log in using your Google Cloud account email (from `.env`) and the default seeded password: `Ch4ng3m3!!1`.
+   - Alternatively, log in using your Google Cloud account email (`GOOGLE_CLOUD_ACCOUNT` from `.env`) and the seeded password: **`Ch4ng3m3!!1`** (or your custom `APP_ADMIN_PASSWORD` if set in `.env`).
 3. **Observe the Visual Telemetry Badges:**
    - Notice the yellow environment banner and badges in the UI: `Notice: Ephemeral Database Active (POSTGRESQL)` and `[EPHEMERAL DB / STORAGE] 💾 Local`.
    - Notice the post watermark: The 🏠 stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
@@ -307,7 +324,7 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
 > 💡 **Optional Pro-Tip: Rails Console Workout**
 > Curious how Rails interacts with your seeded data from the CLI? Drop into the interactive console:
 > ```bash
-> bin/rails console
+> docker compose exec web ./bin/rails console
 > ```
 > Inspect your seeded admin user dynamically using your environment variable:
 > ```ruby
@@ -336,7 +353,7 @@ In the next step, we will intentionally deploy this ephemeral configuration to C
 
 
 
-## Step 3: Deploy 1 — The Stateless Shock (Early WOW in 3 Minutes!)
+## Step 3: Deploy 1 & Deploy 2 — The Stateless Shock (Early WOW in 3 Minutes!)
 
 *Duration: 10min*
 
@@ -353,23 +370,25 @@ just workshop-rewind 1
 > 💡 **What just happened?**
 > `workshop-rewind 1` applied the `stage-1-stateless` configuration overlay to `blog/config/` without leaving the `main` branch. Your app is configured with SQLite on container disk and ActiveStorage on local filesystem.
 
-### 2. Deploying Single-Container Puma to Cloud Run
+### 2. Deploy 1: Deploying Single-Container Puma to Cloud Run
 
-Deploy directly from source code to Cloud Run. Modern Rails 8 automatically generates an official, production-ready `Dockerfile` out of the box (with multi-stage builds, jemalloc, and non-root security). When you deploy from the `blog/` folder, Google Cloud Build detects this native `Dockerfile` directly and provisions a managed serverless service:
+Deploy directly from source code to Cloud Run using the dedicated `rails-cloudrun-sa` Service Account created by Terraform in Step 1. Modern Rails 8 automatically generates an official, production-ready `Dockerfile` out of the box (with multi-stage builds, jemalloc, and non-root security). When you deploy from the `blog/` folder, Google Cloud Build detects this native `Dockerfile` directly and provisions a managed serverless service:
 
 ```bash
 # Ensure you are inside the Rails application directory
 cd blog
 
-# Ensure default region is set
-export GOOGLE_CLOUD_REGION="europe-west1"
+# Ensure default region and custom Cloud Run Service Account are set
+export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 
-# Deploy single-container service from source (with dummy key fallback if starting without credentials)
+# Deploy 1: single-container service from source (passing GOOGLE_CLOUD_ACCOUNT and APP_ADMIN_PASSWORD)
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
+  --service-account $RUN_SA \
   --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,APP_ADMIN_PASSWORD=${APP_ADMIN_PASSWORD:-Ch4ng3m3!!1},SECRET_KEY_BASE_DUMMY=1
 ```
 
 You should see progress output similar to this:
@@ -401,7 +420,7 @@ During deployment:
 Open the generated Cloud Run URL in your browser!
 
 1. Your modern Rails 8 application is live on Google Cloud!
-2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and `APP_ADMIN_PASSWORD`). If you find no login button, click on **"New Post"** and it will prompt for user and password first:
+2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and the default seeded password **`Ch4ng3m3!!1`**). If you find no login button, click on **"New Post"** and it will prompt for user and password first:
 
    ![Rails 8 Sign In page with ephemeral telemetry banners](assets/images/sign_in_page_ephemeral.png)
 
@@ -419,7 +438,7 @@ Open the generated Cloud Run URL in your browser!
 ![Google Cloud Run Console blog service revision details](assets/images/cloud_run_blog_service_details.png)
 
 
-### 4. 💥 The Catch: The Stateless Shock & The "Puma Workaround" Trap
+### 4. 💥 Deploy 2: The Stateless Shock & The "Puma Workaround" Trap
 
 Cloud Run is a **stateless, serverless platform**. When web traffic drops to zero, Cloud Run scales down to zero container instances to save money. When a new HTTP request arrives or a new container revision is deployed, Cloud Run starts a brand new, clean container image.
 
@@ -429,14 +448,14 @@ When you create a post or attach an image in a single-container deployment, Rail
 ![Notice: 8 background jobs currently pending execution](assets/images/stuck_jobs_alert_banner.png)
 
 
-#### The Tempting Fix: Running Solid Queue inside Puma
+#### Deploy 2 — The Tempting Fix: Running Solid Queue inside Puma
 A clever developer might say: *"Wait! Rails 8 lets us run Solid Queue directly inside the Puma web server process by enabling the `SOLID_QUEUE_IN_PUMA=true` environment variable!"*
 
 
-Let's test this workaround on Cloud Run:
+Let's test this workaround on Cloud Run (**Deploy 2**):
 
 ```bash
-# Force a revision update to enable Solid Queue inside Puma
+# Deploy 2: Force a revision update to enable Solid Queue inside Puma
 gcloud run services update blog \
   --region $GOOGLE_CLOUD_REGION \
   --update-env-vars SOLID_QUEUE_IN_PUMA=true
@@ -449,7 +468,17 @@ Now, go back to your browser and **refresh the page**:
 2. **The Cold Shower (The Catch!):**
    - Because Cloud Run deployed a new revision, the previous container instance was replaced!
    - The article you wrote and the SQLite database file on disk **were completely wiped out**!
-3. **The Architectural Lesson:** Running background workers inside Puma consumes precious web thread CPU/RAM, and *still does not solve persistence*.
+3. **The Architectural Lesson (and 512 MiB OOM Hazard):** Running background workers inside Puma forks multiple Ruby processes inside a single 512 MiB container (causing Out-Of-Memory `Memory limit of 512 MiB exceeded` crashes!) and *still does not solve persistence*.
+
+Before moving to Step 4, remove `SOLID_QUEUE_IN_PUMA` and pin `--max-instances 1` (so multiple stateless SQLite containers don't split your login sessions):
+
+```bash
+# Clean up SOLID_QUEUE_IN_PUMA to prevent 512MiB OOM and pin max-instances=1 for Step 4
+gcloud run services update blog \
+  --region $GOOGLE_CLOUD_REGION \
+  --remove-env-vars SOLID_QUEUE_IN_PUMA \
+  --max-instances 1
+```
 
 ### 5. Automated Step 3 Validation
 
@@ -475,9 +504,9 @@ In this step, we decouple media and file storage from the container disk by swit
 
 **① Project ID + Bucket name** — Rails must know *where* to store blobs. The app reads `GOOGLE_CLOUD_PROJECT` from the environment and derives the bucket name as `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`. Your Terraform from Step 1 already created this bucket — no extra work needed.
 
-**② A Service Account with the right permissions** — Cloud Run runs as the *Compute Engine default service account* (`PROJECT_NUMBER-compute@developer.gserviceaccount.com`). This SA needs two IAM roles on the bucket:
+**② A Dedicated Service Account with the right permissions** — Our Cloud Run service runs as the custom Service Account provisioned by Terraform: **`rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com`** (`$RUN_SA`). This SA has two essential IAM roles:
 - `roles/storage.objectAdmin` — to upload and serve blobs
-- `roles/iam.serviceAccountTokenCreator` on *itself* — to call the IAM Credentials `signBlob` API and generate short-lived signed URLs
+- `roles/iam.serviceAccountTokenCreator` on *itself* — to call the IAM Credentials `signBlob` API and generate short-lived signed URLs (`gsa_email: rails-cloudrun-sa@...`)
 
 > ⚠️ **The Tempting Shortcut — `public: true`**
 > The fastest way to get GCS working is to set `public: true` in `storage.yml` and grant `allUsers:objectViewer` on the bucket. Images load instantly, no signing needed. **Do not do this.** A public bucket leaks all uploaded user media to the open internet, forever. Our blueprint uses `iam: true` to keep the bucket 100% private — every image URL is a signed, expiring token generated on the fly by the IAM Credentials API.
@@ -514,14 +543,13 @@ google:
 
 ### 2. Granting IAM Storage & Signing Permissions
 
-Ensure your Cloud Run runtime service account has permissions to sign URLs and upload objects:
+Verify (or idempotently re-apply) that your dedicated Cloud Run runtime service account (`$RUN_SA`) has permissions to sign URLs and upload objects:
 
 ```bash
-export PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
-export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
 
-# Grant Storage Object Admin
+# Grant Storage Object Admin to rails-cloudrun-sa
 gcloud storage buckets add-iam-policy-binding gs://$GCS_BUCKET \
   --member="serviceAccount:$RUN_SA" \
   --role="roles/storage.objectAdmin"
@@ -532,18 +560,21 @@ gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
   --role="roles/iam.serviceAccountTokenCreator"
 ```
 
-### 3. Third Deploy to Cloud Run with GCS Attached
+### 3. Deploy 3: Deploying to Cloud Run with GCS Attached
 
 Re-deploy with GCS enabled. Make sure you are inside the `blog/` folder (otherwise Cloud Run attempts to build using Buildpacks instead of the Rails 8 `Dockerfile`, causing build failures).
 
-Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (master key, IAP config, etc.):
+Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (`GOOGLE_CLOUD_ACCOUNT`, `SECRET_KEY_BASE_DUMMY=1`), and explicitly pass `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` so `storage.yml` resolves `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`:
 
 ```bash
 cd blog
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+
 gcloud run deploy blog \
   --source . \
   --region $GOOGLE_CLOUD_REGION \
-  --update-env-vars ACTIVE_STORAGE_SERVICE=google
+  --service-account $RUN_SA \
+  --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google
 ```
 
 > 💡 **Tip:** If the deployment fails, click on the Cloud Build logs link conveniently provided in your terminal output (as shown in the figure below). You can also ask Antigravity for help deciphering and fixing the error!
@@ -606,9 +637,8 @@ Export all required shell variables directly from your Terraform outputs:
 # Core project variables (should already be set from Step 0)
 export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
 
-# Compute runtime service account
-export PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
-export RUN_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+# Custom Cloud Run Service Account provisioned by Terraform
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 
 # Cloud SQL instance name (from Terraform output, NOT hardcoded)
 export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
@@ -669,18 +699,12 @@ gcloud secrets list --filter="name:rails-"
 <!-- TODO this should be automateable! -->
 ![Google Cloud Secret Manager Console listing configured application secrets](assets/images/secret_manager_secrets_list.png)
 
-#### 🔑 Syncing `master.key` to Your Laptop (Local Sync)
+#### 🔑 Syncing `master.key` & `credentials.yml.enc` (Atomic Key Pairing)
 
-Because `blog/config/master.key` is gitignored for security, your local clone might not have it yet. Run this friendly self-healing snippet to pull it from Secret Manager so your local Rails tools can decrypt credentials:
+In Rails, `blog/config/master.key` and `blog/config/credentials.yml.enc` are an indivisible cryptographic pair — a `master.key` is useless if `credentials.yml.enc` was encrypted with someone else's key (`ActiveSupport::MessageEncryptor::InvalidMessage`). Run `bin/ensure_workshop_credentials.rb --sync-gcp` to verify that your local `master.key` can decrypt `credentials.yml.enc` (and automatically regenerate + push a fresh version to Secret Manager if needed):
 
 ```bash
-if [ ! -f blog/config/master.key ]; then
-  echo "📥 Pulling rails-master-key from Secret Manager to local blog/config/master.key..."
-  gcloud secrets versions access latest --secret=rails-master-key > blog/config/master.key
-  echo "🔑 Created local blog/config/master.key! 🎉"
-else
-  echo "✅ Local blog/config/master.key already exists! 🚀"
-fi
+ruby bin/ensure_workshop_credentials.rb --sync-gcp
 ```
 
 > 🧪 **Playground: Want to create a custom secret just to see how easy it is?**
@@ -695,10 +719,10 @@ fi
 
 In order for Cloud Run containers to mount these secrets as environment variables or volume mounts at boot, the runtime service account (`$RUN_SA`) needs the `roles/secretmanager.secretAccessor` role on each secret.
 
-Terraform already granted this during Step 1! Verify the IAM policy binding on `rails-master-key`:
+Terraform already granted this secret-level IAM policy binding during Step 1! Verify the IAM policy binding on `rails-master-key`:
 
 ```bash
-# Verify that Cloud Run runtime SA has Secret Accessor role
+# Verify that Cloud Run runtime SA has Secret Accessor role on rails-master-key
 gcloud secrets get-iam-policy rails-master-key \
   --flatten="bindings[].members" \
   --format="table(bindings.role,bindings.members)" \
@@ -708,7 +732,7 @@ gcloud secrets get-iam-policy rails-master-key \
 You should see:
 ```text
 ROLE                                 MEMBERS
-roles/secretmanager.secretAccessor   serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com
+roles/secretmanager.secretAccessor   serviceAccount:rails-cloudrun-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com
 ```
 
 ![Cloud SQL Auth Proxy Security Comparison](assets/images/cloud_sql_proxy_comparison.jpg)
@@ -788,6 +812,7 @@ postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJ
 ```bash
 # Core environment variables for database migration & initial admin seed
 export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 echo "Admin user will be seeded for: $GOOGLE_CLOUD_ACCOUNT"
 
 # Get the latest blog image from Cloud Run (jobs don't support --source)
@@ -812,22 +837,6 @@ gcloud run jobs create rails-migrate \
 # Execute migration job
 gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 ```
-
-<!-- 
-NOTE FOR MENTORS / WORKSHOP AUTHORS:
-We believe this should NOT happen with the new auto-exported GOOGLE_CLOUD_ACCOUNT changes above, but if db:prepare ever exits with code 1 due to db:seed aborting, un-comment this snippet:
-
-> 💡 **Troubleshooting: Did `db:prepare` fail with `exit(1)`?**
-> If `db:prepare` failed during seeding because your email was unset, re-run just the seed step:
-> ```bash
-> gcloud run jobs update rails-migrate \
->   --command "bin/rails" \
->   --args "db:seed" \
->   --update-env-vars "GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}" \
->   --region $GOOGLE_CLOUD_REGION
-> gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
-> ```
--->
 
 > 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
 > All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
@@ -854,11 +863,14 @@ gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
 
 
 
-### 4. Fourth Deploy: Deploying Multi-Container Cloud Run via Docker Compose
+### 4. Deploy 4: Deploying Multi-Container Cloud Run via Docker Compose
 
 Now deploy the genuine 3-container production stack (`web`, `worker`, `cloudsql-proxy`) directly from `compose.prod.yaml`:
 
 ```bash
+cd blog
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+
 # 1. Self-healing environment exports (guarantees no missing master key or DB password)
 export RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-$(cat config/master.key 2>/dev/null || gcloud secrets versions access latest --secret=rails-master-key)}"
 export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
@@ -874,7 +886,12 @@ export GEMINI_API_KEY="${GEMINI_API_KEY:-dummy-key}"
 
 # 3. Deploy the full multi-container sidecar architecture to Cloud Run
 gcloud run compose up compose.prod.yaml \
+  --region=$GOOGLE_CLOUD_REGION
+
+# 4. Bind our custom Cloud Run Service Account ($RUN_SA) and public ingress
+gcloud run services update blog \
   --region=$GOOGLE_CLOUD_REGION \
+  --service-account=$RUN_SA \
   --allow-unauthenticated
 ```
 
@@ -1267,4 +1284,6 @@ terraform destroy -auto-approve
 gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 ```
 
+---
 
+*Codelab Version: v2.2.0 (2026-09-24) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

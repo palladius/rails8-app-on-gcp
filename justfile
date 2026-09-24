@@ -1,4 +1,6 @@
 set dotenv-load := true
+export PATH := env_var_or_default("HOME", "/root") + "/.rbenv/shims:" + env_var_or_default("PATH", "/usr/bin:/bin")
+export RBENV_VERSION := "3.4.5"
 
 # default recipe
 default:
@@ -28,9 +30,12 @@ compose-down:
 compose-logs:
     cd blog && just compose-logs
 
-# run all tests
+# run all tests (Rails app test suite + Codelab/Docker/IaC contract tests)
 test:
     cd blog && just test
+    ruby test/test_codelab_sync_and_contracts.rb
+    ruby test/test_docker_compose_contracts.rb
+    ruby test/test_iac_codelab_contracts.rb
 
 # autopush: run tests and push to origin main (GitHub Actions builds static pages on CI)
 autopush:
@@ -217,9 +222,10 @@ workshop-eval step="all":
 workshop-uat step="1":
 	ruby bin/workshop_uat.rb {{step}}
 
-# Generate static HTML for GitHub pages from CODELAB.md and SKELETON.md
+# Generate static HTML for GitHub pages from CODELAB.md and SKELETON.md (and sync DevSite index.lab.md if present)
 build-ghpages:
 	just build-skeleton
+	@if [ -f private/sync_devsite_codelab.rb ]; then ruby private/sync_devsite_codelab.rb; fi
 	ruby workshop/visualizer/build_ghpages.rb
 
 # show registered users in a clean CLI table ordered by created_at DESC

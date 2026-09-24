@@ -1,4 +1,6 @@
 set dotenv-load := true
+export PATH := env_var_or_default("HOME", "/root") + "/.rbenv/shims:" + env_var_or_default("PATH", "/usr/bin:/bin")
+export RBENV_VERSION := "3.4.5"
 
 default:
     @just --list
