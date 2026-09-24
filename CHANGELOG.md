@@ -1,5 +1,34 @@
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-09-24
+### Added & Ratified
+- 🦖🏛️ **After the FL0–FL7 Ecatomb: The Modern Secure Monolith & Constitution v1.3.0**:
+  - Following the post-mortem of 7 automated friction logs that missed major architectural gaps, ratified **Constitution Principle 1 (v1.3.0)** defining the **4 Pillars of the Modern Secure Monolith on GCP**:
+    1. **Docker Compose Native on Cloud Run**: Multi-container sidecar orchestration (`web` + `worker` Solid Queue + `cloudsql-proxy`) deployed declaratively via `compose.prod.yaml`.
+    2. **Private ActiveStorage on GCS**: Strictly non-public bucket (`allUsers` forbidden) with on-the-fly IAM Credentials blob signing (`iam: true`).
+    3. **Managed Cloud SQL via Localhost Proxy**: Zero public IP exposure (`0.0.0.0/0` forbidden), database reached securely over standard TCP `127.0.0.1:5432` through the Auth Proxy sidecar.
+    4. **Zero-Trust Runtime Secret Manager Injection**: Total elimination of committed secrets or plaintext environment variables via Secret Manager mounts.
+  - **The Persona Contract (AGENTS.md & Constitution)**: Mandated that every code and architectural decision must be tested against: *"A seasoned Rails expert who is a newcomer to Google Cloud Platform — what do they look for in an official blueprint, and what do they find?"*
+  - **Friction Logging v2.0 Retrospective**: Codified the **8 Fundamental Sins** of automated friction logs in `docs/investigations/20260923-fl100-lessons-learned.md`, introducing the Semantic Drift Check, the 6-Question Step Audit, tone sobriety, and strict TDD test-first bug fixing.
+
+## [0.3.0] - 2026-09-24
+### Added
+- 🔐 **Atomic `master.key` & `credentials.yml.enc` Pairing (`bin/ensure_workshop_credentials.rb` — fixes Emiliano's Bug [#153](https://github.com/palladius/rails8-app-on-gcp/issues/153))**:
+  - Added `WorkshopCredentialsManager` to detect when `blog/config/credentials.yml.enc` is still encrypted with the founding authors' private key (`7b856d06f492f293bea59a5323150d8c`) or when `blog/config/master.key` is missing/dummy (`0123456789abcdef0123456789abcdef`), atomically generating a fresh 32-char hex `master.key` AND re-encoding `credentials.yml.enc` (`AES-128-GCM`, guaranteed new MD5) before Terraform uploads `rails-master-key` to Secret Manager.
+- 🧪 **32 New Granular Automated Contract Tests & 156 New Assertions (`just test` — inspired by Emiliano's Bug [#153](https://github.com/palladius/rails8-app-on-gcp/issues/153))**:
+  - `test/test_codelab_sync_and_contracts.rb` (**17 tests, 100 assertions**): Enforces variable export ordering in Step 0, `gcloud projects create`, `run/region` vs `compute/region`, billing linkage commands, `.env` creation before `just workshop-test`, single canonical path (no Mode A/Mode B forking roads), contiguous `Deploy 1..4` numbering, `SOLID_QUEUE_IN_PUMA` cleanup, `GOOGLE_CLOUD_PROJECT` in Step 4 `--update-env-vars`, unified `rails-cloudrun-sa` across the entire Codelab, `.ruby-version` parity (`3.4.5` at root and `blog/`), and synchronization with DevSite `index.lab.md`.
+  - `test/test_docker_compose_contracts.rb` (**9 tests, 28 assertions**): Verifies `blog/compose.yaml` (`web`, `worker`, `mailpit`, `adminer`), `blog/bin/docker-entrypoint` (`server.pid` cleanup, `.env` sourcing, `queue_schema.rb` loading, auto `db:seed`), `blog/config/database.yml` (all 4 development databases: `primary`, `cache`, `queue`, `cable`), and `blog/db/seeds.rb`.
+  - `test/test_iac_codelab_contracts.rb` (**6 tests, 28 assertions**): Verifies Terraform `iac/secrets.tf` and `iac/cloudrun.tf` IAM bindings, secret-level IAM policies on `rails-master-key`, and `WorkshopCredentialsManager` end-to-end re-encryption + MD5 divergence.
+- 🔄 **Deterministic DevSite Codelab Compiler (`bin/sync_devsite_codelab.rb`)**:
+  - Automatically compiles `workshop/CODELAB.md` into `workshop/build/devsite/index.lab.md` and syncs to the Google3 CitC DevSite workspace during `just build-ghpages`.
+
+### Fixed
+- 🛠️ **Complete Resolution of Emiliano Della Casa's Friction Log Bug ([#153](https://github.com/palladius/rails8-app-on-gcp/issues/153) — `FL_E001 Magnificent FL from Emiliano`)**:
+  - **Unified Custom Service Account (`rails-cloudrun-sa`)**: Standardized `RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"` across Steps 3, 4, 5, and 6 of `CODELAB.md`, `skeleton.yaml`, and `index.lab.md`, while granting dual runtime permissions in Terraform (`iac/cloudrun.tf` and `iac/secrets.tf`) so `gcloud run compose up` (which uses a hardcoded Go template without `serviceAccountName:`) never fails during boot.
+  - **Step 2 Docker Compose Out-of-the-Box**: Fixed `blog/compose.yaml` (`env_file: ../.env`, `./bin/rails server -p 3000 -b 0.0.0.0`), `blog/bin/docker-entrypoint` (removes stale `tmp/pids/server.pid`, loads `.env`, initializes `db/queue_schema.rb`, and runs `db:seed`), `blog/config/database.yml` (4-DB development layout), and `blog/db/seeds.rb` (updates password on existing admin user).
+  - **Step 3 & Step 4 OOM & Session Loss Prevention**: Added `--remove-env-vars SOLID_QUEUE_IN_PUMA --max-instances 1` at the end of Step 3 (`Deploy 2`) and passed `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` in Step 4 (`Deploy 3`).
+  - **Non-Interactive `rbenv` Shims in `justfile`**: Exported `~/.rbenv/shims` and `RBENV_VERSION=3.4.5` in root `justfile`, `blog/justfile`, and `workshop/skeleton.yaml` evals so `just test` and `just workshop-eval` never fail on system Ruby `3.3.x`.
+
 ## [0.2.83] - 2026-09-23
 ### Changed
 - 🧹 **Streamline Prerequisites in README**:
