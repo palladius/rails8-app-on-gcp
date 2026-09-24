@@ -10,13 +10,17 @@ require "fileutils"
 REPO_ROOT = File.expand_path("..", __dir__)
 CODELAB_MD = File.join(REPO_ROOT, "workshop", "CODELAB.md")
 DEFAULT_BUILD_PATH = File.join(REPO_ROOT, "workshop", "build", "devsite", "index.lab.md")
-DOTENV_PATH = File.join(REPO_ROOT, ".env")
+DOTENV_PATHS = [
+  File.join(REPO_ROOT, ".env"),
+  File.expand_path("../rails8-app-on-gcp-pvt/.env", REPO_ROOT)
+].freeze
 
 dotenv_devsite_path = nil
-if File.exist?(DOTENV_PATH)
-  File.readlines(DOTENV_PATH).each do |line|
+DOTENV_PATHS.each do |dotenv_path|
+  next unless File.exist?(dotenv_path)
+  File.readlines(dotenv_path).each do |line|
     if line.strip =~ /\A(?:export\s+)?DEVSITE_CODELAB_PATH=(['"]?)(.+?)\1\s*(?:#.*)?\z/
-      dotenv_devsite_path = Regexp.last_match(2).strip
+      dotenv_devsite_path ||= Regexp.last_match(2).strip
     end
   end
 end
