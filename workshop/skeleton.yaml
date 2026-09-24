@@ -129,13 +129,14 @@ steps:
 
   - id: "step-3"
     number: 3
-    title: "Deploy 1 — The Stateless Shock (Early WOW!)"
-    description: "Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart."
+    title: "Deploy 1 & Deploy 2 — The Stateless Shock & In-Puma Workaround"
+    description: "Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart, and test SOLID_QUEUE_IN_PUMA=true."
     pseudocode: |
       just workshop-rewind 1
-      gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # dummy key fallback: without credentials the container dies with 'Missing `secret_key_base`'
-      # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
+      gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # Deploy 1: dummy key fallback
+      # Deploy 2: Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, then clean up to prevent 512MiB OOM
       gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars SOLID_QUEUE_IN_PUMA=true
+      gcloud run services update blog --region $GOOGLE_CLOUD_REGION --remove-env-vars SOLID_QUEUE_IN_PUMA --max-instances 1
     prerequisites:
       - "Step 2 completed"
       - "Cloud Run API enabled in GCP project"
@@ -166,11 +167,11 @@ steps:
 
   - id: "step-4"
     number: 4
-    title: "Deploy 2 — GCS Persistent Storage & POLA Warning"
+    title: "Deploy 3 — GCS Persistent Storage & POLA Warning"
     description: "Point ActiveStorage to Google Cloud Storage with private IAM signing and observe the POLA stuck jobs warning banner."
     pseudocode: |
       just workshop-rewind 2
-      gcloud run deploy blog --source . --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
+      gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # Deploy 3: GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
       # Observe surviving images & stuck jobs banner
     prerequisites:
       - "Step 3 completed"
@@ -209,8 +210,9 @@ steps:
     pseudocode: |
       export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name)
       gcloud sql instances describe $SQL_INSTANCE_NAME --format='value(state)'
-      gcloud secrets create rails-master-key --data-file=blog/config/master.key
-      gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
+      export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+      ruby bin/ensure_workshop_credentials.rb --sync-gcp
+      gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$RUN_SA" --role="roles/secretmanager.secretAccessor"
     prerequisites:
       - "Step 4 completed"
       - "Cloud SQL instance provisioned and in RUNNABLE state"
@@ -236,13 +238,15 @@ steps:
         expect_exit: 0
       - id: "step-5-ruby-master-key"
         type: "ruby"
-        description: "Verify master.key exists locally AND matches credentials.yml.enc"
+        description: "Verify master.key exists locally AND matches credentials.yml.enc (and is not author-only WORKSHOP_FILE_MD5_EMI_RICC without matching key)"
         code: |
+          require_relative '../bin/ensure_workshop_credentials'
+          WorkshopCredentialsManager.ensure!(repo_root: File.expand_path('..', __dir__), sync_gcp: false)
           raise 'Missing master.key' unless File.exist?('blog/config/master.key')
           raise 'Missing credentials.yml.enc' unless File.exist?('blog/config/credentials.yml.enc')
-          # Verify key can decrypt credentials (optional, requires rails runner)
           key = File.read('blog/config/master.key').strip
-          raise "master.key looks like dummy (length=#{key.length})" unless key.length == 32 && key != '0123456789abcdef0123456789abcdef'
+          raise "master.key looks like dummy (length=#{key.length})" unless WorkshopCredentialsManager.valid_hex_key?(key)
+          raise "master.key cannot decrypt credentials.yml.enc!" unless WorkshopCredentialsManager.can_decrypt?(key, 'blog/config/credentials.yml.enc')
       - id: "step-5-ruby-status-json-step"
         type: "ruby"
         description: "Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars"
@@ -258,6 +262,7 @@ steps:
           RUBY
           cmd = ["bin/rails", "runner", runner_code]
           env = {
+            "RBENV_VERSION" => "3.4.5",
             "SECRET_KEY_BASE_DUMMY" => "1",
             "RAILS_ENV" => "production",
             "DATABASE_URL" => "postgres://user:pass@localhost:5432/app?host=/cloudsql/p:r:i",
@@ -270,12 +275,13 @@ steps:
 
   - id: "step-6"
     number: 6
-    title: "Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)"
+    title: "Deploy 4 — Enterprise Multi-Container Sidecars (The Gold Standard)"
     description: "Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar via compose.prod.yaml."
     pseudocode: |
       just workshop-restore-gold
-      gcloud run jobs execute rails-migrate --wait
-      gcloud alpha run compose up compose.prod.yaml
+      export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+      gcloud run compose up compose.prod.yaml --region=$GOOGLE_CLOUD_REGION
+      gcloud run services update blog --region=$GOOGLE_CLOUD_REGION --service-account=$RUN_SA
     prerequisites:
       - "Step 5 completed"
       - "Cloud SQL and Secret Manager configured"
@@ -323,6 +329,7 @@ steps:
           RUBY
           cmd = ["bin/rails", "runner", runner_code]
           env = {
+            "RBENV_VERSION" => "3.4.5",
             "SECRET_KEY_BASE_DUMMY" => "1",
             "K_SERVICE" => "blog",
             "RAILS_ENV" => "production",

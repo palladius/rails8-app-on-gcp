@@ -24,6 +24,10 @@ resource "google_secret_manager_secret_version" "db_password" {
 }
 
 # Rails Master Key
+resource "random_id" "rails_master_key" {
+  byte_length = 16
+}
+
 resource "google_secret_manager_secret" "rails_master_key" {
   secret_id = "rails-master-key"
   replication {
@@ -34,7 +38,7 @@ resource "google_secret_manager_secret" "rails_master_key" {
 
 resource "google_secret_manager_secret_version" "rails_master_key" {
   secret      = google_secret_manager_secret.rails_master_key.id
-  secret_data = fileexists("${path.module}/../blog/config/master.key") ? file("${path.module}/../blog/config/master.key") : "0123456789abcdef0123456789abcdef"
+  secret_data = fileexists("${path.module}/../blog/config/master.key") ? trimspace(file("${path.module}/../blog/config/master.key")) : random_id.rails_master_key.hex
 }
 
 # Admin Password
@@ -55,3 +59,38 @@ resource "google_secret_manager_secret_version" "admin_password" {
   secret      = google_secret_manager_secret.admin_password.id
   secret_data = random_password.admin_password.result
 }
+
+# Explicit secret-level IAM bindings so `gcloud secrets get-iam-policy rails-master-key`
+# (Step 5.4) returns the expected policy table for $RUN_SA (rails-cloudrun-sa) and
+# also works seamlessly when `gcloud run compose up` boots with Default Compute SA.
+locals {
+  runtime_secret_accessors = {
+    rails_cloudrun_sa  = module.service_account_cloud_run.iam_email
+    default_compute_sa = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "rails_master_key_access" {
+  for_each  = local.runtime_secret_accessors
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.rails_master_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = each.value
+}
+
+resource "google_secret_manager_secret_iam_member" "db_password_access" {
+  for_each  = local.runtime_secret_accessors
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.db_password.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = each.value
+}
+
+resource "google_secret_manager_secret_iam_member" "admin_password_access" {
+  for_each  = local.runtime_secret_accessors
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.admin_password.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = each.value
+}
+

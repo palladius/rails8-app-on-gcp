@@ -1,5 +1,13 @@
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-09-24
+### Added & Improved
+- 🏷️ **Codelab Versioning & Changelog Synchronization (`workshop/CODELAB_VERSION` v2.2.0 & `workshop/CODELAB_CHANGELOG.md`)**:
+  - Added `workshop/CODELAB_VERSION` (`2.2.0`) and `workshop/CODELAB_CHANGELOG.md` to explicitly track Codelab parity between GitHub (`workshop/CODELAB.md`) and Google3 DevSite (`index.lab.md`).
+  - Added a subtle small-italic version stamp at the bottom of the last page (`Conclusion & Clean Up`) of both Codelabs, enforced by `test_codelab_version_and_changelog_synced_in_last_page_footer` (**33 new contract tests / 176 assertions total**).
+- 🔐 **`SAMPLE_APP_CREDENTIALS` Constant (`bin/ensure_workshop_credentials.rb`)**:
+  - Named the shipped sample app credentials MD5 constant `SAMPLE_APP_CREDENTIALS` (`SAMPLE_APP_CREDENTIALS_MD5 = "7b856d06f492f293bea59a5323150d8c"`) in `WorkshopCredentialsManager` and verified end-to-end re-encryption + MD5 divergence in `test/test_iac_codelab_contracts.rb`.
+
 ## [0.3.1] - 2026-09-24
 ### Added & Ratified
 - 🦖🏛️ **After the FL0–FL7 Ecatomb: The Modern Secure Monolith & Constitution v1.3.0**:

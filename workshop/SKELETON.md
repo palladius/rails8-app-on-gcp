@@ -86,17 +86,18 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 
 ---
 
-### Step 3: Deploy 1 — The Stateless Shock (Early WOW!)
-- **`description`**: Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart.
+### Step 3: Deploy 1 & Deploy 2 — The Stateless Shock & In-Puma Workaround
+- **`description`**: Deploy a single stateless Puma container directly to Cloud Run to witness the Stateless Shock when ephemeral containers restart, and test SOLID_QUEUE_IN_PUMA=true.
 - **`prerequisites`**:
   - Step 2 completed
   - Cloud Run API enabled in GCP project
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 1
-  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # dummy key fallback: without credentials the container dies with 'Missing `secret_key_base`'
-  # Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, observe lost data
+  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # Deploy 1: dummy key fallback
+  # Deploy 2: Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, then clean up to prevent 512MiB OOM
   gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars SOLID_QUEUE_IN_PUMA=true
+  gcloud run services update blog --region $GOOGLE_CLOUD_REGION --remove-env-vars SOLID_QUEUE_IN_PUMA --max-instances 1
   ```
 - **`postrequisites`**:
   - First live public HTTPS URL on Cloud Run
@@ -110,7 +111,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 
 ---
 
-### Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+### Step 4: Deploy 3 — GCS Persistent Storage & POLA Warning
 - **`description`**: Point ActiveStorage to Google Cloud Storage with private IAM signing and observe the POLA stuck jobs warning banner.
 - **`prerequisites`**:
   - Step 3 completed
@@ -118,7 +119,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 2
-  gcloud run deploy blog --source . --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
+  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # Deploy 3: GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
   # Observe surviving images & stuck jobs banner
   ```
 - **`postrequisites`**:
@@ -140,8 +141,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   ```bash
   export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name)
   gcloud sql instances describe $SQL_INSTANCE_NAME --format='value(state)'
-  gcloud secrets create rails-master-key --data-file=blog/config/master.key
-  gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$SA_EMAIL" --role="roles/secretmanager.secretAccessor"
+  export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+  ruby bin/ensure_workshop_credentials.rb --sync-gcp
+  gcloud secrets add-iam-policy-binding rails-master-key --member="serviceAccount:$RUN_SA" --role="roles/secretmanager.secretAccessor"
   ```
 - **`postrequisites`**:
   - Secrets stored securely in Secret Manager (zero credentials in git or env files)
@@ -151,12 +153,12 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - `[SHELL]` Verify Secret Manager API is accessible or offline environment check
   - `[SHELL]` Verify Cloud SQL instance exists and is RUNNABLE (live check)
   - `[SHELL]` Verify rails-master-key secret has a non-dummy value in Secret Manager
-  - `[RUBY]` Verify master.key exists locally AND matches credentials.yml.enc
+  - `[RUBY]` Verify master.key exists locally AND matches credentials.yml.enc (and is not author-only WORKSHOP_FILE_MD5_EMI_RICC without matching key)
   - `[RUBY]` Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars
 
 ---
 
-### Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
+### Step 6: Deploy 4 — Enterprise Multi-Container Sidecars (The Gold Standard)
 - **`description`**: Deploy the full multi-container reference architecture on Cloud Run: Puma web, Solid Queue worker, and Cloud SQL Auth Proxy sidecar via compose.prod.yaml.
 - **`prerequisites`**:
   - Step 5 completed
@@ -164,8 +166,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-restore-gold
-  gcloud run jobs execute rails-migrate --wait
-  gcloud alpha run compose up compose.prod.yaml
+  export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+  gcloud run compose up compose.prod.yaml --region=$GOOGLE_CLOUD_REGION
+  gcloud run services update blog --region=$GOOGLE_CLOUD_REGION --service-account=$RUN_SA
   ```
 - **`postrequisites`**:
   - Production-grade multi-container sidecar architecture running serverlessly on Cloud Run
@@ -257,9 +260,9 @@ Architectural milestones in the workshop are irreversible one-way doors. When ru
 - [x] Step 0: Prerequisites, Antigravity Setup & Billing Verification
 - [x] Step 1: Terraform Infrastructure Kickoff & Pre-Flight Diagnostics
 - [x] Step 2: The Local Baseline, Mailpit & Admin Onboarding
-- [x] Step 3: Deploy 1 — The Stateless Shock (Early WOW!)
-- [x] Step 4: Deploy 2 — GCS Persistent Storage & POLA Warning
+- [x] Step 3: Deploy 1 & Deploy 2 — The Stateless Shock & In-Puma Workaround
+- [x] Step 4: Deploy 3 — GCS Persistent Storage & POLA Warning
 - [x] Step 5: Cloud SQL Ready & Secret Manager CLI Injection
-- [x] Step 6: Deploy 3 — Enterprise Multi-Container Sidecars (The Gold Standard)
+- [x] Step 6: Deploy 4 — Enterprise Multi-Container Sidecars (The Gold Standard)
 - [x] Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
 - [x] Step 8: Choose Your Own Adventure / Advanced Quests 🏆

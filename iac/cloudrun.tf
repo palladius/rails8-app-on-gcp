@@ -2,6 +2,10 @@
 # Cloud Run: Service + IAM + Service Account
 ###############################################################################
 
+data "google_project" "current" {
+  project_id = var.project_id
+}
+
 # Cloud Run Service Account
 module "service_account_cloud_run" {
   source       = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v34.0.0"
@@ -16,6 +20,23 @@ module "service_account_cloud_run" {
       "roles/aiplatform.user" # Nano Banana cover generation on Vertex AI (issue #18)
     ]
   }
+}
+
+# Also grant runtime roles to the Default Compute Service Account
+# (${PROJECT_NUMBER}-compute@developer.gserviceaccount.com) because
+# `gcloud run compose up` uses a hardcoded Go template without `serviceAccountName:`
+# and temporarily resets the Cloud Run service to Default Compute SA until
+# `gcloud run services update blog --service-account=$RUN_SA` runs.
+resource "google_project_iam_member" "default_compute_sa_runtime_roles" {
+  for_each = toset([
+    "roles/storage.objectAdmin",
+    "roles/secretmanager.secretAccessor",
+    "roles/cloudsql.client",
+    "roles/aiplatform.user",
+  ])
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 }
 
 # Required GCP API for Cloud Run
@@ -61,6 +82,12 @@ resource "google_service_account_iam_member" "cloud_run_sa_signer" {
   service_account_id = module.service_account_cloud_run.id
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = module.service_account_cloud_run.iam_email
+}
+
+resource "google_service_account_iam_member" "default_compute_sa_signer" {
+  service_account_id = module.service_account_cloud_run.id
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 }
 
 # Allow developers to sign GCS blob URLs locally via `iam: true` in storage.yml.

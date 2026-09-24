@@ -1,14 +1,30 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing databases and seed initial admin user
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+# Remove any stale Puma server.pid before boot
+rm -f /rails/tmp/pids/server.pid tmp/pids/server.pid
+
+# Auto-load .env if present in /rails or parent repo root
+if [ -f "/rails/../.env" ]; then
+  set -a
+  source /rails/../.env
+  set +a
+elif [ -f "/rails/.env" ]; then
+  set -a
+  source /rails/.env
+  set +a
+fi
+
+# If running the rails server or solid_queue worker, ensure databases & queue schemas exist and seed initial admin user
+if [[ "$*" == *"rails server"* ]] || [[ "$*" == *"./bin/rails server"* ]]; then
   ./bin/rails db:prepare
-  ./bin/rails db:prepare:queue || true
+  ./bin/rails db:prepare:queue || ./bin/rails runner 'load Rails.root.join("db/queue_schema.rb") unless ActiveRecord::Base.connection.table_exists?("solid_queue_processes")' || true
   ./bin/rails db:prepare:cache || true
   ./bin/rails db:prepare:cable || true
   if [ -n "$GOOGLE_CLOUD_ACCOUNT" ] || [ -n "$ADMIN_EMAIL" ]; then
     ./bin/rails db:seed || true
   fi
+elif [[ "$*" == *"solid_queue:start"* ]]; then
+  ./bin/rails runner 'load Rails.root.join("db/queue_schema.rb") unless ActiveRecord::Base.connection.table_exists?("solid_queue_processes")' || true
 fi
 
 exec "${@}"

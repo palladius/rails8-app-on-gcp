@@ -249,23 +249,34 @@ else
 end
 
 puts "\n--- 🔑 3. Checking Rails Secrets & Keys ---".bold
-master_key_file = File.expand_path("../blog/config/master.key", __dir__)
-master_key_env = env_vars["RAILS_MASTER_KEY"] || ENV["RAILS_MASTER_KEY"]
-
-if File.exist?(master_key_file)
-  puts "✅ config/master.key found on disk".green
-elsif !master_key_env.to_s.strip.empty?
-  puts "✅ RAILS_MASTER_KEY configured in environment".green
-else
-  puts "⚠️  [WARNING] Neither config/master.key nor RAILS_MASTER_KEY found!".yellow
-  puts "   ℹ️  Normal for Step 0! Only needed later in Step 5 (Secret Manager)."
-  puts "   👉 To generate when ready: cd blog && bundle install && bin/rails credentials:edit"
+require_relative "ensure_workshop_credentials"
+begin
+  creds_result = WorkshopCredentialsManager.ensure!(
+    repo_root: File.expand_path("..", __dir__),
+    sync_gcp: false
+  ) do |msg|
+    puts "   #{msg}".cyan
+  end
+  if creds_result[:status] == :ok || creds_result[:status] == :regenerated
+    puts "✅ config/master.key and config/credentials.yml.enc verified and cryptographically paired!".green
+  end
+rescue => e
+  puts "⚠️  [WARNING] Could not auto-pair Rails credentials: #{e.message}".yellow
   warnings_count += 1
 end
 
 puts "\n--- 🐤 4. Checking Storage & Canary Asset ---".bold
+local_canary = File.expand_path("../blog/app/assets/images/gcs_dev_image.jpg", __dir__)
+if File.exist?(local_canary)
+  puts "✅ Local canary asset present on disk: blog/app/assets/images/gcs_dev_image.jpg".green
+else
+  puts "⚠️  [WARNING] Local canary asset blog/app/assets/images/gcs_dev_image.jpg is missing!".yellow
+  warnings_count += 1
+end
+
 if project_id && !project_id.empty? && project_id != "(unset)"
   bucket_dev = "#{project_id}-activestorage-dev"
+  bucket_prod = "#{project_id}-activestorage-prod"
   storage_flags = gcloud_flags_str || ""
   _out, _err, b_status = Open3.capture3("gcloud storage buckets describe gs://#{bucket_dev} #{storage_flags} 2>/dev/null")
   if b_status.success?
@@ -281,6 +292,13 @@ if project_id && !project_id.empty? && project_id != "(unset)"
   else
     puts "ℹ️  GCS Bucket gs://#{bucket_dev} not yet created (normal before Step 1 terraform apply)".cyan
   end
+
+  _pout, _perr, p_status = Open3.capture3("gcloud storage buckets describe gs://#{bucket_prod} #{storage_flags} 2>/dev/null")
+  if p_status.success?
+    puts "✅ GCS Bucket gs://#{bucket_prod} exists".green
+  else
+    puts "ℹ️  GCS Bucket gs://#{bucket_prod} not yet created (normal before Step 1 terraform apply)".cyan
+  end
 end
 
 puts "\n--- 📸 4b. Declarative Screenshots Verification ---".bold
@@ -288,12 +306,17 @@ skeleton_yaml = File.expand_path("../workshop/skeleton.yaml", __dir__)
 if File.exist?(skeleton_yaml)
   runner_path = File.expand_path("../workshop/screenshots/runner.js", __dir__)
   if File.exist?(runner_path)
-    stdout, stderr, status = Open3.capture3("node", runner_path, "--dry-run")
-    if status.success?
-      puts "✅ Declarative screenshot specs and scripts verified".green
-    else
-      puts "❌ Screenshot verification failed:\n#{stderr}".red
-      errors_count += 1
+    begin
+      stdout, stderr, status = Open3.capture3("node", runner_path, "--dry-run")
+      if status.success?
+        puts "✅ Declarative screenshot specs and scripts verified".green
+      else
+        puts "❌ Screenshot verification failed:\n#{stderr}".red
+        errors_count += 1
+      end
+    rescue Errno::ENOENT
+      puts "⚠️  [WARNING] `node` CLI not found in PATH — skipping Playwright screenshot dry-run (optional for Rails workshop)".yellow
+      warnings_count += 1
     end
   else
     puts "⚠️  workshop/screenshots/runner.js not found".yellow
