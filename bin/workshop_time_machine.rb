@@ -55,9 +55,18 @@ end
 def restore_gold(repo_root)
   puts "👑 [Time-Machine] Restoring repository to Gold Standard (main)...".cyan
   Dir.chdir(repo_root) do
-    system("git checkout blog/config/")
+    # Never revert the attendee's credentials: `credentials.yml.enc` was regenerated to match
+    # their own `master.key` (and that key is in Secret Manager). Restoring the maintainer's
+    # committed file leaves Rails unable to boot in production (InvalidMessage, #167).
+    # The stage overlays only touch database.yml, storage.yml and environments/.
+    ok = system("git", "checkout", "--", "blog/config/",
+                ":(exclude)blog/config/credentials.yml.enc", ":(exclude)blog/config/master.key")
+    unless ok
+      warn "❌ [Time-Machine] git checkout of blog/config/ failed.".red
+      exit 1
+    end
   end
-  puts "✅ Restored canonical blog/config/ files to git HEAD.".green
+  puts "✅ Restored canonical blog/config/ files to git HEAD (your credentials.yml.enc and master.key were kept).".green
 end
 
 case action

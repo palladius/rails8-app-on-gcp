@@ -240,13 +240,14 @@ steps:
         type: "ruby"
         description: "Verify master.key exists locally AND matches credentials.yml.enc (and is not author-only WORKSHOP_FILE_MD5_EMI_RICC without matching key)"
         code: |
-          require_relative '../bin/ensure_workshop_credentials'
-          WorkshopCredentialsManager.ensure!(repo_root: File.expand_path('..', __dir__), sync_gcp: false)
+          require File.join(Dir.pwd, 'bin/ensure_workshop_credentials')
+          # Read-only on purpose: a verification must never regenerate the attendee's credentials.
           raise 'Missing master.key' unless File.exist?('blog/config/master.key')
           raise 'Missing credentials.yml.enc' unless File.exist?('blog/config/credentials.yml.enc')
-          key = File.read('blog/config/master.key').strip
-          raise "master.key looks like dummy (length=#{key.length})" unless WorkshopCredentialsManager.valid_hex_key?(key)
-          raise "master.key cannot decrypt credentials.yml.enc!" unless WorkshopCredentialsManager.can_decrypt?(key, 'blog/config/credentials.yml.enc')
+          state = WorkshopCredentialsManager.check(repo_root: Dir.pwd)
+          raise "master.key is missing or looks like a dummy key" unless state[:has_valid_local_key]
+          raise "credentials.yml.enc is the maintainer's sample file; run `just workshop-test` to create your own pair" if state[:is_sample_app_md5]
+          raise "master.key cannot decrypt credentials.yml.enc! Run `just workshop-test` to repair the pair" unless state[:can_decrypt]
       - id: "step-5-ruby-status-json-step"
         type: "ruby"
         description: "Verify status telemetry infers Step 5 when Cloud SQL is configured before sidecars"
@@ -268,7 +269,7 @@ steps:
             "DATABASE_URL" => "postgres://user:pass@localhost:5432/app?host=/cloudsql/p:r:i",
             "ACTIVE_STORAGE_SERVICE" => "local"
           }
-          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', Dir.pwd))
           raise "Runner failed: #{err}" unless st.success?
           step_info = JSON.parse(out.lines.last)
           raise "Expected step 5, got #{step_info['number']}" unless step_info['number'] == 5
@@ -302,7 +303,7 @@ steps:
       - id: "step-6-shell-full-test"
         type: "shell"
         description: "Verify full test suite passes against gold standard"
-        command: "cd blog && just test"
+        command: "cd blog && env -u ACTIVE_STORAGE_SERVICE just test"
         expect_exit: 0
       - id: "step-6-ruby-solid-queue-active"
         type: "ruby"
@@ -339,7 +340,7 @@ steps:
             "GOOGLE_CLOUD_PROJECT" => "",
             "GEMINI_API_KEY" => ""
           }
-          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', Dir.pwd))
           raise "Runner failed: #{err}" unless st.success?
           step_info = JSON.parse(out.lines.last)
           raise "Expected step 6, got #{step_info['number']}" unless step_info['number'] == 6
@@ -413,7 +414,7 @@ steps:
             "ACTIVE_STORAGE_SERVICE" => "google_prod",
             "GEMINI_API_KEY" => "dummy-gemini-key"
           }
-          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', __dir__))
+          out, err, st = Open3.capture3(env, *cmd, chdir: File.expand_path('blog', Dir.pwd))
           raise "Runner failed: #{err}" unless st.success?
           step_info = JSON.parse(out.lines.last)
           raise "Expected step 7, got #{step_info['number']}" unless step_info['number'] == 7
@@ -444,7 +445,7 @@ steps:
             end
           RUBY
           cmd = ["bin/rails", "runner", runner_code]
-          out, err, st = Open3.capture3(*cmd, chdir: File.expand_path('blog', __dir__))
+          out, err, st = Open3.capture3(*cmd, chdir: File.expand_path('blog', Dir.pwd))
           raise "Broken images found: #{out.strip}" unless st.success?
   - id: "step-8"
     number: 8

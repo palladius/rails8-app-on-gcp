@@ -30,9 +30,16 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system in a temporary directory.
   # Tests must run offline and in < 5 s (docs/CONSTITUTION.md §6), so the test
-  # suite never talks to a real GCS bucket. Use ACTIVE_STORAGE_SERVICE=google_test
-  # explicitly when you want to exercise the bucket by hand.
-  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "test").to_sym
+  # suite never talks to a real GCS bucket. It deliberately ignores the ambient
+  # ACTIVE_STORAGE_SERVICE: the codelab exports it as `google` (the PRODUCTION bucket)
+  # in Step 6, and the suite would write orphaned fixture blobs there (#170).
+  # Use TEST_ACTIVE_STORAGE_SERVICE=google_test to exercise the test bucket by hand.
+  test_storage_service = ENV.fetch("TEST_ACTIVE_STORAGE_SERVICE", "test")
+  if %w[google google_prod].include?(test_storage_service)
+    raise "Refusing to run the test suite against the production bucket " \
+          "(TEST_ACTIVE_STORAGE_SERVICE=#{test_storage_service}). Use google_test instead."
+  end
+  config.active_storage.service = test_storage_service.to_sym
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
