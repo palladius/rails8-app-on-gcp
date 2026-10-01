@@ -81,4 +81,49 @@ class WorkshopDiagnosticsTest < Minitest::Test
       assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT"
     end
   end
+
+  # --- Default Compute SA check vs. Terraform ordering (#163) ---
+  # Step 1 runs `just workshop-test` BEFORE `just terraform-apply`, and Terraform
+  # (iac/cicd.tf) is what grants the Default Compute SA its build roles. A fresh
+  # project is therefore expected to have none yet.
+
+  def run_diagnostics_with_fake_gcloud(terraform_applied:)
+    Dir.mktmpdir do |dir|
+      bin_dir = File.join(dir, "fakebin")
+      FileUtils.mkdir_p(bin_dir)
+      fake = File.join(bin_dir, "gcloud")
+      File.write(fake, <<~SH)
+        #!/bin/sh
+        case "$*" in
+          "auth list --filter=status:ACTIVE"*) echo student@gmail.com ;;
+          "auth list"*) echo student@gmail.com ;;
+          "beta billing projects describe"*) echo True ;;
+          "auth application-default print-access-token"*) echo token ;;
+          "projects describe"*) echo 123456789 ;;
+          "projects get-iam-policy"*) ;;  # no roles at all
+          "storage buckets describe"*) exit #{terraform_applied ? 0 : 1} ;;
+          "storage ls"*) exit 1 ;;
+          *) ;;
+        esac
+      SH
+      File.chmod(0o755, fake)
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=student@gmail.com\nGOOGLE_CLOUD_PROJECT=fresh-project\n")
+      env = { "PATH" => "#{bin_dir}:#{ENV['PATH']}" }
+      Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
+    end
+  end
+
+  def test_compute_sa_without_roles_is_informational_before_terraform_apply
+    stdout, _stderr, _status = run_diagnostics_with_fake_gcloud(terraform_applied: false)
+    assert_includes stdout, "Checking Default Compute SA"
+    refute_includes stdout, "INSUFFICIENT"
+    refute_includes stdout, "just project-status"
+    assert_includes stdout, "just terraform-apply"
+  end
+
+  def test_compute_sa_without_roles_still_warns_after_terraform_apply
+    stdout, _stderr, _status = run_diagnostics_with_fake_gcloud(terraform_applied: true)
+    assert_includes stdout, "INSUFFICIENT"
+    assert_includes stdout, "lacks the roles Cloud Build needs"
+  end
 end

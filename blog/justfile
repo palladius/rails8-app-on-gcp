@@ -17,6 +17,10 @@ seed:
 dev:
     RAILS8_ENV_LAUNCH_MODE="Hello! I am the native app launched with bin/dev on local SQLite." bin/dev -p 3000
 
+# run workshop evaluations (forwards to the repo-root justfile; the codelab leaves you in blog/)
+workshop-eval step="all":
+    cd .. && just workshop-eval {{step}}
+
 # start docker compose stack
 compose-up:
     docker compose up -d

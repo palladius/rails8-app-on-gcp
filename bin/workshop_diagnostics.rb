@@ -238,12 +238,23 @@ else
     elsif sufficient
       puts "OK (#{granted.include?('roles/editor') ? 'roles/editor' : 'roles/cloudbuild.builds.builder'})".green
     else
-      puts "INSUFFICIENT".red
-      puts "⚠️  [WARNING] #{compute_sa} lacks the roles Cloud Build needs.".yellow
-      puts "   Step 3's `gcloud run deploy --source .` will fail with PERMISSION_DENIED."
-      puts "   👉 Run: just project-status   (grants storage.admin, logging.logWriter,"
-      puts "                                  artifactregistry.writer, cloudbuild.builds.builder)"
-      warnings_count += 1
+      # Terraform (iac/cicd.tf) grants these roles in Step 1 §2, AFTER this check runs.
+      # The dev bucket is also created by Terraform, so it tells us whether apply happened.
+      _bout, _berr, tf_status = Open3.capture3(
+        "gcloud storage buckets describe gs://#{project_id}-activestorage-dev #{gcloud_flags_str} 2>/dev/null"
+      )
+      if tf_status.success?
+        puts "INSUFFICIENT".red
+        puts "⚠️  [WARNING] #{compute_sa} lacks the roles Cloud Build needs.".yellow
+        puts "   Step 3's `gcloud run deploy --source .` will fail with PERMISSION_DENIED."
+        puts "   👉 Run: just project-status   (grants storage.admin, logging.logWriter,"
+        puts "                                  artifactregistry.writer, cloudbuild.builds.builder)"
+        warnings_count += 1
+      else
+        puts "NOT YET GRANTED".cyan
+        puts "ℹ️  #{compute_sa} has no Cloud Build roles yet (normal before Step 1 terraform apply)".cyan
+        puts "   `just terraform-apply` grants them declaratively; no manual action needed now."
+      end
     end
   end
 end

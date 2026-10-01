@@ -160,16 +160,56 @@ class CodelabSyncAndContractsTest < Minitest::Test
                  "Root .ruby-version and blog/.ruby-version must specify the exact same Ruby version"
   end
 
+  # Issue #169: `--allow-unauthenticated` belongs to `gcloud run deploy`; `gcloud run services update`
+  # rejects it ("unrecognized arguments") and then applies NOTHING, including a valid --service-account.
+  def test_codelab_gcloud_run_services_update_never_uses_allow_unauthenticated
+    offenders = []
+    @codelab.scan(/^```(?:bash|sh|shell)\n(.*?)^```/m) do |(block)|
+      block.gsub(/\\\n\s*/, " ").each_line do |line|
+        next unless line.include?("gcloud run services update")
+        offenders << line.strip if line.include?("--allow-unauthenticated")
+      end
+    end
+    assert_empty offenders, "`gcloud run services update` does not accept --allow-unauthenticated:\n  #{offenders.join("\n  ")}"
+  end
+
+  # Issue #165: in an interactive bash/zsh, `!!` outside single quotes is expanded to the
+  # previous command BEFORE evaluation, so pasting a block containing it mangles the command.
+  # The default seeded password therefore must not contain `!`, and no pasteable bash
+  # block in the codelab may contain a history-expansion sequence.
+  def test_default_admin_password_has_no_history_expansion_characters
+    root = File.expand_path("..", __dir__)
+    refute_includes @codelab, "Ch4ng3m3!!1", "CODELAB.md must not use the old default password (contains '!!')"
+    env_default = File.read(File.join(root, ".env.dist"))[/^APP_ADMIN_PASSWORD="?([^"\n]+)"?/, 1]
+    seeds_default = File.read(File.join(root, "blog", "db", "seeds.rb"))[/admin_password = "([^"]+)" if admin_password\.blank\?/, 1]
+    assert env_default, ".env.dist must define APP_ADMIN_PASSWORD"
+    assert seeds_default, "blog/db/seeds.rb must define a default admin password"
+    refute_match(/!/, env_default, ".env.dist default password must not contain '!'")
+    refute_match(/!/, seeds_default, "seeds.rb default password must not contain '!'")
+    assert_equal env_default, seeds_default, ".env.dist and seeds.rb defaults must match"
+  end
+
+  def test_codelab_bash_blocks_contain_no_history_expansion
+    offenders = []
+    @codelab.scan(/^```(?:bash|sh|shell)\n(.*?)^```/m) do |(block)|
+      block.each_line do |line|
+        next if line.lstrip.start_with?("#")
+        offenders << line.strip if line.include?("!!") || line.match?(/![A-Za-z0-9$\-?]/)
+      end
+    end
+    assert_empty offenders, "Bash blocks must not contain history expansion (`!!`, `!word`):\n  #{offenders.join("\n  ")}"
+  end
+
   def test_step_2_documents_default_seeded_password_and_just_compose_up
     step2 = extract_step_section(@codelab, 2)
     assert_match(/just\s+compose-up/, step2, "Step 2 must instruct user to run 'just compose-up'")
-    assert_match(/Ch4ng3m3!!1/, step2, "Step 2 must explicitly mention the default seeded password 'Ch4ng3m3!!1'")
+    assert_match(/Ch4ng3m3-1/, step2, "Step 2 must explicitly mention the default seeded password 'Ch4ng3m3-1'")
   end
 
   def test_step_3_explicitly_states_default_seeded_password_not_just_variable_name
     step3 = extract_step_section(@codelab, 3)
-    assert_match(/Ch4ng3m3!!1/, step3,
-                 "Step 3 must explicitly state the default seeded password 'Ch4ng3m3!!1' so users aren't confused by APP_ADMIN_PASSWORD")
+    assert_match(/Ch4ng3m3-1/, step3,
+                 "Step 3 must explicitly state the default seeded password 'Ch4ng3m3-1' so users aren't confused by APP_ADMIN_PASSWORD")
     assert_match(/--max-instances\s+1/, step3,
                  "Step 3 must pin --max-instances 1 when cleaning up SOLID_QUEUE_IN_PUMA so SQLite sessions don't split across instances in Step 4")
   end

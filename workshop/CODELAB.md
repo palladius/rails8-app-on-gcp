@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.2.0 -->
+<!-- 🏷️ Codelab Version: 2.2.2 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -262,7 +262,7 @@ Our starting point is a clean, modern Rails 8 blog application running on localh
 
 > 🐳 **Canonical Local Stack (`just compose-up`)**
 > Docker Compose runs the exact pinned Ruby `3.4.5` stack, PostgreSQL 16, Solid Queue worker, Mailpit, and Adminer inside isolated containers — zero host gem permission issues!
-> Our `blog/compose.yaml` automatically loads your root `.env`, removes any stale `tmp/pids/server.pid`, runs `db:prepare` across all 4 databases (`primary`, `cache`, `queue`, `cable`), and seeds your admin user (`GOOGLE_CLOUD_ACCOUNT` with password `Ch4ng3m3!!1` or `APP_ADMIN_PASSWORD`).
+> Our `blog/compose.yaml` automatically loads your root `.env`, removes any stale `tmp/pids/server.pid`, runs `db:prepare` across all 4 databases (`primary`, `cache`, `queue`, `cable`), and seeds your admin user (`GOOGLE_CLOUD_ACCOUNT` with password `Ch4ng3m3-1` or `APP_ADMIN_PASSWORD`).
 
 From the repository root (or inside `blog/`), launch the full local stack in one command:
 ```bash
@@ -288,7 +288,7 @@ bin/rails db:prepare db:seed
 
 The database seed (`db/seeds.rb`) features **Smart Environment Auto-Discovery**:
 - It inspects your active database adapter (SQLite vs Postgres) and storage configuration.
-- It detects **Stage 0 (Localhost)** and automatically creates (or updates the password of) the initial admin user from `GOOGLE_CLOUD_ACCOUNT` with `APP_ADMIN_PASSWORD` (default `Ch4ng3m3!!1`), and seeds the pedagogical post:
+- It detects **Stage 0 (Localhost)** and automatically creates (or updates the password of) the initial admin user from `GOOGLE_CLOUD_ACCOUNT` with `APP_ADMIN_PASSWORD` (default `Ch4ng3m3-1`), and seeds the pedagogical post:
   - `[LOCAL BASELINE] Welcome to Rails 8 on Localhost!`
   - Out-of-the-box local sad image attachment (`local_sad_image.png`) with watermark informing you that local disk storage is ephemeral.
 - It automatically triggers a password reset email via ActionMailer.
@@ -314,7 +314,7 @@ The application, local Mailpit SMTP server, and Adminer database viewer are now 
 ![Mailpit web UI displaying intercepted password reset email](assets/images/mailpit_intercepted_email.png)
 2. **Log into the Blog**: Open `http://localhost:3000` in your browser.
    - You can click the password reset link directly inside the Mailpit email to set your password.
-   - Alternatively, log in using your Google Cloud account email (`GOOGLE_CLOUD_ACCOUNT` from `.env`) and the seeded password: **`Ch4ng3m3!!1`** (or your custom `APP_ADMIN_PASSWORD` if set in `.env`).
+   - Alternatively, log in using your Google Cloud account email (`GOOGLE_CLOUD_ACCOUNT` from `.env`) and the seeded password: **`Ch4ng3m3-1`** (or your custom `APP_ADMIN_PASSWORD` if set in `.env`).
 3. **Observe the Visual Telemetry Badges:**
    - Notice the yellow environment banner and badges in the UI: `Notice: Ephemeral Database Active (POSTGRESQL)` and `[EPHEMERAL DB / STORAGE] 💾 Local`.
    - Notice the post watermark: The 🏠 stamp (`nanobanana_stamp_local.png` in the bottom-right corner of the cover image). This provides immediate visual confirmation that your assets and database are currently bound to ephemeral local storage.
@@ -388,7 +388,7 @@ gcloud run deploy blog \
   --region $GOOGLE_CLOUD_REGION \
   --service-account $RUN_SA \
   --allow-unauthenticated \
-  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,APP_ADMIN_PASSWORD=${APP_ADMIN_PASSWORD:-Ch4ng3m3!!1},SECRET_KEY_BASE_DUMMY=1
+  --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,APP_ADMIN_PASSWORD=${APP_ADMIN_PASSWORD:-Ch4ng3m3-1},SECRET_KEY_BASE_DUMMY=1
 ```
 
 You should see progress output similar to this:
@@ -420,7 +420,7 @@ During deployment:
 Open the generated Cloud Run URL in your browser!
 
 1. Your modern Rails 8 application is live on Google Cloud!
-2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and the default seeded password **`Ch4ng3m3!!1`**). If you find no login button, click on **"New Post"** and it will prompt for user and password first:
+2. Log in with your admin credentials (`GOOGLE_CLOUD_ACCOUNT` and the default seeded password **`Ch4ng3m3-1`**). If you find no login button, click on **"New Post"** and it will prompt for user and password first:
 
    ![Rails 8 Sign In page with ephemeral telemetry banners](assets/images/sign_in_page_ephemeral.png)
 
@@ -888,11 +888,11 @@ export GEMINI_API_KEY="${GEMINI_API_KEY:-dummy-key}"
 gcloud run compose up compose.prod.yaml \
   --region=$GOOGLE_CLOUD_REGION
 
-# 4. Bind our custom Cloud Run Service Account ($RUN_SA) and public ingress
+# 4. Bind our custom Cloud Run Service Account ($RUN_SA)
+# (public access is already in place from your Step 3 deploy; no extra flag needed)
 gcloud run services update blog \
   --region=$GOOGLE_CLOUD_REGION \
-  --service-account=$RUN_SA \
-  --allow-unauthenticated
+  --service-account=$RUN_SA
 ```
 
 ![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)
@@ -1286,4 +1286,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.2.0 (2026-09-24) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.2.2 (2026-10-01) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
