@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🟡 **`workshop-test` no longer reports a false `INSUFFICIENT` for the Default Compute SA before `terraform apply` (#163)**: Step 1 runs the diagnostics (§1) before Terraform (§2) grants the build roles (`iac/cicd.tf`). `bin/workshop_diagnostics.rb` now prints an informational "normal before Step 1 terraform apply" line, without a warning or the `just project-status` hand-grant hint, until Terraform has been applied (detected via the Terraform-created `-activestorage-dev` bucket). After apply, missing roles still warn as before. Covered by two new tests using a fake `gcloud` on `PATH`.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
