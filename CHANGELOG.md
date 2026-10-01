@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🟡 **`docker-entrypoint` no longer calls the non-existent `db:prepare:queue|cache|cable` and now really prepares the Solid databases (#168)**: Rails has no per-database `db:prepare:<name>`, so every boot logged 3 "Unrecognized command" errors. Dropping the calls (the issue's first suggestion) would have been unsafe: on Cloud Run all four connections share one existing Cloud SQL database, and plain `db:prepare` does not load `db/{queue,cache,cable}_schema.rb` there. Verified on a throwaway Postgres 16: the old entrypoint created the Solid Queue tables only through its `rails runner` fallback and **never created `solid_cache_entries` or `solid_cable_messages`**. New `ensure_solid_schemas` helper loads each schema on its own connection if its sentinel table is missing, without hiding errors. It also runs **before** `db:prepare` in the server branch: on a brand-new database `db:prepare` runs `db/seeds.rb`, which enqueues a job and used to abort the container (`bash -e`) because `solid_queue_jobs` did not exist yet. Guarded by `test/test_docker_entrypoint.rb` (the Postgres test is opt-in via `ENTRYPOINT_TEST_DATABASE_URL`). Also fixed the same bad commands in `skills/workshop-troubleshooting/references/database-storage.md`.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
