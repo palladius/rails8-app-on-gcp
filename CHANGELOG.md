@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🔴 **`just workshop-restore-gold` no longer overwrites the attendee's `credentials.yml.enc` (#167)**: it ran `git checkout blog/config/`, replacing the `credentials.yml.enc` regenerated to match the attendee's `master.key` with the maintainer's committed file. Step 6 then failed on every production boot (`ActiveSupport::MessageEncryptor::InvalidMessage`, surfaced by Cloud Run as a misleading PORT/timeout error). `bin/workshop_time_machine.rb` now restores everything under `blog/config/` except `credentials.yml.enc` and `master.key` (the stage overlays only touch `database.yml`, `storage.yml` and `environments/`), and exits non-zero if the checkout fails. Covered by `test/test_workshop_time_machine.rb`. **Recovery for an affected attendee:** `rm blog/config/credentials.yml.enc && EDITOR=true bin/rails credentials:edit` (reuses the existing `master.key`), then redeploy.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
