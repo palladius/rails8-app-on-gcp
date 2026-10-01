@@ -16,7 +16,7 @@ if admin_email.blank? || admin_email == "your-email@gmail.com" || admin_email ==
   exit 1
 end
 
-admin_password = "Ch4ng3m3!!1" if admin_password.blank?
+admin_password = "Ch4ng3m3-1" if admin_password.blank?
 
 puts "* Adding/Updating Admin User: #{admin_email}"
 admin_user = User.find_or_create_by!(email_address: admin_email) do |user|
