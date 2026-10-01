@@ -8,40 +8,25 @@
 # and the very first `terraform apply` failed with
 # "Service account ...-compute@developer.gserviceaccount.com does not exist".
 #
+# The wait itself is iac/bin/wait-for-default-compute-sa.sh (retries only on "not found").
 # Every resource that names that SA depends on this waiter
 # (enforced by test/test_iac_codelab_contracts.rb).
 ###############################################################################
 
-# Enabling Compute Engine is what reliably provisions the Default Compute SA,
-# and Cloud Run / Cloud Build rely on it in practice. Also used by iap.tf.
-resource "google_project_service" "compute_api" {
-  project            = var.project_id
-  service            = "compute.googleapis.com"
-  disable_on_destroy = false
-}
-
+# NOTE: this deliberately does NOT enable compute.googleapis.com. The SA appears a few seconds
+# after the first APIs are enabled even with Compute Engine disabled (see #164), and enabling
+# Compute Engine on a new project typically creates the permissive `default` VPC (open SSH/RDP
+# firewall rules), which this workshop's security posture avoids.
 resource "terraform_data" "wait_for_default_compute_sa" {
   triggers_replace = [var.project_id]
 
   provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = <<-EOT
-      sa="${data.google_project.current.number}-compute@developer.gserviceaccount.com"
-      echo "Waiting for the Default Compute Service Account $sa (Google creates it lazily)..."
-      for _ in $(seq 1 36); do
-        if gcloud iam service-accounts describe "$sa" --project="${var.project_id}" >/dev/null 2>&1; then
-          echo "Default Compute Service Account is ready."
-          exit 0
-        fi
-        sleep 5
-      done
-      echo "Timed out after 3 minutes waiting for $sa. Re-run 'just terraform-apply'." >&2
-      exit 1
-    EOT
+    command = "${path.module}/bin/wait-for-default-compute-sa.sh ${data.google_project.current.number}-compute@developer.gserviceaccount.com ${var.project_id}"
   }
 
+  # In #164 the SA appeared shortly after the first APIs (run, cloudbuild, ...) were enabled.
   depends_on = [
-    google_project_service.compute_api,
     google_project_service.cloudbuild,
+    google_project_service.artifactregistry,
   ]
 }
