@@ -2,6 +2,7 @@
 
 require "minitest/autorun"
 require "yaml"
+require "open3"
 require "tmpdir"
 require_relative "../bin/ensure_workshop_credentials"
 
@@ -158,5 +159,71 @@ class IacCodelabContractsTest < Minitest::Test
     assert_match(/precondition\s*\{/, @secrets_tf,
                  "iac/secrets.tf must enforce a lifecycle precondition verifying blog/config/master.key exists")
   end
-end
 
+  # Issue #164: Google creates the Default Compute SA lazily, a few seconds after the
+  # first APIs are enabled. Any Terraform resource that names it must wait for it, or
+  # the first `terraform apply` on a fresh project fails with "Service account ... does not exist".
+  def test_every_resource_using_default_compute_sa_waits_for_it_to_exist
+    iac_dir = File.join(REPO_ROOT, "iac")
+    wait = "terraform_data.wait_for_default_compute_sa"
+    uses_sa = ->(body) { body.include?("-compute@developer.gserviceaccount.com") || body.include?("local.runtime_secret_accessors") }
+
+    offenders = []
+    Dir.glob(File.join(iac_dir, "*.tf")).each do |file|
+      File.read(file).scan(/^resource\s+"([^"]+)"\s+"([^"]+)"\s*\{\n(.*?)^\}/m) do |type, name, body|
+        next if type == "terraform_data" # the waiter itself
+        next unless uses_sa.call(body)
+        offenders << "#{File.basename(file)}: #{type}.#{name}" unless body.include?(wait)
+      end
+    end
+    assert_empty offenders,
+                 "These resources reference the Default Compute SA without depends_on #{wait} (#164):\n  #{offenders.join("\n  ")}"
+  end
+
+  WAIT_SCRIPT = File.join(REPO_ROOT, "iac", "bin", "wait-for-default-compute-sa.sh")
+
+  def test_waiter_uses_the_script_and_does_not_force_the_compute_api
+    wait_tf = File.read(File.join(REPO_ROOT, "iac", "default_compute_sa.tf"))
+    assert_match(/resource\s+"terraform_data"\s+"wait_for_default_compute_sa"/, wait_tf)
+    assert_match(/wait-for-default-compute-sa\.sh/, wait_tf)
+    # The Default Compute SA appears without Compute Engine being enabled (#164 evidence), and enabling
+    # it creates the permissive `default` VPC (open SSH/RDP firewall rules) on new projects.
+    refute_match(/service\s*=\s*"compute\.googleapis\.com"/, wait_tf, "the waiter must not enable the Compute Engine API")
+    iap_tf = File.read(File.join(REPO_ROOT, "iac", "iap.tf"))
+    assert_match(/resource\s+"google_project_service"\s+"compute_api"\s*\{\s*count\s*=\s*var\.enable_iap/, iap_tf,
+                 "compute.googleapis.com must stay opt-in via enable_iap")
+  end
+
+  # Runs iac/bin/wait-for-default-compute-sa.sh against a fake `gcloud`.
+  def run_waiter(fake_gcloud_body, attempts: 5)
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, "gcloud"), "#!/bin/sh\ncount_file=\"#{dir}/count\"\nn=$(cat \"$count_file\" 2>/dev/null || echo 0)\nn=$((n+1)); echo $n > \"$count_file\"\n#{fake_gcloud_body}\n")
+      File.chmod(0o755, File.join(dir, "gcloud"))
+      env = { "PATH" => "#{dir}:#{ENV['PATH']}", "WAIT_ATTEMPTS" => attempts.to_s, "WAIT_SLEEP" => "0" }
+      out, err, status = Open3.capture3(env, WAIT_SCRIPT, "123-compute@developer.gserviceaccount.com", "proj")
+      [out, err, status, File.read(File.join(dir, "count")).to_i]
+    end
+  end
+
+  def test_waiter_retries_while_the_service_account_is_not_found_then_succeeds
+    out, _err, status, calls = run_waiter('if [ "$n" -lt 3 ]; then echo "ERROR: (gcloud.iam.service-accounts.describe) NOT_FOUND: Unknown service account" >&2; exit 1; fi; echo ok')
+    assert status.success?
+    assert_equal 3, calls
+    assert_match(/ready/i, out)
+  end
+
+  def test_waiter_fails_fast_with_the_real_error_when_it_is_not_a_not_found
+    _out, err, status, calls = run_waiter('echo "ERROR: (gcloud.iam.service-accounts.describe) PERMISSION_DENIED: caller lacks iam.serviceAccounts.get" >&2; exit 1', attempts: 30)
+    refute status.success?
+    assert_equal 1, calls, "must not keep polling on an error that waiting cannot fix"
+    assert_includes err, "PERMISSION_DENIED"
+    assert_match(/gcloud auth list/, err)
+  end
+
+  def test_waiter_times_out_with_a_clear_message
+    _out, err, status, calls = run_waiter('echo "ERROR: NOT_FOUND: Unknown service account" >&2; exit 1', attempts: 2)
+    refute status.success?
+    assert_equal 2, calls
+    assert_match(/Timed out/, err)
+  end
+end

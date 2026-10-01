@@ -83,6 +83,8 @@ resource "google_secret_manager_secret_iam_member" "rails_master_key_access" {
   secret_id = google_secret_manager_secret.rails_master_key.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = each.value
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
 resource "google_secret_manager_secret_iam_member" "db_password_access" {
@@ -91,6 +93,8 @@ resource "google_secret_manager_secret_iam_member" "db_password_access" {
   secret_id = google_secret_manager_secret.db_password.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = each.value
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
 resource "google_secret_manager_secret_iam_member" "admin_password_access" {
@@ -99,5 +103,7 @@ resource "google_secret_manager_secret_iam_member" "admin_password_access" {
   secret_id = google_secret_manager_secret.admin_password.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = each.value
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
