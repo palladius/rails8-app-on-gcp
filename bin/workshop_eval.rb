@@ -19,6 +19,24 @@ class String
   def bold; "\e[1m#{self}\e[0m"; end
 end
 
+FAILURE_OUTPUT_MAX_LINES = 40
+# Known harmless noise that would otherwise bury the real failure in a failed check's output.
+FAILURE_OUTPUT_NOISE = /MultiJson constant is deprecated/
+
+# Last lines of a failed shell check's stdout + stderr, indented, minus known noise.
+def failure_output_tail(stdout, stderr, max_lines: FAILURE_OUTPUT_MAX_LINES)
+  lines = "#{stdout}#{stderr}".lines.map(&:chomp).reject { |l| l.strip.empty? }
+  noise, lines = lines.partition { |l| l.match?(FAILURE_OUTPUT_NOISE) }
+  return "" if lines.empty? && noise.empty?
+
+  shown = lines.last(max_lines)
+  out = []
+  out << "     Output (last #{shown.size} of #{lines.size} lines):"
+  shown.each { |l| out << "       #{l}" }
+  out << "     (#{noise.size} deprecation warning(s) hidden)".yellow if noise.any?
+  out.join("\n")
+end
+
 target_step = ARGV[0] || "all"
 yaml_path = File.expand_path('../workshop/skeleton.yaml', __dir__)
 
@@ -79,7 +97,9 @@ steps.each do |step|
         puts "FAILED ❌".red
         puts "     Expected exit #{expected_exit}, got #{status.exitstatus}".red
         puts "     Command: #{cmd}".yellow
-        puts "     Stderr: #{stderr.strip}" unless stderr.strip.empty?
+        # The useful part (e.g. the minitest failure report) is often on stdout, so show
+        # the tail of stdout + stderr instead of stderr alone (#171).
+        puts failure_output_tail(stdout, stderr)
         failed_evals += 1
       end
 
@@ -92,9 +112,11 @@ steps.each do |step|
         end
         puts "PASSED ✅".green
         passed_evals += 1
-      rescue => e
+      rescue StandardError, ScriptError => e
+        # ScriptError covers LoadError / SyntaxError / NotImplementedError: a broken snippet
+        # must be reported as one failed eval, not abort the whole runner (#166).
         puts "FAILED ❌".red
-        puts "     Ruby Error: #{e.message}".red
+        puts "     Ruby Error: #{e.class}: #{e.message}".red
         failed_evals += 1
       end
 
@@ -116,7 +138,7 @@ steps.each do |step|
             puts "     LLM Feedback: #{res['error_message'] || res['comment']}".red
             failed_evals += 1
           end
-        rescue => e
+        rescue StandardError, ScriptError => e
           puts "FAILED ❌ (Invalid JSON from LLM: #{e.message})".red
           failed_evals += 1
         end
