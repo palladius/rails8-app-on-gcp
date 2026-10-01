@@ -92,9 +92,11 @@ steps.each do |step|
         end
         puts "PASSED ✅".green
         passed_evals += 1
-      rescue => e
+      rescue StandardError, ScriptError => e
+        # ScriptError covers LoadError / SyntaxError / NotImplementedError: a broken snippet
+        # must be reported as one failed eval, not abort the whole runner (#166).
         puts "FAILED ❌".red
-        puts "     Ruby Error: #{e.message}".red
+        puts "     Ruby Error: #{e.class}: #{e.message}".red
         failed_evals += 1
       end
 
@@ -116,7 +118,7 @@ steps.each do |step|
             puts "     LLM Feedback: #{res['error_message'] || res['comment']}".red
             failed_evals += 1
           end
-        rescue => e
+        rescue StandardError, ScriptError => e
           puts "FAILED ❌ (Invalid JSON from LLM: #{e.message})".red
           failed_evals += 1
         end
