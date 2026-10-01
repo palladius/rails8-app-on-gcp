@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.2.1 -->
+<!-- 🏷️ Codelab Version: 2.2.2 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -888,11 +888,11 @@ export GEMINI_API_KEY="${GEMINI_API_KEY:-dummy-key}"
 gcloud run compose up compose.prod.yaml \
   --region=$GOOGLE_CLOUD_REGION
 
-# 4. Bind our custom Cloud Run Service Account ($RUN_SA) and public ingress
+# 4. Bind our custom Cloud Run Service Account ($RUN_SA)
+# (public access is already in place from your Step 3 deploy; no extra flag needed)
 gcloud run services update blog \
   --region=$GOOGLE_CLOUD_REGION \
-  --service-account=$RUN_SA \
-  --allow-unauthenticated
+  --service-account=$RUN_SA
 ```
 
 ![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)
@@ -1286,4 +1286,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.2.1 (2026-10-01) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.2.2 (2026-10-01) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

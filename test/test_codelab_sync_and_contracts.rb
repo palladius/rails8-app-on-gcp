@@ -160,6 +160,19 @@ class CodelabSyncAndContractsTest < Minitest::Test
                  "Root .ruby-version and blog/.ruby-version must specify the exact same Ruby version"
   end
 
+  # Issue #169: `--allow-unauthenticated` belongs to `gcloud run deploy`; `gcloud run services update`
+  # rejects it ("unrecognized arguments") and then applies NOTHING, including a valid --service-account.
+  def test_codelab_gcloud_run_services_update_never_uses_allow_unauthenticated
+    offenders = []
+    @codelab.scan(/^```(?:bash|sh|shell)\n(.*?)^```/m) do |(block)|
+      block.gsub(/\\\n\s*/, " ").each_line do |line|
+        next unless line.include?("gcloud run services update")
+        offenders << line.strip if line.include?("--allow-unauthenticated")
+      end
+    end
+    assert_empty offenders, "`gcloud run services update` does not accept --allow-unauthenticated:\n  #{offenders.join("\n  ")}"
+  end
+
   # Issue #165: in an interactive bash/zsh, `!!` outside single quotes is expanded to the
   # previous command BEFORE evaluation, so pasting a block containing it mangles the command.
   # The default seeded password therefore must not contain `!`, and no pasteable bash

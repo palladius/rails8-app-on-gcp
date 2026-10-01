@@ -8,6 +8,12 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.2.2] - 2026-10-01 (Friction Log 4, `palladius/rails8-app-on-gcp#169`)
+
+- **Step 6 (Deploy 4)**: removed `--allow-unauthenticated` from the final `gcloud run services update blog ...` command. That flag belongs to `gcloud run deploy`; `services update` rejects it with `unrecognized arguments` and applies nothing, so `--service-account=$RUN_SA` was never set and the service kept running as the Default Compute SA. Public access already comes from the Step 3 deploy.
+
+---
+
 ## [2.2.1] - 2026-10-01 (Friction Log 4, `palladius/rails8-app-on-gcp#165`)
 
 - **Steps 2 & 3**: the default seeded admin password changed from `Ch4ng3m3!!1` to `Ch4ng3m3-1`. In an interactive bash/zsh, `!!` outside single quotes is history expansion, so pasting the Deploy 1 block mangled the `--set-env-vars` value and corrupted the deploy.
