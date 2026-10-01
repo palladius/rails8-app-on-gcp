@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🔴 **Step 6 Deploy 4 no longer ends with `unrecognized arguments: --allow-unauthenticated` (#169)**: `--allow-unauthenticated` is a `gcloud run deploy` flag; `gcloud run services update` rejects it and applies nothing, so the valid `--service-account=$RUN_SA` was never set and the service kept running as the Default Compute SA instead of `rails-cloudrun-sa`. Removed the flag from the last command of the Deploy 4 block in `workshop/CODELAB.md` (`skeleton.yaml` already had it right; the service is already public from the Step 3 deploy). New contract test fails if any codelab `gcloud run services update` command carries the flag.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.

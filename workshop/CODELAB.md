@@ -888,11 +888,11 @@ export GEMINI_API_KEY="${GEMINI_API_KEY:-dummy-key}"
 gcloud run compose up compose.prod.yaml \
   --region=$GOOGLE_CLOUD_REGION
 
-# 4. Bind our custom Cloud Run Service Account ($RUN_SA) and public ingress
+# 4. Bind our custom Cloud Run Service Account ($RUN_SA)
+# (public access is already in place from your Step 3 deploy; no extra flag needed)
 gcloud run services update blog \
   --region=$GOOGLE_CLOUD_REGION \
-  --service-account=$RUN_SA \
-  --allow-unauthenticated
+  --service-account=$RUN_SA
 ```
 
 ![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)

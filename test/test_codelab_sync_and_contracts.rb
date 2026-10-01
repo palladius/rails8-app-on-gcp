@@ -160,6 +160,19 @@ class CodelabSyncAndContractsTest < Minitest::Test
                  "Root .ruby-version and blog/.ruby-version must specify the exact same Ruby version"
   end
 
+  # Issue #169: `--allow-unauthenticated` belongs to `gcloud run deploy`; `gcloud run services update`
+  # rejects it ("unrecognized arguments") and then applies NOTHING, including a valid --service-account.
+  def test_codelab_gcloud_run_services_update_never_uses_allow_unauthenticated
+    offenders = []
+    @codelab.scan(/^```(?:bash|sh|shell)\n(.*?)^```/m) do |(block)|
+      block.gsub(/\\\n\s*/, " ").each_line do |line|
+        next unless line.include?("gcloud run services update")
+        offenders << line.strip if line.include?("--allow-unauthenticated")
+      end
+    end
+    assert_empty offenders, "`gcloud run services update` does not accept --allow-unauthenticated:\n  #{offenders.join("\n  ")}"
+  end
+
   def test_step_2_documents_default_seeded_password_and_just_compose_up
     step2 = extract_step_section(@codelab, 2)
     assert_match(/just\s+compose-up/, step2, "Step 2 must instruct user to run 'just compose-up'")
