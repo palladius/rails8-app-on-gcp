@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🟡 **Default admin password no longer breaks pasted codelab commands (#165)**: `Ch4ng3m3!!1` contained `!!`, which interactive bash/zsh expands to the previous command before evaluation, mangling the Step 3 Deploy 1 `--set-env-vars` value. The default is now `Ch4ng3m3-1` in `blog/db/seeds.rb`, `.env.dist`, `docs/ENV_VAR_NAMES.md` and `workshop/CODELAB.md` (codelab v2.2.1). New contract tests forbid `!` in the default password and history-expansion sequences in codelab bash blocks. **Upgrade note:** an existing local admin keeps its old password until you re-run `just seed`, which resets it from `APP_ADMIN_PASSWORD`; a `.env` copied from an older `.env.dist` keeps the old value.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
