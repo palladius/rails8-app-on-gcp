@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🟡 **`just workshop-eval N` works from `blog/`, and a failed shell check now shows why (#171)**: the codelab leaves attendees in `blog/` (`cd blog` in Steps 2, 3, 4, 6), whose own justfile had no `workshop-eval` recipe (`error: Justfile does not contain recipes ...`). `blog/justfile` now forwards `workshop-eval` to the repo root. `bin/workshop_eval.rb` used to print only stderr for a failed `shell` check, hiding the minitest report on stdout; it now prints the last 40 lines of stdout + stderr and hides the `MultiJson constant is deprecated` spam (with a count). Guarded by `test/test_workshop_eval_failure_output.rb`. No codelab text changed.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
