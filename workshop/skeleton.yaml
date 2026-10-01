@@ -303,7 +303,7 @@ steps:
       - id: "step-6-shell-full-test"
         type: "shell"
         description: "Verify full test suite passes against gold standard"
-        command: "cd blog && just test"
+        command: "cd blog && env -u ACTIVE_STORAGE_SERVICE just test"
         expect_exit: 0
       - id: "step-6-ruby-solid-queue-active"
         type: "ruby"
