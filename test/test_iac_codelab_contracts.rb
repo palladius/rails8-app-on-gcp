@@ -158,5 +158,33 @@ class IacCodelabContractsTest < Minitest::Test
     assert_match(/precondition\s*\{/, @secrets_tf,
                  "iac/secrets.tf must enforce a lifecycle precondition verifying blog/config/master.key exists")
   end
-end
 
+  # Issue #164: Google creates the Default Compute SA lazily, a few seconds after the
+  # first APIs are enabled. Any Terraform resource that names it must wait for it, or
+  # the first `terraform apply` on a fresh project fails with "Service account ... does not exist".
+  def test_every_resource_using_default_compute_sa_waits_for_it_to_exist
+    iac_dir = File.join(REPO_ROOT, "iac")
+    wait = "terraform_data.wait_for_default_compute_sa"
+    uses_sa = ->(body) { body.include?("-compute@developer.gserviceaccount.com") || body.include?("local.runtime_secret_accessors") }
+
+    offenders = []
+    Dir.glob(File.join(iac_dir, "*.tf")).each do |file|
+      File.read(file).scan(/^resource\s+"([^"]+)"\s+"([^"]+)"\s*\{\n(.*?)^\}/m) do |type, name, body|
+        next if type == "terraform_data" # the waiter itself
+        next unless uses_sa.call(body)
+        offenders << "#{File.basename(file)}: #{type}.#{name}" unless body.include?(wait)
+      end
+    end
+    assert_empty offenders,
+                 "These resources reference the Default Compute SA without depends_on #{wait} (#164):\n  #{offenders.join("\n  ")}"
+  end
+
+  def test_terraform_waits_for_default_compute_sa_by_polling_and_enables_compute_api
+    wait_tf = File.read(File.join(REPO_ROOT, "iac", "default_compute_sa.tf"))
+    assert_match(/resource\s+"terraform_data"\s+"wait_for_default_compute_sa"/, wait_tf)
+    assert_match(/gcloud iam service-accounts describe/, wait_tf)
+    assert_match(/resource\s+"google_project_service"\s+"compute_api"\s*\{(?:(?!count).)*?compute\.googleapis\.com/m,
+                 "#{wait_tf}\n#{File.read(File.join(REPO_ROOT, 'iac', 'iap.tf'))}",
+                 "compute.googleapis.com must be enabled unconditionally (no count) so the Default Compute SA gets created")
+  end
+end

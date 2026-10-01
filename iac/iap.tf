@@ -11,12 +11,7 @@ resource "google_project_service" "iap_api" {
   disable_on_destroy = false
 }
 
-resource "google_project_service" "compute_api" {
-  count              = var.enable_iap ? 1 : 0
-  project            = var.project_id
-  service            = "compute.googleapis.com"
-  disable_on_destroy = false
-}
+# compute.googleapis.com is enabled unconditionally in default_compute_sa.tf
 
 # 1. Serverless Network Endpoint Group (NEG) pointing to the Cloud Run service
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {

@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🔴 **First `terraform apply` no longer fails on a fresh project with "Service account ...-compute@developer.gserviceaccount.com does not exist" (#164)**: Google creates the Default Compute SA lazily, seconds after the first APIs are enabled, and Terraform bound roles to it without waiting. New `iac/default_compute_sa.tf` enables `compute.googleapis.com` unconditionally (previously only with `enable_iap`, now shared with `iap.tf`) and adds a `terraform_data.wait_for_default_compute_sa` waiter that polls `gcloud iam service-accounts describe` (up to 3 minutes). All 7 resources that name that SA (`cicd.tf`, `cloudrun.tf`, `secrets.tf`, including the `admin_password_access` binding the issue did not list) now `depends_on` it, enforced by a contract test. Minimum Terraform raised to 1.4 (`terraform_data`; the codelab already requires 1.5+).
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.

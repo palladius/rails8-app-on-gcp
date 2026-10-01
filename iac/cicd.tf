@@ -41,7 +41,8 @@ resource "google_project_iam_member" "default_compute_sa_cloudbuild" {
 
   depends_on = [
     google_project_service.cloudbuild,
-    google_project_service.artifactregistry
+    google_project_service.artifactregistry,
+    terraform_data.wait_for_default_compute_sa
   ]
 }
 
