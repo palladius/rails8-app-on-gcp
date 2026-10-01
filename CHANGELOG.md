@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🔴 **The Rails test suite no longer follows `ACTIVE_STORAGE_SERVICE` and can no longer write to the production bucket (#170)**: Step 6 of the codelab exports `ACTIVE_STORAGE_SERVICE=google` (an alias of `google_prod`), and `blog/config/environments/test.rb` read it, so `just workshop-eval 6` failed 4 tests and attached fixtures to the real `<project>-activestorage-prod` bucket (43 orphaned objects in the reported run). The test env now reads only `TEST_ACTIVE_STORAGE_SERVICE` (default `test`; `google_test` opts in to the test bucket) and raises on `google` / `google_prod`. `workshop/skeleton.yaml` also runs the suite with `env -u ACTIVE_STORAGE_SERVICE`. New `test/test_blog_test_env_isolation.rb` boots the test env with the offending variables. **Cleanup:** objects already leaked into a prod bucket by earlier runs are not removed by this change.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
