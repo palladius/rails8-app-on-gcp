@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- 🔴 **`just workshop-eval 5` no longer crashes with `LoadError: cannot infer basepath` (#166)**: `step-5-ruby-master-key` used `require_relative` and `File.expand_path('..', __dir__)` inside an `eval` string, where there is no base path and `__dir__` is `nil` (it would have resolved the repo root to the wrong directory). The ruby evals in `workshop/skeleton.yaml` now use `Dir.pwd` (the runner already `chdir`s to the repo root). `bin/workshop_eval.rb` also rescues `ScriptError` (`LoadError`, `SyntaxError`), so a broken snippet is reported as one `FAILED ❌` eval with its error class, and the remaining evals and the summary still run. New `test/test_workshop_eval_runner.rb` guards both the snippets and the runner behaviour.
+
 ## [0.3.3] - 2026-09-24
 ### Fixed (PR #154 Multi-Agent Security & Architecture Review Remediation)
 - 🔴 **C1 (`bin/ensure_workshop_credentials.rb`)**: Preserved custom `credentials.yml.enc` on fresh clones ("Computer 2" scenario) — when `target_key` fetched from GCP Secret Manager already decrypts `credentials.yml.enc` (`MD5 != SAMPLE_APP_CREDENTIALS`), only `blog/config/master.key` is restored (`:restored_key_only`) without rewriting `credentials.yml.enc`.
