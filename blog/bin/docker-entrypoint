@@ -15,32 +15,63 @@ if [ -f "/rails/.env" ]; then
   set +a
 fi
 
-# Helper to ensure solid_queue tables exist in the :queue database connection (fixes M1)
-ensure_queue_schema() {
-  ./bin/rails db:prepare:queue 2>/dev/null || \
-    ./bin/rails runner '
-      ([:queue, :primary].uniq).each do |spec|
+# Rails has no `db:prepare:<name>` task, and plain `db:prepare` does NOT load the Solid Queue /
+# Cache / Cable schemas when their database already exists and is shared with :primary (Cloud Run
+# points all four connections at ONE Cloud SQL database). So load each schema file ourselves, but
+# only if its sentinel table is missing, on that connection only (fixes M1, #168).
+# - `web` and `worker` boot at the same time on Cloud Run, and the schema files use
+#   `create_table force: :cascade`: concurrent loads collide (PG::DuplicateObject). On PostgreSQL an
+#   advisory lock serializes them and the sentinel is re-checked once the lock is held.
+# - If the database itself does not exist yet it is created first (as db:prepare would), so the
+#   solid_* tables exist before db:prepare runs db/seeds.rb.
+# Usage: ensure_solid_schemas queue [cache] [cable]
+ensure_solid_schemas() {
+  ./bin/rails runner '
+    schemas = {
+      "queue" => ["solid_queue_processes", "db/queue_schema.rb"],
+      "cache" => ["solid_cache_entries", "db/cache_schema.rb"],
+      "cable" => ["solid_cable_messages", "db/cable_schema.rb"]
+    }
+    lock_key = 5_168_001 # arbitrary constant shared by all booting containers
+    ARGV.each do |name|
+      table, file = schemas.fetch(name)
+      begin
+        db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: name)
         begin
-          ActiveRecord::Base.establish_connection(spec)
-          load Rails.root.join("db/queue_schema.rb") unless ActiveRecord::Base.connection.table_exists?("solid_queue_processes")
-        rescue StandardError
-          nil
+          ActiveRecord::Base.establish_connection(db_config)
+          ActiveRecord::Base.connection.table_exists?(table)
+        rescue ActiveRecord::NoDatabaseError
+          ActiveRecord::Tasks::DatabaseTasks.create(db_config)
+          retry
         end
+        conn = ActiveRecord::Base.connection
+        postgres = conn.adapter_name.match?(/postg/i)
+        conn.execute("SELECT pg_advisory_lock(#{lock_key})") if postgres
+        begin
+          next if conn.table_exists?(table)
+          load Rails.root.join(file)
+          puts "Loaded #{file} into the :#{name} database"
+        ensure
+          conn.execute("SELECT pg_advisory_unlock(#{lock_key})") if postgres
+        end
+      rescue StandardError => e
+        warn "WARNING: could not prepare the :#{name} database (#{e.class}: #{e.message})"
       end
-    ' || true
+    end
+  ' "$@" || true
 }
 
 # If running the rails server or solid_queue worker, ensure databases & queue schemas exist and seed initial admin user
 if [[ "$*" == *"rails server"* ]] || [[ "$*" == *"./bin/rails server"* ]]; then
+  # Solid schemas first: on a brand-new database `db:prepare` also runs db/seeds.rb, which
+  # enqueues a job and aborts (container exit 1) if solid_queue_* tables do not exist yet.
+  ensure_solid_schemas queue cache cable
   ./bin/rails db:prepare
-  ensure_queue_schema
-  ./bin/rails db:prepare:cache || true
-  ./bin/rails db:prepare:cable || true
   if [ -n "$GOOGLE_CLOUD_ACCOUNT" ] || [ -n "$ADMIN_EMAIL" ]; then
     ./bin/rails db:seed || true
   fi
 elif [[ "$*" == *"solid_queue:start"* ]]; then
-  ensure_queue_schema
+  ensure_solid_schemas queue
 fi
 
 exec "${@}"

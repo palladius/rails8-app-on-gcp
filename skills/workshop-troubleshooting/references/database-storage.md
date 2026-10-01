@@ -13,13 +13,12 @@ Opening `/session/new`, registering a user, or triggering a mailer returns HTTP 
 Rails 8 uses a multi-database architecture where Solid Queue tables live in `db/queue_schema.rb`. The default `bin/rails db:prepare` only migrates the primary application database (`db/schema.rb`).
 
 ### Fix
-Ensure all multi-database schema migrations are executed (e.g. inside `blog/bin/docker-entrypoint`):
+Ensure the Solid Queue / Cache / Cable schemas are loaded. Rails has **no** `db:prepare:<name>` task; `blog/bin/docker-entrypoint` does this with its `ensure_solid_schemas` helper, which loads `db/{queue,cache,cable}_schema.rb` when the matching `solid_*` table is missing. By hand:
 ```bash
+./bin/rails runner 'ActiveRecord::Base.establish_connection(:queue); load Rails.root.join("db/queue_schema.rb")'
 ./bin/rails db:prepare
-./bin/rails db:prepare:queue || true
-./bin/rails db:prepare:cache || true
-./bin/rails db:prepare:cable || true
 ```
+(use `:cache` / `cache_schema.rb` and `:cable` / `cable_schema.rb` for the other two).
 
 ---
 
