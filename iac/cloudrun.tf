@@ -34,6 +34,8 @@ resource "google_project_iam_member" "default_compute_sa_runtime_roles" {
   project = var.project_id
   role    = each.value
   member  = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
 # Bucket-scoped ActiveStorage IAM bindings (fixes M4 — avoids project-wide storage.objectAdmin sprawl)
@@ -57,6 +59,8 @@ resource "google_storage_bucket_iam_member" "default_compute_sa_bucket_object_ad
   bucket   = each.value
   role     = "roles/storage.objectAdmin"
   member   = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
 # Required GCP API for Cloud Run
@@ -109,6 +113,8 @@ resource "google_service_account_iam_member" "default_compute_sa_self_signer" {
   service_account_id = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${data.google_project.current.number}-compute@developer.gserviceaccount.com"
+
+  depends_on = [terraform_data.wait_for_default_compute_sa]
 }
 
 # Allow developers to sign GCS blob URLs locally via `iam: true` in storage.yml.
