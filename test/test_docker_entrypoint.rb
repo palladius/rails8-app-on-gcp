@@ -41,4 +41,63 @@ class DockerEntrypointTest < Minitest::Test
       assert_includes tables.split("\n"), t, "#{t} must exist after the entrypoint prepared the databases"
     end
   end
+
+  # --- first-boot hardening (PR #179 review) -------------------------------------------------
+  # Both need a Postgres where the test can create/drop databases (ENTRYPOINT_TEST_DATABASE_URL).
+
+  def admin_and_fresh_urls(url)
+    name = "entrypoint_test_#{Process.pid}_#{rand(10_000)}"
+    [url.sub(%r{/[^/]+\z}, "/postgres"), url.sub(%r{/[^/]+\z}, "/#{name}"), name]
+  end
+
+  def server_env(url)
+    { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "DATABASE_URL" => url,
+      "GOOGLE_CLOUD_ACCOUNT" => nil, "ADMIN_EMAIL" => nil }
+  end
+
+  def solid_tables(url)
+    out, _e, _s = Open3.capture3("psql", url, "-Atc", "select tablename from pg_tables where schemaname='public'")
+    out.split("\n")
+  end
+
+  # On Cloud Run `web` and `worker` boot at the same time against the same database. Both used to
+  # load queue_schema.rb concurrently (create_table force: :cascade): the loser died with
+  # PG::DuplicateObject. A database-level lock must serialize them.
+  def test_web_and_worker_booting_concurrently_do_not_collide_on_the_schema_load
+    url = ENV["ENTRYPOINT_TEST_DATABASE_URL"]
+    skip "set ENTRYPOINT_TEST_DATABASE_URL to run this" if url.to_s.empty?
+    admin, fresh, name = admin_and_fresh_urls(url)
+    system("psql", admin, "-qc", "create database #{name}", out: File::NULL)
+    begin
+      web = Thread.new { Open3.capture3(server_env(fresh), ENTRYPOINT, "echo", "rails", "server", chdir: BLOG_DIR) }
+      worker = Thread.new { Open3.capture3(server_env(fresh), ENTRYPOINT, "echo", "bin/rails", "solid_queue:start", chdir: BLOG_DIR) }
+      results = [web.value, worker.value]
+      results.each do |out, err, status|
+        assert status.success?, err
+        refute_match(/WARNING|DuplicateObject|aborted/, out + err)
+      end
+      %w[solid_queue_processes solid_queue_jobs solid_cache_entries solid_cable_messages].each do |t|
+        assert_includes solid_tables(fresh), t
+      end
+    ensure
+      system("psql", admin, "-qc", "drop database if exists #{name}", out: File::NULL)
+    end
+  end
+
+  # If the database itself does not exist yet, the helper used to skip (NoDatabaseError), so
+  # db:prepare created it and then died seeding before the solid_queue tables existed.
+  def test_boot_creates_a_missing_database_and_the_solid_tables
+    url = ENV["ENTRYPOINT_TEST_DATABASE_URL"]
+    skip "set ENTRYPOINT_TEST_DATABASE_URL to run this" if url.to_s.empty?
+    admin, fresh, name = admin_and_fresh_urls(url)
+    begin
+      _out, err, status = Open3.capture3(server_env(fresh), ENTRYPOINT, "echo", "rails", "server", chdir: BLOG_DIR)
+      assert status.success?, err
+      %w[solid_queue_processes solid_cache_entries solid_cable_messages posts].each do |t|
+        assert_includes solid_tables(fresh), t
+      end
+    ensure
+      system("psql", admin, "-qc", "drop database if exists #{name}", out: File::NULL)
+    end
+  end
 end

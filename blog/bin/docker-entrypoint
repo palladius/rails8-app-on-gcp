@@ -19,6 +19,11 @@ fi
 # Cache / Cable schemas when their database already exists and is shared with :primary (Cloud Run
 # points all four connections at ONE Cloud SQL database). So load each schema file ourselves, but
 # only if its sentinel table is missing, on that connection only (fixes M1, #168).
+# - `web` and `worker` boot at the same time on Cloud Run, and the schema files use
+#   `create_table force: :cascade`: concurrent loads collide (PG::DuplicateObject). On PostgreSQL an
+#   advisory lock serializes them and the sentinel is re-checked once the lock is held.
+# - If the database itself does not exist yet it is created first (as db:prepare would), so the
+#   solid_* tables exist before db:prepare runs db/seeds.rb.
 # Usage: ensure_solid_schemas queue [cache] [cable]
 ensure_solid_schemas() {
   ./bin/rails runner '
@@ -27,13 +32,28 @@ ensure_solid_schemas() {
       "cache" => ["solid_cache_entries", "db/cache_schema.rb"],
       "cable" => ["solid_cable_messages", "db/cable_schema.rb"]
     }
+    lock_key = 5_168_001 # arbitrary constant shared by all booting containers
     ARGV.each do |name|
       table, file = schemas.fetch(name)
       begin
-        ActiveRecord::Base.establish_connection(name.to_sym)
-        next if ActiveRecord::Base.connection.table_exists?(table)
-        load Rails.root.join(file)
-        puts "Loaded #{file} into the :#{name} database"
+        db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: name)
+        begin
+          ActiveRecord::Base.establish_connection(db_config)
+          ActiveRecord::Base.connection.table_exists?(table)
+        rescue ActiveRecord::NoDatabaseError
+          ActiveRecord::Tasks::DatabaseTasks.create(db_config)
+          retry
+        end
+        conn = ActiveRecord::Base.connection
+        postgres = conn.adapter_name.match?(/postg/i)
+        conn.execute("SELECT pg_advisory_lock(#{lock_key})") if postgres
+        begin
+          next if conn.table_exists?(table)
+          load Rails.root.join(file)
+          puts "Loaded #{file} into the :#{name} database"
+        ensure
+          conn.execute("SELECT pg_advisory_unlock(#{lock_key})") if postgres
+        end
       rescue StandardError => e
         warn "WARNING: could not prepare the :#{name} database (#{e.class}: #{e.message})"
       end
