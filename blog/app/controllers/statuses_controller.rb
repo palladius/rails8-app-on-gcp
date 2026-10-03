@@ -41,8 +41,8 @@ class StatusesController < ApplicationController
       attachments_count: (ActiveStorage::Attachment.count rescue 0)
     }
 
-    # Cache status response for 1 minute on proxy/browser to balance responsiveness and protect against hammering
-    expires_in 1.minute, public: true, stale_while_revalidate: 30.seconds
+    # Cache status response for 1 minute on browser (private cache) to protect against hammering
+    expires_in 1.minute, public: false, stale_while_revalidate: 30.seconds
 
     respond_to do |format|
       format.html
@@ -308,6 +308,7 @@ class StatusesController < ApplicationController
       K_CONFIGURATION
       PORT
       ADMIN_EMAIL
+      APP_ADMIN_PASSWORD
       ADMIN_PASSWORD
       GEMINI_API_KEY
       DATABASE_URL
@@ -322,8 +323,10 @@ class StatusesController < ApplicationController
         if val.nil?
           "nil"
         elsif is_secret
-          # Length-preserving asterisk masking
+          # Length-preserving asterisk masking (retained for instructor debugging)
           "*" * [val.length, 4].max
+        elsif var_name.in?(%w[GOOGLE_CLOUD_ACCOUNT ADMIN_EMAIL])
+          mask_pii_email(val)
         else
           val
         end
@@ -335,6 +338,23 @@ class StatusesController < ApplicationController
         is_secret: is_secret
       }
     end
+  end
+
+  def mask_pii_email(val)
+    str = val.to_s.strip
+    return "nil" if str.empty? || str == "nil"
+    return str unless str.include?("@")
+
+    user, domain = str.split("@", 2)
+    masked_user =
+      if user.length <= 2
+        "#{user[0]}***"
+      elsif user.length <= 4
+        "#{user[0]}***#{user[-1]}"
+      else
+        "#{user[0..1]}***#{user[-2..-1]}"
+      end
+    "#{masked_user}@#{domain}"
   end
 
   def detect_git_commit
