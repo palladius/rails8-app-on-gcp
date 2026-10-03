@@ -215,20 +215,12 @@ resource "google_cloud_run_v2_service" "rails_app" {
 # ==============================================================================
 # 🔐 Cloud Run Access Architecture:
 # ------------------------------------------------------------------------------
-# 👉 WORKSHOP MODE (Default):
-#    We grant 'roles/run.invoker' to specific authenticated accounts in
-#    'var.iap_allowed_users'. This avoids breaking under corporate Org Policies
-#    (e.g., constraints/iam.allowedPolicyMemberDomains blocking allUsers).
-#
-# 👉 OPTIONAL PUBLIC MODE:
-#    Set 'allow_unauthenticated = true' if running in a personal unmanaged GCP
-#    project where public unauthenticated web access is desired.
-#
-# 👉 PRODUCTION HARDENED ZERO-TRUST MODE (Step 8):
-#    For enterprise security, enable IAP by setting 'enable_iap = true' (iac/iap.tf).
-#    This routes all traffic through an HTTPS Application Load Balancer protected
-#    by Identity-Aware Proxy (IAP) and OAuth2 consent, keeping Cloud Run ingress
-#    restricted to internal-and-cloud-load-balancing only.
+# 👉 DEFAULT (PUBLIC) MODE:
+#    'allow_unauthenticated = true' (default) grants 'roles/run.invoker' to
+#    allUsers, so the app is reachable by everyone. IAP has been removed.
+#    If an Org Policy (constraints/iam.allowedPolicyMemberDomains) blocks
+#    allUsers, set 'allow_unauthenticated = false' and list accounts in
+#    'var.iap_allowed_users' (granted run.invoker individually).
 # ==============================================================================
 
 # Public access (only if explicitly enabled and not blocked by Org Policy)

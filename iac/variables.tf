@@ -21,35 +21,16 @@ variable "developers" {
   default     = []
 }
 
-variable "enable_iap" {
-  description = "Whether to provision an External HTTPS Application Load Balancer with Identity-Aware Proxy (IAP) in front of Cloud Run."
-  type        = bool
-  default     = false
-}
-
 variable "allow_unauthenticated" {
-  description = "Whether to allow public unauthenticated access (allUsers) to Cloud Run. Defaults to false to avoid Org Policy violations."
+  description = "Whether to allow public unauthenticated access (allUsers) to Cloud Run. Defaults to true (publicly visible, no IAP)."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "iap_allowed_users" {
-  description = "List of Google accounts allowed to access the Cloud Run app through IAP or as authenticated invokers."
+  description = "List of Google accounts allowed to access the Cloud Run app as authenticated invokers."
   type        = list(string)
   default     = []
-}
-
-variable "iap_client_id" {
-  description = "OAuth2 Client ID for IAP (optional, required if enable_iap is true)."
-  type        = string
-  default     = ""
-}
-
-variable "iap_client_secret" {
-  description = "OAuth2 Client Secret for IAP (optional, required if enable_iap is true)."
-  type        = string
-  default     = ""
-  sensitive   = true
 }
 
 variable "enable_cicd_trigger" {
