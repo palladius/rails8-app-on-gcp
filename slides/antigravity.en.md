@@ -187,6 +187,32 @@ style: |
 
 ---
 
+## Step 1.5: Meanwhile, Open the Official Google Codelab (Page 1 &rarr; `#0`) 📖
+
+<div class="two-col" style="align-items: center; margin-top: 6px;">
+<div style="flex: 0 0 43%; display: flex; flex-direction: column; gap: 8px;">
+<div>
+<a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 7px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.82em;">
+📖 Open Official Codelab (#0)
+</a>
+</div>
+<ul style="font-size: 0.74em; margin: 0; padding-left: 18px;">
+<li>⏳ <strong>While Antigravity downloads:</strong> open the Codelab in <strong>Google Chrome</strong>!</li>
+<li>🔢 <strong>Page 1 (<code>#0</code>):</strong> Introduction &amp; Architecture Overview.</li>
+<li>💳 <strong>Page 2 (<code>#1</code>):</strong> Prerequisites &amp; <strong>Free GCP Credits</strong> (we'll use this in Step 6!).</li>
+</ul>
+<div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+<img src="images/codelab-qr.png" style="width: 105px; height: 105px; border-radius: 6px; border: 1px solid #dadce0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="Codelab QR Code" />
+<span style="font-size: 0.65em; color: #5f6368;">📱 <strong>Scan QR to open Codelab</strong><br/><a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#0" target="_blank" rel="noopener noreferrer" style="color: #1a73e8;">codelabs.../rails8-on-google-cloud#0</a></span>
+</div>
+</div>
+<div style="flex: 1; text-align: center;">
+<img src="images/codelab-page1-intro.png" style="max-height: 315px; max-width: 100%; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 14px rgba(0,0,0,0.14);" alt="Google Codelab Page 1 (#0) Introduction" />
+</div>
+</div>
+
+---
+
 ## Step 2: Launch & Sign In with Gmail 🔐
 
 1. Open **Google Antigravity 2.0** &nbsp;&middot;&nbsp; 2. Click **Sign in with Google** &nbsp;&middot;&nbsp; 3. Authorize your agent.

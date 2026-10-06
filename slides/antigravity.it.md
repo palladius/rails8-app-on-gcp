@@ -187,6 +187,32 @@ style: |
 
 ---
 
+## Step 1.5: Nel frattempo, Apri il Codelab Ufficiale (Pagina 1 &rarr; `#0`) 📖
+
+<div class="two-col" style="align-items: center; margin-top: 6px;">
+<div style="flex: 0 0 43%; display: flex; flex-direction: column; gap: 8px;">
+<div>
+<a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud?hl=it#0" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1a73e8; color: white; padding: 7px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.82em;">
+📖 Apri il Codelab Ufficiale (#0)
+</a>
+</div>
+<ul style="font-size: 0.74em; margin: 0; padding-left: 18px;">
+<li>⏳ <strong>Mentre Antigravity scarica:</strong> aprite il Codelab in <strong>Google Chrome</strong>!</li>
+<li>🔢 <strong>Pagina 1 (<code>#0</code>):</strong> Introduzione &amp; Panoramica Architetturale.</li>
+<li>💳 <strong>Pagina 2 (<code>#1</code>):</strong> Prerequisiti &amp; <strong>Crediti GCP Gratuiti</strong> (ci andremo allo Step 6!).</li>
+</ul>
+<div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+<img src="images/codelab-qr.png" style="width: 105px; height: 105px; border-radius: 6px; border: 1px solid #dadce0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" alt="Codelab QR Code" />
+<span style="font-size: 0.65em; color: #5f6368;">📱 <strong>Scansiona il QR per il Codelab</strong><br/><a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud?hl=it#0" target="_blank" rel="noopener noreferrer" style="color: #1a73e8;">codelabs.../rails8-on-google-cloud#0</a></span>
+</div>
+</div>
+<div style="flex: 1; text-align: center;">
+<img src="images/codelab-page1-intro.png" style="max-height: 315px; max-width: 100%; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 4px 14px rgba(0,0,0,0.14);" alt="Google Codelab Pagina 1 (#0) Introduzione" />
+</div>
+</div>
+
+---
+
 ## Step 2: Fai Login con il tuo Account Gmail 🔐
 
 1. Apri **Google Antigravity 2.0** &nbsp;&middot;&nbsp; 2. Clicca **Sign in with Google** &nbsp;&middot;&nbsp; 3. Autorizza l'agente.

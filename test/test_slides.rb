@@ -37,6 +37,7 @@ class SlidesTest < Minitest::Test
 
   def test_antigravity_en_and_it_decks_exist_and_have_valid_frontmatter_and_prompts
     %w[
+      codelab-page1-intro.png
       agy-step1-new-project.png
       agy-step2-select-folder.png
       agy-step3-project-settings.png
@@ -53,11 +54,14 @@ class SlidesTest < Minitest::Test
       assert_match(/^paginate:\s*true/m, content)
       # Must contain WSL note for Windows
       assert_match(/WSL/i, content, "#{File.basename(deck_path)} must mention WSL for Windows")
+      # Must contain Step 1.5 Codelab Page 1 (#0) screenshot and QR code
+      assert_match(/codelab-page1-intro\.png/, content)
+      assert_match(/codelab-qr\.png/, content)
       # Must contain Prompt 1 (git clone into Documents + sound)
       assert_match(%r{https://github\.com/palladius/rails8-app-on-gcp/}, content)
       assert_match(/git clone/i, content)
       assert_match(/Documents/i, content)
-      # Must contain Step 1.5 / Step 4 Turbo mode instruction, 4 screenshots, and PROD disclaimer
+      # Must contain Step 4 Turbo mode instruction, 4 screenshots, and PROD disclaimer
       assert_match(/TURBO/i, content, "#{File.basename(deck_path)} must mention TURBO mode")
       assert_match(/agy-step1-new-project\.png/, content)
       assert_match(/agy-step2-select-folder\.png/, content)
