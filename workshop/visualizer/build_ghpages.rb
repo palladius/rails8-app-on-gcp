@@ -173,12 +173,20 @@ slides_dist_dir = File.join(slides_source_dir, 'dist')
 slides_build_dir = File.join(build_dir, 'slides')
 FileUtils.mkdir_p(slides_build_dir)
 
-# Ensure slides are compiled to slides/dist/index.html
-system("cd #{repo_root} && just build-slides") unless File.exist?(File.join(slides_dist_dir, 'index.html'))
+# Ensure slides are compiled to slides/dist/
+if system("which just > /dev/null 2>&1")
+  system("cd #{repo_root} && just build-slides")
+elsif system("which marp > /dev/null 2>&1")
+  %w[index antigravity.en antigravity.it why-different].each do |deck|
+    src = File.join(slides_source_dir, "#{deck}.md")
+    dst = File.join(slides_dist_dir, "#{deck}.html")
+    system("marp #{src} -o #{dst} --html") if File.exist?(src)
+  end
+end
 
-if File.exist?(File.join(slides_dist_dir, 'index.html'))
-  FileUtils.cp(File.join(slides_dist_dir, 'index.html'), File.join(slides_build_dir, 'index.html'))
-  puts "   📄 Copied Marp Presentation Slides -> workshop/build/slides/index.html"
+Dir.glob(File.join(slides_dist_dir, '*.html')).each do |html_file|
+  FileUtils.cp(html_file, File.join(slides_build_dir, File.basename(html_file)))
+  puts "   📄 Copied Marp Presentation Slides -> workshop/build/slides/#{File.basename(html_file)}"
 end
 
 slides_images_dir = File.join(slides_source_dir, 'images')

@@ -12,3 +12,5 @@ Each event is structured as `workshop/events/YYYYMMDD-EVENT_NAME/`:
 ## Registered Events
 
 - [2026-10-03 DevFest Modena](20261003-devfest-modena/README.md) (Premiere workshop delivery)
+- [2026-10-07 Wednesday Build Hour (WBH)](20261007-wednesday-build-hour/README.md) (Antigravity 2.0 & Rails 8 on GCP virtual hands-on build session)
+

@@ -1,5 +1,5 @@
 set dotenv-load := true
-export PATH := env_var_or_default("HOME", "/root") + "/.rbenv/shims:" + env_var_or_default("PATH", "/usr/bin:/bin")
+export PATH := env_var_or_default("HOME", "/root") + "/.rbenv/shims:" + env_var_or_default("HOME", "/root") + "/.nvm/versions/node/v24.0.0/bin:" + env_var_or_default("PATH", "/usr/bin:/bin")
 export RBENV_VERSION := "3.4.5"
 
 # default recipe
@@ -48,12 +48,21 @@ workshop-dev *flags:
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
-    @echo "Serving Marp slides on http://localhost:{{port}} (visit /why-different.md for Why-Different deck)"
+    @echo "Serving Marp slides on http://localhost:{{port}} (EN: /antigravity.en.md | IT: /antigravity.it.md | Why-Different: /why-different.md)"
     @if command -v marp >/dev/null 2>&1; then \
         PORT={{port}} marp --server slides --html; \
     else \
         PORT={{port}} npx -y @marp-team/marp-cli --server slides --html; \
     fi
+
+# run the Antigravity-centric kickoff slide deck server (EN & IT)
+slides-antigravity port="8082":
+    @echo "🚀 Launching Antigravity Kickoff Decks:"
+    @echo "   🇬🇧 EN (Wednesday Build Hour): http://localhost:{{port}}/antigravity.en.md"
+    @echo "   🇮🇹 IT (Workshop Italiano):    http://localhost:{{port}}/antigravity.it.md"
+    @just slides {{port}}
+
+alias slides-agy := slides-antigravity
 
 # run the "Why is this workshop different?" showcase deck (alias: slides-why-different)
 slides2 port="8083":
@@ -71,9 +80,13 @@ build-slides:
     @mkdir -p slides/dist
     @if command -v marp >/dev/null 2>&1; then \
         marp slides/index.md -o slides/dist/index.html --html; \
+        marp slides/antigravity.en.md -o slides/dist/antigravity.en.html --html; \
+        marp slides/antigravity.it.md -o slides/dist/antigravity.it.html --html; \
         marp slides/why-different.md -o slides/dist/why-different.html --html; \
     else \
         npx -y @marp-team/marp-cli slides/index.md -o slides/dist/index.html --html; \
+        npx -y @marp-team/marp-cli slides/antigravity.en.md -o slides/dist/antigravity.en.html --html; \
+        npx -y @marp-team/marp-cli slides/antigravity.it.md -o slides/dist/antigravity.it.html --html; \
         npx -y @marp-team/marp-cli slides/why-different.md -o slides/dist/why-different.html --html; \
     fi
 
