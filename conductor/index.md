@@ -111,3 +111,8 @@ This project utilizes the Conductor methodology for structured, AI-assisted deve
 - [x] **Track: Workshop Hive Leaderboard: High-Density 50+ Compact View**
 *Link: [./tracks/hive_compact_view_20260911/index.md](./tracks/hive_compact_view_20260911/index.md)*
 
+---
+
+- [ ] **Track: Antigravity-Centric Workshop Kickoff Slides (EN/IT) & Wednesday Build Hour Deck**
+*Link: [./tracks/antigravity_slides_wbh_20261006/index.md](./tracks/antigravity_slides_wbh_20261006/index.md)*
+

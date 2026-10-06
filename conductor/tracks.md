@@ -96,4 +96,9 @@
 - [ ] **Track: Harden Access to Cloud Run (Milestone 2: Post-Modena - Issue #136)**
 *Link: [tracks/harden_cloud_run_access_20260922/index.md](tracks/harden_cloud_run_access_20260922/index.md)*
 
+---
+
+- [ ] **Track: Antigravity-Centric Workshop Kickoff Slides (EN/IT) & Wednesday Build Hour Deck**
+*Link: [tracks/antigravity_slides_wbh_20261006/index.md](tracks/antigravity_slides_wbh_20261006/index.md)*
+
 
