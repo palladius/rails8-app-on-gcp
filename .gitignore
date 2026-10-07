@@ -22,3 +22,5 @@ node_modules/
 .venv/
 __pycache__/
 diagrams/output/
+.cache/
+.git-privatize

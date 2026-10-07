@@ -29,7 +29,7 @@ class SlidesTest < Minitest::Test
 
   def test_slides_md_has_valid_frontmatter
     assert File.exist?(SLIDES_MD), "slides/index.md must exist"
-    content = File.read(SLIDES_MD)
+    content = File.read(SLIDES_MD, encoding: "utf-8")
     assert_match(/^marp:\s*true/m, content)
     assert_match(/^theme:\s*gaia/m, content)
     assert_match(/^paginate:\s*true/m, content)
@@ -48,7 +48,7 @@ class SlidesTest < Minitest::Test
 
     [AGY_EN_MD, AGY_IT_MD].each do |deck_path|
       assert File.exist?(deck_path), "#{File.basename(deck_path)} must exist"
-      content = File.read(deck_path)
+      content = File.read(deck_path, encoding: "utf-8")
       assert_match(/^marp:\s*true/m, content)
       assert_match(/^theme:\s*gaia/m, content)
       assert_match(/^paginate:\s*true/m, content)
@@ -81,7 +81,7 @@ class SlidesTest < Minitest::Test
   def test_no_unrendered_html_tags_or_code_escaped_markup_in_rendered_slides
     [SLIDES_HTML, AGY_EN_HTML, AGY_IT_HTML].each do |html_path|
       assert File.exist?(html_path), "Rendered slides HTML #{File.basename(html_path)} must exist"
-      html = File.read(html_path)
+      html = File.read(html_path, encoding: "utf-8")
 
       # In Marp, when indentation causes HTML to be parsed as code block,
       # it gets wrapped in <pre ...><code>&lt;div... or &lt;button...
@@ -107,7 +107,7 @@ class SlidesTest < Minitest::Test
     offenders = []
 
     ALL_SLIDE_SOURCES.each do |path|
-      File.readlines(path, chomp: true).each_with_index do |line, index|
+      File.readlines(path, encoding: "utf-8", chomp: true).each_with_index do |line, index|
         line.scan(/<a\s+[^>]*href="https?:\/\/[^"]*"[^>]*>/) do |tag|
           next if tag.include?('target="_blank"')
 

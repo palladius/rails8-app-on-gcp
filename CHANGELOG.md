@@ -2,6 +2,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-10-07
+### Added
+- 🎥 **Interactive Codelab Walkthrough Demo Video (`slides/images/codelab-demo.mp4`, `.webm`)**:
+  - Embedded an automated high-resolution browser walkthrough in Step 2 of the Antigravity kickoff decks (`antigravity.en.md` & `antigravity.it.md`), replacing the static preview with a smooth 15-second scroll and zoom of Page 1 and Page 2.
+- 💎 **Production-Grade Rails 8 Superpowers Slide**:
+  - Inserted a dedicated reference slide immediately following the *Canonical Architecture Blueprint* slide detailing production enterprise capabilities: Zero-Trust Cloud IAP, Cloud SQL Private mTLS Proxy, Private GCS with IAM blob signing, Native Structured JSON Logging, Multi-Container Cloud Run Pods, and Vertex AI background pipelines.
+- 💳 **Credits Redemption Banner & Visual Guidance in Step 8**:
+  - Added user screenshot of the *Learning by doing [NO COST] ... Activate* banner with explicit caption ("looks like this") and balanced layout with the Codelab QR code.
+
+### Changed
+- 🔢 **Clean Sequential Step Numbering (1 to 9)**:
+  - Standardized all kickoff steps across English & Italian decks, `slides/README.md`, and `workshop/events/20261007-wednesday-build-hour/README.md` to be strictly integer-sequential (1, 2, 3, 4, 5, 6, 7, 8, 9), completely removing confusing sub-steps (`1.5`, `4a`, `4b`).
+
+### Fixed
+- 🌐 **UTF-8 Encoding Safety Across Test & Sync Runners**:
+  - Declared `Encoding.default_external = Encoding::UTF_8` in `bin/sync_devsite_codelab.rb`, `test/test_slides.rb`, `test/test_codelab_sync_and_contracts.rb`, `test/test_docker_compose_contracts.rb`, and `test/test_iac_codelab_contracts.rb`, preventing `ArgumentError: invalid byte sequence in US-ASCII` failures under macOS default non-UTF8 subshells.
+
 ## [0.3.4] - 2026-10-06
 ### Added
 - 🚀 **Antigravity-Centric Kickoff Slide Decks in English & Italian (`slides/antigravity.en.md` & `slides/antigravity.it.md`)**:

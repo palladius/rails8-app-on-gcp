@@ -196,7 +196,7 @@ style: |
 
 ---
 
-## Step 1.5: Open the Official Google Codelab (Page 1 &rarr; `#0`) 📖
+## Step 2: Open the Official Google Codelab (Page 1 &rarr; `#0`) 📖
 
 <div class="two-col" style="align-items: center; margin-top: 2px; gap: 20px;">
 <div style="flex: 0 0 41%; display: flex; flex-direction: column; gap: 10px;">
@@ -208,7 +208,7 @@ style: |
 <ul style="font-size: 0.8em; margin: 0; padding-left: 20px; line-height: 1.4;">
 <li>⏳ <strong>While Antigravity downloads:</strong> open the Codelab in <strong>Google Chrome</strong>!</li>
 <li>🔢 <strong>Page 1 (<code>#0</code>):</strong> Introduction &amp; Architecture Overview.</li>
-<li>💳 <strong>Page 2 (<code>#1</code>):</strong> Prerequisites &amp; <strong>Free GCP Credits</strong> (we'll claim them in Step 6!).</li>
+<li>💳 <strong>Page 2 (<code>#1</code>):</strong> Prerequisites &amp; <strong>Free GCP Credits</strong> (we'll claim them in Step 8!).</li>
 </ul>
 <div style="display: flex; align-items: center; gap: 14px; margin-top: 4px; background: white; padding: 12px 14px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
 <img src="images/codelab-qr.png" style="width: 155px; height: 155px; border-radius: 6px; border: 1px solid #dadce0;" alt="Codelab QR Code" />
@@ -216,13 +216,17 @@ style: |
 </div>
 </div>
 <div style="flex: 1; text-align: center;">
-<img src="images/codelab-page1-intro.png" style="max-height: 555px; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 6px 20px rgba(0,0,0,0.18);" alt="Google Codelab Page 1 (#0) Introduction" />
+<video autoplay loop muted playsinline controls poster="images/codelab-page1-intro.png" style="max-height: 555px; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 6px 20px rgba(0,0,0,0.18);">
+  <source src="images/codelab-demo.mp4" type="video/mp4" />
+  <source src="images/codelab-demo.webm" type="video/webm" />
+  <img src="images/codelab-page1-intro.png" style="max-height: 555px; width: 100%; object-fit: contain;" alt="Google Codelab Page 1 (#0) Introduction" />
+</video>
 </div>
 </div>
 
 ---
 
-## Step 2: Launch & Sign In with Gmail 🔐
+## Step 3: Launch & Sign In with Gmail 🔐
 
 1. Open **Google Antigravity 2.0** &nbsp;&middot;&nbsp; 2. Click **Sign in with Google** &nbsp;&middot;&nbsp; 3. Authorize your agent.
 
@@ -236,7 +240,7 @@ style: |
 
 ---
 
-## Step 3: Prompt 1 — Clone the Repository into `Documents` 📥
+## Step 4: Prompt 1 — Clone the Repository into `Documents` 📥
 
 Paste this **first prompt** into any Antigravity chat window to clone the workshop repo and chime when ready:
 
@@ -252,7 +256,7 @@ Download https://github.com/palladius/rails8-app-on-gcp/ (via git clone) into my
 
 ---
 
-## Step 4a: Open a New Project Inside `Documents/rails8-app-on-gcp` 📁
+## Step 5: Open a New Project Inside `Documents/rails8-app-on-gcp` 📁
 
 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
 <div class="col-half" style="flex-direction: row; align-items: center; gap: 16px; padding: 10px 14px;">
@@ -275,7 +279,7 @@ Download https://github.com/palladius/rails8-app-on-gcp/ (via git clone) into my
 
 ---
 
-## Step 4b: Say `"ciao"` & Enable TURBO Mode ⚡
+## Step 6: Say `"ciao"` & Enable TURBO Mode ⚡
 
 <div class="two-col" style="align-items: center; margin-top: 4px; gap: 18px;">
 <div style="flex: 0 0 47%; display: flex; flex-direction: column; gap: 10px;">
@@ -297,7 +301,7 @@ Download https://github.com/palladius/rails8-app-on-gcp/ (via git clone) into my
 
 ---
 
-## Step 5: Prompt 2 — Start the Guided Workshop Journey 🎯
+## Step 7: Prompt 2 — Start the Guided Workshop Journey 🎯
 
 <div class="slide5-container">
 <div class="slide5-col-left">
@@ -324,36 +328,41 @@ I am attending the Rails 8 on Google Cloud workshop. Please follow the official 
 
 ---
 
-## Step 6 (Step 2.5): Claim GCP Credits on Codelab Page 2 💳
+## Step 8: Claim GCP Credits on Codelab Page 2 💳
 
-<div style="display: flex; gap: 28px; align-items: center; margin-top: 10px;">
+<div style="display: flex; gap: 24px; align-items: center; margin-top: 4px;">
 <div style="flex: 1;">
-<p style="margin: 0 0 10px 0; font-size: 0.94em;">Go to <strong>Page 2 (<code>#1</code>)</strong> of the Official Google Codelab to claim your free GCP credits:</p>
+<p style="margin: 0 0 6px 0; font-size: 0.88em;">Go to <strong>Page 2 (<code>#1</code>)</strong> of the Official Google Codelab to claim your free GCP credits:</p>
 <a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud?hl=it#1" target="_blank" rel="noopener noreferrer" title="Codelab in Italiano (#1)" style="position: absolute; top: 12px; right: 16px; font-size: 0.7em; text-decoration: none; opacity: 0.82;">🇮🇹</a>
-<div style="margin: 10px 0 16px 0;">
-<a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#1" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1e8e3e; color: white; padding: 10px 22px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.92em;">
+<div style="margin: 6px 0 10px 0;">
+<a href="https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#1" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #1e8e3e; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.86em;">
 🎟️ Open Codelab Page 2 (Credits)
 </a>
 </div>
-<ul style="font-size: 0.88em; margin: 0; line-height: 1.45;">
+<ul style="font-size: 0.78em; margin: 0; line-height: 1.35;">
 <li>🌐 Open with <strong>Google Chrome</strong> and make sure you are logged into your personal <code>@gmail.com</code>.</li>
-<li>🟢 <strong>Check: Do you see a GREEN button</strong> to claim credits? Let us know in the chat/comments!</li>
+<li>🟢 <strong>Check:</strong> Look for the <strong>Learning by doing [NO COST]</strong> banner (it <em>looks like this</em> 👇) and click <strong>Activate</strong>!</li>
 <li>⚠️ Early workshop steps run 100% on <code>localhost</code> while your billing activates.</li>
 </ul>
 </div>
-<div style="text-align: center; background: white; padding: 14px; border-radius: 10px; border: 1px solid #dadce0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-<img src="images/codelab-qr.png" style="width: 245px; height: 245px; border-radius: 8px; display: block;" alt="Scan QR Code to open Codelab" />
-<p style="font-size: 0.7em; color: #5f6368; margin: 6px 0 0 0; font-weight: bold;">📱 Scan to open Codelab (#1)</p>
+<div style="text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid #dadce0; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+<img src="images/codelab-qr.png" style="width: 145px; height: 145px; border-radius: 6px; display: block;" alt="Scan QR Code to open Codelab" />
+<p style="font-size: 0.65em; color: #5f6368; margin: 4px 0 0 0; font-weight: bold;">📱 Scan to open Codelab (#1)</p>
 </div>
 </div>
 
-<div style="border: 1px solid #f9ab00; background-color: #fef7e0; border-radius: 6px; padding: 10px 14px; margin-top: 16px; font-size: 0.78em; line-height: 1.35;">
+<div style="text-align: center; margin: 6px 0 4px 0;">
+<span style="font-size: 0.68em; color: #5f6368; font-weight: bold; display: block; margin-bottom: 2px;">🔍 The redemption banner looks like this:</span>
+<img src="images/codelab-credits-banner.png" style="max-height: 108px; width: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 3px 12px rgba(0,0,0,0.12); border: 1px solid #dadce0;" alt="Claim Google Cloud Credits Banner" />
+</div>
+
+<div style="border: 1px solid #f9ab00; background-color: #fef7e0; border-radius: 6px; padding: 6px 12px; margin-top: 6px; font-size: 0.72em; line-height: 1.3;">
 <strong>⚡ Out of Antigravity AI quota?</strong> Switch model pool under the prompt box to <strong>Claude / GPT-OSS</strong> or pick a <strong>Gemini Flash</strong> model (lighter on rate limits).
 </div>
 
 ---
 
-## Step 7: Prompt 3 — Create Your GCP Project (Post-Coupon) ☁️
+## Step 9: Prompt 3 — Create Your GCP Project (Post-Coupon) ☁️
 
 After you have claimed your GCP coupon on Page 2, paste **Prompt 3** into Antigravity:
 
@@ -377,6 +386,60 @@ I have claimed a GCP coupon. Create a project under my gmail, name it something 
 
 <p style="font-size: 0.76em; color: #5f6368; text-align: center; margin: 4px 0 0 0;">
 ☁️ <strong>Full Production Reference Architecture:</strong> Cloud Run multi-container pod &middot; Cloud SQL PostgreSQL &middot; Private GCS &middot; Secret Manager &middot; Vertex AI
+</p>
+
+---
+
+## Production-Grade Rails 8 Superpowers 💎
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px;">
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #1a73e8; font-size: 0.84em;">🛡️ Zero-Trust Security via Cloud IAP</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    Identity-Aware Proxy protects internal routes with Google IAM authentication &amp; OAuth context — zero VPNs or exposed ports.
+  </p>
+</div>
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #188038; font-size: 0.84em;">🐘 Cloud SQL (Private mTLS Proxy)</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    Cloud SQL Auth Proxy sidecar container handles mTLS encryption &amp; IAM credentials pooling without opening public IPs (zero <code>0.0.0.0/0</code>).
+  </p>
+</div>
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #d93025; font-size: 0.84em;">🔐 Private GCS + IAM Blob Signing</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    ActiveStorage configured with <code>iam: true</code>. No world-readable buckets! Short-lived time-bounded signed URLs via Cloud IAM <code>signBlob</code>.
+  </p>
+</div>
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #ea8600; font-size: 0.84em;">🪵 Native Structured JSON Logging</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    Cloud Logging ingestion with native severity mapping, Error Reporting stack-trace parsing, and Cloud Trace trace context correlation.
+  </p>
+</div>
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #1a73e8; font-size: 0.84em;">📦 Multi-Container Cloud Run Pod</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    Puma Web + Rails 8 Solid Queue Worker + Cloud SQL Proxy all sharing localhost in one single serverless service instance.
+  </p>
+</div>
+
+<div style="background: white; border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+  <h3 style="margin: 0 0 3px 0; color: #8e24aa; font-size: 0.84em;">🤖 Vertex AI Multimodal Pipelines</h3>
+  <p style="margin: 0; font-size: 0.68em; color: #3c4043; line-height: 1.32;">
+    Asynchronous background Solid Queue jobs driving Google Gemini &amp; Imagen 3 cover image generation via official Vertex AI SDK.
+  </p>
+</div>
+
+</div>
+
+<p style="font-size: 0.72em; color: #5f6368; text-align: center; margin: 12px 0 0 0;">
+🔑 <strong>Plus:</strong> Secret Manager runtime injection · Zero committed secrets · Automated CI/CD via Cloud Build
 </p>
 
 ---
