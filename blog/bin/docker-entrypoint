@@ -72,6 +72,10 @@ if [[ "$*" == *"rails server"* ]] || [[ "$*" == *"./bin/rails server"* ]]; then
   fi
 elif [[ "$*" == *"solid_queue:start"* ]]; then
   ensure_solid_schemas queue
+elif [[ "$*" == *"db:prepare"* ]] || [[ "$*" == *"db:seed"* ]]; then
+  # One-off database tasks, e.g. the Step 6 `rails-migrate` Cloud Run Job (`./bin/rails db:prepare db:seed`):
+  # seeding enqueues Solid Queue jobs, so load the Solid schemas first, idempotently (FL008-12).
+  ensure_solid_schemas queue cache cable
 fi
 
 exec "${@}"

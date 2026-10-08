@@ -100,4 +100,40 @@ class DockerEntrypointTest < Minitest::Test
       system("psql", admin, "-qc", "drop database if exists #{name}", out: File::NULL)
     end
   end
+
+  def psql_value(url, sql)
+    out, _e, _s = Open3.capture3("psql", url, "-Atc", sql)
+    out.strip
+  end
+
+  # FL008-12: the Step 6 `rails-migrate` Cloud Run Job runs `./bin/rails db:prepare db:seed` through
+  # this entrypoint (no --command override) against a brand-new Cloud SQL database. Seeding enqueues
+  # Solid Queue jobs, so the Solid schemas must exist first, and re-running the job must not wipe the
+  # queue (the old `db:schema:load:queue` did: `create_table force: :cascade`).
+  def test_migrate_job_prepares_and_seeds_a_fresh_database_and_is_safe_to_rerun
+    url = ENV["ENTRYPOINT_TEST_DATABASE_URL"]
+    skip "set ENTRYPOINT_TEST_DATABASE_URL to run this" if url.to_s.empty?
+    admin, fresh, name = admin_and_fresh_urls(url)
+    system("psql", admin, "-qc", "create database #{name}", out: File::NULL)
+    env = server_env(fresh).merge("GOOGLE_CLOUD_ACCOUNT" => "student@example.com", "ACTIVE_STORAGE_SERVICE" => "local")
+    job = [ENTRYPOINT, "./bin/rails", "db:prepare", "db:seed"]
+    begin
+      out, err, status = Open3.capture3(env, *job, chdir: BLOG_DIR)
+      assert status.success?, "first run failed:\n#{out}\n#{err}"
+      %w[solid_queue_jobs solid_cache_entries solid_cable_messages posts users].each do |t|
+        assert_includes solid_tables(fresh), t
+      end
+      assert_equal "1", psql_value(fresh, "select count(*) from users where email_address = 'student@example.com'")
+
+      system("psql", fresh, "-qc", "insert into solid_queue_jobs (queue_name, class_name, priority, created_at, updated_at) " \
+                                   "values ('default', 'Fl008SentinelJob', 0, now(), now())", out: File::NULL)
+      out, err, status = Open3.capture3(env, *job, chdir: BLOG_DIR)
+      assert status.success?, "re-run failed:\n#{out}\n#{err}"
+      assert_equal "1", psql_value(fresh, "select count(*) from solid_queue_jobs where class_name = 'Fl008SentinelJob'"),
+                   "re-running the migrate job must not wipe pending Solid Queue jobs"
+      assert_equal "1", psql_value(fresh, "select count(*) from users where email_address = 'student@example.com'")
+    ensure
+      system("psql", admin, "-qc", "drop database if exists #{name}", out: File::NULL)
+    end
+  end
 end

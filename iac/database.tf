@@ -18,6 +18,14 @@ resource "google_project_service" "sqladmin" {
   disable_on_destroy = false
 }
 
+# Required by Cloud Run `--set-cloudsql-instances` (Step 6 `rails-migrate` job): without it gcloud
+# stops on an interactive "enable API? (y/N)" prompt (FL008-09).
+resource "google_project_service" "sql_component" {
+  project            = var.project_id
+  service            = "sql-component.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Cloud SQL PostgreSQL Instance
 resource "google_sql_database_instance" "main" {
   name             = "rails8-app-on-gcp-${random_id.db_suffix.hex}"

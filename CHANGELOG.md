@@ -2,6 +2,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-10-08
+### Fixed (Friction Log FL008, reworked from PR #155 on top of current `main`)
+- 🔴 **Step 6 `rails-migrate` job no longer crashes on a fresh Cloud SQL database (`FL008-12`)**: `db:prepare` seeded the database (which enqueues `GenerateCoverImageJob`) before `solid_queue_jobs` existed (`PG::UndefinedTable`). The job now runs `./bin/rails db:prepare db:seed` **through `bin/docker-entrypoint`** (no `--command` override). A new entrypoint branch for one-off `db:prepare` / `db:seed` commands reuses the idempotent `ensure_solid_schemas` helper (#168) first. The old follow-up `db:schema:load:queue|cache|cable` step is gone: it was `create_table force: :cascade`, so every re-run wiped pending Solid Queue jobs. Reproduced and verified on Postgres 16 with the new opt-in test `test_migrate_job_prepares_and_seeds_a_fresh_database_and_is_safe_to_rerun`.
+- 🔴 **`rails-migrate` is a single idempotent `gcloud run jobs deploy … --wait` that no longer hides errors (`FL008-09`)**: replaces `jobs create … 2>/dev/null || true` + `jobs execute` + `jobs update`. The old redirect hid the interactive "enable sql-component.googleapis.com? (y/N)" prompt, so the terminal hung silently. Terraform now enables `sql-component.googleapis.com` (`iac/database.tf`).
+- 🔴 **Terraform declares the outputs the workshop reads (`FL008-10`)**: `sql_instance_name` and `db_password` (`sensitive = true`) in `iac/outputs.tf`. Step 5 §0 no longer falls back to the `CHANGE_ME` placeholder (which led to `PG::ConnectionBad`). It now falls back to the `rails-db-password` secret and fails loudly if both sources are empty.
+- 🟡 **ruby-build bootstrap for rbenv (`FL008-02`)** in `skills/rails8app-workshop/SKILL.md`, without `rbenv global` (`.ruby-version` already selects 3.4.5).
+- 🟢 **Live Deploy 4 readiness eval (`FL008-11`)**: `step-6-shell-cloud-run-ready` in `workshop/skeleton.yaml`, skipped unless `WORKSHOP_LIVE_EVAL` is set.
+- 🧪 New `Fl008StepFiveSixContractsTest` in `test/test_iac_codelab_contracts.rb` guards all of the above (e.g. every `terraform output -raw X` used by the workshop must be declared in `iac/`).
+
 ## [0.3.6] - 2026-10-08
 ### Security & Privacy
 - 🔒 **PII Masking on Telemetry (`GOOGLE_CLOUD_ACCOUNT` & `ADMIN_EMAIL`) (#185)**: Obfuscated personal email addresses in `StatusesController#safe_env_inspection` (e.g. `settilorenzo97@gmail.com` -> `se***97@gmail.com`, `ricc@google.com` -> `r***@google.com`) to prevent scraping and harvesting personal contact info from unauthenticated `/status` and `/status.json` endpoints on Cloud Run. Short local parts (<= 4 chars) reveal only their first character. Each `safe_environment` entry now carries an `is_pii` flag (single source of truth: `StatusesController::PII_EMAIL_VARS`).
