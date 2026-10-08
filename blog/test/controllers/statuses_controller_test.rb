@@ -130,19 +130,34 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
       assert_equal "se***97@gmail.com", account_entry["value"]
       assert_equal true, account_entry["is_set"]
       assert_equal false, account_entry["is_secret"]
+      assert_equal true, account_entry["is_pii"]
 
+      # Short local parts (<= 4 chars) only reveal their first character
       admin_entry = safe_env.find { |e| e["key"] == "ADMIN_EMAIL" }
       assert admin_entry.present?
-      assert_equal "r***c@google.com", admin_entry["value"]
+      assert_equal "r***@google.com", admin_entry["value"]
       assert_equal true, admin_entry["is_set"]
       assert_equal false, admin_entry["is_secret"]
+      assert_equal true, admin_entry["is_pii"]
+
+      project_entry = safe_env.find { |e| e["key"] == "GOOGLE_CLOUD_PROJECT" }
+      assert_equal false, project_entry["is_pii"]
     ensure
       ENV["GOOGLE_CLOUD_ACCOUNT"] = old_account
       ENV["ADMIN_EMAIL"] = old_email
     end
   end
 
-  test "safe_environment includes APP_ADMIN_PASSWORD and masks secrets with length-preserving asterisks" do
+  test "mask_pii_email never reveals most of a short or medium local part" do
+    controller = StatusesController.new
+    assert_equal "a***@example.com", controller.send(:mask_pii_email, "abc@example.com")
+    assert_equal "j***@example.com", controller.send(:mask_pii_email, "j@example.com")
+    assert_equal "a***e@example.com", controller.send(:mask_pii_email, "abcde@example.com")
+    assert_equal "se***97@gmail.com", controller.send(:mask_pii_email, "settilorenzo97@gmail.com")
+    assert_equal "not-an-email", controller.send(:mask_pii_email, "not-an-email")
+  end
+
+  test "safe_environment includes APP_ADMIN_PASSWORD and masks secrets with a fixed-length mask (no length oracle)" do
     old_app_pw = ENV["APP_ADMIN_PASSWORD"]
     old_admin_pw = ENV["ADMIN_PASSWORD"]
     ENV["APP_ADMIN_PASSWORD"] = "SecretPassword123"
@@ -157,13 +172,16 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
       assert app_pw_entry.present?
       assert_equal true, app_pw_entry["is_secret"]
       assert_equal true, app_pw_entry["is_set"]
-      assert_equal "*" * 17, app_pw_entry["value"]
+      assert_equal StatusesController::SECRET_MASK, app_pw_entry["value"]
 
       admin_pw_entry = safe_env.find { |e| e["key"] == "ADMIN_PASSWORD" }
       assert admin_pw_entry.present?
       assert_equal true, admin_pw_entry["is_secret"]
       assert_equal true, admin_pw_entry["is_set"]
-      assert_equal "*" * 12, admin_pw_entry["value"]
+      # Secrets of different lengths (17 vs 12 chars) must render identically
+      assert_equal app_pw_entry["value"], admin_pw_entry["value"]
+      refute_includes response.body, "SecretPassword123"
+      refute_includes response.body, "FallbackPass"
     ensure
       ENV["APP_ADMIN_PASSWORD"] = old_app_pw
       ENV["ADMIN_PASSWORD"] = old_admin_pw

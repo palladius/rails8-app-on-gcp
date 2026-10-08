@@ -152,7 +152,7 @@
                 <%= entry[:value] %>
                 <% if entry[:is_secret] && entry[:is_set] %>
                   <span style="font-size: 0.75rem; color: #f59e0b; margin-left: 8px;">(masked)</span>
-                <% elsif %w[GOOGLE_CLOUD_ACCOUNT ADMIN_EMAIL].include?(entry[:key]) && entry[:is_set] %>
+                <% elsif entry[:is_pii] && entry[:is_set] %>
                   <span style="font-size: 0.75rem; color: #38bdf8; margin-left: 8px;">(PII masked)</span>
                 <% end %>
               </td>

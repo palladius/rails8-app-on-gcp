@@ -3,6 +3,11 @@
 class StatusesController < ApplicationController
   allow_unauthenticated_access only: [:show]
 
+  # Env vars holding personal email addresses: partially masked on the public /status endpoint (#185)
+  PII_EMAIL_VARS = %w[GOOGLE_CLOUD_ACCOUNT ADMIN_EMAIL].freeze
+  # Fixed-length mask for secrets, so the endpoint does not leak their length (#185)
+  SECRET_MASK = "********"
+
   def show
     # Run environment detection (0 ms)
     @run_env = detect_run_env
@@ -319,13 +324,15 @@ class StatusesController < ApplicationController
     vars_of_interest.map do |var_name|
       val = ENV[var_name]
       is_secret = secret_patterns.any? { |pat| var_name.match?(pat) }
+      is_pii = PII_EMAIL_VARS.include?(var_name)
       display_value =
         if val.nil?
           "nil"
         elsif is_secret
-          # Length-preserving asterisk masking (retained for instructor debugging)
-          "*" * [val.length, 4].max
-        elsif var_name.in?(%w[GOOGLE_CLOUD_ACCOUNT ADMIN_EMAIL])
+          # Fixed-length mask: never leak the secret length on this unauthenticated endpoint (#185).
+          # Instructors can still debug via `is_set`.
+          SECRET_MASK
+        elsif is_pii
           mask_pii_email(val)
         else
           val
@@ -335,11 +342,16 @@ class StatusesController < ApplicationController
         key: var_name,
         value: display_value,
         is_set: val.present?,
-        is_secret: is_secret
+        is_secret: is_secret,
+        is_pii: is_pii
       }
     end
   end
 
+  # Masks the local part of an email address, keeping the domain for debugging:
+  #   "j@x.com" / "ricc@x.com"      -> "j***@x.com" / "r***@x.com"   (<= 4 chars: first char only)
+  #   "abcde@x.com" .. 8 chars       -> "a***e@x.com"
+  #   "settilorenzo97@gmail.com"     -> "se***97@gmail.com"
   def mask_pii_email(val)
     str = val.to_s.strip
     return "nil" if str.empty? || str == "nil"
@@ -347,9 +359,9 @@ class StatusesController < ApplicationController
 
     user, domain = str.split("@", 2)
     masked_user =
-      if user.length <= 2
+      if user.length <= 4
         "#{user[0]}***"
-      elsif user.length <= 4
+      elsif user.length <= 8
         "#{user[0]}***#{user[-1]}"
       else
         "#{user[0..1]}***#{user[-2..-1]}"
