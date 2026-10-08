@@ -106,3 +106,17 @@ output "cloud_sql_connection_name" {
   description = "The Cloud SQL connection name (PROJECT:REGION:INSTANCE)"
   value       = google_sql_database_instance.main.connection_name
 }
+
+# Used by workshop Step 5 §0 (`terraform output -raw sql_instance_name`) and skeleton.yaml (FL008-10)
+output "sql_instance_name" {
+  description = "The Cloud SQL PostgreSQL instance name"
+  value       = google_sql_database_instance.main.name
+}
+
+# Used by workshop Step 5 §0 (`terraform output -raw db_password`) (FL008-10).
+# Sensitive: hidden in plan/apply output, readable only via an explicit `terraform output -raw db_password`.
+output "db_password" {
+  description = "The generated Cloud SQL password for rails_user (same value as the rails-db-password secret)"
+  value       = random_password.db_password.result
+  sensitive   = true
+}

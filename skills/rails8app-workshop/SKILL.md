@@ -76,3 +76,10 @@ rvm install 3.4.5       # rvm
 asdf install ruby 3.4.5 # asdf
 mise use ruby@3.4.5     # mise
 ```
+
+With rbenv, `rbenv install` comes from the **ruby-build** plugin, which is often missing on Debian/Ubuntu and other Linux setups (`rbenv: no such command 'install'`). Install it first, then retry. If `3.4.5` is still unknown, update ruby-build. No `rbenv global` is needed: the repo's `.ruby-version` selects `3.4.5` automatically.
+
+```bash
+rbenv install --version >/dev/null 2>&1 || git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)/plugins/ruby-build"
+rbenv install -s 3.4.5 || { git -C "$(rbenv root)/plugins/ruby-build" pull && rbenv install -s 3.4.5; }
+```

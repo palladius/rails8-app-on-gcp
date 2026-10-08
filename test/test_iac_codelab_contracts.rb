@@ -230,3 +230,97 @@ class IacCodelabContractsTest < Minitest::Test
     assert_match(/Timed out/, err)
   end
 end
+
+# FL008 (Friction Log 20260921-fl008, reworked from PR #155 on top of current main):
+# contracts between workshop/CODELAB.md, workshop/skeleton.yaml, iac/*.tf and blog/bin/docker-entrypoint.
+class Fl008StepFiveSixContractsTest < Minitest::Test
+  REPO_ROOT = File.expand_path("..", __dir__)
+
+  def setup
+    @codelab = File.read(File.join(REPO_ROOT, "workshop", "CODELAB.md"))
+    @skeleton_raw = File.read(File.join(REPO_ROOT, "workshop", "skeleton.yaml"))
+    @skeleton = YAML.safe_load(@skeleton_raw)
+    @iac_tf = Dir.glob(File.join(REPO_ROOT, "iac", "*.tf")).sort.map { |f| File.read(f) }.join("\n")
+    @entrypoint = File.read(File.join(REPO_ROOT, "blog", "bin", "docker-entrypoint"))
+    @skill = File.read(File.join(REPO_ROOT, "skills", "rails8app-workshop", "SKILL.md"))
+  end
+
+  # Shell commands in CODELAB.md with backslash line-continuations joined into one line.
+  def codelab_commands
+    @codelab.gsub(/\\\n/, " ").lines.map(&:strip)
+  end
+
+  def rails_migrate_commands
+    codelab_commands.select { |l| l.match?(/\Agcloud run jobs \S+ rails-migrate\b/) }
+  end
+
+  # FL008-10: `terraform output -raw X` silently fell back (to "CHANGE_ME" for the DB password)
+  # because iac/ never declared those outputs.
+  def test_every_terraform_output_used_by_the_workshop_is_declared_in_iac
+    used = (@codelab + @skeleton_raw).scan(/terraform output -raw ([a-z0-9_]+)/).flatten.uniq
+    refute_empty used
+    used.each do |name|
+      assert_match(/^output\s+"#{name}"\s*\{/, @iac_tf,
+                   "workshop runs `terraform output -raw #{name}` but iac/*.tf declares no output \"#{name}\"")
+    end
+  end
+
+  def test_db_password_output_is_marked_sensitive
+    block = @iac_tf[/^output\s+"db_password"\s*\{.*?^\}/m]
+    refute_nil block, "iac/*.tf must declare output \"db_password\""
+    assert_match(/sensitive\s*=\s*true/, block)
+  end
+
+  def test_codelab_never_falls_back_to_a_placeholder_db_password
+    refute_match(/DB_PASSWORD=.*(CHANGE_ME|RailsWorkshopSecure)/, @codelab,
+                 "A placeholder DB password makes Cloud Run fail later with PG::ConnectionBad")
+  end
+
+  # FL008-09: `--set-cloudsql-instances` prompts to enable sql-component.googleapis.com; with
+  # `2>/dev/null` the (y/N) prompt was invisible and the terminal hung silently.
+  def test_terraform_enables_the_sql_component_api
+    assert_match(/service\s*=\s*"sql-component\.googleapis\.com"/, @iac_tf)
+  end
+
+  def test_rails_migrate_job_commands_do_not_hide_errors
+    refute_empty rails_migrate_commands
+    rails_migrate_commands.each do |cmd|
+      refute_match(%r{2>/dev/null|\|\|\s*true}, cmd, "rails-migrate commands must not hide errors: #{cmd}")
+    end
+  end
+
+  # FL008-12: the job must be safe to re-run. `db:schema:load:*` is `create_table force: :cascade`
+  # (wipes pending Solid Queue jobs), so the job must go through the image ENTRYPOINT, whose
+  # `ensure_solid_schemas` loads each schema only if its sentinel table is missing (#168).
+  def test_rails_migrate_job_is_idempotent_and_goes_through_the_entrypoint
+    deploy = rails_migrate_commands.find { |c| c.start_with?("gcloud run jobs deploy rails-migrate") }
+    refute_nil deploy, "use `gcloud run jobs deploy rails-migrate` (create-or-update, safe to re-run)"
+    rails_migrate_commands.each do |cmd|
+      refute_match(/db:schema:load/, cmd, "db:schema:load is destructive on re-run: #{cmd}")
+      refute_match(/--command[ =]["']?(?!["'])\S/, cmd, "do not override --command: it bypasses bin/docker-entrypoint")
+    end
+    assert_match(/--args[ =]"?\.\/bin\/rails,db:prepare,db:seed"?/, deploy)
+    assert_includes deploy, "GOOGLE_CLOUD_ACCOUNT=", "db:seed needs GOOGLE_CLOUD_ACCOUNT for the admin user"
+    assert_match(/--wait\b/, deploy)
+  end
+
+  def test_entrypoint_loads_solid_schemas_before_one_off_db_tasks
+    branch = @entrypoint[/^elif .*db:prepare.*\n(?:\s*#.*\n)*\s*ensure_solid_schemas queue cache cable$/]
+    refute_nil branch, "bin/docker-entrypoint must run `ensure_solid_schemas queue cache cable` for db:prepare / db:seed commands"
+  end
+
+  # FL008-02: on many Debian/Ubuntu setups `rbenv install` is missing until ruby-build is installed.
+  def test_skill_installs_ruby_build_without_touching_the_global_ruby
+    assert_match(/ruby-build/, @skill)
+    refute_match(/rbenv global\s+\d/, @skill, "the repo's .ruby-version already selects 3.4.5; do not change the student's global Ruby")
+  end
+
+  # FL008-11: live readiness check for Deploy 4, skipped offline / in CI.
+  def test_skeleton_step_6_has_a_live_cloud_run_readiness_eval_gated_on_workshop_live_eval
+    step = @skeleton["steps"].find { |s| s["number"] == 6 }
+    eval_item = step["evals"].find { |e| e["id"] == "step-6-shell-cloud-run-ready" }
+    refute_nil eval_item
+    assert_includes eval_item["command"], "WORKSHOP_LIVE_EVAL"
+    assert_includes eval_item["command"], "gcloud run services describe blog"
+  end
+end

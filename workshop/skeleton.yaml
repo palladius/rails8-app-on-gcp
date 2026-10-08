@@ -305,6 +305,11 @@ steps:
         description: "Verify full test suite passes against gold standard"
         command: "cd blog && env -u ACTIVE_STORAGE_SERVICE just test"
         expect_exit: 0
+      - id: "step-6-shell-cloud-run-ready"
+        type: "shell"
+        description: "Verify the live Cloud Run service 'blog' is Ready=True (only when WORKSHOP_LIVE_EVAL=1; skipped offline/CI)"
+        command: "if [ -z \"$WORKSHOP_LIVE_EVAL\" ]; then echo 'Offline/CI: skipping live Cloud Run readiness check'; else test \"$(gcloud run services describe blog --project=\"$GOOGLE_CLOUD_PROJECT\" --region=\"${GOOGLE_CLOUD_REGION:-europe-west1}\" --format='value(status.conditions[0].status)')\" = 'True'; fi"
+        expect_exit: 0
       - id: "step-6-ruby-solid-queue-active"
         type: "ruby"
         description: "Verify that Solid Queue worker or supervisor is active and draining jobs"

@@ -643,8 +643,9 @@ export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
 # Cloud SQL instance name (from Terraform output, NOT hardcoded)
 export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
 
-# Database password (from Terraform output)
-export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "CHANGE_ME")
+# Database password (from Terraform output, or the rails-db-password secret Terraform created)
+export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || gcloud secrets versions access latest --secret=rails-db-password)
+: "${DB_PASSWORD:?Could not read the DB password from Terraform or Secret Manager. Did Step 1 terraform apply succeed?}"
 
 # GCS bucket names
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
@@ -815,7 +816,7 @@ export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value a
 export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 echo "Admin user will be seeded for: $GOOGLE_CLOUD_ACCOUNT"
 
-# Get the latest blog image from Cloud Run (jobs don't support --source)
+# Reuse the exact image the blog service runs, so migrations match the deployed code
 export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
 
 # Build the DATABASE_URL in triple-slash format (required for Unix socket proxy)
@@ -823,36 +824,26 @@ export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-pas
 export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
 export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
 
-# Create migration job — note ALL 4 database URL env vars and GOOGLE_CLOUD_ACCOUNT for seed user creation
-gcloud run jobs create rails-migrate \
+# Create (or update) the migration job and run it. `jobs deploy` is create-or-update, so re-running is safe.
+# Note ALL 4 database URL env vars, and GOOGLE_CLOUD_ACCOUNT for the admin user created by db:seed.
+# No --command: the image ENTRYPOINT (bin/docker-entrypoint) runs first and loads the Solid Queue/Cache/Cable
+# schemas (only if missing) BEFORE db:prepare and db:seed. Seeding enqueues jobs, so solid_queue_jobs must exist.
+gcloud run jobs deploy rails-migrate \
   --image=$BLOG_IMAGE \
-  --command "bin/rails" \
-  --args "db:prepare" \
+  --args="./bin/rails,db:prepare,db:seed" \
   --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT}" \
   --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
   --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
   --service-account=$RUN_SA \
-  --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
-
-# Execute migration job
-gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
+  --region $GOOGLE_CLOUD_REGION \
+  --wait
 ```
 
 > 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
-> All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
-> Solid Queue/Cache/Cable tables won't be created.
-
-After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
-
-```bash
-# Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
-gcloud run jobs update rails-migrate \
-  --command "bash" \
-  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
-  --region $GOOGLE_CLOUD_REGION
-
-gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
-```
+> On Cloud Run all 4 `DATABASE_*_URL` env vars point to the same Cloud SQL database. Plain `db:prepare` does not
+> load `db/{queue,cache,cable}_schema.rb` into an existing shared database, so `bin/docker-entrypoint` does it with
+> `ensure_solid_schemas`. It is idempotent: each schema is loaded only if its `solid_*` table is missing, so
+> re-running the job never wipes pending Solid Queue jobs.
 
 ![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
 *In the figure above, you can see a possible output of `gcloud run jobs executions describe $JOBNAME`*
