@@ -11,6 +11,13 @@ All notable changes to this project will be documented in this file.
 - 🟢 **Live Deploy 4 readiness eval (`FL008-11`)**: `step-6-shell-cloud-run-ready` in `workshop/skeleton.yaml`, skipped unless `WORKSHOP_LIVE_EVAL` is set.
 - 🧪 New `Fl008StepFiveSixContractsTest` in `test/test_iac_codelab_contracts.rb` guards all of the above (e.g. every `terraform output -raw X` used by the workshop must be declared in `iac/`).
 
+## [0.3.6] - 2026-10-08
+### Security & Privacy
+- 🔒 **PII Masking on Telemetry (`GOOGLE_CLOUD_ACCOUNT` & `ADMIN_EMAIL`) (#185)**: Obfuscated personal email addresses in `StatusesController#safe_env_inspection` (e.g. `settilorenzo97@gmail.com` -> `se***97@gmail.com`, `ricc@google.com` -> `r***@google.com`) to prevent scraping and harvesting personal contact info from unauthenticated `/status` and `/status.json` endpoints on Cloud Run. Short local parts (<= 4 chars) reveal only their first character. Each `safe_environment` entry now carries an `is_pii` flag (single source of truth: `StatusesController::PII_EMAIL_VARS`).
+- 🔒 **No more secret length oracle (#185)**: Secrets are now rendered with a fixed-length mask (`StatusesController::SECRET_MASK`, `********`) instead of length-preserving asterisks, so the public endpoint no longer leaks how long the admin password or API keys are. Instructors can still debug via `is_set`.
+- 🔒 **Private HTTP Caching for `/status` (#185)**: Replaced `public: true` with `public: false` in `expires_in 1.minute` so that shared reverse proxies and CDN edges do not cache and distribute environment telemetry across unrelated clients, while retaining browser cache responsiveness.
+- 🔑 **Added `APP_ADMIN_PASSWORD` to Environment Inspection (#185)**: Tracked canonical administrator password variable `APP_ADMIN_PASSWORD` alongside `ADMIN_PASSWORD`, both masked with the fixed-length mask.
+
 ## [0.3.5] - 2026-10-07
 ### Added
 - 🎥 **Interactive Codelab Walkthrough Demo Video (`slides/images/codelab-demo.mp4`, `.webm`)**:
