@@ -7,6 +7,42 @@ All notable changes to this project will be documented in this file.
 - 🔑 **Added `APP_ADMIN_PASSWORD` to Environment Inspection (#185)**: Tracked canonical administrator password variable `APP_ADMIN_PASSWORD` alongside `ADMIN_PASSWORD`, properly masked with length-preserving asterisks for instructor debugging.
 
 ## [Unreleased]
+
+## [0.3.5] - 2026-10-07
+### Added
+- 🎥 **Interactive Codelab Walkthrough Demo Video (`slides/images/codelab-demo.mp4`, `.webm`)**:
+  - Embedded an automated high-resolution browser walkthrough in Step 2 of the Antigravity kickoff decks (`antigravity.en.md` & `antigravity.it.md`), replacing the static preview with a smooth 15-second scroll and zoom of Page 1 and Page 2.
+- 💎 **Production-Grade Rails 8 Superpowers Slide**:
+  - Inserted a dedicated reference slide immediately following the *Canonical Architecture Blueprint* slide detailing production enterprise capabilities: Zero-Trust Cloud IAP, Cloud SQL Private mTLS Proxy, Private GCS with IAM blob signing, Native Structured JSON Logging, Multi-Container Cloud Run Pods, and Vertex AI background pipelines.
+- 💳 **Credits Redemption Banner & Visual Guidance in Step 8**:
+  - Added user screenshot of the *Learning by doing [NO COST] ... Activate* banner with explicit caption ("looks like this") and balanced layout with the Codelab QR code.
+
+### Changed
+- 🔢 **Clean Sequential Step Numbering (1 to 9)**:
+  - Standardized all kickoff steps across English & Italian decks, `slides/README.md`, and `workshop/events/20261007-wednesday-build-hour/README.md` to be strictly integer-sequential (1, 2, 3, 4, 5, 6, 7, 8, 9), completely removing confusing sub-steps (`1.5`, `4a`, `4b`).
+
+### Fixed
+- 🌐 **UTF-8 Encoding Safety Across Test & Sync Runners**:
+  - Declared `Encoding.default_external = Encoding::UTF_8` in `bin/sync_devsite_codelab.rb`, `test/test_slides.rb`, `test/test_codelab_sync_and_contracts.rb`, `test/test_docker_compose_contracts.rb`, and `test/test_iac_codelab_contracts.rb`, preventing `ArgumentError: invalid byte sequence in US-ASCII` failures under macOS default non-UTF8 subshells.
+
+## [0.3.4] - 2026-10-06
+### Added
+- 🚀 **Antigravity-Centric Kickoff Slide Decks in English & Italian (`slides/antigravity.en.md` & `slides/antigravity.it.md`)**:
+  - Created standalone Marp presentation decks centered on the 5-step **Google Antigravity 2.0** onboarding flow for tomorrow's **Wednesday Build Hour (WBH)** event (`antigravity.en.md`) and Italian workshops (`antigravity.it.md`), leaving `slides/index.md` untouched:
+    1. **Download & Install Antigravity 2.0** (`antigravity.google/download` + Windows **WSL** tip, with a 62%-wide right-column screenshot).
+    2. **Step 1.5 (Open the Official Google Codelab Page 1 $\to$ `#0`):** Dedicated slide introducing the official Google Codelab URL (`#0` / `?hl=it#0`), scan-ready QR code (`codelab-qr.png`), and a full-height right-half preview screenshot (`codelab-page1-intro.png`).
+    3. **Sign in with Gmail** (`@gmail.com`).
+    4. **Prompt 1 (Clone & Chime):** Copyable prompt instructing Antigravity to `git clone` `https://github.com/palladius/rails8-app-on-gcp/` into `~/Documents` and play a sound when done.
+    5. **Step 4a & 4b (Scoped Project + Turbo Mode):** Step-by-step visual guide with 4 enlarged UI screenshots (`agy-step1-new-project.png`, `agy-step2-select-folder.png`, `agy-step3-project-settings.png`, `agy-step4-turbo-mode.png` occupying the full right half of Step 4b) showing how to open a new project inside `Documents/rails8-app-on-gcp`, type `"ciao"` to trigger the sidebar entry, and enable **Turbo mode**—accompanied by a prominent **🚨 DO NOT DO IN PROD** safety disclaimer.
+    6. **Prompt 2 (Start Guided Codelab):** Copyable prompt pointing Antigravity to the official Google Codelab (`#0`) and `workshop/landing-page/README.md` / `README.it.md`.
+    7. **Step 6 (Claim GCP Credits on Codelab Page 2):** Direct links to `#1` / `?hl=it#1`, Chrome `@gmail.com` checklist, and green button verification.
+    8. **Prompt 3 (Post-Coupon GCP Project Creation):** Copyable prompt to create a timestamped project (`workshop-rails8-YYYYMMDD` / `workshop-modena-YYYYMMDD`).
+    9. **Discreet Top-Right Language Switcher & Enlarged Visuals:** Added subtle top-right `🇮🇹` / `🇬🇧` flag links across all slides and enlarged screenshots by 30–60%+ in each dimension to eliminate bottom whitespace.
+- 📅 **Wednesday Build Hour Event Registration (`workshop/events/20261007-wednesday-build-hour/README.md`)**:
+  - Registered the **Wednesday Build Hour (WBH)** session (*"How to bring your Rails 8 app to GCP with Riccardo Carlesso"*, Wed 7 Oct 2026, 13:00–14:00 CEST) in `workshop/events/`.
+- 🧪 **Extended Marp Slide Contract Tests (`test/test_slides.rb`, `justfile`, `.github/workflows/deploy-pages.yml`)**:
+  - Added `just slides-antigravity` (`just slides-agy`), updated `just build-slides`, `workshop/visualizer/build_ghpages.rb`, and `.github/workflows/deploy-pages.yml` to compile and publish `antigravity.en.html` and `antigravity.it.html`, and expanded `test/test_slides.rb` to 122 assertions verifying frontmatter, prompts, screenshots, external link safety, and unescaped HTML rendering.
+
 ### Fixed
 - 🟡 **`docker-entrypoint` no longer calls the non-existent `db:prepare:queue|cache|cable` and now really prepares the Solid databases (#168)**: Rails has no per-database `db:prepare:<name>`, so every boot logged 3 "Unrecognized command" errors. Dropping the calls (the issue's first suggestion) would have been unsafe: on Cloud Run all four connections share one existing Cloud SQL database, and plain `db:prepare` does not load `db/{queue,cache,cable}_schema.rb` there. Verified on a throwaway Postgres 16: the old entrypoint created the Solid Queue tables only through its `rails runner` fallback and **never created `solid_cache_entries` or `solid_cable_messages`**. New `ensure_solid_schemas` helper loads each schema on its own connection if its sentinel table is missing, without hiding errors. It also runs **before** `db:prepare` in the server branch: on a brand-new database `db:prepare` runs `db/seeds.rb`, which enqueues a job and used to abort the container (`bash -e`) because `solid_queue_jobs` did not exist yet. Guarded by `test/test_docker_entrypoint.rb` (the Postgres test is opt-in via `ENTRYPOINT_TEST_DATABASE_URL`). Also fixed the same bad commands in `skills/workshop-troubleshooting/references/database-storage.md`. **First-boot hardening:** on Postgres an advisory lock now serializes the schema load, because `web` and `worker` boot concurrently on Cloud Run and the schema files use `create_table force: :cascade` (reproduced: 3 of 3 concurrent boots had one loader die with `PG::DuplicateObject`); and a missing database is created first (as `db:prepare` would), instead of being skipped. Opt-in Postgres tests cover both.
 - 🔴 **Step 6 Deploy 4 no longer ends with `unrecognized arguments: --allow-unauthenticated` (#169)**: `--allow-unauthenticated` is a `gcloud run deploy` flag; `gcloud run services update` rejects it and applies nothing, so the valid `--service-account=$RUN_SA` was never set and the service kept running as the Default Compute SA instead of `rails-cloudrun-sa`. Removed the flag from the last command of the Deploy 4 block in `workshop/CODELAB.md` (`skeleton.yaml` already had it right; the service is already public from the Step 3 deploy). New contract test fails if any codelab `gcloud run services update` command carries the flag.

@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 # bin/sync_devsite_codelab.rb
 # Synchronizes workshop/CODELAB.md (GitHub source of truth) with an external DevSite Codelab
 # export path (via ENV["DEVSITE_CODELAB_PATH"] or workshop/build/devsite/index.lab.md).

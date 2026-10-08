@@ -44,11 +44,15 @@ marp slides/index.md --pdf -o slides/dist/slides.pdf
 
 ---
 
-## 📑 Slide Outline
+## 📑 Available Slide Decks
 
-1. **Welcome & Kickoff**: Intro by Riccardo & Emiliano.
-2. **Download & Install Antigravity**: Cross-platform binaries.
-3. **Launch & Connect**: Sign in with Google identity.
-4. **Reclaim Credits Now**: Redeem Google Cloud credits voucher for hands-on GCP projects.
-5. **Set the Mission**: Launch prompt pointing Antigravity to `workshop/landing-page/README.md`.
-6. **The Pedagogical Contract**: Socratic tutoring ("Guide me, don't do everything for me").
+1. **Original Kickoff Deck (`slides/index.md` $\to$ `slides/dist/index.html`)**:
+   - Original 6-slide DevFest Modena kickoff deck.
+2. **Antigravity-Centric Kickoff Deck — English (`slides/antigravity.en.md` $\to$ `slides/dist/antigravity.en.html`)**:
+   - Created for the **Wednesday Build Hour (WBH)** event and international workshops.
+   - Step-by-step Antigravity 2.0 onboarding (Steps 1 through 9): Install (with WSL tip) $\to$ Open Codelab Page 1 $\to$ Gmail Login $\to$ Prompt 1 (`git clone` into `Documents` + audio chime) $\to$ Open New Project in Folder $\to$ Say `"ciao"` + Enable **Turbo Mode** (with 4 screenshots & PROD safety disclaimer) $\to$ Prompt 2 (Guided Codelab + `landing-page/README.md`) $\to$ Claim GCP Credits on Codelab Page 2 (`#1`) $\to$ Prompt 3 (Automated GCP Project Creation).
+3. **Antigravity-Centric Kickoff Deck — Italian (`slides/antigravity.it.md` $\to$ `slides/dist/antigravity.it.html`)**:
+   - Full Italian localization of the Antigravity-centric onboarding flow (`workshop-modena-YYYYMMDD`, `README.it.md`, Codelab `?hl=it#1`).
+4. **Why Is This Workshop Different? (`slides/why-different.md` $\to$ `slides/dist/why-different.html`)**:
+   - Deep-dive showcase deck on architectural highlights (Structured JSON Logging, etc.).
+
