@@ -2,6 +2,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-10-10
+### Fixed
+- 🛡️ **IAP Mock Identity Leak in Production (`blog/compose.prod.yaml`)**:
+  - Removed hardcoded default `ricc@google.com` fallback for `IAP_MOCK_EMAIL` in `blog/compose.prod.yaml` (now `${IAP_MOCK_EMAIL:-}`). This prevents visitors from automatically being authenticated as `ricc@google.com` in Cloud Run deployments before IAP is configured (fixes #181).
+
 ## [0.3.5] - 2026-10-07
 ### Added
 - 🎥 **Interactive Codelab Walkthrough Demo Video (`slides/images/codelab-demo.mp4`, `.webm`)**:
