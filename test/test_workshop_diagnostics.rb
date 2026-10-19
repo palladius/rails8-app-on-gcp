@@ -16,12 +16,51 @@ class WorkshopDiagnosticsTest < Minitest::Test
 
   def test_warns_when_google_cloud_account_is_not_google_or_gmail
     Dir.mktmpdir do |dir|
+      bin_dir = create_fake_gcloud(dir, account: "student@yahoo.com")
       File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=student@yahoo.com\nGOOGLE_CLOUD_PROJECT=dummy\n")
-      stdout, _stderr, _status = Open3.capture3("ruby", SCRIPT_PATH, chdir: dir)
+      env = { "PATH" => "#{bin_dir}:#{ENV['PATH']}" }
+      stdout, _stderr, _status = Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
       assert_includes stdout, "GOOGLE_CLOUD_ACCOUNT (student@yahoo.com) is not a @gmail.com or @google.com address"
       assert_includes stdout, "Billable resources"
       assert_includes stdout, "terraform apply"
+      refute_includes stdout, "Attenzione:"
     end
+  end
+
+  def test_detects_qwiklabs_student_account_as_green_without_warning
+    Dir.mktmpdir do |dir|
+      bin_dir = create_fake_gcloud(dir, account: "antigravity-sa@qwiklabs-gcp-04-3a33b9df40aa.iam.gserviceaccount.com")
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=student-01-e7b3f29ceedf@qwiklabs.net\nGOOGLE_CLOUD_PROJECT=qwiklabs-gcp-04-3a33b9df40aa\n")
+      env = { "PATH" => "#{bin_dir}:#{ENV['PATH']}" }
+      stdout, _stderr, _status = Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
+      assert_includes stdout, "Qwiklab student account detected"
+      assert_includes stdout, "All good"
+      assert_includes stdout, "Qwiklab workstation service account active"
+      refute_includes stdout, "is not a @gmail.com or @google.com address"
+      refute_includes stdout, "Attenzione:"
+    end
+  end
+
+  def create_fake_gcloud(dir, account: "student@gmail.com", terraform_applied: false)
+    bin_dir = File.join(dir, "fakebin")
+    FileUtils.mkdir_p(bin_dir)
+    fake = File.join(bin_dir, "gcloud")
+    File.write(fake, <<~SH)
+      #!/bin/sh
+      case "$*" in
+        "auth list --filter=status:ACTIVE"*) echo "#{account}" ;;
+        "auth list"*) echo "#{account}" ;;
+        "beta billing projects describe"*) echo True ;;
+        "auth application-default print-access-token"*) echo token ;;
+        "projects describe"*) echo 123456789 ;;
+        "projects get-iam-policy"*) ;;
+        "storage buckets describe"*) exit #{terraform_applied ? 0 : 1} ;;
+        "storage ls"*) exit 1 ;;
+        *) ;;
+      esac
+    SH
+    File.chmod(0o755, fake)
+    bin_dir
   end
 
   def test_warns_when_admin_email_differs_from_google_cloud_account
