@@ -8,6 +8,12 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.2.3] - 2026-10-16 (Antigravity App rebrand)
+
+- **Title & Step 0**: renamed the codelab to *"Rails 8 on Google Cloud: From Zero to AI with Antigravity App"* and replaced every "Google Antigravity 2.0" mention with the new official product name **Antigravity App** (see `antigravity.google/download`). Also applied to `workshop/skeleton.yaml`, `SKELETON.md`, landing pages, and the Marp slides. No command changes.
+
+---
+
 ## [2.2.2] - 2026-10-01 (Friction Log 4, `palladius/rails8-app-on-gcp#169`)
 
 - **Step 6 (Deploy 4)**: removed `--allow-unauthenticated` from the final `gcloud run services update blog ...` command. That flag belongs to `gcloud run deploy`; `services update` rejects it with `unrecognized arguments` and applies nothing, so `--service-account=$RUN_SA` was never set and the service kept running as the Default Compute SA. Public access already comes from the Step 3 deploy.

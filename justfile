@@ -48,7 +48,7 @@ workshop-dev *flags:
 
 # run the Marp presentation slides server (default port: 8082)
 slides port="8082":
-    @echo "Serving Marp slides on http://localhost:{{port}} (EN: /antigravity.en.md | IT: /antigravity.it.md | Why-Different: /why-different.md)"
+    @echo "Serving Marp slides on http://localhost:{{port}} (EN: /antigravity.en.md | IT: /antigravity.it.md | Qwiklabs: /qwiklabs.md | Why-Different: /why-different.md)"
     @if command -v marp >/dev/null 2>&1; then \
         PORT={{port}} marp --server slides --html; \
     else \
@@ -60,9 +60,19 @@ slides-antigravity port="8082":
     @echo "🚀 Launching Antigravity Kickoff Decks:"
     @echo "   🇬🇧 EN (Wednesday Build Hour): http://localhost:{{port}}/antigravity.en.md"
     @echo "   🇮🇹 IT (Workshop Italiano):    http://localhost:{{port}}/antigravity.it.md"
+    @echo "   🎓 Qwiklabs Self-Paced Deck:  http://localhost:{{port}}/qwiklabs.md"
     @just slides {{port}}
 
 alias slides-agy := slides-antigravity
+
+# run the Qwiklabs self-paced slide deck server (default port: 8084)
+slides-qwiklabs port="8084":
+    @echo "🚀 Launching Qwiklabs Edition deck at http://localhost:{{port}}/qwiklabs.md"
+    @if command -v marp >/dev/null 2>&1; then \
+        PORT={{port}} marp --server slides --html; \
+    else \
+        PORT={{port}} npx -y @marp-team/marp-cli --server slides --html; \
+    fi
 
 # run the "Why is this workshop different?" showcase deck (alias: slides-why-different)
 slides2 port="8083":
@@ -82,11 +92,13 @@ build-slides:
         marp slides/index.md -o slides/dist/index.html --html; \
         marp slides/antigravity.en.md -o slides/dist/antigravity.en.html --html; \
         marp slides/antigravity.it.md -o slides/dist/antigravity.it.html --html; \
+        marp slides/qwiklabs.md -o slides/dist/qwiklabs.html --html; \
         marp slides/why-different.md -o slides/dist/why-different.html --html; \
     else \
         npx -y @marp-team/marp-cli slides/index.md -o slides/dist/index.html --html; \
         npx -y @marp-team/marp-cli slides/antigravity.en.md -o slides/dist/antigravity.en.html --html; \
         npx -y @marp-team/marp-cli slides/antigravity.it.md -o slides/dist/antigravity.it.html --html; \
+        npx -y @marp-team/marp-cli slides/qwiklabs.md -o slides/dist/qwiklabs.html --html; \
         npx -y @marp-team/marp-cli slides/why-different.md -o slides/dist/why-different.html --html; \
     fi
 

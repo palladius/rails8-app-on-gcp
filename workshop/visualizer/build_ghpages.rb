@@ -177,7 +177,7 @@ FileUtils.mkdir_p(slides_build_dir)
 if system("which just > /dev/null 2>&1")
   system("cd #{repo_root} && just build-slides")
 elsif system("which marp > /dev/null 2>&1")
-  %w[index antigravity.en antigravity.it why-different].each do |deck|
+  %w[index antigravity.en antigravity.it qwiklabs why-different].each do |deck|
     src = File.join(slides_source_dir, "#{deck}.md")
     dst = File.join(slides_dist_dir, "#{deck}.html")
     system("marp #{src} -o #{dst} --html") if File.exist?(src)
