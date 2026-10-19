@@ -55,6 +55,14 @@ elif [ -n "${TF_VAR_admin_account}" ]; then
     export TF_VAR_developers="[\"user:${TF_VAR_admin_account}\"]"
 fi
 
+# Auto-enable public Cloud Run access in Qwiklabs mode (no Domain Restricted Sharing OrgPolicy) or when ALLOW_UNAUTHENTICATED is set
+if [ -n "${ALLOW_UNAUTHENTICATED:-}" ]; then
+    export TF_VAR_allow_unauthenticated="${ALLOW_UNAUTHENTICATED}"
+elif [[ "${PROJECT_ID}" == qwiklabs-gcp-* ]] || [[ "${TF_VAR_admin_account:-}" == *@qwiklabs.net ]]; then
+    echo "🟢 Qwiklabs environment detected (${PROJECT_ID}): enabling TF_VAR_allow_unauthenticated=true"
+    export TF_VAR_allow_unauthenticated="true"
+fi
+
 # 4. Ensure local master.key + credentials.yml.enc are atomically paired before Terraform uploads master.key
 echo "🔐 Ensuring local Rails master.key and credentials.yml.enc are paired..."
 "${REPO_ROOT}/bin/ensure_workshop_credentials.rb" --sync-gcp

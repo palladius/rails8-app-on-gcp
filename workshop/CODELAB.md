@@ -1,7 +1,7 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.1.0) -->
-<!-- 🏷️ Codelab Version: 2.2.2 -->
-# Rails 8 on Google Cloud: From Zero to AI
+<!-- 🏷️ Codelab Version: 2.2.3 -->
+# Rails 8 on Google Cloud: From Zero to AI with Antigravity App
 
 ## Introduction
 
@@ -64,7 +64,7 @@ Before we begin, ensure you have the following tools available in your environme
 - **[Terraform](https://developer.hashicorp.com/terraform/install)** CLI (1.5+): For declarative infrastructure provisioning.
 - **[`docker`](https://docs.docker.com/get-started/get-docker/)** & **[`docker-compose`](https://docs.docker.com/compose/)**: Installed and running locally.
 - **Ruby `3.4.5`:** (`ruby -v` — pinned by `blog/.ruby-version`; ask your AI harness to install `3.4.5` if missing). Rails 8 is declared in the `Gemfile` and installed automatically by `bundle install`.
-- **Google Antigravity 2.0:** Your autonomous AI pair programming assistant ([Download Google Antigravity 2.0](https://antigravity.google/download)). You'll login with your personal Gmail — no API token needed.
+- **Google Antigravity App:** Your autonomous AI pair programming assistant ([Download Google Antigravity App](https://antigravity.google/download)). You'll login with your personal Gmail — no API token needed.
 
 ### 2. Configure Environment Variables, Dedicated `gcloud` Profile & ADC
 
@@ -1286,4 +1286,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.2.2 (2026-10-01) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.2.3 (2026-10-16) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

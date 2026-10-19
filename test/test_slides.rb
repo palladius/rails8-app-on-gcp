@@ -7,11 +7,13 @@ class SlidesTest < Minitest::Test
   SLIDES_MD = File.join(REPO_ROOT, "slides/index.md")
   AGY_EN_MD = File.join(REPO_ROOT, "slides/antigravity.en.md")
   AGY_IT_MD = File.join(REPO_ROOT, "slides/antigravity.it.md")
+  QWIKLABS_MD = File.join(REPO_ROOT, "slides/qwiklabs.md")
   ALL_SLIDE_SOURCES = Dir[File.join(REPO_ROOT, "slides/*.md")].reject { |f| File.basename(f) == "README.md" }.sort
   SLIDES_DIST_DIR = File.join(REPO_ROOT, "slides/dist")
   SLIDES_HTML = File.join(SLIDES_DIST_DIR, "index.html")
   AGY_EN_HTML = File.join(SLIDES_DIST_DIR, "antigravity.en.html")
   AGY_IT_HTML = File.join(SLIDES_DIST_DIR, "antigravity.it.html")
+  QWIKLABS_HTML = File.join(SLIDES_DIST_DIR, "qwiklabs.html")
 
   def marp_cmd
     nvm_bins = Dir[File.expand_path("~/.nvm/versions/node/*/bin")].sort.reverse
@@ -25,6 +27,7 @@ class SlidesTest < Minitest::Test
     system("#{cmd} #{SLIDES_MD} -o #{SLIDES_HTML} --html > /dev/null 2>&1")
     system("#{cmd} #{AGY_EN_MD} -o #{AGY_EN_HTML} --html > /dev/null 2>&1") if File.exist?(AGY_EN_MD)
     system("#{cmd} #{AGY_IT_MD} -o #{AGY_IT_HTML} --html > /dev/null 2>&1") if File.exist?(AGY_IT_MD)
+    system("#{cmd} #{QWIKLABS_MD} -o #{QWIKLABS_HTML} --html > /dev/null 2>&1") if File.exist?(QWIKLABS_MD)
   end
 
   def test_slides_md_has_valid_frontmatter
@@ -79,7 +82,7 @@ class SlidesTest < Minitest::Test
   end
 
   def test_no_unrendered_html_tags_or_code_escaped_markup_in_rendered_slides
-    [SLIDES_HTML, AGY_EN_HTML, AGY_IT_HTML].each do |html_path|
+    [SLIDES_HTML, AGY_EN_HTML, AGY_IT_HTML, QWIKLABS_HTML].each do |html_path|
       assert File.exist?(html_path), "Rendered slides HTML #{File.basename(html_path)} must exist"
       html = File.read(html_path, encoding: "utf-8")
 
@@ -132,5 +135,22 @@ class SlidesTest < Minitest::Test
     slide5 = File.join(SLIDES_DIST_DIR, "slide.005.png")
     assert File.exist?(slide5), "Slide 5 PNG was not generated"
     assert File.size(slide5) > 10_000, "Slide 5 PNG is suspiciously small (#{File.size(slide5)} bytes)"
+  end
+
+  def test_qwiklabs_deck_exists_and_has_3_phases_and_v035_contracts
+    assert File.exist?(QWIKLABS_MD), "slides/qwiklabs.md must exist"
+    content = File.read(QWIKLABS_MD, encoding: "utf-8")
+    assert_match(/^marp:\s*true/m, content)
+    assert_match(/^theme:\s*gaia/m, content)
+    assert_match(/^paginate:\s*true/m, content)
+    assert_match(/ce526-rails8-on-google-cloud/, content)
+    assert_match(/v0\.3\.\d+/, content)
+    assert_match(/What's Different in Qwiklabs\?/, content)
+    assert_match(/The 3-Phase Startup Timeline/, content)
+    refute_match(/Cosa Cambia|La Tempistica|Tutto gira/, content)
+    assert_match(/PORT=3002 bin\/dev/, content)
+    assert_match(/ag_autologin\.py/, content)
+    assert_match(/TF_CLI_ARGS_apply="-lock-timeout=15m"/, content)
+    assert_match(/remote-browser-vm1/, content)
   end
 end

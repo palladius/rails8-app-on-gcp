@@ -50,9 +50,14 @@ marp slides/index.md --pdf -o slides/dist/slides.pdf
    - Original 6-slide DevFest Modena kickoff deck.
 2. **Antigravity-Centric Kickoff Deck — English (`slides/antigravity.en.md` $\to$ `slides/dist/antigravity.en.html`)**:
    - Created for the **Wednesday Build Hour (WBH)** event and international workshops.
-   - Step-by-step Antigravity 2.0 onboarding (Steps 1 through 9): Install (with WSL tip) $\to$ Open Codelab Page 1 $\to$ Gmail Login $\to$ Prompt 1 (`git clone` into `Documents` + audio chime) $\to$ Open New Project in Folder $\to$ Say `"ciao"` + Enable **Turbo Mode** (with 4 screenshots & PROD safety disclaimer) $\to$ Prompt 2 (Guided Codelab + `landing-page/README.md`) $\to$ Claim GCP Credits on Codelab Page 2 (`#1`) $\to$ Prompt 3 (Automated GCP Project Creation).
+   - Step-by-step Antigravity App onboarding (Steps 1 through 9): Install (with WSL tip) $\to$ Open Codelab Page 1 $\to$ Gmail Login $\to$ Prompt 1 (`git clone` into `Documents` + audio chime) $\to$ Open New Project in Folder $\to$ Say `"ciao"` + Enable **Turbo Mode** (with 4 screenshots & PROD safety disclaimer) $\to$ Prompt 2 (Guided Codelab + `landing-page/README.md`) $\to$ Claim GCP Credits on Codelab Page 2 (`#1`) $\to$ Prompt 3 (Automated GCP Project Creation).
 3. **Antigravity-Centric Kickoff Deck — Italian (`slides/antigravity.it.md` $\to$ `slides/dist/antigravity.it.html`)**:
    - Full Italian localization of the Antigravity-centric onboarding flow (`workshop-modena-YYYYMMDD`, `README.it.md`, Codelab `?hl=it#1`).
 4. **Why Is This Workshop Different? (`slides/why-different.md` $\to$ `slides/dist/why-different.html`)**:
    - Deep-dive showcase deck on architectural highlights (Structured JSON Logging, etc.).
+5. **Qwiklabs Self-Paced Edition (`slides/qwiklabs.md` $\to$ `slides/dist/qwiklabs.html`)**:
+   - 3-slide visual guide for Qwiklabs (`ce526-rails8-on-google-cloud` `v0.3.5`):
+     1. *Cosa Cambia? (What's Different in Qwiklabs)*: 100% KDE Webtop Remote Session, no local Docker (`PORT=3002 bin/dev` + Cloud Build), zero-install workstation.
+     2. *La Tempistica in 3 Fasi (The 3-Phase Startup Timeline)*: Phase 1 (`T+0m`$\to$`T+7m` GCP/VM provisioning), Phase 2 (`T+7m`$\to$`T+11m` `ag_autologin.py` "Ghost in the Shell" — hands off mouse & keyboard!), Phase 3 (`T+11m`$\to$`T+23m` background `bundle install` + `just terraform-apply`).
+     3. *Auto-Terraform & Zero-Collision Lock (`v0.3.5`)*: Sequential CPU priority after GUI auto-login, `TF_CLI_ARGS_apply="-lock-timeout=15m"` on `gs://${PROJECT_ID}-tfstate`, and `remote-browser-vm1` vs `*-rails-app` Cloud Run services.
 

@@ -2,6 +2,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-10-19
+### Added & Improved (Qwiklabs Mode — #194)
+- 🟢 **Qwiklabs Student Account Detection (`@qwiklabs.net`) in `bin/workshop_diagnostics.rb` (#194)**:
+  - Recognizes `@qwiklabs.net` accounts in green (`✅ Qwiklab student account detected (<account>). All good!`) without incrementing `warnings_count`.
+  - Recognizes the Qwiklabs workstation service account (`antigravity-sa@...`) gracefully as an informational hint before the student runs `gcloud auth login` in Step 0.
+  - Translated all remaining Italian warning strings in `bin/workshop_diagnostics.rb` to 100% English.
+- 🌍 **Auto-Enable Public Cloud Run Access (`TF_VAR_allow_unauthenticated=true`) in Qwiklabs (`iac/bin/terraform-apply.sh`, #194)**:
+  - Automatically exports `TF_VAR_allow_unauthenticated=true` when `PROJECT_ID` starts with `qwiklabs-gcp-`, `TF_VAR_admin_account` ends with `@qwiklabs.net`, or `ALLOW_UNAUTHENTICATED` is set in `.env`, since Qwiklabs projects allow `allUsers` on Cloud Run without corporate Domain Restricted Sharing OrgPolicies.
+
 ## [0.3.6] - 2026-10-08
 ### Security & Privacy
 - 🔒 **PII Masking on Telemetry (`GOOGLE_CLOUD_ACCOUNT` & `ADMIN_EMAIL`) (#185)**: Obfuscated personal email addresses in `StatusesController#safe_env_inspection` (e.g. `settilorenzo97@gmail.com` -> `se***97@gmail.com`, `ricc@google.com` -> `r***@google.com`) to prevent scraping and harvesting personal contact info from unauthenticated `/status` and `/status.json` endpoints on Cloud Run. Short local parts (<= 4 chars) reveal only their first character. Each `safe_environment` entry now carries an `is_pii` flag (single source of truth: `StatusesController::PII_EMAIL_VARS`).

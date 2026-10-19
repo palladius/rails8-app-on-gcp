@@ -81,7 +81,7 @@ if gcp_account.to_s.strip.empty? || gcp_account == "your-personal-email@gmail.co
     puts "ℹ️  GOOGLE_CLOUD_ACCOUNT not customized in .env; detected active account from gcloud: #{gcp_account}".blue
   else
     puts "❌ [ERROR] GOOGLE_CLOUD_ACCOUNT is missing or placeholder in .env and gcloud has no active logged-in account!".red
-    puts "   👉 Un account Google valido è OBBLIGATORIO per: risorse billable, Terraform e IAM/IAP."
+    puts "   👉 A valid Google account is REQUIRED for billable resources, Terraform, and IAM/IAP."
     puts "   👉 Set GOOGLE_CLOUD_ACCOUNT=\"yourname@gmail.com\" in .env or run: gcloud auth login"
     errors_count += 1
   end
@@ -98,24 +98,26 @@ else
   puts "✅ Blog Admin User defaults to: #{effective_admin}".green
 end
 
-# Mandatory Warning: Non-Google/Gmail account
+# Mandatory Warning: Non-Google/Gmail account (with Qwiklabs student detection)
 if !gcp_account.to_s.strip.empty?
-  unless gcp_account.end_with?("@gmail.com") || gcp_account.end_with?("@google.com")
-    puts "⚠️  [WARNING] GOOGLE_CLOUD_ACCOUNT (#{gcp_account}) is not a @gmail.com or @google.com address!".yellow
-    puts "   Attenzione: Se usi un account non Google/Gmail ti apri a problemi critici con GCP:"
-    puts "   - Attivazione e linking account di fatturazione (Billable resources)"
-    puts "   - Esecuzione di `terraform apply` (IAM policy bindings per user:email)"
-    puts "   - Zero-Trust Identity-Aware Proxy (IAP) e matching utente."
-    warnings_count += 1
-  else
+  if gcp_account.end_with?("@qwiklabs.net")
+    puts "✅ Qwiklab student account detected (#{gcp_account}). All good!".green
+  elsif gcp_account.end_with?("@gmail.com") || gcp_account.end_with?("@google.com")
     puts "✅ Google Account verified: #{gcp_account} (Ready for Billing, Terraform, IAM & IAP)".green
+  else
+    puts "⚠️  [WARNING] GOOGLE_CLOUD_ACCOUNT (#{gcp_account}) is not a @gmail.com or @google.com address!".yellow
+    puts "   Warning: Using a non-Google/Gmail account may cause critical issues with GCP:"
+    puts "   - Activating and linking a billing account (Billable resources)"
+    puts "   - Running `terraform apply` (IAM policy bindings for user:email)"
+    puts "   - Zero-Trust Identity-Aware Proxy (IAP) and user matching."
+    warnings_count += 1
   end
 end
 
 # Warning if someone explicitly overrode ADMIN_EMAIL to be different
 if !admin_email.to_s.strip.empty? && !gcp_account.to_s.strip.empty? && admin_email.strip.downcase != gcp_account.strip.downcase
   puts "⚠️  [WARNING] ADMIN_EMAIL (#{admin_email}) and GOOGLE_CLOUD_ACCOUNT (#{gcp_account}) differ!".yellow
-  puts "   Se usi 2 email diverse puoi avere problemi con Mailpit, single sign-on IAP e matching utente."
+  puts "   Using two different email addresses may cause issues with Mailpit, IAP single sign-on, and user matching."
   warnings_count += 1
 end
 
@@ -162,6 +164,8 @@ else
           puts "   👉 To switch active gcloud account, run:"
           puts "      gcloud config set account #{gcp_account}"
           warnings_count += 1
+        elsif gcp_account.end_with?("@qwiklabs.net") && active_account.include?("antigravity-sa@")
+          puts "ℹ️  Qwiklab workstation service account active (#{active_account}); run `gcloud auth login #{gcp_account}` when ready.".cyan
         else
           puts "❌ [ERROR] .env specifies GOOGLE_CLOUD_ACCOUNT='#{gcp_account}', but it is NOT logged in via gcloud!".red
           puts "   Available accounts: #{credentialed_accounts.join(', ')}"
