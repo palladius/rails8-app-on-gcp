@@ -126,4 +126,36 @@ class WorkshopDiagnosticsTest < Minitest::Test
     assert_includes stdout, "INSUFFICIENT"
     assert_includes stdout, "lacks the roles Cloud Build needs"
   end
+
+  def test_fails_when_deprecated_unsandboxed_permission_rules_present
+    Dir.mktmpdir do |dir|
+      gemini_dir = File.join(dir, ".gemini")
+      FileUtils.mkdir_p(File.join(gemini_dir, "config"))
+      File.write(
+        File.join(gemini_dir, "config/config.json"),
+        '{"userSettings":{"globalPermissionGrants":{"allow":["unsandboxed(git status)"]}}}'
+      )
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nGOOGLE_CLOUD_PROJECT=dummy\n")
+      env = { "GEMINI_CONFIG_DIR" => gemini_dir }
+      stdout, _stderr, status = Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
+      assert_equal 1, status.exitstatus
+      assert_includes stdout, "Found 1 deprecated 'unsandboxed(...)' permission rule(s)"
+      assert_includes stdout, 'replace "unsandboxed(" with "command("'
+    end
+  end
+
+  def test_passes_antigravity_permission_check_when_only_command_rules_present
+    Dir.mktmpdir do |dir|
+      gemini_dir = File.join(dir, ".gemini")
+      FileUtils.mkdir_p(File.join(gemini_dir, "config"))
+      File.write(
+        File.join(gemini_dir, "config/config.json"),
+        '{"userSettings":{"globalPermissionGrants":{"allow":["command(git status)"]}}}'
+      )
+      File.write(File.join(dir, ".env"), "GOOGLE_CLOUD_ACCOUNT=ricc@google.com\nGOOGLE_CLOUD_PROJECT=dummy\n")
+      env = { "GEMINI_CONFIG_DIR" => gemini_dir }
+      stdout, _stderr, _status = Open3.capture3(env, "ruby", SCRIPT_PATH, chdir: dir)
+      assert_includes stdout, "Antigravity permission rules valid (zero deprecated 'unsandboxed(...)' rules)"
+    end
+  end
 end

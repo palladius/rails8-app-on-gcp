@@ -2,6 +2,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-10-22
+### Added
+- 🤖 **Antigravity Permission Rules Pre-Flight Check (`bin/workshop_diagnostics.rb`, `test/test_workshop_diagnostics.rb`)**:
+  - Added Section `4c` to `bin/workshop_diagnostics.rb` (`just workshop-test`) to inspect `~/.gemini/config/config.json`, `~/.gemini/antigravity-cli/settings.json`, and `~/.gemini/config/projects/*.json` for deprecated `unsandboxed(...)` permission rules and fail fast with remediation guidance (`replace "unsandboxed(" with "command("`).
+  - Added unit tests in `test/test_workshop_diagnostics.rb` (`test_fails_when_deprecated_unsandboxed_permission_rules_present` and `test_passes_antigravity_permission_check_when_only_command_rules_present`) using an isolated `GEMINI_CONFIG_DIR` fixture.
+
 ## [0.3.6] - 2026-10-08
 ### Security & Privacy
 - 🔒 **PII Masking on Telemetry (`GOOGLE_CLOUD_ACCOUNT` & `ADMIN_EMAIL`) (#185)**: Obfuscated personal email addresses in `StatusesController#safe_env_inspection` (e.g. `settilorenzo97@gmail.com` -> `se***97@gmail.com`, `ricc@google.com` -> `r***@google.com`) to prevent scraping and harvesting personal contact info from unauthenticated `/status` and `/status.json` endpoints on Cloud Run. Short local parts (<= 4 chars) reveal only their first character. Each `safe_environment` entry now carries an `is_pii` flag (single source of truth: `StatusesController::PII_EMAIL_VARS`).

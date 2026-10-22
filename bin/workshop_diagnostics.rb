@@ -354,6 +354,33 @@ if File.exist?(skeleton_yaml)
   end
 end
 
+puts "\n--- 🤖 4c. Antigravity Permission Rules Check ---".bold
+gemini_dir = ENV["GEMINI_CONFIG_DIR"] || File.expand_path("~/.gemini")
+agy_config_files = [
+  File.join(gemini_dir, "config/config.json"),
+  File.join(gemini_dir, "antigravity-cli/settings.json")
+] + Dir.glob(File.join(gemini_dir, "config/projects/*.json"))
+
+unsandboxed_hits = []
+agy_config_files.each do |cfg_path|
+  next unless File.exist?(cfg_path)
+  content = File.read(cfg_path, encoding: "utf-8") rescue ""
+  count = content.scan(/"unsandboxed\(/).size
+  unsandboxed_hits << [cfg_path, count] if count > 0
+end
+
+if unsandboxed_hits.empty?
+  puts "✅ Antigravity permission rules valid (zero deprecated 'unsandboxed(...)' rules)".green
+else
+  total_bad = unsandboxed_hits.sum { |_, c| c }
+  puts "❌ [ERROR] Found #{total_bad} deprecated 'unsandboxed(...)' permission rule(s) in Antigravity config!".red
+  unsandboxed_hits.each do |path, c|
+    puts "   - #{path} (#{c} rule(s))"
+  end
+  puts "   👉 Fix: replace \"unsandboxed(\" with \"command(\" in the file(s) above, or use /permissions in agy."
+  errors_count += 1
+end
+
 puts "\n--- 🧭 5. Current Architectural State Telemetry ---".bold
 storage_yml = File.expand_path("../blog/config/storage.yml", __dir__)
 database_yml = File.expand_path("../blog/config/database.yml", __dir__)
