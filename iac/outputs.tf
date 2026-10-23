@@ -56,7 +56,8 @@ resource "local_file" "readme_html" {
           <li><strong>DB User</strong>: <code>${google_sql_user.rails_user.name}</code></li>
         </ul>
 
-        <h2>🏃 Cloud Run</h2>
+        <h2>🏃 Cloud Run (Sample App / Infrastructure Smoke Test)</h2>
+        <p>⚠️ <em>Note: This placeholder service was provisioned by Terraform to verify Cloud Run functionality. Your actual workshop application will be built and deployed as <code>blog</code> in Step 3 of the codelab!</em></p>
         <ul>
           <li><strong>Service</strong>: <a href="https://console.cloud.google.com/run/detail/${var.region}/${google_cloud_run_v2_service.rails_app.name}/metrics?project=${var.project_id}">${google_cloud_run_v2_service.rails_app.name}</a></li>
           <li><strong>URL</strong>: <a href="${google_cloud_run_v2_service.rails_app.uri}">${google_cloud_run_v2_service.rails_app.uri}</a></li>
@@ -78,12 +79,12 @@ resource "local_file" "readme_html" {
 ###############################################################################
 
 output "cloud_run_url" {
-  description = "The URL of the deployed Cloud Run service"
+  description = "The URL of the sample Cloud Run service placeholder (infrastructure smoke test)"
   value       = google_cloud_run_v2_service.rails_app.uri
 }
 
 output "cloud_run_service_name" {
-  description = "The name of the Cloud Run service"
+  description = "The name of the sample Cloud Run service placeholder"
   value       = google_cloud_run_v2_service.rails_app.name
 }
 

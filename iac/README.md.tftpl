@@ -13,11 +13,11 @@ Welcome to your dynamically generated infrastructure output!
 * **Connection Name**: `${sql_connection_name}`
 * **DB User**: `${sql_user_name}`
 
-## 🏃 Cloud Run
+## 🏃 Cloud Run (Sample App / Infrastructure Smoke Test)
 * **Service**: [${cloud_run_service_name}](https://console.cloud.google.com/run/detail/${region}/${cloud_run_service_name}/metrics?project=${project_id})
 * **URL**: [${cloud_run_service_uri}](${cloud_run_service_uri})
 
-*(TODO: Note that Terraform provisions a placeholder "hello" image initially. Use Cloud Build to push the real built image!)*
+> ⚠️ **Workshop Note**: This service is a placeholder provisioned by Terraform to verify Cloud Run functionality. Your actual workshop application will be built and deployed as `blog` starting in Step 3 of the codelab!
 ## 🔐 Secret Manager
 * **rails-master-key**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-master-key/versions?project=${project_id})
 * **rails-db-password**: [View in Secret Manager](https://console.cloud.google.com/security/secret-manager/secret/rails-db-password/versions?project=${project_id})

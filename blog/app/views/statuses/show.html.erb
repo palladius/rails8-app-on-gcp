@@ -43,6 +43,11 @@
         <span class="version-badge" style="background: <%= @run_env[:color] %>;"><%= @run_env[:badge] %></span>
       </div>
       <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0 0 1rem;"><%= @run_env[:details] %></p>
+      <% if @run_env[:is_sample_app] %>
+        <div style="margin-bottom: 0.75rem; background: rgba(234, 88, 12, 0.2); border: 1px solid #ea580c; border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; color: #fdba74;">
+          ⚠️ <strong>Sample App Mode Active</strong>: <%= @run_env[:sample_app_banner] || "Pre-provisioned infrastructure placeholder" %>
+        </div>
+      <% end %>
       <div style="font-size: 0.8rem; color: #94a3b8; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
         Ruby <%= @system_info[:ruby_version] %> · Rails <%= @system_info[:rails_version] %>
       </div>

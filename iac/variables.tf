@@ -58,5 +58,12 @@ variable "enable_cicd_trigger" {
   default     = false
 }
 
+variable "sample_app_service_name" {
+  description = "Name override for the Terraform sample Cloud Run service placeholder. Defaults to '<project_id>-sample-app' if empty."
+  type        = string
+  default     = ""
+}
+
+
 
 

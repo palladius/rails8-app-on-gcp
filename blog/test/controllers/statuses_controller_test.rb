@@ -187,4 +187,43 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
       ENV["ADMIN_PASSWORD"] = old_admin_pw
     end
   end
+
+  test "detects sample-app when SAMPLE_APP_BANNER or OPTIONAL_BANNER or sample-app K_SERVICE is set" do
+    old_banner = ENV["SAMPLE_APP_BANNER"]
+    old_service = ENV["K_SERVICE"]
+    begin
+      ENV["SAMPLE_APP_BANNER"] = "This is a custom sample app notice"
+      ENV["K_SERVICE"] = "my-sample-app"
+
+      get status_url(format: :json)
+      assert_response :success
+      json = JSON.parse(response.body)
+      assert_equal true, json.dig("run_env", "is_sample_app")
+      assert_equal "This is a custom sample app notice", json.dig("run_env", "sample_app_banner")
+
+      get status_url
+      assert_response :success
+      assert_includes response.body, "Sample App Mode Active"
+      assert_includes response.body, "This is a custom sample app notice"
+    ensure
+      ENV["SAMPLE_APP_BANNER"] = old_banner
+      ENV["K_SERVICE"] = old_service
+    end
+  end
+
+  test "renders prominent sample app banner in workshop alerts hub when banner is set" do
+    old_banner = ENV["OPTIONAL_BANNER"]
+    begin
+      ENV["OPTIONAL_BANNER"] = "Don't touch this POC"
+      get root_url
+      assert_response :success
+      assert_select ".workshop-sample-app-banner" do
+        assert_select "div", text: /SAMPLE APP \/ WORKSHOP BASELINE/
+        assert_select "div", text: /Don't touch this POC/
+        assert_select "a[href='https://palladius.github.io/rails8-app-on-gcp/']", text: /Open Codelab/
+      end
+    ensure
+      ENV["OPTIONAL_BANNER"] = old_banner
+    end
+  end
 end

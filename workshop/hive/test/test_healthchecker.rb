@@ -99,4 +99,25 @@ class HealthcheckerTest < Minitest::Test
       WorkshopHive::ProctorReviewer.define_singleton_method(:review, original_review)
     end
   end
+
+  def test_check_url_detects_sample_app_in_telemetry_or_url
+    @server.mount_proc "/status.json" do |_req, res|
+      res.status = 200
+      res.content_type = "application/json"
+      res.body = {
+        system: { app_version: "0.3.8" },
+        run_env: {
+          is_sample_app: true,
+          sample_app_banner: "This is a sample app",
+          service_name: "test-sample-app"
+        }
+      }.to_json
+    end
+
+    res = WorkshopHive::Healthchecker.check("http://127.0.0.1:#{@port}")
+    assert_equal "up", res[:status]
+    assert_equal true, res.dig(:telemetry, :is_sample_app)
+    assert_equal "This is a sample app", res.dig(:telemetry, :sample_app_banner)
+    assert_equal "test-sample-app", res.dig(:telemetry, :k_service)
+  end
 end

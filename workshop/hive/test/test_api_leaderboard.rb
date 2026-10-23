@@ -158,7 +158,7 @@ class AppLeaderboardApiTest < Minitest::Test
   end
 
   def test_get_index_json_endpoint
-    env = Rack::MockRequest.env_for("/index.json?event_name=test-conf&event_start=2026-09-09T09:00:00Z&max_age=24h", method: "GET")
+    env = Rack::MockRequest.env_for("/index.json?event_name=test-conf&event_start=2026-09-09T09:00:00Z&max_age=365d", method: "GET")
     status, headers, body = app.call(env)
 
     assert_equal 200, status
@@ -173,7 +173,7 @@ class AppLeaderboardApiTest < Minitest::Test
     assert_equal "test-conf", parsed.dig("event", "name")
     assert parsed.key?("query_params")
     assert_equal "test-conf", parsed["query_params"]["event_name"]
-    assert_equal "24h", parsed["query_params"]["max_age"]
+    assert_equal "365d", parsed["query_params"]["max_age"]
     assert parsed.key?("entries")
     assert parsed["entries"].is_a?(Array)
     refute_empty parsed["entries"]
