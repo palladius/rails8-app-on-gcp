@@ -691,6 +691,14 @@ function renderTable() {
       `;
     }
 
+    const isSampleApp = student.is_sample_app || (student.url && student.url.includes("sample-app")) || (t.k_service && t.k_service.includes("sample-app"));
+    const sampleBadge = isSampleApp ? `
+      <span class="inline-flex items-center gap-1 px-1.5 py-0.2 rounded border border-amber-500/40 bg-amber-500/15 text-amber-300 text-[10px] font-bold" title="⚠️ Terraform Sample App Placeholder (Not the student's workshop 'blog' deployment)">
+        <span>🚧</span>
+        <span>Sample App</span>
+      </span>
+    ` : "";
+
     const stackHtml = hasTelemetry ? `
       <div class="flex items-center gap-2 text-xs font-mono">
         <span class="inline-flex items-center gap-1 text-rose-300 font-medium">
@@ -698,6 +706,7 @@ function renderTable() {
           <span>${rubyVersion}</span>
         </span>
         ${envBadge}
+        ${sampleBadge}
         <span class="inline-flex items-center gap-1 text-red-300 font-medium">
           <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rails/rails-plain.svg" class="w-3.5 h-3.5 inline-block" alt="Rails">
           <span>${railsVersion}</span>
@@ -705,7 +714,10 @@ function renderTable() {
         ${gcpTriadHtml}
       </div>
     ` : `
-      <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
+      <div class="flex items-center gap-2 text-xs font-mono">
+        ${sampleBadge}
+        <span class="text-[11px] font-mono text-slate-500 italic">Awaiting stack...</span>
+      </div>
     `;
 
     // Metriche e Delta Revision di fianco allo stack nella riga 2

@@ -2,6 +2,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-10-23
+### Changed
+- 🏃 **Terraform Cloud Run Service Renamed to `sample-app` (#192)**:
+  - Renamed the default Cloud Run service provisioned by Terraform in Step 1 from `${var.project_id}-rails-app` to `${var.project_id}-sample-app` (configurable via `var.sample_app_service_name`).
+  - Stripped unused database credentials, Secret Manager runtime mount, and Cloud SQL proxy volumes from the placeholder `hello` container, turning it into a lean, fast infrastructure smoke test.
+  - Eliminated plaintext database password from Cloud Run service environment variables (resolving #188).
+  - Clarified in `iac/out/OUTPUT.html` and `iac/README.md.tftpl` that this service is an infrastructure placeholder, and that attendees build and deploy `blog` starting in Step 3.
+
+### Added
+- 🚧 **Prominent Sample App Warning Banner (`_sample_app_banner.html.erb`) (#192)**:
+  - Added a high-visibility amber/orange alert banner at the very top of `workshop/alerts/_hub.html.erb`, triggered when `SAMPLE_APP_BANNER` or `OPTIONAL_BANNER` is set or when `K_SERVICE` includes `sample-app`.
+  - Includes a direct link to the workshop codelab (`https://palladius.github.io/rails8-app-on-gcp/`).
+  - Exposed `is_sample_app` and `sample_app_banner` in `StatusesController` (`/status.json` and `/status` HTML dashboard).
+- 🐝 **Workshop Hive Leaderboard Sample App Detection (#192)**:
+  - Added `is_sample_app` detection in `Healthchecker` and exposed `is_sample_app` badge in `workshop/hive/public/js/hive.js` so instructors and attendees immediately spot submissions pointing to the Terraform sample placeholder rather than their own deployment.
+
 ## [0.3.7] - 2026-10-22
 ### Added
 - 🤖 **Antigravity Permission Rules Pre-Flight Check (`bin/workshop_diagnostics.rb`, `test/test_workshop_diagnostics.rb`)**:

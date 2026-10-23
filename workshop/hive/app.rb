@@ -91,6 +91,8 @@ module WorkshopHive
             pending_jobs: tel[:pending_jobs],
             k_service: tel[:k_service],
             k_revision: tel[:k_revision],
+            is_sample_app: tel[:is_sample_app] || url.include?("sample-app"),
+            sample_app_banner: tel[:sample_app_banner],
             proctor_status: tel[:proctor_status],
             proctor_reviewer: tel[:proctor_reviewer],
             proctor_approved_at: tel[:proctor_approved_at],

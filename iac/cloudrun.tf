@@ -127,9 +127,11 @@ resource "google_service_account_iam_member" "developer_sa_signer" {
   member             = each.value
 }
 
-# Cloud Run Service (Rails App)
+# Cloud Run Service (Infrastructure Smoke Test / Sample App Placeholder)
+# NOTE: This placeholder verifies Cloud Run provisioning and IAM invoker access.
+# The actual workshop application is built and deployed as 'blog' starting in Step 3 of the codelab.
 resource "google_cloud_run_v2_service" "rails_app" {
-  name     = "${var.project_id}-rails-app"
+  name     = var.sample_app_service_name != "" ? var.sample_app_service_name : "${var.project_id}-sample-app"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
 
@@ -137,63 +139,16 @@ resource "google_cloud_run_v2_service" "rails_app" {
     service_account = module.service_account_cloud_run.email
 
     containers {
-      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder until Cloud Build pushes
+      image = "us-docker.pkg.dev/cloudrun/container/hello" # Placeholder smoke-test image
 
       env {
-        name  = "DATABASE_URL"
-        value = "postgres://${google_sql_user.rails_user.name}:${random_password.db_password.result}@localhost:5432/${google_sql_database.database.name}?host=/cloudsql/${google_sql_database_instance.main.connection_name}"
-      }
-
-      env {
-        name = "DB_PASSWORD"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.db_password.secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "RAILS_MASTER_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.rails_master_key.secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name = "ADMIN_PASSWORD"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.admin_password.secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name  = "GOOGLE_CLOUD_ACCOUNT"
-        value = var.admin_account != "" ? var.admin_account : (length(var.developers) > 0 ? replace(var.developers[0], "user:", "") : "admin@example.com")
+        name  = "SAMPLE_APP_BANNER"
+        value = "This is a sample app, please do not work on or edit this but follow the codelab to create and deploy your own application ('blog')."
       }
 
       env {
         name  = "GOOGLE_CLOUD_PROJECT"
         value = var.project_id
-      }
-
-      volume_mounts {
-        name       = "cloudsql"
-        mount_path = "/cloudsql"
-      }
-    }
-
-    volumes {
-      name = "cloudsql"
-      cloud_sql_instance {
-        instances = [google_sql_database_instance.main.connection_name]
       }
     }
   }
@@ -208,7 +163,6 @@ resource "google_cloud_run_v2_service" "rails_app" {
 
   depends_on = [
     google_project_service.run,
-    google_project_service.sqladmin,
   ]
 }
 

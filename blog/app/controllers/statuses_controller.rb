@@ -70,33 +70,44 @@ class StatusesController < ApplicationController
   private
 
   def detect_run_env
-    if ENV["K_SERVICE"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("cloud run")
-      {
-        tier: :cloud_run,
-        badge: "☁️ Google Cloud Run",
-        color: "#059669",
-        is_cloud: true,
-        service_name: ENV["K_SERVICE"],
-        revision_name: ENV["K_REVISION"],
-        details: "Serverless container running on Cloud Run (Service: #{ENV['K_SERVICE'] || 'custom'})"
-      }
-    elsif File.exist?("/.dockerenv") || ENV["DOCKER_CONTAINER"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("docker")
-      {
-        tier: :docker,
-        badge: "🐳 Docker Compose",
-        color: "#0284c7",
-        is_cloud: false,
-        details: "Containerized application running via Docker Compose (PostgreSQL)"
-      }
-    else
-      {
-        tier: :local_rails,
-        badge: "💻 Local Rails (Host)",
-        color: "#6366f1",
-        is_cloud: false,
-        details: "Running natively on host developer machine (#{`hostname`.strip rescue 'localhost'})"
-      }
-    end
+    is_sample = ENV["SAMPLE_APP_BANNER"].present? ||
+                ENV["OPTIONAL_BANNER"].present? ||
+                ENV["K_SERVICE"].to_s.include?("sample-app")
+    sample_banner = ENV["SAMPLE_APP_BANNER"].presence || ENV["OPTIONAL_BANNER"].presence
+
+    env_data =
+      if ENV["K_SERVICE"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("cloud run")
+        {
+          tier: :cloud_run,
+          badge: "☁️ Google Cloud Run",
+          color: "#059669",
+          is_cloud: true,
+          service_name: ENV["K_SERVICE"],
+          revision_name: ENV["K_REVISION"],
+          details: "Serverless container running on Cloud Run (Service: #{ENV['K_SERVICE'] || 'custom'})"
+        }
+      elsif File.exist?("/.dockerenv") || ENV["DOCKER_CONTAINER"].present? || ENV["RAILS8_ENV_LAUNCH_MODE"].to_s.downcase.include?("docker")
+        {
+          tier: :docker,
+          badge: "🐳 Docker Compose",
+          color: "#0284c7",
+          is_cloud: false,
+          details: "Containerized application running via Docker Compose (PostgreSQL)"
+        }
+      else
+        {
+          tier: :local_rails,
+          badge: "💻 Local Rails (Host)",
+          color: "#6366f1",
+          is_cloud: false,
+          details: "Running natively on host developer machine (#{`hostname`.strip rescue 'localhost'})"
+        }
+      end
+
+    env_data.merge(
+      is_sample_app: is_sample,
+      sample_app_banner: sample_banner
+    )
   end
 
   def detect_db_status
@@ -319,6 +330,8 @@ class StatusesController < ApplicationController
       DATABASE_URL
       SOLID_QUEUE_IN_PUMA
       STEP_8_GHI
+      SAMPLE_APP_BANNER
+      OPTIONAL_BANNER
     ]
 
     vars_of_interest.map do |var_name|

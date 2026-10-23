@@ -88,6 +88,11 @@ module WorkshopHive
                 step["description"]
               end
 
+            is_sample_app = run_env["is_sample_app"] == true ||
+                            parsed_uri.to_s.include?("sample-app") ||
+                            k_service.to_s.include?("sample-app")
+            sample_app_banner = run_env["sample_app_banner"]
+
             status_data = {
               app_version: sys["app_version"],
               ruby_version: sys["ruby_version"],
@@ -110,6 +115,8 @@ module WorkshopHive
               k_service: k_service,
               k_revision: k_revision,
               admin_email: admin_email,
+              is_sample_app: is_sample_app,
+              sample_app_banner: sample_app_banner,
               quest_step_8_completed: step_8_completed,
               quest_ghi_issue: ghi_issue,
               quest_ghi_url: ghi_url,

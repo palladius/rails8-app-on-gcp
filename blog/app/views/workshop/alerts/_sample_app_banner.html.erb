@@ -1,0 +1,57 @@
+<%# 
+  Sample App / Pre-provisioned POC Banner.
+  Displays a prominent educational warning when running as a sample or POC deployment.
+  Activated by ENV["SAMPLE_APP_BANNER"], ENV["OPTIONAL_BANNER"], or when K_SERVICE contains "sample-app".
+%>
+<% is_sample_app = ENV["SAMPLE_APP_BANNER"].present? || ENV["OPTIONAL_BANNER"].present? || ENV["K_SERVICE"].to_s.include?("sample-app") %>
+<% if is_sample_app %>
+  <% banner_message = ENV["SAMPLE_APP_BANNER"].presence || ENV["OPTIONAL_BANNER"].presence || "This is a pre-provisioned sample app. Please follow the workshop codelab to create and deploy your own Rails application ('blog')." %>
+  <div class="workshop-sample-app-banner" style="
+    background-color: #fff7ed;
+    border: 2px solid #ea580c;
+    border-left: 8px solid #c2410c;
+    color: #9a3412;
+    padding: 16px 20px;
+    margin: 16px auto;
+    max-width: 1200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    font-family: system-ui, -apple-system, sans-serif;">
+    
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: flex-start; gap: 14px; flex: 1; min-width: 280px;">
+        <span style="font-size: 2rem; line-height: 1;">🚧</span>
+        <div>
+          <div style="font-size: 1.15rem; font-weight: 700; color: #9a3412; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span>SAMPLE APP / WORKSHOP BASELINE</span>
+            <span style="background-color: #ea580c; color: #ffffff; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">Notice</span>
+          </div>
+          <div style="font-size: 0.95rem; line-height: 1.5; color: #7c2d12;">
+            <%= banner_message %>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink: 0; align-self: center;">
+        <a href="https://palladius.github.io/rails8-app-on-gcp/" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           style="
+             display: inline-flex;
+             align-items: center;
+             gap: 6px;
+             background-color: #ea580c;
+             color: #ffffff;
+             padding: 8px 16px;
+             border-radius: 6px;
+             text-decoration: none;
+             font-size: 0.9rem;
+             font-weight: 600;
+             box-shadow: 0 1px 2px rgba(0,0,0,0.15);">
+          <span>Open Codelab</span>
+          <span>🚀</span>
+        </a>
+      </div>
+    </div>
+  </div>
+<% end %>
