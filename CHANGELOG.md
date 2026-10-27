@@ -2,6 +2,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.9] - 2026-10-27
+### Fixed
+- 🛡️ **IAP Mock Identity Leak in Production (`blog/compose.prod.yaml`)**:
+  - Removed hardcoded default `ricc@google.com` fallback for `IAP_MOCK_EMAIL` in `blog/compose.prod.yaml` (now `${IAP_MOCK_EMAIL:-}`). This prevents visitors from automatically being authenticated as `ricc@google.com` in Cloud Run deployments before IAP is configured (fixes #181).
+
 ## [0.3.8] - 2026-10-23
 ### Changed
 - 🏃 **Terraform Cloud Run Service Renamed to `sample-app` (#192)**:
