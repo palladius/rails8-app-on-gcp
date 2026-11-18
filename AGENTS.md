@@ -112,6 +112,8 @@ Riccardo and Emiliano collaborate on this project, which is bifidus (two-fold):
 
 ## 🛠️ AI Development Guidelines
 
+- **Read `workshop/constraints.yaml` before changing `.env.dist`, `iac/`, `blog/compose.prod.yaml`, `blog/justfile` or a deploy command in the codelab.** It lists the rules the workshop depends on and the test that guards each one. A new rule goes in with its failing test first.
+
 - **Pair Programming Assistants:** Gemini CLI, Claude Code, and Antigravity. Ensure the Conductor extension/skill is available: https://github.com/gemini-cli-extensions/conductor
 - **Strict Semantic Versioning:** Ensure proper versioning in `VERSION` and `CHANGELOG.md` aligning with releases (e.g. useful for workshop errata).
 - **Footer UI:** Surface app version in the footer alongside a link to GitHub code.

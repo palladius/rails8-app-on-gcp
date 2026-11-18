@@ -1,0 +1,164 @@
+# Workshop constraints: the rules this workshop depends on, written down once.
+#
+# Read this before you change `.env.dist`, `iac/`, `blog/compose.prod.yaml`, `blog/justfile`
+# or a deploy command in `workshop/CODELAB.md`.
+#
+# Each entry says what the rule is, why it exists, what the failure looks like for a student,
+# where we learned it, and which test enforces it. A rule that no test can enforce yet says so
+# (`unguarded`) and points at an open issue. `test/test_workshop_constraints.rb` checks that
+# every test named here really exists, so this file and the test suite cannot drift apart.
+#
+# Adding a constraint: write the failing test first, then add the entry.
+
+constraints:
+  - id: WC-01
+    rule: "`.env.dist` ships `IAP_ALLOWED_USERS` commented out. If you set it, every entry must be a real Google Account."
+    why: "`iac/bin/terraform-apply.sh` passes the list to Terraform, which grants `roles/run.invoker` on Cloud Run to each entry."
+    breaks_as: "`just terraform-apply` exits 1 after several minutes: `Error 400: User student@example.com does not exist`."
+    learned_from: "Friction log FL014, issue #204"
+    guarded_by:
+      - file: test/test_iac_codelab_contracts.rb
+        test: test_env_dist_does_not_feed_identities_to_terraform_by_default
+
+  - id: WC-02
+    rule: "No personal email addresses in public config files or tests."
+    why: "The repository is public. Together with WC-01 this means the `IAP_ALLOWED_USERS` line stays a commented example: real addresses break this rule, invented ones break WC-01."
+    breaks_as: "A maintainer's address is published; or, when it is replaced by a placeholder, WC-01 fails."
+    learned_from: "v0.3.11 fixed this rule and broke WC-01 on the same line"
+    guarded_by:
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_no_personal_emails_in_public_configs_or_tests
+
+  - id: WC-03
+    rule: "`blog/compose.prod.yaml` carries no secret values: no database password, no `RAILS_MASTER_KEY`, no `DATABASE_*_URL`."
+    why: "Whatever `gcloud run compose up` reads from that file is stored in plain text in the Cloud Run service."
+    breaks_as: "`gcloud run services describe blog` shows the password and the master key to anyone who can read the service."
+    learned_from: "Friction log FL014, issue #206"
+    guarded_by:
+      - file: test/test_docker_compose_contracts.rb
+        test: test_compose_prod_yaml_carries_no_secret_values
+
+  - id: WC-04
+    rule: "Step 6 mounts `RAILS_MASTER_KEY` and `DB_PASSWORD` from Secret Manager after `compose up`, on both `web` and `worker`, naming each container."
+    why: "`gcloud run compose up` cannot attach existing secrets, and a variable it sets as a literal cannot later be turned into a secret."
+    breaks_as: "`Cannot update environment variable [RAILS_MASTER_KEY] to the given type because it has already been set with a different type`; or the worker boots without the database password."
+    learned_from: "Friction log FL014, issue #206"
+    guarded_by:
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_step_6_mounts_secrets_on_web_and_worker_after_compose_up
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_step_6_compose_up_followed_by_service_account_binding
+
+  - id: WC-05
+    rule: "Production builds its PostgreSQL connection from `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, and stays on SQLite until `DB_PASSWORD` is present."
+    why: "A password inside `DATABASE_URL` cannot be mounted as a secret (WC-03), and the service must still boot between Deploy 4a and Deploy 4b."
+    breaks_as: "The revision of Deploy 4a fails to start, or the app silently stays on SQLite after Deploy 4b."
+    learned_from: "Friction log FL014, issue #206"
+    guarded_by:
+      - file: blog/test/integration/docker_compose_configuration_test.rb
+        test: "database.yml production uses discrete DB_* settings when DB_HOST and DB_PASSWORD are set"
+      - file: blog/test/integration/docker_compose_configuration_test.rb
+        test: "database.yml production stays on SQLite while DB_PASSWORD is not mounted yet"
+
+  - id: WC-06
+    rule: "`blog/compose.prod.yaml` passes `GOOGLE_CLOUD_ACCOUNT` to `web`."
+    why: "The first boot on an empty database runs `db/seeds.rb`, which exits 1 without the admin identity."
+    breaks_as: "`The user-provided container failed to start`; revision log: `[db:seed ERROR] GOOGLE_CLOUD_ACCOUNT (or ADMIN_EMAIL) is not set`."
+    learned_from: "Friction log FL014, first attempt of the Step 6 fix"
+    guarded_by:
+      - file: test/test_docker_compose_contracts.rb
+        test: test_compose_prod_yaml_carries_no_secret_values
+
+  - id: WC-07
+    rule: "Terraform enables every API that a codelab command needs, including `cloudresourcemanager.googleapis.com` for `gcloud run compose up`."
+    why: "On a project created from the CLI that API is off. A person gets an unexpected y/N question in the middle of Step 6; a non-interactive run fails."
+    breaks_as: "`Cloud Resource Manager API has not been used in project ... or it is disabled`."
+    learned_from: "Friction log FL014, issue #206"
+    guarded_by:
+      - file: test/test_iac_codelab_contracts.rb
+        test: test_terraform_enables_cloud_resource_manager_api_for_compose_up
+
+  - id: WC-08
+    rule: "Every Terraform output that the codelab or the skeleton reads is defined in `iac/outputs.tf`."
+    why: "A missing output hidden behind `2>/dev/null ||` silently turns into a wrong value."
+    breaks_as: "`DB_PASSWORD` became the literal `CHANGE_ME`."
+    learned_from: "Friction log FL014"
+    guarded_by:
+      - file: test/test_iac_codelab_contracts.rb
+        test: test_terraform_exposes_the_outputs_the_codelab_reads
+
+  - id: WC-09
+    rule: "Every root `just` recipe works from inside `blog/`."
+    why: "Step 3 says `cd blog` and nothing goes back up. Students stay in one terminal."
+    breaks_as: "`error: justfile does not contain recipe 'workshop-rewind'`, then the next deploy succeeds with the previous step's configuration."
+    learned_from: "Issue #171 (fixed for one recipe only), friction log FL015, issue #208"
+    guarded_by:
+      - file: test/test_justfile.rb
+        test: test_root_workshop_recipes_are_reachable_from_blog
+
+  - id: WC-10
+    rule: "`gcloud run services update` in the codelab never uses `--allow-unauthenticated`."
+    why: "That flag belongs to `deploy`; `services update` rejects it and the whole command fails."
+    breaks_as: "The command after `compose up` is rejected, so the service account is not switched either."
+    learned_from: "Issue #169"
+    guarded_by:
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_codelab_gcloud_run_services_update_never_uses_allow_unauthenticated
+
+  - id: WC-11
+    rule: "No Gemini API key anywhere: code, Compose files, `.env.dist`, codelab (Constitution section 11)."
+    why: "A key in the environment shadows Application Default Credentials, and keys leak."
+    breaks_as: "Cover generation uses a dummy key and fails, or a real key ends up in a service definition."
+    learned_from: "Constitution section 11, issue #182"
+    guarded_by:
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_constitution_bans_gemini_api_key_and_enforces_vertex_ai_adc
+      - file: test/test_docker_compose_contracts.rb
+        test: test_compose_prod_yaml_excludes_gemini_api_key_and_iap_mock_email
+
+  - id: WC-12
+    rule: "The default admin password and every bash block in the codelab are free of `!`."
+    why: "Bash history expansion rewrites a pasted command before it runs."
+    breaks_as: "`event not found`, or a different password than the one on the page."
+    learned_from: "Issue #165"
+    guarded_by:
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_default_admin_password_has_no_history_expansion_characters
+      - file: test/test_codelab_sync_and_contracts.rb
+        test: test_codelab_bash_blocks_contain_no_history_expansion
+
+  - id: WC-13
+    rule: "`just workshop-restore-gold` keeps the attendee's `credentials.yml.enc` and `master.key`."
+    why: "They are a pair generated on the attendee's machine; the committed file belongs to another key."
+    breaks_as: "Rails fails to boot on Cloud Run with `ActiveSupport::MessageEncryptor::InvalidMessage`."
+    learned_from: "Issue #167"
+    guarded_by:
+      - file: test/test_workshop_time_machine.rb
+        test: test_restore_gold_keeps_the_attendees_credentials
+
+  - id: WC-14
+    rule: "A change to `.env.dist`, `iac/`, `blog/compose.prod.yaml` or a deploy command of the codelab is run once on a real, new project before it is merged."
+    why: "Tests here read files. v0.3.11 passed every suite and shipped two commands that failed for real."
+    breaks_as: "Attendees find it first."
+    learned_from: "Friction logs FL014 and FL015"
+    unguarded:
+      reason: "A process rule; no unit test can stand in for a deploy."
+      issue: 210
+
+  - id: WC-15
+    rule: "A green `just workshop-eval N` is not proof that the deploy worked: check `gcloud run services describe blog`."
+    why: "The Step 6 evals read the repository, not the deployed service."
+    breaks_as: "11/11 passed while `compose up` had failed."
+    learned_from: "Friction log FL014, issue #206 (point 4)"
+    unguarded:
+      reason: "Needs evals that query the live service."
+      issue: 206
+
+  - id: WC-16
+    rule: "The Clean Up page must leave no billable resource behind, whichever option the attendee picks."
+    why: "Option 1 (`terraform destroy`) stops at the database user and the non-empty bucket."
+    breaks_as: "`terraform destroy` exits 1 and the Cloud SQL instance stays `RUNNABLE`."
+    learned_from: "Teardown of friction logs FL014 and FL015, issue #213"
+    unguarded:
+      reason: "Not fixed yet; a fix needs a live project to verify."
+      issue: 213

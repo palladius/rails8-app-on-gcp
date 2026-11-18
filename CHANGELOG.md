@@ -2,6 +2,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.17] - 2026-11-18
+### Added
+- 📐 **Workshop constraints registry (`workshop/constraints.yaml`, `test/test_workshop_constraints.rb`)**: the rules the workshop depends on, written down once, each with why it exists, what the failure looks like for a student, where it was learned, and the test that guards it (for example: "every `IAP_ALLOWED_USERS` entry must be a real Google Account, because Terraform turns it into an IAM binding"). Sixteen entries; three are marked `unguarded` with an open issue. The new test fails when the registry names a test that does not exist, so the two cannot drift apart. It runs as part of `just test`.
+- 🧪 New contract test for constraint WC-04: Step 6 must mount `RAILS_MASTER_KEY` and `DB_PASSWORD` after `compose up` on both `web` and `worker`. It fails against the v0.3.11 codelab.
+
 ## [0.3.16] - 2026-11-18
 ### Changed
 - 🧭 **Codelab `v2.5.2` (`workshop/CODELAB.md`, friction log FL015)**:

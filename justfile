@@ -38,6 +38,7 @@ test:
     ruby test/test_iac_codelab_contracts.rb
     ruby test/test_workshop_diagnostics.rb
     ruby test/test_workshop_invariants.rb
+    ruby test/test_workshop_constraints.rb
     ruby test/test_workshop_time_machine.rb
     ruby test/test_workshop_visualizer.rb
     ruby test/test_stress_and_automated_friction_log.rb

@@ -247,6 +247,26 @@ class CodelabSyncAndContractsTest < Minitest::Test
            "'gcloud run services update blog --service-account=$RUN_SA' must run AFTER 'gcloud run compose up' in Step 6"
   end
 
+  # Constraint WC-04 (friction log FL014): `gcloud run compose up` cannot attach existing secrets,
+  # and a variable it sets as a literal cannot later become a secret. So Step 6 must mount both
+  # secrets AFTER compose up, on web AND worker, in a command that names each container.
+  def test_step_6_mounts_secrets_on_web_and_worker_after_compose_up
+    step6 = extract_step_section(@codelab, 6)
+    compose_pos = step6.index(/gcloud\s+run\s+compose\s+up\s+compose\.prod\.yaml/)
+    update = step6[/gcloud run services update blog \\\n(?:[^\n]*\\\n)*[^\n]*\n/]
+    refute_nil compose_pos, "Step 6 must run 'gcloud run compose up compose.prod.yaml'"
+    refute_nil update, "Step 6 must run a multi-line 'gcloud run services update blog'"
+    assert compose_pos < step6.index(update), "the secrets must be mounted after compose up"
+    %w[web worker].each do |container|
+      assert_match(/--container=#{container}\s[^\n]*--set-secrets=/, update,
+                   "Step 6 must mount the secrets on the '#{container}' container (--container=#{container} ... --set-secrets=...)")
+    end
+    secrets = step6[/APP_SECRETS="([^"]+)"/, 1].to_s
+    %w[RAILS_MASTER_KEY=rails-master-key DB_PASSWORD=rails-db-password].each do |pair|
+      assert_includes secrets, pair, "Step 6 must mount #{pair.split('=').first} from Secret Manager"
+    end
+  end
+
   def test_skeleton_yaml_evals_pin_rbenv_version_3_4_5
     %w[step-5 step-6 step-7].each do |step_id|
       step = @skeleton["steps"].find { |s| s["id"] == step_id }
