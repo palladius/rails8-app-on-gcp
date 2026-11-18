@@ -4,7 +4,9 @@
   instead of managed Google Cloud SQL.
 %>
 <% db_adapter = ActiveRecord::Base.connection_db_config.adapter.to_s rescue "unknown" %>
-<% is_cloudsql = ENV["CLOUDSQL_INSTANCE"].present? || ENV["DATABASE_URL"].to_s.include?("cloudsql") %>
+<% db_host = ActiveRecord::Base.connection_db_config.configuration_hash[:host].to_s rescue "" %>
+<% is_cloudsql = ENV["CLOUDSQL_INSTANCE"].present? || ENV["DATABASE_URL"].to_s.include?("cloudsql") ||
+                 (db_adapter.start_with?("postg") && db_host.include?("cloudsql")) %>
 
 <% unless is_cloudsql %>
   <div class="workshop-ephemeral-database-alert" style="

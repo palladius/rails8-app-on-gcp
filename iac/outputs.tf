@@ -107,3 +107,8 @@ output "cloud_sql_connection_name" {
   description = "The Cloud SQL connection name (PROJECT:REGION:INSTANCE)"
   value       = google_sql_database_instance.main.connection_name
 }
+
+output "sql_instance_name" {
+  description = "The Cloud SQL instance name (Step 5 of the codelab reads it)"
+  value       = google_sql_database_instance.main.name
+}

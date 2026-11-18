@@ -2,7 +2,7 @@
 # The DATABASE_URL env var (if set) takes precedence over any adapter config.
 #
 # Local dev:  sqlite3 (or postgres via DATABASE_URL in Docker Compose)
-# Cloud Run:  postgres via DATABASE_URL env var pointing to Cloud SQL
+# Cloud Run:  postgres via DB_HOST + DB_PASSWORD (password mounted from Secret Manager)
 
 default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
@@ -41,29 +41,58 @@ test:
   adapter: sqlite3
   database: storage/test.sqlite3
 
-# Production uses DATABASE_URL (PostgreSQL on Cloud SQL) if available,
-# otherwise falls back to SQLite for local/docker testing.
+# Production picks its database from the environment, in this order:
+#   1. DATABASE_URL (plus optional DATABASE_CACHE_URL / _QUEUE_URL / _CABLE_URL): PostgreSQL from a URL.
+#   2. DB_HOST and DB_PASSWORD (plus optional DB_PORT, DB_NAME, DB_USER): PostgreSQL from discrete
+#      settings. Cloud Run uses this one: DB_PASSWORD is mounted from Secret Manager, so the password
+#      never sits inside a URL in the service configuration.
+#   3. Neither: SQLite on the container disk (ephemeral; Steps 3 and 4 of the workshop).
+<% pg_from_parts = ENV["DATABASE_URL"].blank? && ENV["DB_HOST"].present? && ENV["DB_PASSWORD"].present? %>
+postgres_from_parts: &postgres_from_parts
+  adapter: postgresql
+  host: <%= ENV["DB_HOST"].to_json %>
+  port: <%= ENV.fetch("DB_PORT", "5432").to_i %>
+  database: <%= ENV.fetch("DB_NAME", "rails_production").to_json %>
+  username: <%= ENV.fetch("DB_USER", "rails_user").to_json %>
+  password: <%= ENV["DB_PASSWORD"].to_json %>
+
 production:
   primary:
+<% if pg_from_parts %>
+    <<: [*default, *postgres_from_parts]
+<% else %>
     <<: *default
     adapter: <%= ENV['DATABASE_URL'].present? ? 'postgresql' : 'sqlite3' %>
     url: <%= ENV['DATABASE_URL'] %>
     database: <%= ENV['DATABASE_URL'].present? ? nil : 'storage/production.sqlite3' %>
+<% end %>
   cache:
+<% if pg_from_parts %>
+    <<: [*default, *postgres_from_parts]
+<% else %>
     <<: *default
     adapter: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
     url: <%= ENV.fetch('DATABASE_CACHE_URL', ENV['DATABASE_URL']) %>
     database: <%= (ENV['DATABASE_CACHE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_cache.sqlite3' %>
+<% end %>
     migrations_paths: db/cache_migrate
   queue:
+<% if pg_from_parts %>
+    <<: [*default, *postgres_from_parts]
+<% else %>
     <<: *default
     adapter: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
     url: <%= ENV.fetch('DATABASE_QUEUE_URL', ENV['DATABASE_URL']) %>
     database: <%= (ENV['DATABASE_QUEUE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_queue.sqlite3' %>
+<% end %>
     migrations_paths: db/queue_migrate
   cable:
+<% if pg_from_parts %>
+    <<: [*default, *postgres_from_parts]
+<% else %>
     <<: *default
     adapter: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? 'postgresql' : 'sqlite3' %>
     url: <%= ENV.fetch('DATABASE_CABLE_URL', ENV['DATABASE_URL']) %>
     database: <%= (ENV['DATABASE_CABLE_URL'] || ENV['DATABASE_URL']).present? ? nil : 'storage/production_cable.sqlite3' %>
+<% end %>
     migrations_paths: db/cable_migrate

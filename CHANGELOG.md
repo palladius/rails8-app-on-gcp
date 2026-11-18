@@ -2,6 +2,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.13] - 2026-11-18
+### Security
+- 🔐 **No secret values in the Cloud Run service or job (`blog/compose.prod.yaml`, `blog/config/database.yml`, codelab Step 6; friction log FL014, first raised by Daniel Strebel)**:
+  - Before: `compose.prod.yaml` interpolated the database password into four `DATABASE_*_URL` values and `RAILS_MASTER_KEY` into a plain variable, on both `web` and `worker`. After `gcloud run compose up` the service configuration held the password 8 times and the master key twice in plain text, and the `rails-migrate` job held the password 4 more times.
+  - Now: `compose.prod.yaml` carries no secret. `config/database.yml` builds the production PostgreSQL connection from `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` and `DB_PASSWORD`, and stays on SQLite until `DB_PASSWORD` is mounted. `DATABASE_URL` still wins when it is set.
+  - Codelab Step 6 is now two deploys: 4a (`gcloud run compose up`, three containers, still ephemeral) and 4b (one `gcloud run services update` that mounts `RAILS_MASTER_KEY` and `DB_PASSWORD` from Secret Manager on `web` and `worker`, removes `SECRET_KEY_BASE_DUMMY` and switches to `rails-cloudrun-sa`). The migration job moved to an optional section and uses the same secrets.
+### Fixed
+- 🚑 **Step 6 ended with an error (`workshop/CODELAB.md`)**: `gcloud run services update blog --set-secrets=RAILS_MASTER_KEY=...` was rejected with `Cannot update environment variable [RAILS_MASTER_KEY] to the given type because it has already been set with a different type`, because `compose up` had just set it as a literal. The service account was not switched either.
+- 🚑 **`gcloud run compose up` failed on projects created from the CLI (`iac/cloudrun.tf`)**: it needs the Cloud Resource Manager API, which Terraform now enables.
+- 🧭 **Step 5 read Terraform outputs that did not exist (`iac/outputs.tf`, `workshop/CODELAB.md`)**: `sql_instance_name` is now an output; the codelab no longer pretends to read `db_password` from Terraform (it silently became `CHANGE_ME`).
+- 🪧 The "Ephemeral Database" banner now also recognises Cloud SQL from the active connection (`DB_HOST=cloudsql-proxy`), not only from `DATABASE_URL`.
+
 ## [0.3.12] - 2026-11-18
 ### Fixed
 - 🚑 **`just terraform-apply` failed on a fresh clone (`.env.dist`, friction log FL014)**:

@@ -70,6 +70,14 @@ resource "google_project_service" "run" {
   disable_on_destroy = false
 }
 
+# `gcloud run compose up` (Step 6) resolves the project number through the Cloud Resource Manager
+# API and bills that call to this project. Projects created from the CLI start with the API off.
+resource "google_project_service" "cloudresourcemanager" {
+  project            = var.project_id
+  service            = "cloudresourcemanager.googleapis.com"
+  disable_on_destroy = false
+}
+
 # GenerateCoverImageJob asks Vertex AI (gemini-2.5-flash-image, "Nano Banana")
 # for a cover image whenever a post is saved without one. Authentication is
 # Application Default Credentials only — the Cloud Run service account above,

@@ -241,4 +241,26 @@ class IacCodelabContractsTest < Minitest::Test
                  ".env.dist must ship IAP_ALLOWED_USERS commented out: every entry becomes a Cloud Run IAM binding, " \
                  "and IAM rejects accounts that do not exist"
   end
+  # FL014: `gcloud run compose up` looks up the project number through the Cloud Resource Manager
+  # API and bills that call to the workshop project. On a project created from the CLI the API is
+  # off, and Step 6 stops with "Cloud Resource Manager API has not been used in project ... before
+  # or it is disabled". Terraform must enable it in Step 1.
+  def test_terraform_enables_cloud_resource_manager_api_for_compose_up
+    all_tf = Dir[File.join(REPO_ROOT, "iac", "*.tf")].map { |f| File.read(f) }.join("\n")
+    assert_match(/resource\s+"google_project_service"\s+"\w+"\s*\{[^}]*service\s*=\s*"cloudresourcemanager\.googleapis\.com"/m, all_tf,
+                 "iac/ must enable cloudresourcemanager.googleapis.com: `gcloud run compose up` (Step 6) needs it")
+  end
+  # FL014: Step 5 read `terraform output -raw sql_instance_name` and `db_password`. Neither output
+  # existed, and a `2>/dev/null ||` fallback hid the error. Whatever the codelab or the skeleton
+  # reads from Terraform must be defined in iac/outputs.tf.
+  def test_terraform_exposes_the_outputs_the_codelab_reads
+    outputs_tf = File.read(File.join(REPO_ROOT, "iac", "outputs.tf"))
+    %w[workshop/CODELAB.md workshop/skeleton.yaml].each do |doc|
+      File.read(File.join(REPO_ROOT, doc)).scan(/terraform output -raw (\w+)/).flatten.uniq.each do |name|
+        assert_match(/^output\s+"#{Regexp.escape(name)}"/, outputs_tf,
+                     "#{doc} reads `terraform output -raw #{name}` but iac/outputs.tf does not define it")
+      end
+    end
+    assert_match(/^output\s+"sql_instance_name"/, outputs_tf)
+  end
 end

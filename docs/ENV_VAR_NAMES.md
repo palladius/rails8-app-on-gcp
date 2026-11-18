@@ -27,6 +27,7 @@
 | `GOOGLE_CLOUD_LOCATION` | Region/Location for AI and regional endpoints | Synonymous with or paired with `GOOGLE_CLOUD_REGION` for Vertex AI model locations. |
 | `APP_ADMIN_PASSWORD` | Initial seeded password for the Rails blog administrator | Explicitly distinguishes application admin password from system or cloud database passwords. Defaults to `Ch4ng3m3-1`. |
 | `DATABASE_URL` | Connection string for PostgreSQL or SQLite | Rails standard 12-factor database URL. (e.g. `postgresql://user:pass@127.0.0.1:5432/blog_development`). |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Discrete PostgreSQL settings for production | Used on Cloud Run instead of `DATABASE_URL`, so `DB_PASSWORD` can be mounted from Secret Manager and never sits inside a URL. Production stays on SQLite until both `DB_HOST` and `DB_PASSWORD` are set. |
 | `CLOUDSQL_INSTANCE` | Cloud SQL instance connection name (`project:region:instance`) | Used by Cloud SQL Auth Proxy sidecar container on Cloud Run. |
 | `ACTIVE_STORAGE_SERVICE` | Rails ActiveStorage service selector (`local`, `gcs_local`, `google`) | Controls whether ActiveStorage uploads to local disk or Google Cloud Storage. |
 | `GCS_BUCKET_NAME` | Cloud Storage bucket name for ActiveStorage blobs | Storage bucket name for production and cloud-connected development. |

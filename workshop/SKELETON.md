@@ -169,7 +169,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   just workshop-restore-gold
   export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
   gcloud run compose up compose.prod.yaml --region=$GOOGLE_CLOUD_REGION
-  gcloud run services update blog --region=$GOOGLE_CLOUD_REGION --service-account=$RUN_SA --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest"
+  export APP_SECRETS="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest"
+  gcloud run services update blog --region=$GOOGLE_CLOUD_REGION --service-account=$RUN_SA --container=web --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS" --container=worker --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS"
   ```
 - **`postrequisites`**:
   - Production-grade multi-container sidecar architecture running serverlessly on Cloud Run

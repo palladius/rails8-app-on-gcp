@@ -112,4 +112,27 @@ class DockerComposeContractsTest < Minitest::Test
     refute_match(/IAP_MOCK_EMAIL/, prod_raw,
                  "blog/compose.prod.yaml must never set IAP_MOCK_EMAIL in production (causes fake IAP login for all visitors)")
   end
+  # FL014 (and Daniel Strebel's friction log): compose.prod.yaml used to interpolate ${DB_PASSWORD}
+  # into four DATABASE_*_URL values and ${RAILS_MASTER_KEY} into a plain variable, so both secrets
+  # were readable in the Cloud Run service configuration. The production blueprint must carry no
+  # secret values: Cloud Run mounts them from Secret Manager (--set-secrets) on web and worker.
+  def test_compose_prod_yaml_carries_no_secret_values
+    prod_path = File.expand_path("../blog/compose.prod.yaml", __dir__)
+    prod_raw = File.read(prod_path)
+    refute_match(/\$\{?DB_PASSWORD/, prod_raw,
+                 "blog/compose.prod.yaml must not interpolate DB_PASSWORD: it ends up in plain text in the Cloud Run service")
+    refute_match(/\$\{?RAILS_MASTER_KEY/, prod_raw,
+                 "blog/compose.prod.yaml must not interpolate RAILS_MASTER_KEY: it ends up in plain text in the Cloud Run service")
+    prod = YAML.load_file(prod_path)
+    %w[web worker].each do |name|
+      env = prod.dig("services", name, "environment") || {}
+      leaked = env.keys.grep(/\A(DATABASE(_\w+)?_URL|DB_PASSWORD|RAILS_MASTER_KEY)\z/)
+      assert_empty leaked, "compose.prod.yaml service '#{name}' must not define #{leaked.join(', ')}"
+      assert_equal "cloudsql-proxy", env["DB_HOST"],
+                   "compose.prod.yaml service '#{name}' must reach PostgreSQL through the cloudsql-proxy sidecar via DB_HOST"
+    end
+    # First boot on an empty database runs db/seeds.rb, which exits 1 without the admin identity.
+    assert_match(/GOOGLE_CLOUD_ACCOUNT/, prod.dig("services", "web", "environment", "GOOGLE_CLOUD_ACCOUNT").to_s,
+                 "compose.prod.yaml service 'web' must pass GOOGLE_CLOUD_ACCOUNT: db/seeds.rb aborts the first boot without it")
+  end
 end

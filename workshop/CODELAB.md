@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.4.0 -->
+<!-- 🏷️ Codelab Version: 2.5.0 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -667,11 +667,8 @@ export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
 # Custom Cloud Run Service Account provisioned by Terraform
 export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 
-# Cloud SQL instance name (from Terraform output, NOT hardcoded)
-export SQL_INSTANCE_NAME=$(cd iac && terraform output -raw sql_instance_name 2>/dev/null || gcloud sql instances list --format='value(name)' --limit=1)
-
-# Database password (from Terraform output)
-export DB_PASSWORD=$(cd iac && terraform output -raw db_password 2>/dev/null || echo "CHANGE_ME")
+# Cloud SQL instance name (asked to Google Cloud, so it works from any folder)
+export SQL_INSTANCE_NAME=$(gcloud sql instances list --format='value(name)' --limit=1)
 
 # GCS bucket names
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
@@ -705,7 +702,7 @@ If you have `cloud-sql-proxy` and `psql` installed on your machine and want to v
 # Optional: test connectivity via Google-managed mTLS proxy
 gcloud sql connect $SQL_INSTANCE_NAME --user=rails_user --database=rails_production
 ```
-*(If prompted for a password, enter `$DB_PASSWORD`. Otherwise, feel free to skip directly to Step 3 below!)*
+*(If prompted for a password, print it with `gcloud secrets versions access latest --secret=rails-db-password`. Otherwise, feel free to skip directly to section 3 below!)*
 
 
 ### 3. Inspecting Terraform-Provisioned Secrets
@@ -805,126 +802,58 @@ The production deployment runs three coordinated containers sharing the same loc
 2. **`worker`**: Dedicated background processing container running `bundle exec rails solid_queue:start`.
 3. **`cloudsql-proxy`**: Official Google Cloud SQL Auth Proxy sidecar (`gcr.io/cloud-sql-connectors/cloud-sql-proxy:2`) bound to `127.0.0.1:5432`.
 
-### 3. Running Database Migrations via Cloud Run Job
+Look at the `environment:` blocks: there is a `DB_HOST`, a `DB_USER` and a `DB_NAME`, but no password and no `RAILS_MASTER_KEY`. Secrets never go into this file; Cloud Run mounts them from Secret Manager in section 4.
 
-Before routing web traffic to our new deployment, we must run database migrations and initial seeding against Cloud SQL. 
+### 3. Deploy 4a: Three Containers from `compose.prod.yaml`
 
-#### ⚖️ How to Run Migrations in Containers: Two Strategies
-
-In containerized cloud environments, there are two common approaches to executing database migrations:
-
-- **Option A: Automatic inside Docker Entrypoint** (`entrypoint.sh` executes `db:migrate` on container boot)
-  - *Pros:* Fully automated; developers don't have to remember to run a command.
-  - *Cons:* Hazardous in serverless autoscaling! When Cloud Run scales up to 10 instances simultaneously under high traffic, 10 containers race to run migrations concurrently, causing database locking, schema race conditions, or boot timeouts.
-- **Option B: Explicit via Cloud Run Job (Our Architectural Choice)**
-  - *Pros:* Complete control, transactional safety, and zero race conditions. Runs as a dedicated one-shot container task completely detached from serving web traffic. If a migration fails, web serving is unaffected.
-  - *Cons:* Requires triggering a CLI job or CI/CD step before deployment.
-
-We choose **Option B** for maximum production reliability.
-
-#### ⚠️ Critical: `DATABASE_URL` Format & Ruby 3.4.5 RFC 3986 Strictness
-
-Cloud Run Jobs connect to Cloud SQL using the native Unix socket proxy (`/cloudsql/PROJECT:REGION:INSTANCE`). The `DATABASE_URL` **must** use the triple-slash format:
-
-```text
-postgresql:///rails_production?user=rails_user&password=PASS&host=/cloudsql/PROJECT:REGION:INSTANCE
-```
-
-<!--
-> 🔬 **Why not `postgresql://user:pass@PROJECT:REGION:INSTANCE/db`?**
-> Google Cloud SQL connection names contain colons (`:`). Starting in **Ruby 3.4+** (including our version **Ruby 3.4.5** with the bundled `uri-1.1.1` gem), the Ruby URI parser enforces strict compliance with **RFC 3986**. It considers colons invalid characters within an unbracketed host authority, raising `URI::InvalidURIError: bad URI`. The triple-slash format (`///`) omits the host authority completely and moves the Unix socket path to the query parameter `?host=...`, ensuring seamless parsing across all modern Ruby versions!
--->
-
-```bash
-# Core environment variables for database migration & initial admin seed
-export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
-export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
-echo "Admin user will be seeded for: $GOOGLE_CLOUD_ACCOUNT"
-
-# Get the latest blog image from Cloud Run (jobs don't support --source)
-export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format='value(spec.template.spec.containers[0].image)')
-
-# Build the DATABASE_URL in triple-slash format (required for Unix socket proxy)
-export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
-export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
-export DB_URL="postgresql:///rails_production?user=rails_user&password=${DB_PASSWORD}&host=/cloudsql/${CLOUDSQL_CONNECTION}"
-
-# Create migration job — note ALL 4 database URL env vars and GOOGLE_CLOUD_ACCOUNT for seed user creation
-gcloud run jobs create rails-migrate \
-  --image=$BLOG_IMAGE \
-  --command "bin/rails" \
-  --args "db:prepare" \
-  --set-env-vars="DATABASE_URL=${DB_URL},DATABASE_QUEUE_URL=${DB_URL},DATABASE_CACHE_URL=${DB_URL},DATABASE_CABLE_URL=${DB_URL},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_ACCOUNT=${GOOGLE_CLOUD_ACCOUNT}" \
-  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest" \
-  --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
-  --service-account=$RUN_SA \
-  --region $GOOGLE_CLOUD_REGION 2>/dev/null || true
-
-# Execute migration job
-gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
-```
-
-> 💡 **Rails 8 Multi-Database:** The app uses 4 databases (primary, queue, cache, cable) per `database.yml`.
-> All 4 `DATABASE_*_URL` env vars must point to the same Cloud SQL instance, otherwise
-> Solid Queue/Cache/Cable tables won't be created.
-
-After `db:prepare`, load the Solid Queue/Cache/Cable schemas:
-
-```bash
-# Schema load for queue, cache, and cable databases (creates solid_queue_jobs, etc.)
-gcloud run jobs update rails-migrate \
-  --command "bash" \
-  --args "-c,DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable" \
-  --region $GOOGLE_CLOUD_REGION
-
-gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
-```
-
-![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
-*In the figure above, you can see a possible output of `gcloud run jobs executions describe $JOBNAME`*
-
-![Google Cloud Run Jobs Console showing rails-migrate job Succeeded](assets/images/rails_migrate_job_succeeded.png)
-*Google Cloud Run Jobs Console showing `rails-migrate` execution Succeeded*
-
-
-
-
-### 4. Deploy 4: Deploying Multi-Container Cloud Run via Docker Compose
-
-Now deploy the genuine 3-container production stack (`web`, `worker`, `cloudsql-proxy`) directly from `compose.prod.yaml`:
+`blog/compose.prod.yaml` holds **no secret values**: no database password, no `RAILS_MASTER_KEY`. Deploy it as it is:
 
 ```bash
 cd blog
-export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 
-# 1. Self-healing environment exports (guarantees no missing master key or DB password)
-export RAILS_MASTER_KEY="${RAILS_MASTER_KEY:-$(cat config/master.key 2>/dev/null || gcloud secrets versions access latest --secret=rails-master-key)}"
-export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
+# Plain settings read by compose.prod.yaml (nothing secret here)
+export SQL_INSTANCE_NAME="${SQL_INSTANCE_NAME:-$(gcloud sql instances list --format='value(name)' --limit=1)}"
 export CLOUDSQL_INSTANCE_CONNECTION_NAME="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
-
-# 2. Database credentials & GCS attachments (Zero Gemini API Keys per Constitution §11!)
-export DB_USER="rails_user"
-export DB_NAME="rails_production"
-export GCS_BUCKET="${GCS_BUCKET}"
+export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
 export ACTIVE_STORAGE_SERVICE="google"
 export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
 
-# 3. Deploy the full multi-container sidecar architecture to Cloud Run
+# Deploy the three containers to Cloud Run (about 6 minutes: it builds the image)
 gcloud run compose up compose.prod.yaml \
   --region=$GOOGLE_CLOUD_REGION
-
-# 4. Bind our custom Cloud Run Service Account ($RUN_SA) and mount RAILS_MASTER_KEY from Secret Manager
-# (public access is already in place from your Step 3 deploy; no extra flag needed)
-gcloud run services update blog \
-  --region=$GOOGLE_CLOUD_REGION \
-  --service-account=$RUN_SA \
-  --set-secrets="RAILS_MASTER_KEY=rails-master-key:latest"
 ```
 
 ![Google Cloud Run Console Containers tab displaying the 3 sidecar containers](assets/images/step6_cloud_run_three_containers.png)
 *Google Cloud Run Console: 'Containers' tab displaying all three sidecar containers (`cloudsql-proxy`, `web`, `worker`)*
 
-> 💡 **UI Curiosity / Console Glitch:** In the Console dropdown, you may notice Cloud Run labels the top entry as `Ingress container: cloudsql-proxy`. Don't worry! This is purely a visual UI glitch in the Google Cloud Console (tracked in [#149](https://github.com/palladius/rails8-app-on-gcp/issues/149)) caused by container dependency ordering. In reality, `web` is the only container listening on HTTP port 8080 and handles 100% of ingress web traffic, while `cloudsql-proxy` strictly serves private PostgreSQL traffic on port 5432!
+Open your Cloud Run URL. The three containers are running, but the **"Ephemeral Database Active (SQLITE3)"** banner is still there: without the database password, `config/database.yml` stays on SQLite, and Rails signs sessions with a throwaway key (`SECRET_KEY_BASE_DUMMY`). The service also runs as the Default Compute service account, because `compose up` cannot set one.
+
+> 💡 **UI Curiosity / Console Glitch:** In the Console dropdown, you may notice Cloud Run labels the top entry as `Ingress container: cloudsql-proxy`. This is a visual glitch in the Google Cloud Console (tracked in [#149](https://github.com/palladius/rails8-app-on-gcp/issues/149)). `web` is the only container listening on HTTP port 8080; `cloudsql-proxy` only serves PostgreSQL traffic on port 5432.
+
+> 🧯 **`Cloud Resource Manager API has not been used in project ... or it is disabled`?** Step 1 enables this API for you. If your infrastructure predates that change, run `gcloud services enable cloudresourcemanager.googleapis.com`, wait half a minute, and run `compose up` again.
+
+### 4. Deploy 4b: Secrets from Secret Manager
+
+One command mounts both secrets on `web` and `worker`, removes the throwaway key and switches to the dedicated service account (`$RUN_SA`):
+
+```bash
+export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+export APP_SECRETS="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest"
+
+gcloud run services update blog \
+  --region=$GOOGLE_CLOUD_REGION \
+  --service-account=$RUN_SA \
+  --container=web    --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS" \
+  --container=worker --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS"
+```
+
+The new revision finds `DB_PASSWORD`, so `config/database.yml` switches to PostgreSQL through the `cloudsql-proxy` sidecar (`DB_HOST=cloudsql-proxy`). On its first boot `web` prepares the database (`db:prepare`, the Solid Queue / Cache / Cable schemas, the seed) from `bin/docker-entrypoint`.
+
+Check that no secret value is stored in the service. Every secret must show up as a reference (`secretKeyRef`), never as a `value`:
+
+```bash
+gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format=yaml | grep -B1 -A3 secretKeyRef
+```
 
 ### 5. ✨ The Wow Moment: Zero Warnings & Full Cloud Persistence!
 
@@ -946,7 +875,37 @@ Open your Cloud Run URL:
 2. Create blog posts and comments.
 3. Restart or redeploy as many times as you like: your data, posts, comments, and assets survive forever in Cloud SQL and GCS!
 
-### 6. Automated Step 6 Validation
+### 6. (Optional) Later Migrations as a Cloud Run Job
+
+`web` prepares the database when it boots. That is convenient for a workshop, and it is safe here because the entrypoint takes a PostgreSQL advisory lock. For a busy production service, a schema change is better run **once, before** the new revision takes traffic. A Cloud Run Job does that, with the same image and the same secrets:
+
+```bash
+# The image of the web container (jobs do not support --source)
+export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format=json \
+  | ruby -rjson -e 'puts JSON.parse(STDIN.read).dig("spec","template","spec","containers").find { |c| c["name"] == "web" }["image"]')
+export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
+
+# A job has no sidecar: Cloud Run mounts the Cloud SQL Unix socket under /cloudsql instead
+gcloud run jobs create rails-migrate \
+  --image=$BLOG_IMAGE \
+  --command "bin/rails" \
+  --args "db:migrate" \
+  --set-env-vars="DB_HOST=/cloudsql/${CLOUDSQL_CONNECTION},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}" \
+  --set-secrets="$APP_SECRETS" \
+  --set-cloudsql-instances="${CLOUDSQL_CONNECTION}" \
+  --service-account=$RUN_SA \
+  --region $GOOGLE_CLOUD_REGION
+
+gcloud run jobs execute rails-migrate --region $GOOGLE_CLOUD_REGION --wait
+```
+
+![Output of gcloud run jobs executions describe JOBNAME](assets/images/rails_migrate_job_describe.png)
+*A possible output of `gcloud run jobs executions describe $JOBNAME`*
+
+![Google Cloud Run Jobs Console showing rails-migrate job Succeeded](assets/images/rails_migrate_job_succeeded.png)
+*Google Cloud Run Jobs Console showing `rails-migrate` execution Succeeded*
+
+### 7. Automated Step 6 Validation
 
 Verify the multi-container configuration:
 
@@ -1085,6 +1044,7 @@ Let's use the Rails console to rescue it and attach it to a Cloud SQL post:
 ```bash
 # Connect to your production database via Rails console and Cloud SQL Proxy
 cloud-sql-proxy --port 5432 ${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME} &
+export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
 DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production bin/rails c
 ```
 
@@ -1217,6 +1177,7 @@ gcloud run jobs execute my-job --region europe-west1 --wait
 cloud-sql-proxy rails8-fl-20260907b-xm8ko4:europe-west1:your-instance
 
 # In another terminal: open a read-write or sandbox console
+export DB_PASSWORD=$(gcloud secrets versions access latest --secret=rails-db-password)
 DATABASE_URL=postgresql://rails_user:${DB_PASSWORD}@127.0.0.1:5432/rails_production \
   bin/rails console --sandbox
 ```
@@ -1320,4 +1281,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.4.0 (2026-11-16) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.5.0 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

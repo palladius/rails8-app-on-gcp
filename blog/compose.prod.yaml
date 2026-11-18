@@ -1,3 +1,9 @@
+# Production blueprint for Cloud Run: web + worker + Cloud SQL Auth Proxy sidecar.
+#
+# This file carries NO secret values. Deploying it gives you the three containers on SQLite
+# (ephemeral), signed with a throwaway key (SECRET_KEY_BASE_DUMMY). The next command of the codelab
+# mounts RAILS_MASTER_KEY and DB_PASSWORD from Secret Manager on web and worker and removes
+# SECRET_KEY_BASE_DUMMY; config/database.yml switches to PostgreSQL as soon as DB_PASSWORD is there.
 services:
   web:
     build:
@@ -8,14 +14,15 @@ services:
     environment:
       RAILS_ENV: production
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GCS_BUCKET: ${GCS_BUCKET}
       ACTIVE_STORAGE_SERVICE: ${ACTIVE_STORAGE_SERVICE:-google}
       GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
-      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      GOOGLE_CLOUD_ACCOUNT: ${GOOGLE_CLOUD_ACCOUNT}
+      DB_HOST: cloudsql-proxy
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-rails_user}
+      DB_NAME: ${DB_NAME:-rails_production}
+      SECRET_KEY_BASE_DUMMY: "1"
       DB_POOL: "5"
     ports:
       - "8080:8080"
@@ -30,14 +37,15 @@ services:
     environment:
       RAILS_ENV: production
       RAILS8_ENV_LAUNCH_MODE: "Hello! I am running serverless on Google Cloud Run."
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       GCS_BUCKET: ${GCS_BUCKET}
       ACTIVE_STORAGE_SERVICE: ${ACTIVE_STORAGE_SERVICE:-google}
       GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
-      DATABASE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_QUEUE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_CACHE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
-      DATABASE_CABLE_URL: postgresql://${DB_USER:-rails_user}:${DB_PASSWORD}@cloudsql-proxy:5432/${DB_NAME:-rails_production}
+      GOOGLE_CLOUD_ACCOUNT: ${GOOGLE_CLOUD_ACCOUNT}
+      DB_HOST: cloudsql-proxy
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-rails_user}
+      DB_NAME: ${DB_NAME:-rails_production}
+      SECRET_KEY_BASE_DUMMY: "1"
       DB_POOL: "5"
     depends_on:
       - cloudsql-proxy

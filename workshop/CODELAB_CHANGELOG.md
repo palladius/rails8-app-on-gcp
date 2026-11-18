@@ -8,6 +8,13 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.5.0] - 2026-11-18 (Step 6: secrets from Secret Manager; fixes from friction log FL014)
+
+- **Step 6**: split into Deploy 4a (`gcloud run compose up`: three containers, no secrets, still on SQLite) and Deploy 4b (one `gcloud run services update` mounting `RAILS_MASTER_KEY` and `DB_PASSWORD` from Secret Manager on `web` and `worker`, and switching to `rails-cloudrun-sa`). The previous last command of the step failed with a type-conflict error. A new check shows that the service holds only `secretKeyRef` references.
+- **Step 6**: the migration job is now an optional section after the deploy; it no longer needs a `DATABASE_URL` with the password inside.
+- **Step 5**: `SQL_INSTANCE_NAME` comes from `gcloud sql instances list`; the `DB_PASSWORD` export is gone.
+- **Step 7 and Step 8**: the local console examples fetch `DB_PASSWORD` from Secret Manager themselves.
+
 ## [2.4.0] - 2026-11-16 (Constitution v1.5.0: Any Harness & Honest Local AI Story)
 
 - **Step 0 (Constitution §12)**: Any AI coding harness works. `CLAUDE.md` and `GEMINI.md` are symlinks to `AGENTS.md`, and the repo's skills are linked under `.claude/skills` and `.agents/skills`. Antigravity with a Gmail account stays the zero-cost default.
