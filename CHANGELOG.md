@@ -2,6 +2,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.16] - 2026-11-18
+### Changed
+- 🧭 **Codelab `v2.5.2` (`workshop/CODELAB.md`, friction log FL015)**:
+  - Steps 3, 4 and 6 use `cd "$(git rev-parse --show-toplevel)/blog"` instead of `cd blog`, which printed `No such file or directory` when the shell was already inside `blog/`.
+  - Step 0 says where workshop credits are claimed: the banner exists only in the Google-hosted copy of the codelab, not on GitHub Pages.
+
 ## [0.3.15] - 2026-11-18
 ### Added
 - 💎 **Kickoff deck for Rubyists (`slides/rubyists.en.md`), made for Helvetic Ruby 2026 (Zurich, 19 Nov 2026)**:

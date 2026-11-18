@@ -8,6 +8,11 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.5.2] - 2026-11-18 (Folder-independent `cd`; where to claim credits)
+
+- **Steps 3, 4 and 6**: `cd "$(git rev-parse --show-toplevel)/blog"` works from the repository root and from inside `blog/`.
+- **Step 0**: a note says the credits banner is only in the Google-hosted copy of the codelab.
+
 ## [2.5.1] - 2026-11-18 (Works from `blog/`; honest timings; from friction log FL015)
 
 - **Step 4 and Step 6**: `just workshop-rewind 2` and `just workshop-restore-gold` now work from inside `blog/`, where Step 3 leaves you (fix in `blog/justfile`, no text change).

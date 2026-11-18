@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.5.1 -->
+<!-- 🏷️ Codelab Version: 2.5.2 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -105,6 +105,8 @@ gcloud auth application-default set-quota-project $GOOGLE_CLOUD_PROJECT
 ![Active gcloud configuration](assets/images/gcloud_config_configurations_list.png)
 
 ### 3. 🚨 GCP Billing Linkage & Verification
+
+> 🎟️ **Workshop credits?** If your proctor offers Google Cloud credits, the claim banner is at the top of this step in the Google-hosted copy of the codelab: [codelabs.developers.google.com/codelabs/rails8-on-google-cloud#1](https://codelabs.developers.google.com/codelabs/rails8-on-google-cloud#1) (sign in with a personal Gmail account). The GitHub Pages copy has no banner. Claim the credits first, then come back here.
 
 > ⚠️ **Important — Having an `OPEN` Billing Account vs. Linking It to Your Project**:
 > Running `gcloud billing accounts list` and seeing `OPEN: True` only means your billing account exists — **you must still link it to `$GOOGLE_CLOUD_PROJECT`**! Also note that temporary workshop credit trials can become `SUSPENDED` (`BILLING_ISSUE`) if left overnight, so we recommend completing the cloud steps in a same-day single session.
@@ -402,7 +404,7 @@ Deploy directly from source code to Cloud Run using the dedicated `rails-cloudru
 
 ```bash
 # Ensure you are inside the Rails application directory
-cd blog
+cd "$(git rev-parse --show-toplevel)/blog"   # the Rails app folder, from wherever you are in the repo
 
 # Ensure default region and custom Cloud Run Service Account are set
 export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
@@ -594,7 +596,7 @@ Re-deploy with GCS enabled. Make sure you are inside the `blog/` folder (otherwi
 Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (`GOOGLE_CLOUD_ACCOUNT`, `SECRET_KEY_BASE_DUMMY=1`), and explicitly pass `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` so `storage.yml` resolves `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`:
 
 ```bash
-cd blog
+cd "$(git rev-parse --show-toplevel)/blog"   # the Rails app folder, from wherever you are in the repo
 export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
 
 gcloud run deploy blog \
@@ -810,7 +812,7 @@ Look at the `environment:` blocks: there is a `DB_HOST`, a `DB_USER` and a `DB_N
 `blog/compose.prod.yaml` holds **no secret values**: no database password, no `RAILS_MASTER_KEY`. Deploy it as it is:
 
 ```bash
-cd blog
+cd "$(git rev-parse --show-toplevel)/blog"   # the Rails app folder, from wherever you are in the repo
 
 # Plain settings read by compose.prod.yaml (nothing secret here)
 export SQL_INSTANCE_NAME="${SQL_INSTANCE_NAME:-$(gcloud sql instances list --format='value(name)' --limit=1)}"
@@ -1284,4 +1286,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.5.1 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.5.2 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
