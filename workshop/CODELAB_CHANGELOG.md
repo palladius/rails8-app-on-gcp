@@ -8,6 +8,13 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.5.1] - 2026-11-18 (Works from `blog/`; honest timings; from friction log FL015)
+
+- **Step 4 and Step 6**: `just workshop-rewind 2` and `just workshop-restore-gold` now work from inside `blog/`, where Step 3 leaves you (fix in `blog/justfile`, no text change).
+- **Step 5**: the credentials check runs from any folder.
+- **Step 3**: title and intro no longer promise "3 minutes"; a source deploy takes about six.
+- **Step 7**: a note says the AI cover can take a few minutes.
+
 ## [2.5.0] - 2026-11-18 (Step 6: secrets from Secret Manager; fixes from friction log FL014)
 
 - **Step 6**: split into Deploy 4a (`gcloud run compose up`: three containers, no secrets, still on SQLite) and Deploy 4b (one `gcloud run services update` mounting `RAILS_MASTER_KEY` and `DB_PASSWORD` from Secret Manager on `web` and `worker`, and switching to `rails-cloudrun-sa`). The previous last command of the step failed with a type-conflict error. A new check shows that the service holds only `secretKeyRef` references.

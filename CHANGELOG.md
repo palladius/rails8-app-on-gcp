@@ -2,6 +2,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.14] - 2026-11-18
+### Fixed
+- 🚑 **`just workshop-rewind` and `just workshop-restore-gold` failed from `blog/` (`blog/justfile`, friction log FL015)**: Step 3 of the codelab says `cd blog` and nothing goes back up. From there `just workshop-rewind 2` (Step 4) and `just workshop-restore-gold` (Step 6) stopped with `error: justfile does not contain recipe`, so the next deploy silently reused the previous step's configuration. `blog/justfile` now sets `fallback := true`, which makes every root recipe reachable from `blog/`. Guarded by a new test in `test/test_justfile.rb`.
+- 🧭 **Step 5 from any folder (`workshop/CODELAB.md`)**: `ensure_workshop_credentials.rb` is now called through `git rev-parse --show-toplevel`, so it works from `blog/` too.
+### Changed
+- ⏱️ **Honest timings (`workshop/CODELAB.md`, codelab `v2.5.1`)**: Step 3 no longer promises a deploy "in under 3 minutes" (a source deploy took about six minutes in four measured runs) and its title drops "in 3 Minutes"; Step 7 says the AI cover can take a few minutes to appear (2m43s measured).
+
 ## [0.3.13] - 2026-11-18
 ### Security
 - 🔐 **No secret values in the Cloud Run service or job (`blog/compose.prod.yaml`, `blog/config/database.yml`, codelab Step 6; friction log FL014, first raised by Daniel Strebel)**:

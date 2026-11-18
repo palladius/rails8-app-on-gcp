@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.5.0 -->
+<!-- 🏷️ Codelab Version: 2.5.1 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -379,11 +379,11 @@ In the next step, we will intentionally deploy this ephemeral configuration to C
 
 
 
-## Step 3: Deploy 1 & Deploy 2 — The Stateless Shock (Early WOW in 3 Minutes!)
+## Step 3: Deploy 1 & Deploy 2 — The Stateless Shock (Early WOW)
 
 *Duration: 10min*
 
-Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** in under 3 minutes!
+Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** with one command (about six minutes the first time, while Cloud Build builds the image).
 
 ### 1. The Time-Machine Rewind
 
@@ -421,7 +421,7 @@ You should see progress output similar to this:
 
 ![gcloud run deploy building and deploying container](assets/images/gcloud_run_deploy_in_progress.png)
 
-⏳ *This should take a couple of minutes while Cloud Build packages your container and provisions the Cloud Run revision.*
+⏳ *Expect about six minutes: Cloud Build builds the image, then Cloud Run starts the revision. Every later `--source` deploy rebuilds the image and takes about as long.*
 
 
 #### 🧯 Troubleshooting & Common Caveats
@@ -730,7 +730,8 @@ In Rails 8, `blog/config/master.key` (ignored by git) decrypts `blog/config/cred
 Run `bin/ensure_workshop_credentials.rb --sync-gcp` to verify that your local `master.key` decrypts `credentials.yml.enc` and sync it to Secret Manager (`rails-master-key`):
 
 ```bash
-ruby bin/ensure_workshop_credentials.rb --sync-gcp
+# Works from any folder of the repository (you are probably still inside blog/)
+ruby "$(git rev-parse --show-toplevel)/bin/ensure_workshop_credentials.rb" --sync-gcp
 ```
 
 > 🛡️ **Dev vs. Production Secret Injection on Cloud Run:**
@@ -932,6 +933,8 @@ Good news: **this functionality is already fully implemented in the codebase!** 
 - **Model:** It prompts Google's multimodal model (**Gemini 2.5 Flash Image** / Imagen on Vertex AI) to generate an authentic vintage 1960s Italian film poster (*"Locandina di un film 1960"*) complete with a cameo banana and a shiny ruby "8".
 - **Dynamic Provenance Watermark:** Uses `libvips` to dynamically stamp a visual badge on the corner (colorful cloud stamp on GCS).
 - **Turbo Stream Hot-Swap:** When the image is attached, `Turbo::StreamsChannel.broadcast_refresh_to(post)` updates the reader's browser live without a manual page reload!
+
+> ⏳ **Give it a few minutes.** On Cloud Run the cover took 2m43s to appear in our last test run. Reload the post if the cover does not show up by itself.
 
 > 🔐 **Verify Vertex AI IAM Permissions (`roles/aiplatform.user`):**
 > Terraform grants `roles/aiplatform.user` to `rails-cloudrun-sa` in Step 1. If you ever see `403 PERMISSION_DENIED` on Vertex AI in your worker logs, verify or idempotently bind the role with:
@@ -1281,4 +1284,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.5.0 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.5.1 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

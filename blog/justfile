@@ -1,4 +1,7 @@
 set dotenv-load := true
+# Recipes not defined here (workshop-rewind, workshop-restore-gold, terraform-apply, ...) are looked up
+# in the repository-root justfile, so they work from blog/ too.
+set fallback := true
 export PATH := env_var_or_default("HOME", "/root") + "/.rbenv/shims:" + env_var_or_default("PATH", "/usr/bin:/bin")
 export RBENV_VERSION := "3.4.5"
 

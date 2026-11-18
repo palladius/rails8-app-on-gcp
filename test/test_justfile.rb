@@ -49,6 +49,20 @@ class JustfileTest < Minitest::Test
     assert_includes output, "slides", "Expected the `slides` recipe to be listed"
   end
 
+  # Friction log FL015: Step 3 of the codelab says `cd blog` and nothing ever goes back up.
+  # From blog/, `just workshop-rewind 2` (Step 4) and `just workshop-restore-gold` (Step 6) died
+  # with "justfile does not contain recipe", so the student silently kept the Step 3 config.
+  # blog/justfile must fall back to the repository-root justfile for recipes it does not define.
+  def test_root_workshop_recipes_are_reachable_from_blog
+    skip "`just` is not installed" unless system("command -v just > /dev/null 2>&1")
+
+    blog_dir = File.expand_path("../blog", __dir__)
+    ["workshop-rewind 2", "workshop-restore-gold", "workshop-test", "workshop-eval 3", "terraform-apply"].each do |invocation|
+      output = `cd #{blog_dir} && just --dry-run #{invocation} 2>&1`
+      assert $?.success?, "`just #{invocation}` must work from blog/ (the codelab leaves the student there):\n#{output}"
+    end
+  end
+
   private
 
   def each_recipe
