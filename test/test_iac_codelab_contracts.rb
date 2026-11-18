@@ -229,4 +229,16 @@ class IacCodelabContractsTest < Minitest::Test
     assert_equal 2, calls
     assert_match(/Timed out/, err)
   end
+  # FL014: iac/bin/terraform-apply.sh turns IAP_ALLOWED_USERS from .env into TF_VAR_iap_allowed_users,
+  # and iac/cloudrun.tf grants roles/run.invoker to every entry. IAM rejects accounts that do not exist
+  # ("Error 400: User student@example.com does not exist"), so `terraform apply` exits 1 on a fresh
+  # `cp .env.dist .env`. The template must not feed any identity to Terraform by default.
+  def test_env_dist_does_not_feed_identities_to_terraform_by_default
+    assert_includes @tf_apply_sh, "IAP_ALLOWED_USERS",
+                    "this contract only matters while terraform-apply.sh bridges IAP_ALLOWED_USERS into Terraform"
+    active = File.read(File.join(REPO_ROOT, ".env.dist")).lines.grep(/^\s*IAP_ALLOWED_USERS=/)
+    assert_empty active,
+                 ".env.dist must ship IAP_ALLOWED_USERS commented out: every entry becomes a Cloud Run IAM binding, " \
+                 "and IAM rejects accounts that do not exist"
+  end
 end

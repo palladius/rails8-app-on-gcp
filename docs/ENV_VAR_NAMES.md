@@ -33,7 +33,7 @@
 | `GCS_SIGNER_SA_EMAIL` | Service Account email for IAM blob URL signing | Used by `iam: true` in `config/storage.yml` when generating short-lived signed URLs via Cloud Run metadata server or local development. |
 | `NANOBANANA_MODEL` | Gemini / Imagen model version string | Specifies which generative AI model to invoke on Vertex AI (e.g., `gemini-2.5-flash-image`). |
 | `AUDIO_LANGUAGES` | Comma-separated languages for AI podcastifier (e.g. `it,en`) | Configures audio generation pipelines. |
-| `IAP_ALLOWED_USERS` | Comma-separated allowlist of emails for Identity-Aware Proxy | Application-level Zero-Trust guard for Cloud Run IAP headers. |
+| `IAP_ALLOWED_USERS` | Comma-separated allowlist of emails for Identity-Aware Proxy (commented out in `.env.dist`) | Application-level Zero-Trust guard for Cloud Run IAP headers. `just terraform-apply` also grants `roles/run.invoker` to every entry, so each one must be a real Google Account. |
 | `IAP_MOCK_EMAIL` | Local-only simulated IAP user email (e.g. `simulated-iap-account@example.com`) | Simulates `X-Goog-Authenticated-User-Email` in local dev/test; displays an explicit fake-IAP warning banner and MUST NEVER be set in production. |
 | `RAILS8_ENV_LAUNCH_MODE` | Human-readable badge text override | Displayed in application footer and `/status` page to provide clear environment context. |
 | `RAILS_MASTER_KEY` | Decryption key for Rails encrypted credentials | Standard Rails credential decryption key when `config/master.key` is not mounted. |

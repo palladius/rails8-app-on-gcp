@@ -2,6 +2,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.12] - 2026-11-18
+### Fixed
+- 🚑 **`just terraform-apply` failed on a fresh clone (`.env.dist`, friction log FL014)**:
+  - `.env.dist` shipped `IAP_ALLOWED_USERS` with three placeholder addresses since 0.3.11. `iac/bin/terraform-apply.sh` passes that list to Terraform, which grants `roles/run.invoker` on Cloud Run to each entry, and IAM answered `Error 400: User student@example.com does not exist`. The apply exited 1 after about five minutes with 56 of 59 resources created.
+  - `IAP_ALLOWED_USERS` is now commented out in `.env.dist`, with a note that every entry must be a real Google Account. Guarded by a new contract test in `test/test_iac_codelab_contracts.rb`.
+  - If you already copied the 0.3.11 template: comment out `IAP_ALLOWED_USERS` in your `.env` and run `just terraform-apply` again. It finishes in under a minute.
+
 ## [0.3.11] - 2026-11-16
 ### Added
 - 🧰 **Any Coding Harness, per Constitution §12 (`CLAUDE.md`, `.claude/skills`, `.agents/skills`, `AGENTS.md`)**:
