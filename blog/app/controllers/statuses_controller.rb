@@ -203,13 +203,15 @@ class StatusesController < ApplicationController
   end
 
   def detect_jobs_status
-    pending = SolidQueue::Job.where(finished_at: nil).count rescue 0
-    failed = SolidQueue::FailedExecution.count rescue 0
+    queue = JobQueueStatus.snapshot
+    pending = queue.pending
+    failed = queue.failed
     in_puma = ENV["SOLID_QUEUE_IN_PUMA"] == "true"
 
     {
       pending_count: pending,
       failed_count: failed,
+      worker_alive: queue.worker_alive,
       in_puma: in_puma,
       badge: pending > 0 ? "⚠️ #{pending} Pending Jobs" : "✅ Queue Drained",
       color: pending > 0 ? "#f59e0b" : "#10b981"

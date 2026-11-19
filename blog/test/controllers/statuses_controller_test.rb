@@ -29,6 +29,19 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.headers["Cache-Control"], "private"
   end
 
+  test "status JSON counts failed jobs as failed, not pending, and reports the worker" do
+    snapshot = JobQueueStatus::Snapshot.new(pending: 0, failed: 1, worker_alive: true)
+    stub_singleton(JobQueueStatus, :snapshot, snapshot) do
+      get status_url(format: :json)
+    end
+
+    jobs = JSON.parse(response.body)["jobs"]
+    assert_equal 0, jobs["pending_count"]
+    assert_equal 1, jobs["failed_count"]
+    assert_equal true, jobs["worker_alive"]
+    assert_equal "✅ Queue Drained", jobs["badge"]
+  end
+
   test "should return quest status with step_8_completed false when STEP_8_GHI is not set" do
     old_val = ENV["STEP_8_GHI"]
     ENV.delete("STEP_8_GHI")

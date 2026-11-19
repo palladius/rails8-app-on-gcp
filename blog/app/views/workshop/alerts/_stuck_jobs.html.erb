@@ -5,9 +5,10 @@
   This partial warns the student and turns a potential "bug" into a learning moment.
   At Stage 3 (Enterprise Sidecars), this file auto-hides when count is 0 or can be commented out.
 %>
-<% pending_jobs_count = SolidQueue::Job.where(finished_at: nil).count rescue 0 %>
+<% queue = JobQueueStatus.snapshot %>
+<% pending_jobs_count = queue.pending %>
 
-<% if pending_jobs_count > 0 %>
+<% if pending_jobs_count > 0 || queue.failed > 0 %>
   <div class="stuck-jobs-alert" style="
     background-color: #fffbeb;
     border-left: 5px solid #f59e0b;
@@ -25,13 +26,26 @@
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 1.5rem;">⚠️</span>
       <div>
-        <strong>Notice: <%= pluralize(pending_jobs_count, "background job") %> currently pending execution.</strong>
-        <div style="font-size: 0.85rem; color: #b45309; margin-top: 2px;">
-          Solid Queue worker is not running in this single-container deployment.
-        </div>
+        <% if pending_jobs_count > 0 %>
+          <strong>Notice: <%= pluralize(pending_jobs_count, "background job") %> currently pending execution.</strong>
+          <div class="stuck-jobs-reason" style="font-size: 0.85rem; color: #b45309; margin-top: 2px;">
+            <% if queue.worker_alive %>
+              A Solid Queue worker is running and will pick them up shortly.
+            <% else %>
+              Solid Queue worker is not running in this single-container deployment.
+            <% end %>
+          </div>
+        <% end %>
+        <% if queue.failed > 0 %>
+          <strong class="failed-jobs-notice">Notice: <%= pluralize(queue.failed, "background job") %> failed.</strong>
+          <div style="font-size: 0.85rem; color: #b45309; margin-top: 2px;">
+            Solid Queue keeps failed jobs until they are retried or discarded. See <%= link_to "/status", status_path %> for the counts.
+          </div>
+        <% end %>
       </div>
     </div>
 
+    <% unless queue.worker_alive %>
     <div>
       <a href="#stuck-jobs-modal" 
          onclick="alert('💡 Why is this happening?\n\nIn Stages 1 & 2, Rails runs as a single web container (Puma).\nHeavy background jobs (like GenAI image & audio synthesis) wait in the database queue.\n\nIn Stage 3 (Deploy 3), we will attach a dedicated Solid Queue worker sidecar container to drain this queue asynchronously!'); return false;"
@@ -47,5 +61,6 @@
         Why? (Ask AI) 🤖
       </a>
     </div>
+    <% end %>
   </div>
 <% end %>
