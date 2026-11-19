@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   # Real-time environment and telemetry inspection for workshop professors & students
   get "status" => "statuses#show", as: :status
 
-  # Diagnostic test route deliberately raising RuntimeError to verify Cloud Error Reporting
+  # Admin-only test route deliberately raising an exception to verify Cloud Error Reporting (Step 8, Quest 2)
   get "boom" => "booms#show", as: :boom
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
