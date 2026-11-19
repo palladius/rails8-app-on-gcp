@@ -214,6 +214,36 @@ gcloud-config:
     gcloud config set auth/impersonate_service_account ""
     echo "✅ gcloud profile [${CONFIG_NAME}] configured and active!"
 
+# allow a Google account through IAP on the deployed Cloud Run service (Step 8 / Quest 1)
+iap-allow account:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ACCOUNT="{{ account }}"
+    PROJECT="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null || true)}"
+    REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
+    SERVICE="${CLOUD_RUN_SERVICE:-blog}"
+    case "${ACCOUNT}" in
+        *@*) ;;
+        *) echo "❌ Expected a Google account (name@domain), got '${ACCOUNT}'." >&2; exit 1 ;;
+    esac
+    if [ -z "${PROJECT}" ] || [ "${PROJECT}" = "(unset)" ]; then
+        echo "❌ No project: set GOOGLE_CLOUD_PROJECT in .env or run 'just gcloud-config'." >&2
+        exit 1
+    fi
+    echo "🛡️  Allowing ${ACCOUNT} through IAP on ${SERVICE} (${PROJECT}/${REGION})"
+    # The role lives on the IAP resource: the Cloud Run IAM form fails with
+    # "Role roles/iap.httpsResourceAccessor is not supported for this resource".
+    gcloud iap web add-iam-policy-binding --project="${PROJECT}" \
+        --resource-type=cloud-run --region="${REGION}" --service="${SERVICE}" \
+        --member="user:${ACCOUNT}" --role="roles/iap.httpsResourceAccessor" >/dev/null
+    # The service-level binding alone does not let the OAuth identity through.
+    gcloud projects add-iam-policy-binding "${PROJECT}" \
+        --member="user:${ACCOUNT}" --role="roles/iap.httpsResourceAccessor" \
+        --condition=None --quiet >/dev/null
+    echo "✅ Granted. IAM propagation takes a minute or two."
+    echo "   Verify: curl -s -o /dev/null -w '%{http_code}\\n' https://<service-url>/   (302 = IAP in front)"
+    echo "   Undo IAP: gcloud run services update ${SERVICE} --region=${REGION} --no-iap"
+
 # check the status of conductor tracks
 conductor-status:
 	./conductor/bin/conductor-inspector --all --short

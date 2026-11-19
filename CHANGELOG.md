@@ -2,6 +2,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.23] - 2026-11-19
+### Added
+- 🛡️ **`just iap-allow <account>` and the native-IAP path in Step 8 (`justfile`, `workshop/CODELAB.md`)**: the new recipe grants `roles/iap.httpsResourceAccessor` twice, once on the IAP resource (`gcloud iap web add-iam-policy-binding --resource-type=cloud-run`) and once at project level, because `gcloud run services add-iam-policy-binding` rejects that role for Cloud Run and the service-level binding alone still answers `You don't have access`. Step 8 now sets the native path (`gcloud run services update --iap`, no load balancer, no domain, no certificate) next to the load-balancer shape in `iac/iap.tf`, and states its two limits: the NEG points at the Terraform sample service and the listener is HTTP-only. It also records that a project without an organization cannot create the OAuth brand from the CLI, that the client is made in the Console with the `iap.googleapis.com/...:handleRedirect` URI, and that an IAP-protected `/status.json` answers the Hive's anonymous poll with `302`.
+
 ## [0.3.22] - 2026-11-19
 ### Changed
 - 🖼️ **Pictures on the four cards of "What you need today" (`slides/rubyists.en.md`, slide 2)**: each card shows, at 50 percent opacity on its right side, a picture of what its link opens: the cover of the deck (`slides/images/need-slides.jpg`, rendered from the deck), the repository on GitHub (`need-repo.jpg`), the first page of the codelab on GitHub Pages (`need-codelab.jpg`) and page 2 of the Google-hosted codelab with the credits banner (`need-credits.jpg`). The three screenshots were taken signed out. The text keeps its own column on the left, so no text sits on top of a picture; long addresses wrap after a slash. The pictures do not take clicks: the links work as before.
