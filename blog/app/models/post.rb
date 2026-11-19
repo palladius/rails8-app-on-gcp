@@ -5,10 +5,25 @@ class Post < ApplicationRecord
   has_many :comments, dependent: :destroy
   belongs_to :user, optional: true
 
+  # Semantic search (lib/semantic_search.rb): Gemini embedding in a pgvector column.
+  has_neighbors :embedding
+
   after_commit :generate_cover_image_if_missing, on: [ :create, :update ]
   after_commit :generate_podcast_audio, on: [ :create, :update ]
+  after_commit :refresh_embedding, on: [ :create, :update ]
+
+  # True on PostgreSQL once the AddEmbeddingToPosts migration created the vector column.
+  def self.semantic_search_ready?
+    connection.adapter_name.match?(/postg/i) && column_names.include?("embedding")
+  rescue ActiveRecord::ActiveRecordError
+    false
+  end
 
   private
+
+  def refresh_embedding
+    EmbedPostJob.perform_later(id) if self.class.semantic_search_ready?
+  end
 
   def generate_cover_image_if_missing
     # Nano Banana auto-cover (issue #18): enqueue the generator when no cover is

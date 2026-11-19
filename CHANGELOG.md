@@ -2,6 +2,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-19
+### Added
+- 🔎 **Semantic search with pgvector + Gemini RAG (`/search`, search bar on the posts page)**: every post gets a 768-dimension Gemini embedding (`gemini-embedding-001` on Vertex AI, task type `RETRIEVAL_DOCUMENT`) stored in a pgvector `posts.embedding` column with an HNSW cosine index. A question is embedded as `RETRIEVAL_QUERY`, the `neighbor` gem returns the closest posts by cosine distance, and Gemini (`gemini-3-flash-preview`, override with `RAG_CHAT_MODEL`) answers from those posts only, citing them as [1], [2]. Embeddings and answers go through `ruby_llm` with keyless ADC (Constitution §11), configured in `config/initializers/ruby_llm.rb` from `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_LOCATION`.
+- 🧵 **`EmbedPostJob`**: re-embeds a post after every create and update; called without an id it embeds every post still missing a vector. The search page enqueues that backfill at most once every ten minutes, so posts written before the upgrade become searchable on their own.
+- 🗄️ **Migration `AddEmbeddingToPosts`**: enables the `vector` extension and adds the column and index only on PostgreSQL where pgvector is available (Cloud SQL has it). SQLite and the plain `postgres:16-alpine` Compose image skip it.
+### Notes
+- Localhost invariant (Constitution §6): without pgvector, credentials or Vertex AI, search falls back to a case-insensitive keyword match on title and body and says so in a notice. Tests never call the network.
+- `/search` is public and rate limited to 20 queries per minute per client, since each query costs an embedding and a Gemini call.
+- A database built from `db/schema.rb` (a fresh `db:prepare`) records the migration without running it, so it stays on keyword search; databases that already exist, like Cloud SQL from Step 1, run the migration on the next boot.
+
 ## [0.3.22] - 2026-11-19
 ### Changed
 - 🖼️ **Pictures on the four cards of "What you need today" (`slides/rubyists.en.md`, slide 2)**: each card shows, at 50 percent opacity on its right side, a picture of what its link opens: the cover of the deck (`slides/images/need-slides.jpg`, rendered from the deck), the repository on GitHub (`need-repo.jpg`), the first page of the codelab on GitHub Pages (`need-codelab.jpg`) and page 2 of the Google-hosted codelab with the credits banner (`need-credits.jpg`). The three screenshots were taken signed out. The text keeps its own column on the left, so no text sits on top of a picture; long addresses wrap after a slash. The pictures do not take clicks: the links work as before.

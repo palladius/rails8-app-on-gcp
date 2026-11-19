@@ -72,3 +72,7 @@ gem "google-cloud-storage", "~> 1.62"
 gem "dotenv-rails", "~> 3.2", groups: [:development, :test]
 
 gem "archspec", "~> 1.0"
+
+# Semantic search (pgvector + Gemini RAG): embeddings and answers via Vertex AI (ADC, no API keys)
+gem "ruby_llm", "~> 2.2"
+gem "neighbor", "~> 1.2"

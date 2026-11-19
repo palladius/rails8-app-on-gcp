@@ -1,0 +1,7 @@
+<%= form_with url: search_path, method: :get, class: "semantic-search", data: { turbo_frame: "_top" }, style: "display: flex; gap: 8px; width: 100%;" do |f| %>
+  <%= f.search_field :q, value: local_assigns[:query], placeholder: "Ask the blog anything… (semantic search by meaning)",
+        "aria-label": "Search posts by meaning", required: true, maxlength: SemanticSearch::MAX_QUERY_CHARS,
+        style: "flex: 1; min-width: 0; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color: inherit; font-size: 1rem;" %>
+  <%= f.submit "🔎 Search", name: nil,
+        style: "padding: 10px 16px; border-radius: 8px; border: 0; background: linear-gradient(135deg, #4285f4, #9b72cb); color: #fff; font-weight: 600; cursor: pointer;" %>
+<% end %>

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resource :registration, only: [:new, :create]
   resource :profile, controller: "users", only: [:show]
   resources :passwords, param: :token
+  resource :search, only: :show
   resources :posts do
     delete :purge_cover_image, on: :member
     resources :comments
