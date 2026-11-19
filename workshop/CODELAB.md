@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.5.2 -->
+<!-- 🏷️ Codelab Version: 2.5.3 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -916,6 +916,8 @@ Verify the multi-container configuration:
 just workshop-eval 6
 ```
 
+> 🔭 **The `[LIVE]` line asks Cloud Run what is really deployed.** It makes one `gcloud run services describe` call and one request to your `/status.json`, and takes a few seconds. A `WARNING` there means your files are fine but the service is not what this step expects: three containers, the `rails-cloudrun-sa` service account, both secrets mounted from Secret Manager, Cloud SQL. Steps 3 and 4 have a smaller check of the same kind.
+
 
 ## Step 7: Generative AI Pipelines, Podcastifier & The GCS Treasure Hunt 🏴‍☠️
 
@@ -1263,6 +1265,8 @@ You have built and deployed a production-grade, enterprise-ready Rails 8 applica
 
 To avoid ongoing charges after completing the workshop, make sure to clean up your Google Cloud resources! Choose the approach that best fits your environment:
 
+> ⚠️ **Known issue ([#213](https://github.com/palladius/rails8-app-on-gcp/issues/213)): Option 1 currently stops with an error and leaves the Cloud SQL instance running.** `terraform destroy` cannot drop the database user (it owns the app's tables) or the production bucket (it is not empty). If you created a project just for this workshop, use **Option 2**. If you have to use Option 1, afterwards open the Google Cloud Console and delete the Cloud SQL instance and the `-activestorage-prod` bucket by hand.
+
 #### Option 1: Terraform & CLI Surgical Teardown (Recommended for Shared Projects 🟢)
 > Use this option if you are using an existing or shared Google Cloud project where other resources or data live. It surgically destroys **only** the resources provisioned during this workshop (Cloud Run services/jobs, Cloud SQL instance, Artifact Registry images, Secret Manager secrets, and GCS buckets), leaving the rest of your project untouched.
 
@@ -1286,4 +1290,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.5.2 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.5.3 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

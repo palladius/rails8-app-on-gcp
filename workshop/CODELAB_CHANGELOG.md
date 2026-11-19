@@ -8,6 +8,11 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.5.3] - 2026-11-18 (Live checks in the evals; honest Clean Up)
+
+- **Step 6**: a note explains the new `[LIVE]` line of `just workshop-eval 6` (it asks Cloud Run what is deployed; a warning does not fail the run). Steps 3 and 4 get a smaller live check, with no text change.
+- **Clean Up**: a warning says that Option 1 currently fails and leaves Cloud SQL running; use Option 2 for a dedicated workshop project.
+
 ## [2.5.2] - 2026-11-18 (Folder-independent `cd`; where to claim credits)
 
 - **Steps 3, 4 and 6**: `cd "$(git rev-parse --show-toplevel)/blog"` works from the repository root and from inside `blog/`.

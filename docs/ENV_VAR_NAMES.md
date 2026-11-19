@@ -37,6 +37,7 @@
 | `IAP_ALLOWED_USERS` | Comma-separated allowlist of emails for Identity-Aware Proxy (commented out in `.env.dist`) | Application-level Zero-Trust guard for Cloud Run IAP headers. `just terraform-apply` also grants `roles/run.invoker` to every entry, so each one must be a real Google Account. |
 | `IAP_MOCK_EMAIL` | Local-only simulated IAP user email (e.g. `simulated-iap-account@example.com`) | Simulates `X-Goog-Authenticated-User-Email` in local dev/test; displays an explicit fake-IAP warning banner and MUST NEVER be set in production. |
 | `RAILS8_ENV_LAUNCH_MODE` | Human-readable badge text override | Displayed in application footer and `/status` page to provide clear environment context. |
+| `WORKSHOP_EVAL_LIVE` | `warn` (default), `strict` or `off` | Controls the `[LIVE]` checks of `just workshop-eval` (Steps 3, 4, 6), which ask Cloud Run what is really deployed. `warn` shows problems without failing the run, `strict` fails it (use it in friction logs), `off` makes no remote call. `WORKSHOP_EVAL_LIVE_TIMEOUT` (seconds, default 30) bounds each call. |
 | `RAILS_MASTER_KEY` | Decryption key for Rails encrypted credentials | Standard Rails credential decryption key when `config/master.key` is not mounted. |
 
 ---

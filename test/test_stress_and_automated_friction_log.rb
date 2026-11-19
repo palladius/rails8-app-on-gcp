@@ -95,6 +95,8 @@ class StressAndAutomatedFrictionLogTest < Minitest::Test
         .env.dist
         bin/workshop_diagnostics.rb
         bin/workshop_eval.rb
+        lib/workshop_eval/invariant_checker.rb
+        lib/workshop_eval/live_check.rb
         bin/workshop_time_machine.rb
         bin/ensure_workshop_credentials.rb
         blog/compose.prod.yaml

@@ -146,6 +146,12 @@ steps:
       - "First-hand experience of container disk ephemeral resets (lost SQLite posts & images)"
       - "Clear motivation for Google Cloud Storage and managed Cloud SQL"
     evals:
+      - id: "step-3-live-service-ready"
+        type: "live"
+        description: "The Cloud Run service 'blog' exists and its latest revision is Ready"
+        service: "blog"
+        expect:
+          ready: true
       - id: "step-3-shell-cloudrun-service"
         type: "shell"
         description: "Verify Cloud Run service exists and is responding (dry-run/check)"
@@ -182,6 +188,14 @@ steps:
       - "Signed blob URLs functioning via IAM Credentials API"
       - "Pedagogical stuck jobs warning (_check_stuck_jobs) visible in UI"
     evals:
+      - id: "step-4-live-storage-on-gcs"
+        type: "live"
+        description: "The deployed blog stores files in Cloud Storage, not on the container disk"
+        service: "blog"
+        expect:
+          ready: true
+          status_json:
+            storage_tier: "gcs"
       - id: "step-4-ruby-storage-config"
         type: "ruby"
         description: "Verify storage.yml defines google service with IAM signing"
@@ -295,6 +309,21 @@ steps:
       - "Persistent Cloud SQL PostgreSQL with connection pooling"
       - "UI badge turns green: [CLOUD PERSISTENT 🐘 ☁️]"
     evals:
+      - id: "step-6-live-three-containers-and-secrets"
+        type: "live"
+        description: "Deployed: three containers, the dedicated service account, secrets from Secret Manager, Cloud SQL"
+        service: "blog"
+        expect:
+          ready: true
+          containers: ["web", "worker", "cloudsql-proxy"]
+          service_account: "rails-cloudrun-sa@"
+          secrets:
+            web: ["RAILS_MASTER_KEY", "DB_PASSWORD"]
+            worker: ["RAILS_MASTER_KEY", "DB_PASSWORD"]
+          no_plain_env: ["DATABASE_URL", "DATABASE_QUEUE_URL", "DATABASE_CACHE_URL", "DATABASE_CABLE_URL", "DB_PASSWORD", "RAILS_MASTER_KEY"]
+          status_json:
+            database_tier: "cloud_sql"
+            storage_tier: "gcs"
       - id: "step-6-ruby-compose-prod"
         type: "ruby"
         description: "Verify multi-container production compose configuration contains web, worker, and proxy"

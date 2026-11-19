@@ -10,6 +10,7 @@ require 'open3'
 require 'json'
 require 'optparse'
 require_relative '../lib/workshop_eval/invariant_checker'
+require_relative '../lib/workshop_eval/live_check'
 
 class String
   def red; "\e[31m#{self}\e[0m"; end
@@ -67,6 +68,7 @@ puts "🎯 Evaluating Step(s): #{target_step} (#{steps.size} step(s) selected)\n
 total_evals = 0
 passed_evals = 0
 failed_evals = 0
+live_warnings = 0 # `live` evals: shown, but not counted as failures unless WORKSHOP_EVAL_LIVE=strict
 
 steps.each do |step|
   puts "▶️ [Step #{step['number']}] #{step['title']}".bold
@@ -153,6 +155,31 @@ steps.each do |step|
         passed_evals += 1
       end
 
+    when 'live'
+      # Asks Google Cloud what is really deployed (one `gcloud run services describe`, at most one
+      # GET /status.json). Each remote call is announced before it starts and has a timeout.
+      puts ""
+      live_check = WorkshopEval::LiveCheck.new
+      strict = live_check.mode == "strict"
+      total_evals -= 1 unless strict
+      result = live_check.run(eval_spec)
+      case result.status
+      when :passed
+        puts "     PASSED ✅ (checked on Google Cloud)".green
+        passed_evals += 1 if strict
+      when :skipped
+        puts "     SKIPPED ⚪ (#{result.note})".yellow
+        total_evals -= 1 if strict
+      when :warning
+        puts "     WARNING ⚠️  what is deployed does not look like this step expects (not counted as a failure):".yellow
+        result.problems.each { |problem| puts "       - #{problem}".yellow }
+        live_warnings += 1
+      else
+        puts "     FAILED ❌ what is deployed does not look like this step expects:".red
+        result.problems.each { |problem| puts "       - #{problem}".red }
+        failed_evals += 1
+      end
+
     else
       puts "SKIPPED (Unknown type: #{eval_type}) ⚠️".yellow
     end
@@ -182,6 +209,7 @@ end
 
 puts "=========================================================".cyan
 puts "📊 Evaluation Summary: #{passed_evals}/#{total_evals} Passed, #{failed_evals} Failed.".bold
+puts "⚠️  #{live_warnings} live check warning(s): the files are fine, but the deployed service is not what this step expects. Read the WARNING lines above.".yellow if live_warnings > 0
 if failed_evals > 0
   puts "❌ Some evaluations failed. Please review the errors above.\n".red
   exit 1

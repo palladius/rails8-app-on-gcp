@@ -105,6 +105,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - First-hand experience of container disk ephemeral resets (lost SQLite posts & images)
   - Clear motivation for Google Cloud Storage and managed Cloud SQL
 - **`evals`**:
+  - `[LIVE]` The Cloud Run service 'blog' exists and its latest revision is Ready
   - `[SHELL]` Verify Cloud Run service exists and is responding (dry-run/check)
   - `[RUBY]` Verify missing admin alert partial is present in views
   - `[RUBY]` Verify docker-entrypoint automatically runs db:seed to bootstrap admin user
@@ -128,6 +129,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Signed blob URLs functioning via IAM Credentials API
   - Pedagogical stuck jobs warning (_check_stuck_jobs) visible in UI
 - **`evals`**:
+  - `[LIVE]` The deployed blog stores files in Cloud Storage, not on the container disk
   - `[RUBY]` Verify storage.yml defines google service with IAM signing
   - `[SHELL]` Verify integration test for stuck jobs banner passes
 
@@ -178,6 +180,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   - Persistent Cloud SQL PostgreSQL with connection pooling
   - UI badge turns green: [CLOUD PERSISTENT 🐘 ☁️]
 - **`evals`**:
+  - `[LIVE]` Deployed: three containers, the dedicated service account, secrets from Secret Manager, Cloud SQL
   - `[RUBY]` Verify multi-container production compose configuration contains web, worker, and proxy
   - `[SHELL]` Verify full test suite passes against gold standard
   - `[RUBY]` Verify that Solid Queue worker or supervisor is active and draining jobs
