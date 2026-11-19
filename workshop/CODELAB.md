@@ -1115,6 +1115,39 @@ Now that you have mastered the canonical reference architecture, choose your gra
      iap_allowed_users = [var.google_cloud_account]
      ```
 
+#### Shape A vs Shape B: load balancer or native IAP
+
+`iac/iap.tf` builds the classic shape: an external load balancer, a serverless NEG and an HTTP listener. That is the right choice when you own a domain, because the consent screen wants an HTTPS origin and a managed certificate needs a DNS name to validate. Two caveats apply to the module as it ships: the NEG points at the Terraform sample service (`google_cloud_run_v2_service.rails_app`), not at the `blog` service you deploy with `gcloud run compose up`, and the listener is HTTP-only. Repoint the NEG at your service and add a `google_compute_managed_ssl_certificate` before you rely on it.
+
+Native Cloud Run IAP needs neither load balancer, domain nor certificate:
+
+```bash
+# 1. OAuth client: Cloud Console -> APIs & Services -> Credentials -> Create OAuth client ID,
+#    type "Web application", authorized redirect URI
+#    https://iap.googleapis.com/v1/oauth/clientIds/<CLIENT_ID>:handleRedirect
+cat > /tmp/iap.yaml <<EOF
+access_settings:
+  oauth_settings:
+    client_id: "<CLIENT_ID>"
+    client_secret: "<CLIENT_SECRET>"
+EOF
+
+# 2. Attach the client to the service, then switch IAP on
+gcloud iap settings set /tmp/iap.yaml --resource-type=cloud-run \
+  --region=europe-west1 --service=blog
+gcloud run services update blog --region=europe-west1 --iap
+
+# 3. Let a person in (yourself, a proctor, a colleague)
+just iap-allow <google-account>
+```
+
+Two IAM details cost hours if you meet them the hard way:
+
+- `gcloud run services add-iam-policy-binding --role=roles/iap.httpsResourceAccessor` fails with `Role roles/iap.httpsResourceAccessor is not supported for this resource`. IAP authorization lives on the IAP resource, not on Cloud Run IAM: use `gcloud iap web add-iam-policy-binding --resource-type=cloud-run`.
+- The service-level binding alone is not enough; the same role must also be bound at project level. `just iap-allow` runs both bindings and is idempotent.
+
+A Gmail-only project has no organization, so `gcloud alpha iap oauth-brands` refuses to create the brand and client (`Project must belong to an organization`); the Console form above is the supported way. Keep in mind that the Hive polls `/status.json` anonymously: with IAP on it receives a `302` instead of telemetry, so proctors verify by signing in rather than through the leaderboard.
+
 > ⚠️ **Local Simulation (`IAP_MOCK_EMAIL`) vs. Real Production IAP:**
 > For local development and automated tests, `IapAuthenticatable` supports `ENV["IAP_MOCK_EMAIL"]` (e.g. `simulated-iap-account@example.com`). When active, the UI displays an explicit warning banner: `⚠️ This is a fake IAP login based on ENV[IAP_MOCK_EMAIL] — do NOT use in prod!!!` Never set `IAP_MOCK_EMAIL` in `compose.prod.yaml` or production Cloud Run!
 
