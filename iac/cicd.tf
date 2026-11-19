@@ -81,8 +81,8 @@ resource "google_service_account_iam_member" "cloudbuild_acts_as_cloudrun" {
 
 # Cloud Build Trigger — auto-deploys on push to main
 # Substitutions are the "glue" between TF outputs and cloudbuild.yaml vars.
-# Secrets (_RAILS_MASTER_KEY, _DATABASE_URL) are passed by bin/cloudbuild-submit
-# for local testing, and by the trigger config for auto-deploy.
+# They carry no secrets: a substitution is stored in plain text in the build record,
+# and the service reads its secrets from Secret Manager at runtime.
 resource "google_cloudbuild_trigger" "deploy_on_push" {
   count           = var.enable_cicd_trigger ? 1 : 0
   name            = "on-commit-build-rails8-app-on-gcp"

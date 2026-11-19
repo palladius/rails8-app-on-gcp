@@ -1,0 +1,51 @@
+###############################################################################
+# Build the blog image once, with a layer cache, and push it to Artifact Registry.
+#
+#   cd blog && gcloud builds submit --config cloudbuild-image.yaml
+#
+# Run it from blog/: gcloud uploads only this folder. Cloud Run then deploys the
+# pushed image with `--image` (Steps 3 and 4) or `image:` in compose.prod.yaml
+# (Step 6), without building again.
+#
+# Every Cloud Build runs on a fresh VM, so the only cache that survives is one
+# stored in Artifact Registry. `mode=max` exports every stage to
+# `rails8-blog:buildcache`, so a change outside Gemfile/Gemfile.lock reuses the
+# installed gems. The repository's cloudbuild.yaml (the CI trigger) builds the
+# same way.
+###############################################################################
+
+timeout: 1800s
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _AR_REGION: europe-west1
+  _AR_REPO: rails8-gcp-app
+
+steps:
+  # A BuildKit builder that can import and export a registry cache (the default
+  # docker driver cannot export `mode=max`). The image comes from Google's Docker
+  # Hub mirror to stay clear of Docker Hub rate limits on shared build IPs.
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'buildx-builder'
+    args:
+      - 'buildx'
+      - 'create'
+      - '--name=cached'
+      - '--driver=docker-container'
+      - '--driver-opt=image=mirror.gcr.io/moby/buildkit:buildx-stable-1'
+      - '--use'
+      - '--bootstrap'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build-push'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -euo pipefail
+        IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog"
+        docker buildx build --builder cached --progress=plain \
+          --cache-from "type=registry,ref=$$IMAGE:buildcache" \
+          --cache-to "type=registry,ref=$$IMAGE:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
+          -t "$$IMAGE:latest" --push .

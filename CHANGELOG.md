@@ -2,6 +2,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.23] - 2026-11-19
+### Changed
+- 🧱 **The codelab builds the image once and deploys it** (issue #217): Steps 3, 4 and 6 run `gcloud builds submit --config cloudbuild-image.yaml` from `blog/`, then deploy the pushed image (`gcloud run deploy blog --image $BLOG_IMAGE`, or `image: ${BLOG_IMAGE}` in `compose.prod.yaml`). The new `blog/cloudbuild-image.yaml` builds with the same `mode=max` registry cache as `cloudbuild.yaml`, so later builds reuse the installed gems; a `--source` deploy built from scratch every time. Measured on Cloud Run: a `--source` deploy took 341 s; a cached build took 65 s and the `--image` deploy 95 s. Running the build from `blog/` uploads 12.6 MiB instead of 80.3 MiB from the repository root.
+- 🐳 **`blog/compose.prod.yaml`: `web` and `worker` run `image: ${BLOG_IMAGE}`** instead of `build:`, so `gcloud run compose up` deploys without building. The line references in the speaker notes of `slides/rubyists.en.md` follow the file.
+
+### Fixed
+- 🏗️ **`cloudbuild.yaml` now keeps a layer cache that survives Cloud Build's fresh VMs** (issue #217): the build runs with `docker buildx` and a registry cache of every stage (`rails8-blog:buildcache`, `mode=max`) in Artifact Registry. The old `docker pull` + `--cache-from :latest` never hit: BuildKit ignores an image without cache metadata, and the final image does not hold the `build` stage where `bundle install` runs. Measured on Cloud Build: a cold build takes 276 s, a rebuild with nothing changed 18 s, a rebuild after a change in `blog/config/` 67 s with the gems taken from the cache (a `--source` build took 221 to 242 s).
+- 🔐 **No secrets as build substitutions** (`cloudbuild.yaml`, `bin/cloudbuild-submit`): `_RAILS_MASTER_KEY` and `_DATABASE_URL` are gone. A substitution is stored in the build record in plain text, and the service already reads its secrets from Secret Manager.
+- 🏷️ **Default service name `blog`** in `cloudbuild.yaml` (was `palladius-genai-rails-app`, a leftover from another project).
+- 🔖 **The commit tag comes from the `$SHORT_SHA` substitution** (`cloudbuild.yaml`): Cloud Build does not export `SHORT_SHA` or `COMMIT_SHA` as environment variables, so the old `$${COMMIT_SHA:0:7}` was always empty. Every image was tagged `sha-local`, and the deploy step, which runs under `set -u`, stopped on that line.
+
+### Tests
+- 🧪 **`test/test_cloudbuild_contracts.rb`** (in `just test`): `cloudbuild.yaml` must import and export a `mode=max` registry cache through a `docker-container` buildx builder, must not list `images:`, and must not pass secrets as substitutions; `cloudbuild-image.yaml` shares that cache; `compose.prod.yaml` does not build `web` or `worker`; Steps 3 and 4 of `CODELAB.md` and `SKELETON.md` do not deploy with `--source`, and Step 6 builds before `compose up`.
+
 ## [0.3.22] - 2026-11-19
 ### Changed
 - 🖼️ **Pictures on the four cards of "What you need today" (`slides/rubyists.en.md`, slide 2)**: each card shows, at 50 percent opacity on its right side, a picture of what its link opens: the cover of the deck (`slides/images/need-slides.jpg`, rendered from the deck), the repository on GitHub (`need-repo.jpg`), the first page of the codelab on GitHub Pages (`need-codelab.jpg`) and page 2 of the Google-hosted codelab with the credits banner (`need-credits.jpg`). The three screenshots were taken signed out. The text keeps its own column on the left, so no text sits on top of a picture; long addresses wrap after a slash. The pictures do not take clicks: the links work as before.

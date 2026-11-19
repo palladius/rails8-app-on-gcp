@@ -5,6 +5,14 @@
 #   Stage 1: bin/cloudbuild-submit (local) — sources .env, assembles substitutions
 #   Stage 2: THIS FILE (Cloud Build) — builds, tags, pushes, deploys
 #
+# Layer cache: every Cloud Build runs on a fresh VM, so the only cache that
+# survives is one stored in Artifact Registry. A plain `--cache-from :latest`
+# never hits: BuildKit needs cache metadata, and the final image does not hold
+# the `build` stage where `bundle install` runs. `mode=max` exports every stage
+# to `rails8-blog:buildcache`, so a change outside Gemfile/Gemfile.lock reuses
+# the installed gems. Measurements: https://github.com/palladius/rails8-app-on-gcp/issues/217
+# (slow codelab builds).
+#
 # Substitutions are passed by:
 #   - bin/cloudbuild-submit (local testing)
 #   - Cloud Build Trigger (auto-deploy, configured in Terraform)
@@ -17,65 +25,46 @@ options:
 
 substitutions:
   _AR_REGION: europe-west1
-  _APP_NAME: palladius-genai-rails-app
+  _APP_NAME: blog
   _AR_REPO: rails8-gcp-app
   _ENVIRONMENT: dev
-  _RAILS_MASTER_KEY: ''
-  _DATABASE_URL: ''
   _CLOUD_SQL_CONNECTION: ''
   _ENABLE_SIGNUP: 'true'
 
-images:
-  - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
-
 steps:
-  # 0. Pull previous latest image for Docker layer caching (ignore failure on first build)
+  # 0. A BuildKit builder that can import and export a registry cache (the default
+  #    docker driver cannot export `mode=max`). The image comes from Google's Docker
+  #    Hub mirror to stay clear of Docker Hub rate limits on shared build IPs.
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-pull-cache'
-    entrypoint: 'bash'
+    id: 'buildx-builder'
     args:
-      - '-c'
-      - 'docker pull ${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest || exit 0'
+      - 'buildx'
+      - 'create'
+      - '--name=cached'
+      - '--driver=docker-container'
+      - '--driver-opt=image=mirror.gcr.io/moby/buildkit:buildx-stable-1'
+      - '--use'
+      - '--bootstrap'
 
-  # 1. Build Docker image from blog/ directory using cached layers
+  # 1. Build blog/ with the registry cache, tag (latest, sha, version) and push in one go.
+  #    buildx pushes straight from its builder, so there is no `images:` section.
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-build'
-    args:
-      - 'build'
-      - '--cache-from'
-      - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
-      - '-t'
-      - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog:latest'
-      - 'blog/'
-
-  # 2. Tag with SHA and VERSION
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-tag'
+    id: 'docker-build-push'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        SHORT_SHA="$${SHORT_SHA:-$${COMMIT_SHA:0:7}}"
+        set -euo pipefail
+        SHORT_SHA="$SHORT_SHA"  # substitution: empty on a manual submit
         SHORT_SHA="$${SHORT_SHA:-local}"
         IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog"
+        TAGS=(-t "$$IMAGE:latest" -t "$$IMAGE:sha-$$SHORT_SHA")
+        if [ -f VERSION ]; then TAGS+=(-t "$$IMAGE:v$$(cat VERSION)"); fi
 
-        docker tag "$$IMAGE:latest" "$$IMAGE:sha-$$SHORT_SHA"
-
-        if [ -f "VERSION" ]; then
-          VERSION=$$(cat VERSION)
-          docker tag "$$IMAGE:latest" "$$IMAGE:v$$VERSION"
-          echo "✅ Tagged: latest, sha-$$SHORT_SHA, v$$VERSION"
-        else
-          echo "✅ Tagged: latest, sha-$$SHORT_SHA"
-        fi
-
-  # 3. Push all tags to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'docker-push'
-    args:
-      - 'push'
-      - '--all-tags'
-      - '${_AR_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/rails8-blog'
+        docker buildx build --builder cached --progress=plain \
+          --cache-from "type=registry,ref=$$IMAGE:buildcache" \
+          --cache-to "type=registry,ref=$$IMAGE:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
+          "$${TAGS[@]}" --push blog/
 
   # 4. Deploy to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -86,7 +75,7 @@ steps:
       - |
         set -euo pipefail
         APP_VERSION=$$(cat VERSION 2>/dev/null || echo 'unknown')
-        SHORT_SHA="$${SHORT_SHA:-$${COMMIT_SHA:0:7}}"
+        SHORT_SHA="$SHORT_SHA"  # substitution: empty on a manual submit
         SHORT_SHA="$${SHORT_SHA:-local}"
         IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog:v$$APP_VERSION"
 

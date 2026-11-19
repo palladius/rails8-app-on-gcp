@@ -1,14 +1,15 @@
 # Production blueprint for Cloud Run: web + worker + Cloud SQL Auth Proxy sidecar.
 #
+# web and worker run the image cloudbuild-image.yaml pushed (BLOG_IMAGE), so nothing is built here.
+#
 # This file carries NO secret values. Deploying it gives you the three containers on SQLite
 # (ephemeral), signed with a throwaway key (SECRET_KEY_BASE_DUMMY). The next command of the codelab
 # mounts RAILS_MASTER_KEY and DB_PASSWORD from Secret Manager on web and worker and removes
 # SECRET_KEY_BASE_DUMMY; config/database.yml switches to PostgreSQL as soon as DB_PASSWORD is there.
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # Built and pushed by cloudbuild-image.yaml: compose up deploys it without building.
+    image: ${BLOG_IMAGE}
     x-google-cloudrun:
       ingress-container: true
     environment:
@@ -30,9 +31,7 @@ services:
       - cloudsql-proxy
 
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${BLOG_IMAGE}
     command: ["bash", "-c", "until bundle exec rails solid_queue:start; do echo 'SolidQueue: database not ready, retrying in 10s...'; sleep 10; done"]
     environment:
       RAILS_ENV: production

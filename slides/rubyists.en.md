@@ -603,7 +603,7 @@ services:
 <!--
 Tour stop 2.
 production.rb line 64 is Solid Cache, lines 67 and 68 are Solid Queue on its own database; config/cable.yml line 12 is Solid Cable. Everything that used to need Redis now sits in PostgreSQL.
-compose.prod.yaml declares three containers: web at line 8 (Puma, the only one that receives HTTP), worker at line 32 (the full command is on line 36, it retries until the database is ready), and cloudsql-proxy at line 53.
+compose.prod.yaml declares three containers: web at line 10 (Puma, the only one that receives HTTP), worker at line 33 (the full command is on line 35, it retries until the database is ready), and cloudsql-proxy at line 52.
 The YAML on the slide is shortened; the environment blocks are on the next stops.
 The same Compose file is what gets deployed: one service, three containers, one command. That is Deploy 4a in the codelab.
 -->
@@ -668,7 +668,7 @@ gcloud run services update blog ... \
 
 <!--
 Tour stop 4.
-database.yml lines 51 to 57: production builds its PostgreSQL connection from five plain settings. DB_HOST is cloudsql-proxy (compose.prod.yaml line 21): the app talks to the Cloud SQL Auth Proxy sidecar, which opens an encrypted tunnel to Cloud SQL authorised by the identity of the service. The database login itself still uses the user and the password.
+database.yml lines 51 to 57: production builds its PostgreSQL connection from five plain settings. DB_HOST is cloudsql-proxy (compose.prod.yaml line 22): the app talks to the Cloud SQL Auth Proxy sidecar, which opens an encrypted tunnel to Cloud SQL authorised by the identity of the service. The database login itself still uses the user and the password.
 Line 50 is the switch: without DB_PASSWORD the app stays on SQLite. That is why Deploy 4a comes up with three containers and still shows the "ephemeral database" banner.
 compose.prod.yaml carries no secret values at all. Deploy 4b is one command that mounts two secrets from Secret Manager, RAILS_MASTER_KEY and DB_PASSWORD, on web and on worker, and switches to a dedicated service account. The command on the slide is shortened; the full one is in Step 6 of the codelab.
 After that, the service configuration contains only references to secrets, no values. The codelab shows how to check it.
