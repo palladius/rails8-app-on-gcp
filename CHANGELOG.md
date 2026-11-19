@@ -1,6 +1,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- 🔗 **Request trace correlation (`blog/lib/cloud_trace_context.rb`, `blog/config/initializers/cloud_trace.rb`)**: a Rack middleware reads Cloud Run's `X-Cloud-Trace-Context` header (or a W3C `traceparent`) into `Current.trace_id`, so every structured JSON log line of a request carries `logging.googleapis.com/trace`. Logs Explorer groups a request's lines under its trace, and Cloud Trace shows them next to the request's span. Malformed headers are ignored.
+### Removed
+- 🧹 **`CloudErrorReportingMiddleware` (`blog/config/initializers/error_reporting.rb`)**: it printed the exception to `STDERR` line by line, and Cloud Run stores each line as its own log entry, so the output never formed one report. Rails' own exception log line, written by `GoogleJsonFormatter`, already reaches Error Reporting; a structured replacement produced a second Error Reporting group for every crash.
 
 ## [0.3.22] - 2026-11-19
 ### Changed
