@@ -65,14 +65,23 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Configure outgoing SMTP relay when configured via environment variables (GCP blocks outbound
+  # port 25; use authenticated STARTTLS on port 587). When no SMTP server is configured, skip
+  # network delivery so background mailer jobs complete cleanly instead of failing with
+  # Errno::ECONNREFUSED on localhost:25 (Issue #197).
+  if (smtp_address = ENV["SMTP_ADDRESS"].presence || ENV["SMTP_HOST"].presence)
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              smtp_address,
+      port:                 ENV.fetch("SMTP_PORT", 587).to_i,
+      user_name:            ENV["SMTP_USERNAME"].presence,
+      password:             ENV["SMTP_PASSWORD"].presence,
+      authentication:       ENV["SMTP_AUTHENTICATION"].presence&.to_sym,
+      enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS_AUTO", "true") == "true"
+    }.compact
+  else
+    config.action_mailer.perform_deliveries = false
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

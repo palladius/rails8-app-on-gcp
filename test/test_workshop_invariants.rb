@@ -221,5 +221,47 @@ class WorkshopInvariantsTest < Minitest::Test
     _, _, status = Open3.capture3(cmd, chdir: File.expand_path("..", __dir__))
     assert_equal 1, status.exitstatus, "Checker must exit with status 1 when an invariant fails"
   end
+
+  # Authored locally for bug reproduction (Issue #197)
+  def test_check_zero_stuck_jobs_ignores_failed_or_claimed_when_ready_count_is_zero
+    with_mock_solid_queue(unfinished_jobs: 1, ready_executions: 0) do
+      inv = { "id" => "inv-zero-stuck-background-jobs", "check" => "zero_stuck_jobs" }
+      result = @checker.evaluate_invariant(inv)
+      assert result[:passed], "Expected zero_stuck_jobs to pass when ReadyExecution count is 0: #{result[:error_message]}"
+    end
+  end
+
+  # Authored locally for bug reproduction (Issue #197)
+  def test_check_zero_stuck_jobs_fails_when_ready_executions_accumulate
+    with_mock_solid_queue(unfinished_jobs: 2, ready_executions: 2) do
+      inv = { "id" => "inv-zero-stuck-background-jobs", "check" => "zero_stuck_jobs" }
+      result = @checker.evaluate_invariant(inv)
+      refute result[:passed], "Expected zero_stuck_jobs to fail when ReadyExecution count > 0"
+      assert_match(/2 background job\(s\)/, result[:error_message])
+    end
+  end
+
+  private
+
+  def with_mock_solid_queue(unfinished_jobs:, ready_executions:)
+    had_solid_queue = Object.const_defined?(:SolidQueue)
+    raise "Unexpected SolidQueue constant defined in standalone test" if had_solid_queue
+
+    mod = Module.new
+    job_cls = Class.new
+    rel = Object.new
+    rel.define_singleton_method(:count) { unfinished_jobs }
+    job_cls.define_singleton_method(:where) { |*_args| rel }
+
+    ready_cls = Class.new
+    ready_cls.define_singleton_method(:count) { ready_executions }
+
+    mod.const_set(:Job, job_cls)
+    mod.const_set(:ReadyExecution, ready_cls)
+    Object.const_set(:SolidQueue, mod)
+    yield
+  ensure
+    Object.send(:remove_const, :SolidQueue) if !had_solid_queue && Object.const_defined?(:SolidQueue)
+  end
 end
 

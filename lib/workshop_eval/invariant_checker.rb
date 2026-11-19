@@ -245,7 +245,16 @@ module WorkshopEval
     # Ensures Solid Queue has zero unworked background jobs accumulating in queue
     def check_zero_stuck_jobs(inv)
       # If Rails and SolidQueue are defined, query DB safely with fast timeout
-      if defined?(SolidQueue::Job)
+      if defined?(SolidQueue::ReadyExecution)
+        begin
+          stuck_count = SolidQueue::ReadyExecution.count
+          if stuck_count > 0
+            return build_result(inv, passed: false, error_message: "REGRESSION: #{stuck_count} background job(s) stuck in queue! Dedicated Solid Queue worker required from Step 6 onward.")
+          end
+        rescue StandardError => e
+          # DB might not be connected in isolated unit tests; that is allowed offline
+        end
+      elsif defined?(SolidQueue::Job)
         begin
           stuck_count = SolidQueue::Job.where(finished_at: nil).count
           if stuck_count > 0

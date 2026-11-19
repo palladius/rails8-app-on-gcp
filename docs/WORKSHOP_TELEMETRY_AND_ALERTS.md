@@ -75,14 +75,22 @@ The banners live under [`blog/app/views/workshop/alerts/`](file:///usr/local/goo
 
 ---
 
-### 5. ⚠️ Stuck Background Jobs Alert (`_stuck_jobs.html.erb`)
-* **Condition:** `SolidQueue::Job.where(finished_at: nil).count > 0`
-* **Trigger:** ActiveJobs enqueued while running in single-container mode without a dedicated Solid Queue worker.
-* **Style:**
+### 5. ⚠️ Stuck & Failed Background Jobs Alerts (`_stuck_jobs.html.erb`)
+* **Pending Condition:** `SolidQueue::ReadyExecution.count > 0`
+  - Counting `ReadyExecution` (rather than `SolidQueue::Job.where(finished_at: nil)`) targets unclaimed jobs waiting for a worker and avoids false-positive warnings on failed executions (`FailedExecution`), actively running jobs (`ClaimedExecution`), or future/retry-backoff jobs (`ScheduledExecution`).
+* **Pending Trigger:** ActiveJobs waiting in the queue while running in single-container mode without a dedicated Solid Queue worker.
+* **Pending Style:**
   - **Border / Accent:** Warning amber `#f59e0b` (`border-left: 5px solid #f59e0b`)
   - **Background:** Pale gold `#fffbeb`
   - **Text Color:** `#92400e` / `#b45309`
-* **Why Button (`Ask AI 🤖`):** Explains that Puma only handles HTTP traffic; background jobs await execution until Step 3 attaches the Solid Queue worker sidecar container.
+* **Pending Why Button (`Ask AI 🤖`):** Explains that Puma only handles HTTP traffic; background jobs await execution until Step 3 attaches the Solid Queue worker sidecar container.
+* **Failed Condition (`.failed-jobs-alert`):** `SolidQueue::FailedExecution.count > 0`
+* **Failed Trigger:** A Solid Queue worker picked up a job and it raised an unhandled exception (e.g. transient DB connection spike or API permissions).
+* **Failed Style:**
+  - **Border / Accent:** Crimson `#ef4444` (`border-left: 5px solid #ef4444`)
+  - **Background:** Soft red `#fef2f2`
+  - **Text Color:** `#991b1b` / `#b91c1c`
+* **Recovery Commands:** `bin/rails solid_queue:retry_failed` / `bin/rails solid_queue:clear_failed`.
 
 ---
 
@@ -121,7 +129,8 @@ All workshop alerts must follow these strict CSS design system principles:
 | **Database** | 🟡 | SQLite / Local Postgres | `#eab308` (Yellow) | Distinguishes ephemeral storage from Google Cloud SQL |
 | **Storage** | 💾 | `storage_tier == :local` | `#64748b` (Slate) | Explains grayscale mode and previews private GCS bucket |
 | **AI Status** | 🍌 | `!Nanobanana.available?` | `#ef4444` (Red) | Explains fake cover fallback vs Vertex AI (ADC) |
-| **Queue Worker**| ⚠️ | `SolidQueue::Job.pending > 0` | `#f59e0b` (Amber) | Teaches multi-container Cloud Run worker sidecars |
+| **Queue Worker**| ⚠️ | `SolidQueue::ReadyExecution.count > 0` | `#f59e0b` (Amber) | Teaches multi-container Cloud Run worker sidecars |
+| **Failed Jobs** | ❌ | `SolidQueue::FailedExecution.count > 0` | `#ef4444` (Red) | Surfaces worker job errors separately with retry/clear guidance |
 
 ---
 

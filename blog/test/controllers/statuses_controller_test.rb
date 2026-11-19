@@ -226,4 +226,39 @@ class StatusesControllerTest < ActionDispatch::IntegrationTest
       ENV["OPTIONAL_BANNER"] = old_banner
     end
   end
+
+  # Authored locally for bug reproduction (Issue #197)
+  test "reports failed executions separately from pending count in status JSON" do
+    dummy_relation = Object.new
+    dummy_relation.define_singleton_method(:count) { 1 }
+
+    stub_singleton(SolidQueue::Job, :where, ->(*_args) { dummy_relation }) do
+      stub_singleton(SolidQueue::ReadyExecution, :count, 0) do
+        stub_singleton(SolidQueue::FailedExecution, :count, 1) do
+          get status_url(format: :json)
+          assert_response :success
+          json = JSON.parse(response.body)
+          assert_equal 0, json.dig("jobs", "pending_count")
+          assert_equal 1, json.dig("jobs", "failed_count")
+          assert_equal "❌ 1 Failed Job", json.dig("jobs", "badge")
+          assert_equal "#ef4444", json.dig("jobs", "color")
+        end
+      end
+    end
+  end
+
+  # Authored locally for bug reproduction (Issue #197)
+  test "reports ready executions as pending jobs in status JSON" do
+    stub_singleton(SolidQueue::ReadyExecution, :count, 2) do
+      stub_singleton(SolidQueue::FailedExecution, :count, 0) do
+        get status_url(format: :json)
+        assert_response :success
+        json = JSON.parse(response.body)
+        assert_equal 2, json.dig("jobs", "pending_count")
+        assert_equal 0, json.dig("jobs", "failed_count")
+        assert_equal "⚠️ 2 Pending Jobs", json.dig("jobs", "badge")
+        assert_equal "#f59e0b", json.dig("jobs", "color")
+      end
+    end
+  end
 end
