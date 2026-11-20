@@ -202,7 +202,7 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`evals`**:
   - `[RUBY]` Verify GenerateCoverImageJob exists
   - `[LLM]` Verify GenAI prompt conforms to Milanese vintage poster aesthetic
-  - `[RUBY]` Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)
+  - `[RUBY]` Verify Podcastifier exists as either the initial student scaffold stub or a completed TTS implementation
   - `[LLM]` Verify student implementation of Podcastifier via Antigravity if attempted
   - `[RUBY]` Verify deterministic absence of warning alerts, stuck jobs, and ephemeral badges via integration tests
   - `[LLM]` Verify rendered UI and screenshots at Step 7 have zero warning banners, zero pending background jobs alerts, and no ephemeral storage badges

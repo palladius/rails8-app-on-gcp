@@ -114,4 +114,139 @@ class WorkshopEvalRunnerTest < Minitest::Test
       assert_equal before, File.binread(cred_path)
     end
   end
+
+  # Authored locally for bug reproduction (#198)
+  def test_podcastifier_eval_passes_for_initial_starter_stub
+    stub_job = <<~RUBY
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          # TODO(student): COMPLETE_ME — Pair program with Google Antigravity to implement
+          # Italian TTS podcast generation using voice 'it-IT-Wavenet-A' via Cloud TTS / ADC!
+        end
+      end
+    RUBY
+    routes = "Rails.application.routes.draw { resources :posts }\n"
+
+    _out, err, status = run_podcastifier_eval(job_code: stub_job, routes_code: routes)
+    assert status.success?, "starter COMPLETE_ME stub should pass eval: #{err}"
+  end
+
+  def test_podcastifier_eval_passes_for_completed_solutions_implementation
+    completed_job = <<~'RUBY'
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          post = Post.find(post_id)
+          return if post.podcast_audio_it.attached?
+
+          script_text = PodcastTranslationService.translate_and_summarize(title: post.title, body: post.body.to_plain_text)
+          audio_io = CloudTtsService.synthesize(text: script_text, language_code: "it-IT", voice: "it-IT-Wavenet-A")
+          post.podcast_audio_it.attach(io: audio_io, filename: "podcast_it_#{post.id}.mp3", content_type: "audio/mpeg")
+        end
+      end
+    RUBY
+    routes = <<~RUBY
+      Rails.application.routes.draw do
+        resources :posts do
+          post :generate_podcast, on: :member
+        end
+      end
+    RUBY
+
+    _out, err, status = run_podcastifier_eval(job_code: completed_job, routes_code: routes)
+    assert status.success?, "completed solutions/podcastifier implementation should pass eval: #{err}"
+  end
+
+  def test_podcastifier_eval_passes_for_completed_custom_tts_implementation_without_route
+    custom_tts_job = <<~RUBY
+      require "google/cloud/text_to_speech"
+
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          post = Post.find(post_id)
+          client = Google::Cloud::TextToSpeech.text_to_speech
+          response = client.synthesize_speech(input: { text: post.title }, voice: { language_code: "it-IT", name: "it-IT-Wavenet-A" }, audio_config: { audio_encoding: :MP3 })
+          post.podcast_audio_it.attach(io: StringIO.new(response.audio_content), filename: "podcast.mp3", content_type: "audio/mpeg")
+        end
+      end
+    RUBY
+    routes = "Rails.application.routes.draw { resources :posts }\n"
+
+    _out, err, status = run_podcastifier_eval(job_code: custom_tts_job, routes_code: routes)
+    assert status.success?, "completed callback-triggered TTS implementation without generate_podcast route should pass eval: #{err}"
+  end
+
+  def test_podcastifier_eval_fails_for_half_wired_stub_with_route
+    stub_job = <<~RUBY
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          # TODO(student): COMPLETE_ME
+        end
+      end
+    RUBY
+    routes = "Rails.application.routes.draw { resources :posts { post :generate_podcast, on: :member } }\n"
+
+    _out, _err, status = run_podcastifier_eval(job_code: stub_job, routes_code: routes)
+    refute status.success?, "half-wired COMPLETE_ME stub with generate_podcast route must fail eval"
+  end
+
+  def test_podcastifier_eval_fails_for_incomplete_job_missing_tts_or_attachment
+    incomplete_job = <<~RUBY
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          post = Post.find(post_id)
+          Rails.logger.info post.title
+        end
+      end
+    RUBY
+    routes = "Rails.application.routes.draw { resources :posts { post :generate_podcast, on: :member } }\n"
+
+    _out, _err, status = run_podcastifier_eval(job_code: incomplete_job, routes_code: routes)
+    refute status.success?, "incomplete PodcastifierJob lacking TTS and podcast_audio_it attachment must fail eval"
+  end
+
+  def test_podcastifier_eval_fails_when_complete_me_marker_is_left_in_expanded_job
+    uncleaned_job = <<~'RUBY'
+      class PodcastifierJob < ApplicationJob
+        queue_as :default
+
+        def perform(post_id)
+          # TODO(student): COMPLETE_ME
+          post = Post.find(post_id)
+          return if post.podcast_audio_it.attached?
+
+          audio_io = CloudTtsService.synthesize(text: post.title, language_code: "it-IT", voice: "it-IT-Wavenet-A")
+          post.podcast_audio_it.attach(io: audio_io, filename: "podcast_it_#{post.id}.mp3", content_type: "audio/mpeg")
+        end
+      end
+    RUBY
+    routes = "Rails.application.routes.draw { resources :posts { post :generate_podcast, on: :member } }\n"
+
+    _out, _err, status = run_podcastifier_eval(job_code: uncleaned_job, routes_code: routes)
+    refute status.success?, "expanded job that still contains COMPLETE_ME must fail eval"
+  end
+
+  private
+
+  def run_podcastifier_eval(job_code:, routes_code:)
+    code = ruby_evals.find { |e| e["id"] == "step-7-ruby-podcastifier-scaffold-check" }["code"]
+    Dir.mktmpdir do |dir|
+      FileUtils.mkdir_p(File.join(dir, "blog", "app", "jobs"))
+      FileUtils.mkdir_p(File.join(dir, "blog", "config"))
+      File.write(File.join(dir, "blog", "app", "jobs", "podcastifier_job.rb"), job_code)
+      File.write(File.join(dir, "blog", "config", "routes.rb"), routes_code)
+      File.write(File.join(dir, "snippet.rb"), code)
+
+      Open3.capture3("ruby", "-e", "Dir.chdir(ARGV[0]) { eval(File.read(ARGV[1])) }", dir, File.join(dir, "snippet.rb"))
+    end
+  end
 end

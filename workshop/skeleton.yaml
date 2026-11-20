@@ -373,13 +373,17 @@ steps:
         prompt: "Review the image generation prompt in GenerateCoverImageJob. Verify it requests a vintage retro poster style with a banana cameo. Return JSON with {return: 0 or 1, comment: string, error_message: string}."
       - id: "step-7-ruby-podcastifier-scaffold-check"
         type: "ruby"
-        description: "Verify Podcastifier exists as a minimal student scaffold stub (< 10 lines with COMPLETE_ME)"
+        description: "Verify Podcastifier exists as either the initial student scaffold stub or a completed TTS implementation"
         code: |
           job = File.read('blog/app/jobs/podcastifier_job.rb')
           routes = File.read('blog/config/routes.rb')
-          raise 'Missing COMPLETE_ME placeholder' unless job.include?('COMPLETE_ME')
-          raise 'Job should be an unfilled stub before student works on it' if job.lines.count > 10
-          raise 'generate_podcast should not be in routes' if routes.include?('generate_podcast')
+          is_stub = job.include?('COMPLETE_ME') && job.lines.count <= 10 && !routes.include?('generate_podcast')
+          is_implemented = !job.include?('COMPLETE_ME') &&
+                           job.match?(/CloudTtsService|TextToSpeech|texttospeech/i) &&
+                           job.include?('podcast_audio_it')
+          unless is_stub || is_implemented
+            raise 'PodcastifierJob must either be the untouched COMPLETE_ME starter stub (<= 10 lines, no generate_podcast route) or a completed TTS implementation attaching podcast_audio_it without COMPLETE_ME'
+          end
       - id: "step-7-llm-podcastifier-button-test"
         type: "llm"
         description: "Verify student implementation of Podcastifier via Antigravity if attempted"
