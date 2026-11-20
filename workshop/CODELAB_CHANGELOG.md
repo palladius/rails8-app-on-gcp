@@ -8,6 +8,10 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.5.3] - 2026-11-20 (Quest 2: what the app already does, and how to see it)
+
+- **Step 8, Quest 2**: the quest no longer asks you to configure JSON logging, which the app already does. It names the three files involved (`google_json_formatter.rb`, `cloud_trace_context.rb`, `cloud_error_reporter.rb`), then walks through four checks: trigger `/boom` as the admin, find the `BoomsController::DeliberateBoom` group in Error Reporting, show the Rails lines of the request under its trace in Logs Explorer, and get an email when a resolved group reopens.
+
 ## [2.5.2] - 2026-11-18 (Folder-independent `cd`; where to claim credits)
 
 - **Steps 3, 4 and 6**: `cd "$(git rev-parse --show-toplevel)/blog"` works from the repository root and from inside `blog/`.

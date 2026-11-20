@@ -57,6 +57,20 @@ class GoogleJsonFormatterTest < ActiveSupport::TestCase
     assert_includes payload["message"], "app/models/post.rb:10"
   end
 
+  test "writes a Hash message as structured fields (jsonPayload), not as a JSON string" do
+    payload = JSON.parse(@formatter.call("INFO", @time, nil, { message: "Paid \e[32morder\e[0m", order_id: 42 }))
+
+    assert_equal "Paid order", payload["message"]
+    assert_equal 42, payload["order_id"]
+  end
+
+  test "a Hash message cannot override the severity or the time of the line" do
+    payload = JSON.parse(@formatter.call("ERROR", @time, nil, { "severity" => "DEBUG", "time" => "yesterday", "message" => "x" }))
+
+    assert_equal "ERROR", payload["severity"]
+    assert_equal "2026-09-10T12:00:00.000000Z", payload["time"]
+  end
+
   test "handles nil and empty messages gracefully" do
     output = @formatter.call("INFO", @time, nil, nil)
     payload = JSON.parse(output)

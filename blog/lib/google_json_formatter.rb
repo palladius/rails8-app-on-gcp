@@ -11,6 +11,10 @@ require "time"
 # entry's severity and timestamp, the `logging.googleapis.com/*` keys become its trace, spanId and
 # traceSampled (so the line is grouped with the request log of the same request), and when only
 # `message` is left the entry shows it as textPayload.
+#
+# Log a Hash to write structured fields: `Rails.logger.info("message" => "Paid", "order_id" => 42)`
+# becomes a jsonPayload you can filter on (jsonPayload.order_id=42). CloudErrorReporter uses this to
+# write Error Reporting events.
 class GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter
   SEVERITY_MAP = {
     "DEBUG"   => "DEBUG",
@@ -28,19 +32,28 @@ class GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter
     gcp_severity = SEVERITY_MAP[severity.to_s.upcase] || severity.to_s.upcase
 
     payload = {
-      severity: gcp_severity,
+      "severity" => gcp_severity,
       # Microseconds, like Cloud Run's own request log: whole seconds would shuffle the lines of a request.
-      time: (timestamp.respond_to?(:getutc) ? timestamp : Time.now).getutc.iso8601(6),
-      message: format_message(msg).gsub(ANSI_ESCAPE, "")
+      "time" => (timestamp.respond_to?(:getutc) ? timestamp : Time.now).getutc.iso8601(6)
     }
+    # A Hash message may not override the severity and time of the line.
+    payload.merge!(message_fields(msg)) { |_key, own, _given| own }
 
-    payload[:progname] = progname.to_s if progname && !progname.empty?
+    payload["progname"] = progname.to_s if progname && !progname.empty?
     payload.merge!(trace_fields)
 
     payload.to_json + "\n"
   end
 
   private
+
+  def message_fields(msg)
+    return { "message" => format_message(msg).gsub(ANSI_ESCAPE, "") } unless msg.is_a?(Hash)
+
+    fields = msg.transform_keys(&:to_s)
+    fields["message"] = fields["message"].gsub(ANSI_ESCAPE, "") if fields["message"].is_a?(String)
+    fields
+  end
 
   def format_message(msg)
     return "" if msg.nil?
@@ -49,8 +62,6 @@ class GoogleJsonFormatter < ActiveSupport::Logger::SimpleFormatter
       formatted = "#{msg.class}: #{msg.message}"
       formatted += "\n" + msg.backtrace.join("\n") if msg.backtrace
       formatted
-    elsif msg.is_a?(Hash)
-      msg.to_json
     else
       msg.to_s
     end

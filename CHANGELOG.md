@@ -2,6 +2,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.23] - 2026-11-20
+### Fixed
+- 📊 **Error Reporting groups are named after the exception (workshop Step 8, Quest 2)**: on Cloud Run, the `/boom` group was named after a stack frame (`app/controllers/booms_controller.rb:17:in 'BoomsController#show'`), with the message `undefined` and the response code 0. Error Reporting could not read the exception class from the way Rails logs exceptions. The new `blog/lib/cloud_error_reporter.rb`, a `Rails.error` subscriber, writes each unhandled exception (in a request or in a Solid Queue job) as one `ReportedErrorEvent`:
+  - the exception in Ruby's own format;
+  - the HTTP method, the URL with filtered parameters hidden, the user agent and the status code;
+  - the user id, and the Cloud Run service and revision.
+
+  `config/initializers/logging.rb` subscribes it wherever logs are Google Cloud JSON. Rails' own copies of the exception would have been second events, so `production.rb` moves ActionDispatch's copy to DEBUG and the Active Job "Error performing ..." line keeps no frames.
+- 🪵 **Trace-correlated logs**: every Rails line of a request carries the Cloud Run trace and span (`blog/lib/cloud_trace_context.rb`, reading `X-Cloud-Trace-Context` or `traceparent`), so "Show entries for this trace" in Logs Explorer lists them under the request log. Timestamps keep microseconds, and ANSI color codes are stripped.
+- 🧯 **One log entry per exception, no Error Reporting group for a 404**: the stderr middleware that printed each backtrace frame as its own log entry is gone, and `log_rescued_responses = false` keeps rescued client errors (404, 422) out of Error Reporting.
+- 🔒 **`/boom` is admin-only**: anonymous visitors are sent to the sign-in page and other users get a 404. Before, anyone could flood Error Reporting with it.
+
+### Added
+- 🧾 **Structured fields in logs**: `GoogleJsonFormatter` writes a Hash message as `jsonPayload` fields (`Rails.logger.info("message" => "Paid", "order_id" => 42)`). A Hash cannot override the severity or the time of the line.
+- 🧭 **Codelab `v2.5.3`**: Quest 2 explains what the app already does and how to see it in Error Reporting and Logs Explorer, including email notifications.
+
 ## [0.3.22] - 2026-11-19
 ### Changed
 - 🖼️ **Pictures on the four cards of "What you need today" (`slides/rubyists.en.md`, slide 2)**: each card shows, at 50 percent opacity on its right side, a picture of what its link opens: the cover of the deck (`slides/images/need-slides.jpg`, rendered from the deck), the repository on GitHub (`need-repo.jpg`), the first page of the codelab on GitHub Pages (`need-codelab.jpg`) and page 2 of the Google-hosted codelab with the credits banner (`need-credits.jpg`). The three screenshots were taken signed out. The text keeps its own column on the left, so no text sits on top of a picture; long addresses wrap after a slash. The pictures do not take clicks: the links work as before.
