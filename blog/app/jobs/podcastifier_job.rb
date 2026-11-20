@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Generates an Italian audio overview for each Post via Vertex AI translation
+# and Google Cloud Text-to-Speech (ADC only). See lib/podcast_translation_service.rb.
 class PodcastifierJob < ApplicationJob
   queue_as :default
 
@@ -9,14 +11,19 @@ class PodcastifierJob < ApplicationJob
     post = Post.find(post_id)
     return if post.podcast_audio_it.attached?
 
-    Rails.logger.info "🎧 Podcastifier: Generating Italian TTS podcast for Post #{post.id} ('#{post.title}')..."
+    safe_title = PodcastTranslationService.sanitize_log(post.title, 80)
+    Rails.logger.info "🎧 Podcastifier: Generating Italian TTS podcast for Post #{post.id} ('#{safe_title}')..."
 
-    # Simple Italian summary script for the podcast
-    title = post.title.presence || "Articolo"
-    body_text = post.body.to_plain_text.presence || ""
-    summary_text = "Benvenuti al podcast del blog! Oggi parliamo di: #{title}. #{body_text.truncate(250)}"
+    script_text = PodcastTranslationService.translate_and_summarize(
+      title: post.title,
+      body: post.body.to_plain_text
+    )
 
-    audio_io = CloudTtsService.synthesize(text: summary_text, language_code: "it-IT", voice: "it-IT-Wavenet-A")
+    audio_io = CloudTtsService.synthesize(
+      text: script_text,
+      language_code: "it-IT",
+      voice: "it-IT-Wavenet-A"
+    )
 
     post.podcast_audio_it.attach(
       io: audio_io,
