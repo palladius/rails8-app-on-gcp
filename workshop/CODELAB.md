@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.5.2 -->
+<!-- 🏷️ Codelab Version: 2.5.3 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -1125,9 +1125,17 @@ Now that you have mastered the canonical reference architecture, choose your gra
 ### 📊 Quest 2: Production SRE Telemetry & Cloud Logging
 * **Difficulty:** Medium (Observability)
 * **The Goal:** Stream structured JSON application logs with trace correlation IDs directly to Google Cloud Logging and catch production exceptions in real-time with Cloud Error Reporting.
+* **Already in the app** (no gem, no extra IAM role: Cloud Run sends everything your containers write to stdout to Cloud Logging):
+  - `blog/lib/google_json_formatter.rb` writes each log line as one JSON object. Cloud Logging reads its severity, its timestamp (to the microsecond) and its trace.
+  - `blog/lib/cloud_trace_context.rb` reads the `X-Cloud-Trace-Context` header that Cloud Run adds to every request, so each Rails line of a request carries that request's trace.
+  - `blog/lib/cloud_error_reporter.rb`, a `Rails.error` subscriber, writes each unhandled exception (in a request or in a Solid Queue job) once, in the format Error Reporting reads.
 * **How it Works:**
-  - Configure `blog/config/environments/production.rb` to emit structured JSON logs with GCP trace labels.
-  - Trigger an intentional test exception and watch Google Cloud Error Reporting group and notify you instantly.
+  1. Sign in to your deployed blog as the admin (`GOOGLE_CLOUD_ACCOUNT`) and open `/boom`: it raises an exception on purpose and you get a 500 page. Only the admin can do this: a public crash button would let anyone flood Error Reporting and your inbox.
+  2. Open [Error Reporting](https://console.cloud.google.com/errors). A new group is named after the exception, `BoomsController::DeliberateBoom`, with its message, the response code 500 and the Cloud Run revision.
+  3. Open [Logs Explorer](https://console.cloud.google.com/logs/query), expand the `GET /boom` request log, click its trace icon and choose **Show entries for this trace**. The Rails lines of that request (`Started GET`, `Processing`, the admin warning, `Completed 500` and the error) appear under it, in order.
+  4. Get notified. In Error Reporting, click **Configure notifications** and select an email channel (to create one: **Monitoring > Alerting > Edit notification channels > Email > Add new**). Mark the `DeliberateBoom` group as **Resolved**, wait 5 minutes (Error Reporting holds notifications for a group that long after you resolve it), then open `/boom` again: the group reopens and you get an email.
+
+> 💡 **Ask your AI pair programmer:** "Rails already logs every exception with its backtrace. Why does this app write its own Error Reporting event, and why does `production.rb` move Rails' copy to DEBUG?"
 
 ---
 
@@ -1286,4 +1294,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.5.2 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.5.3 (2026-11-20) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

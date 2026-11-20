@@ -39,8 +39,10 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Native Google Cloud Structured JSON Logging (Issue #82)
+  # Native Google Cloud Structured JSON Logging (Issue #82, workshop Step 8 Quest 2)
   # When deployed to Cloud Run, structured JSON logs enable instant severity filtering and grouping.
+  # Each line carries the request's trace (CloudTraceContext), and each unhandled exception becomes ONE
+  # Error Reporting event written by CloudErrorReporter (both set up in config/initializers/logging.rb).
   if ENV["LOG_FORMAT"] == "plain"
     config.log_tags = [ :request_id ]
     config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
@@ -49,7 +51,18 @@ Rails.application.configure do
     logger = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = GoogleJsonFormatter.new
     config.logger = logger
+
+    # Rails logs every unhandled exception itself too ("Class (message):" and the backtrace). Error
+    # Reporting would count that copy as a second event, in a group named after a stack frame because
+    # it cannot read the exception class from that format. CloudErrorReporter already wrote the
+    # exception, so the copy goes to DEBUG, below the default log level.
+    config.action_dispatch.debug_exception_log_level = :debug
   end
+
+  # Client errors (404 RecordNotFound / RoutingError, 422 CSRF, 400 ParameterMissing) are not bugs:
+  # never log their stack traces, even at RAILS_LOG_LEVEL=debug, or Error Reporting opens an error
+  # group for every 404. Cloud Run's request log still records each 4xx response (at WARNING).
+  config.action_dispatch.log_rescued_responses = false
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!).
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
