@@ -9,7 +9,14 @@ class RegistrationsController < ApplicationController
   def create
     @user = User.new(registration_params)
     @user.created_via = "ui"
-    if @user.save
+    saved = begin
+      @user.save
+    rescue ActiveRecord::RecordNotUnique
+      @user.errors.add(:email_address, :taken)
+      false
+    end
+
+    if saved
       UserMailer.with(user: @user).welcome.deliver_later
       start_new_session_for @user
       redirect_to root_path, notice: "Welcome aboard! 🎉 Account created successfully."
