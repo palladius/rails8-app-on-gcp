@@ -13,6 +13,12 @@
 # the installed gems. Measurements: https://github.com/palladius/rails8-app-on-gcp/issues/217
 # (slow codelab builds).
 #
+# Gem seed: `rails8-blog:gems` holds the last build's BUNDLE_PATH, so a Gemfile
+# change installs only the added or changed gems. blog/bin/cloudbuild-build-image
+# (shared with blog/cloudbuild-image.yaml) builds, pushes and refreshes the seed.
+# `_WORKSHOP_SEED` (empty by default) is for workshop attendees only: see
+# workshop/SEED_IMAGE.md.
+#
 # Substitutions are passed by:
 #   - bin/cloudbuild-submit (local testing)
 #   - Cloud Build Trigger (auto-deploy, configured in Terraform)
@@ -30,6 +36,7 @@ substitutions:
   _ENVIRONMENT: dev
   _CLOUD_SQL_CONNECTION: ''
   _ENABLE_SIGNUP: 'true'
+  _WORKSHOP_SEED: ''
 
 steps:
   # 0. A BuildKit builder that can import and export a registry cache (the default
@@ -46,7 +53,7 @@ steps:
       - '--use'
       - '--bootstrap'
 
-  # 1. Build blog/ with the registry cache, tag (latest, sha, version) and push in one go.
+  # 1. Build blog/ with the registry cache and the gem seed, tag (latest, sha, version) and push.
   #    buildx pushes straight from its builder, so there is no `images:` section.
   - name: 'gcr.io/cloud-builders/docker'
     id: 'docker-build-push'
@@ -58,13 +65,10 @@ steps:
         SHORT_SHA="$SHORT_SHA"  # substitution: empty on a manual submit
         SHORT_SHA="$${SHORT_SHA:-local}"
         IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog"
-        TAGS=(-t "$$IMAGE:latest" -t "$$IMAGE:sha-$$SHORT_SHA")
-        if [ -f VERSION ]; then TAGS+=(-t "$$IMAGE:v$$(cat VERSION)"); fi
+        TAGS=(latest "sha-$$SHORT_SHA")
+        if [ -f VERSION ]; then TAGS+=("v$$(cat VERSION)"); fi
 
-        docker buildx build --builder cached --progress=plain \
-          --cache-from "type=registry,ref=$$IMAGE:buildcache" \
-          --cache-to "type=registry,ref=$$IMAGE:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
-          "$${TAGS[@]}" --push blog/
+        WORKSHOP_SEED="${_WORKSHOP_SEED}" bash blog/bin/cloudbuild-build-image "$$IMAGE" blog "$${TAGS[@]}"
 
   # 4. Deploy to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'

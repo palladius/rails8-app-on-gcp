@@ -2,6 +2,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.24] - 2026-11-21
+### Added
+- 🌱 **Project gem seed, always on in Cloud Build** (`blog/bin/cloudbuild-build-image`, shared by `cloudbuild.yaml` and `blog/cloudbuild-image.yaml`): every build pushes the `gems` stage as `rails8-blog:gems`, and the next build copies that `BUNDLE_PATH` in before `Gemfile*`, so a Gemfile change installs only the added or changed gems. `bundle clean` keeps the self-seeding image from growing. The seed is used only if its `org.opencontainers.image.base.digest` label matches the Dockerfile's base digest; a missing or stale seed falls back to a full install, never to a failed build.
+- 🎓 **Opt-in workshop seed** (`_WORKSHOP_SEED`, empty by default): while a project has no `:gems` of its own, its first build reads the workshop leader's public `:gems` and `:buildcache`. It never writes there. Codelab Steps 3, 4 and 6 pass `_WORKSHOP_SEED=$WORKSHOP_SEED` (codelab v2.6.0).
+- 📦 **`.github/workflows/workshop-seed.yml`** publishes `ghcr.io/<owner>/rails8-blog-seed:{gems,gems-lock-<hash>,buildcache}` (linux/amd64) on Gemfile, Dockerfile or Ruby changes on `main`, with the same script and no app image.
+- 📖 **`workshop/SEED_IMAGE.md`**: the two seeds, when a seed is valid, the one-time GitHub setup (public package, anonymous pull check), the check before each workshop, a public Artifact Registry alternative, and what to delete when starting a new app from this repository.
+
+### Changed
+- 🐳 **`blog/Dockerfile`**: a new `gems` stage between `base` and `build`, `ARG GEMS_SEED=base` (a plain `docker build` stays seed-free and pulls only the Ruby image), the Ruby base pinned by manifest-list digest, `BUNDLE_WITHOUT="development:test"`, and no more `COPY vendor/* ./vendor/` before `bundle install` (it copied `vendor/javascript/local-time.js` flattened, `COPY . .` copies it again, and every importmap pin change invalidated the gem layer).
+- Measured locally (buildx 0.39, `docker-container` builder, local registry; `bundle install` step only, 123 gems): 38.9 s without a seed, 5.3 s with the project seed, 9.8 s after adding one gem (1 gem installed), 4.6 s for a new project on the workshop seed (0 installed). Not yet measured on Cloud Build.
+
+### Tests
+- 🧪 **`test/test_cloudbuild_contracts.rb`**: the Dockerfile's seed default, digest pin and stage order (apt, seed copy, `Gemfile*`, `bundle install`, `bundle clean`); both Cloud Build configs build through the shared script with `_WORKSHOP_SEED` empty by default; the script's seed order with existence and base checks, cache and images written only to the project; the workflow pushes only `:gems*` and `:buildcache`; Steps 3, 4 and 6 of `CODELAB.md` and `SKELETON.md` pass the workshop seed. The two existing cache tests follow the buildx flags into the shared script.
+
 ## [0.3.23] - 2026-11-19
 ### Changed
 - 🧱 **The codelab builds the image once and deploys it** (issue #217): Steps 3, 4 and 6 run `gcloud builds submit --config cloudbuild-image.yaml` from `blog/`, then deploy the pushed image (`gcloud run deploy blog --image $BLOG_IMAGE`, or `image: ${BLOG_IMAGE}` in `compose.prod.yaml`). The new `blog/cloudbuild-image.yaml` builds with the same `mode=max` registry cache as `cloudbuild.yaml`, so later builds reuse the installed gems; a `--source` deploy built from scratch every time. Measured on Cloud Run: a `--source` deploy took 341 s; a cached build took 65 s and the `--image` deploy 95 s. Running the build from `blog/` uploads 12.6 MiB instead of 80.3 MiB from the repository root.

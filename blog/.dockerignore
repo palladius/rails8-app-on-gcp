@@ -49,3 +49,6 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Cloud Build drives the image build with it; it has no place inside the image
+/bin/cloudbuild-build-image
