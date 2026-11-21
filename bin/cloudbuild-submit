@@ -36,7 +36,7 @@ APP_VERSION="$(cat VERSION 2>/dev/null || echo 'unknown')"
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-palladius-genai}"
 REGION="${REGION:-europe-west1}"
 AR_REPO="${AR_REPO:-rails8-gcp-app}"
-APP_NAME="palladius-genai-rails-app-${ENVIRONMENT}"
+APP_NAME="${APP_NAME:-blog}-${ENVIRONMENT}"
 CLOUD_SQL_CONNECTION="${CLOUD_SQL_CONNECTION:-${PROJECT_ID}:${REGION}:rails8-app-on-gcp-7de2}"
 
 # Environment-specific config
@@ -58,13 +58,12 @@ echo "  ENABLE_SIGNUP: ${ENABLE_SIGNUP}"
 echo "  CLOUD_SQL:     ${CLOUD_SQL_CONNECTION}"
 echo "───────────────────────────────────"
 
-# Build substitutions string
+# Build substitutions string. No secrets here: substitutions are stored in the build
+# record in plain text. The service reads RAILS_MASTER_KEY and DB_PASSWORD from Secret Manager.
 CB_SUBSTITUTIONS="_AR_REGION=${REGION}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_APP_NAME=${APP_NAME}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_AR_REPO=${AR_REPO}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENVIRONMENT=${ENVIRONMENT}"
-CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-placeholder}"
-CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_DATABASE_URL=${DATABASE_URL:-placeholder}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_CLOUD_SQL_CONNECTION=${CLOUD_SQL_CONNECTION}"
 CB_SUBSTITUTIONS="${CB_SUBSTITUTIONS},_ENABLE_SIGNUP=${ENABLE_SIGNUP}"
 

@@ -5,6 +5,7 @@ When we're ready, Riccardo is going to port this to Google Codelabs.
 
 * More user-facing details under `cfp/` 
 * More process-details under `AGENTS.md`
+* Gem seeds for faster Cloud Builds, and how to publish the workshop seed: [`SEED_IMAGE.md`](./SEED_IMAGE.md)
 ## 📸 Declarative Screenshots
 
 Screenshots for workshop steps and codelab walkthroughs are specified declaratively in `workshop/skeleton.yaml` and embedded in Markdown files (`CODELAB.md`) via HTML comments/directives:

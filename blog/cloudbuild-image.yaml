@@ -1,0 +1,55 @@
+###############################################################################
+# Build the blog image once, with a layer cache, and push it to Artifact Registry.
+#
+#   cd blog && gcloud builds submit --config cloudbuild-image.yaml
+#
+# Run it from blog/: gcloud uploads only this folder. Cloud Run then deploys the
+# pushed image with `--image` (Steps 3 and 4) or `image:` in compose.prod.yaml
+# (Step 6), without building again.
+#
+# Every Cloud Build runs on a fresh VM, so the only cache that survives is one
+# stored in Artifact Registry. bin/cloudbuild-build-image (shared with the
+# repository's cloudbuild.yaml, the CI trigger) keeps two things there:
+#   - `rails8-blog:buildcache`, a `mode=max` cache of every stage: a change
+#     outside Gemfile/Gemfile.lock reuses the installed gems.
+#   - `rails8-blog:gems`, the project's gem seed: a Gemfile change installs only
+#     the added or changed gems.
+#
+# Optional, workshop only: `--substitutions=_WORKSHOP_SEED=<repo>` reads the
+# workshop leader's public :gems and :buildcache while this project has no
+# :gems of its own yet (its first build). See workshop/SEED_IMAGE.md.
+###############################################################################
+
+timeout: 1800s
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _AR_REGION: europe-west1
+  _AR_REPO: rails8-gcp-app
+  _WORKSHOP_SEED: ''
+
+steps:
+  # A BuildKit builder that can import and export a registry cache (the default
+  # docker driver cannot export `mode=max`). The image comes from Google's Docker
+  # Hub mirror to stay clear of Docker Hub rate limits on shared build IPs.
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'buildx-builder'
+    args:
+      - 'buildx'
+      - 'create'
+      - '--name=cached'
+      - '--driver=docker-container'
+      - '--driver-opt=image=mirror.gcr.io/moby/buildkit:buildx-stable-1'
+      - '--use'
+      - '--bootstrap'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build-push'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -euo pipefail
+        IMAGE="${_AR_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/rails8-blog"
+        WORKSHOP_SEED="${_WORKSHOP_SEED}" bash bin/cloudbuild-build-image "$$IMAGE" . latest

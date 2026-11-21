@@ -95,7 +95,10 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 1
-  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # Deploy 1: dummy key fallback
+  export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
+  export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed # optional: prebuilt gems for the first build only
+  gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED # build once; the layer cache lives in Artifact Registry
+  gcloud run deploy blog --image $BLOG_IMAGE --region $GOOGLE_CLOUD_REGION --allow-unauthenticated --set-env-vars GOOGLE_CLOUD_ACCOUNT=$GOOGLE_CLOUD_ACCOUNT,SECRET_KEY_BASE_DUMMY=1 # Deploy 1: dummy key fallback
   # Deploy 2: Notice stuck jobs banner, attempt workaround via SOLID_QUEUE_IN_PUMA=true, then clean up to prevent 512MiB OOM
   gcloud run services update blog --region $GOOGLE_CLOUD_REGION --update-env-vars SOLID_QUEUE_IN_PUMA=true
   gcloud run services update blog --region $GOOGLE_CLOUD_REGION --remove-env-vars SOLID_QUEUE_IN_PUMA --max-instances 1
@@ -120,7 +123,8 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
 - **`pseudocode`**:
   ```bash
   just workshop-rewind 2
-  gcloud run deploy blog --source . --region $GOOGLE_CLOUD_REGION --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # Deploy 3: GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
+  gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED # config changed: about a minute, gems from the cache
+  gcloud run deploy blog --image $BLOG_IMAGE --region $GOOGLE_CLOUD_REGION --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google # Deploy 3: GOOGLE_CLOUD_PROJECT is required: storage.yml builds the bucket as "$GOOGLE_CLOUD_PROJECT-activestorage-prod". update, not set: --set-env-vars would wipe the vars from Step 3
   # Observe surviving images & stuck jobs banner
   ```
 - **`postrequisites`**:
@@ -168,6 +172,9 @@ This is the canonical high-level roadmap and step breakdown for the Rails 8 on G
   ```bash
   just workshop-restore-gold
   export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+  export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
+  export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed # optional: prebuilt gems for the first build only
+  gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED # gold config: compose.prod.yaml deploys $BLOG_IMAGE without building
   gcloud run compose up compose.prod.yaml --region=$GOOGLE_CLOUD_REGION
   export APP_SECRETS="RAILS_MASTER_KEY=rails-master-key:latest,DB_PASSWORD=rails-db-password:latest"
   gcloud run services update blog --region=$GOOGLE_CLOUD_REGION --service-account=$RUN_SA --container=web --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS" --container=worker --remove-env-vars=SECRET_KEY_BASE_DUMMY --set-secrets="$APP_SECRETS"

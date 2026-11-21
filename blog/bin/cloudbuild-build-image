@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# Builds and pushes the blog image with a registry layer cache and a gem seed.
+# Shared by blog/cloudbuild-image.yaml (codelab) and cloudbuild.yaml (CI trigger); the workshop
+# seed workflow (.github/workflows/workshop-seed.yml) runs it without app tags.
+#
+#   bin/cloudbuild-build-image IMAGE CONTEXT [TAG...] [-- EXTRA_BUILDX_ARGS...]
+#
+#   IMAGE    repository without a tag, e.g. europe-west1-docker.pkg.dev/my-project/rails8-gcp-app/rails8-blog
+#   CONTEXT  build context holding the Dockerfile (`.` from blog/, `blog` from the repository root)
+#   TAG      app tags to push (latest, sha-..., v...); none: the app image only fills IMAGE:buildcache
+#   WORKSHOP_SEED (env, optional)  repository without a tag whose public :gems and :buildcache
+#                                  speed up a project's FIRST build; read only, never written
+#   SEED_EXTRA_TAGS (env, optional) more tags for the seed besides IMAGE:gems, space-separated
+#   BUILDER (env, default: cached) the docker-container buildx builder
+#
+# Seed order: the project's own IMAGE:gems, then WORKSHOP_SEED:gems, then the empty `base` stage.
+# `FROM` on a missing ref fails the build, so every candidate is inspected first. A candidate built
+# on a different Ruby base digest is skipped as well: its native extensions belong to other bytes.
+set -euo pipefail
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: $0 IMAGE CONTEXT [TAG...] [-- EXTRA_BUILDX_ARGS...]" >&2
+  exit 64
+fi
+
+IMAGE="$1"
+CONTEXT="$2"
+shift 2
+APP_TAGS=()
+while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do
+  APP_TAGS+=(-t "$IMAGE:$1")
+  shift
+done
+[ "${1:-}" = "--" ] && shift
+EXTRA_ARGS=("$@")
+WORKSHOP_SEED="${WORKSHOP_SEED:-}"
+BUILDER="${BUILDER:-cached}"
+SEED_TAGS=(-t "$IMAGE:gems")
+for tag in ${SEED_EXTRA_TAGS:-}; do
+  SEED_TAGS+=(-t "$IMAGE:$tag")
+done
+if [ "${#APP_TAGS[@]}" -gt 0 ]; then
+  APP_OUTPUT=("${APP_TAGS[@]}" --push)
+else
+  APP_OUTPUT=(--output type=cacheonly)
+fi
+
+BASE_DIGEST="$(sed -n 's/^ARG RUBY_DIGEST=//p' "$CONTEXT/Dockerfile")"
+if [ -z "$BASE_DIGEST" ]; then
+  echo "❌ No 'ARG RUBY_DIGEST=' in $CONTEXT/Dockerfile" >&2
+  exit 1
+fi
+
+# Prints why a candidate cannot seed this build; prints nothing when it can.
+seed_problem() {
+  local inspected
+  if ! inspected="$(docker buildx imagetools inspect --format '{{json .Image}}' "$1" 2>&1)"; then
+    echo "not found or not readable"
+  elif ! grep -Eq "\"org.opencontainers.image.base.digest\": *\"$BASE_DIGEST\"" <<<"$inspected"; then
+    echo "built on another Ruby base (this Dockerfile: $BASE_DIGEST)"
+  fi
+}
+
+GEMS_SEED=base
+CANDIDATES=("$IMAGE:gems")
+[ -n "$WORKSHOP_SEED" ] && CANDIDATES+=("$WORKSHOP_SEED:gems")
+for candidate in "${CANDIDATES[@]}"; do
+  problem="$(seed_problem "$candidate")"
+  if [ -z "$problem" ]; then
+    GEMS_SEED="$candidate"
+    break
+  fi
+  echo "🌱 Skipping gem seed $candidate: $problem"
+done
+if [ "$GEMS_SEED" = base ]; then
+  echo "🌱 Gem seed: none, bundle install starts from an empty BUNDLE_PATH"
+else
+  echo "🌱 Gem seed: $GEMS_SEED"
+fi
+
+# A missing --cache-from is only a warning, so the project's own cache needs no check.
+CACHE_FROM=(--cache-from "type=registry,ref=$IMAGE:buildcache")
+if [ -n "$WORKSHOP_SEED" ]; then
+  if docker buildx imagetools inspect "$WORKSHOP_SEED:buildcache" >/dev/null 2>&1; then
+    CACHE_FROM+=(--cache-from "type=registry,ref=$WORKSHOP_SEED:buildcache")
+    echo "📦 Also reading the layer cache $WORKSHOP_SEED:buildcache"
+  else
+    echo "📦 Skipping layer cache $WORKSHOP_SEED:buildcache: not found or not readable"
+  fi
+fi
+
+docker buildx build --builder "$BUILDER" --progress=plain \
+  --build-arg "GEMS_SEED=$GEMS_SEED" \
+  "${CACHE_FROM[@]}" \
+  --cache-to "type=registry,ref=$IMAGE:buildcache,mode=max,image-manifest=true,oci-mediatypes=true" \
+  "${EXTRA_ARGS[@]}" "${APP_OUTPUT[@]}" "$CONTEXT"
+
+# The next build's seed. Every layer of the gems stage was just built or exported above, so this is
+# cache hits only. Seeding the seed from itself cannot grow it: the gems stage runs `bundle clean`,
+# which drops every gem the current Gemfile.lock no longer lists.
+docker buildx build --builder "$BUILDER" --progress=plain \
+  --build-arg "GEMS_SEED=$GEMS_SEED" \
+  --cache-from "type=registry,ref=$IMAGE:buildcache" \
+  --target gems "${SEED_TAGS[@]}" "${EXTRA_ARGS[@]}" --push "$CONTEXT"
+echo "🌱 Pushed the next gem seed: $IMAGE:gems ${SEED_EXTRA_TAGS:-}"

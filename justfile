@@ -34,6 +34,7 @@ compose-logs:
 test:
     cd blog && just test
     ruby test/test_codelab_sync_and_contracts.rb
+    ruby test/test_cloudbuild_contracts.rb
     ruby test/test_docker_compose_contracts.rb
     ruby test/test_iac_codelab_contracts.rb
     ruby test/test_workshop_diagnostics.rb

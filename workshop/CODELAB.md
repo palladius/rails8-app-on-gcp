@@ -1,6 +1,6 @@
 <!-- ⚠️ AGENT WARNING: This file (CODELAB.md) and SKELETON.md must be kept in sync at all times. A change to one requires a change to the other! -->
 <!-- 📜 Adheres to docs/CONSTITUTION.md (v1.5.0) -->
-<!-- 🏷️ Codelab Version: 2.5.2 -->
+<!-- 🏷️ Codelab Version: 2.6.0 -->
 # Rails 8 on Google Cloud: From Zero to AI
 
 ## Introduction
@@ -385,7 +385,7 @@ In the next step, we will intentionally deploy this ephemeral configuration to C
 
 *Duration: 10min*
 
-Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** with one command (about six minutes the first time, while Cloud Build builds the image).
+Instead of waiting 15–20 minutes for cloud databases before seeing anything on the web, modern serverless development begins with an early victory: deploying our single-container Rails application directly to **Google Cloud Run** with one build and one deploy command (about six minutes the first time, while Cloud Build builds the image).
 
 ### 1. The Time-Machine Rewind
 
@@ -400,7 +400,7 @@ just workshop-rewind 1
 
 ### 2. Deploy 1: Deploying Single-Container Puma to Cloud Run
 
-Deploy directly from source code to Cloud Run using the dedicated `rails-cloudrun-sa` Service Account created by Terraform in Step 1. Modern Rails 8 automatically generates an official, production-ready `Dockerfile` out of the box (with multi-stage builds, jemalloc, and non-root security). When you deploy from the `blog/` folder, Google Cloud Build detects this native `Dockerfile` directly and provisions a managed serverless service:
+Modern Rails 8 generates an official, production-ready `Dockerfile` out of the box (with multi-stage builds, jemalloc, and non-root security). Google Cloud Build builds it once and pushes the image to the Artifact Registry repository Terraform created in Step 1; Cloud Run then runs that image with the dedicated `rails-cloudrun-sa` Service Account:
 
 ```bash
 # Ensure you are inside the Rails application directory
@@ -409,10 +409,15 @@ cd "$(git rev-parse --show-toplevel)/blog"   # the Rails app folder, from wherev
 # Ensure default region and custom Cloud Run Service Account are set
 export GOOGLE_CLOUD_REGION="${GOOGLE_CLOUD_REGION:-europe-west1}"
 export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
+export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed   # prebuilt gems from the workshop leader, first build only
 
-# Deploy 1: single-container service from source (passing GOOGLE_CLOUD_ACCOUNT and APP_ADMIN_PASSWORD)
+# Build the image with Cloud Build (the layer cache lives next to the image in Artifact Registry)
+gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED
+
+# Deploy 1: single-container service from that image (passing GOOGLE_CLOUD_ACCOUNT and APP_ADMIN_PASSWORD)
 gcloud run deploy blog \
-  --source . \
+  --image $BLOG_IMAGE \
   --region $GOOGLE_CLOUD_REGION \
   --service-account $RUN_SA \
   --allow-unauthenticated \
@@ -423,7 +428,9 @@ You should see progress output similar to this:
 
 ![gcloud run deploy building and deploying container](assets/images/gcloud_run_deploy_in_progress.png)
 
-⏳ *Expect about six minutes: Cloud Build builds the image, then Cloud Run starts the revision. Every later `--source` deploy rebuilds the image and takes about as long.*
+⏳ *Expect about six minutes the first time: almost five for the build, which also fills the layer cache, and one and a half for Cloud Run to start the revision. Later builds take the gems from the cache: when only your code or `config/` changed, the build takes about a minute.*
+
+🌱 *`WORKSHOP_SEED` only speeds up your first build: it lends you gems the workshop leader already compiled. Every later build starts from your project's own gem seed (`rails8-blog:gems`, pushed by each build), and without `WORKSHOP_SEED` the first build simply takes longer.*
 
 
 #### 🧯 Troubleshooting & Common Caveats
@@ -436,11 +443,11 @@ You should see progress output similar to this:
 >    just project-status   # grants storage.admin, logging.logWriter, artifactregistry.writer, cloudbuild.builds.builder
 >    ```
 >    `just workshop-test` also reports this now, so it is worth re-running if the deploy keeps failing.
-> 3. **Updating `Gemfile` / `google-cloud-*` Gems or Speeding Up Docker Builds:** If you add or bump gems on macOS/Windows, run `bundle lock --add-platform x86_64-linux` so Cloud Build's Linux container resolves precompiled native gems cleanly alongside Rails 8 Propshaft and Psych 5 (`libyaml-dev`). For faster repeated builds with Artifact Registry Docker layer caching (`--cache-from`), see `cloudbuild.yaml` and `bin/cloudbuild-submit`.
+> 3. **Updating `Gemfile` / `google-cloud-*` Gems or Speeding Up Docker Builds:** If you add or bump gems on macOS/Windows, run `bundle lock --add-platform x86_64-linux` so Cloud Build's Linux container resolves precompiled native gems cleanly alongside Rails 8 Propshaft and Psych 5 (`libyaml-dev`). A change to `Gemfile.lock` installs only the added or changed gems on top of your project's gem seed; the build after that takes them from the layer cache again (see `blog/cloudbuild-image.yaml`). How the two seeds work, and how the workshop seed is published: [`workshop/SEED_IMAGE.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/SEED_IMAGE.md).
 
 
 During deployment:
-1. Cloud Run builds your Rails container image.
+1. Cloud Build builds your Rails container image and pushes it to Artifact Registry.
 2. It assigns a public HTTPS endpoint (`https://blog-[hash]-[region].a.run.app`) secured with a Google-managed TLS certificate.
 3. Traffic begins routing to Puma on port 8080.
 
@@ -591,16 +598,20 @@ gcloud iam service-accounts add-iam-policy-binding $RUN_SA \
 
 ### 3. Deploy 3: Deploying to Cloud Run with GCS Attached
 
-Re-deploy with GCS enabled. Make sure you are inside the `blog/` folder (otherwise Cloud Run attempts to build using Buildpacks instead of the Rails 8 `Dockerfile`, causing build failures).
+The rewind changed `blog/config/`, so build the image again from the `blog/` folder: about a minute, because the gems come from the layer cache. Then re-deploy with GCS enabled.
 
 Use `--update-env-vars` (not `--set-env-vars`) to preserve existing env vars (`GOOGLE_CLOUD_ACCOUNT`, `SECRET_KEY_BASE_DUMMY=1`), and explicitly pass `GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT` so `storage.yml` resolves `${GOOGLE_CLOUD_PROJECT}-activestorage-prod`:
 
 ```bash
 cd "$(git rev-parse --show-toplevel)/blog"   # the Rails app folder, from wherever you are in the repo
 export RUN_SA="rails-cloudrun-sa@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com"
+export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
+export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed   # prebuilt gems from the workshop leader, first build only
+
+gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED
 
 gcloud run deploy blog \
-  --source . \
+  --image $BLOG_IMAGE \
   --region $GOOGLE_CLOUD_REGION \
   --service-account $RUN_SA \
   --update-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,ACTIVE_STORAGE_SERVICE=google
@@ -820,8 +831,13 @@ export CLOUDSQL_INSTANCE_CONNECTION_NAME="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD
 export GCS_BUCKET="${GOOGLE_CLOUD_PROJECT}-activestorage-prod"
 export ACTIVE_STORAGE_SERVICE="google"
 export GOOGLE_CLOUD_ACCOUNT="${GOOGLE_CLOUD_ACCOUNT:-$(gcloud config get-value account)}"
+export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
+export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed   # prebuilt gems from the workshop leader, first build only
 
-# Deploy the three containers to Cloud Run (about 6 minutes: it builds the image)
+# The restore changed blog/config/: build the gold image once (about a minute, gems from the cache)
+gcloud builds submit --config cloudbuild-image.yaml --substitutions=_AR_REGION=$GOOGLE_CLOUD_REGION,_WORKSHOP_SEED=$WORKSHOP_SEED
+
+# Deploy the three containers to Cloud Run: web and worker both run $BLOG_IMAGE, nothing is built here
 gcloud run compose up compose.prod.yaml \
   --region=$GOOGLE_CLOUD_REGION
 ```
@@ -883,9 +899,8 @@ Open your Cloud Run URL:
 `web` prepares the database when it boots. That is convenient for a workshop, and it is safe here because the entrypoint takes a PostgreSQL advisory lock. For a busy production service, a schema change is better run **once, before** the new revision takes traffic. A Cloud Run Job does that, with the same image and the same secrets:
 
 ```bash
-# The image of the web container (jobs do not support --source)
-export BLOG_IMAGE=$(gcloud run services describe blog --region=$GOOGLE_CLOUD_REGION --format=json \
-  | ruby -rjson -e 'puts JSON.parse(STDIN.read).dig("spec","template","spec","containers").find { |c| c["name"] == "web" }["image"]')
+# The image web and worker run (built in section 3)
+export BLOG_IMAGE="${GOOGLE_CLOUD_REGION}-docker.pkg.dev/${GOOGLE_CLOUD_PROJECT}/rails8-gcp-app/rails8-blog:latest"
 export CLOUDSQL_CONNECTION="${GOOGLE_CLOUD_PROJECT}:${GOOGLE_CLOUD_REGION}:${SQL_INSTANCE_NAME}"
 
 # A job has no sidecar: Cloud Run mounts the Cloud SQL Unix socket under /cloudsql instead
@@ -1286,4 +1301,4 @@ gcloud projects delete $GOOGLE_CLOUD_PROJECT --quiet
 
 ---
 
-*Codelab Version: v2.5.2 (2026-11-18) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*
+*Codelab Version: v2.6.0 (2026-11-21) — Synchronized across GitHub (`workshop/CODELAB.md`) & Google DevSite (`rails8-on-google-cloud`). See [`workshop/CODELAB_CHANGELOG.md`](https://github.com/palladius/rails8-app-on-gcp/blob/main/workshop/CODELAB_CHANGELOG.md).*

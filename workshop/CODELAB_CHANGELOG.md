@@ -8,6 +8,12 @@ The current version in [`workshop/CODELAB_VERSION`](./CODELAB_VERSION) is embedd
 
 ---
 
+## [2.6.0] - 2026-11-21 (Build once, then reuse; optional workshop gem seed)
+
+- **Steps 3, 4 and 6**: build the image once with `gcloud builds submit --config cloudbuild-image.yaml` and deploy the pushed `$BLOG_IMAGE` (app v0.3.23; no `--source` deploy, `compose up` builds nothing).
+- **Steps 3, 4 and 6**: `export WORKSHOP_SEED=ghcr.io/palladius/rails8-blog-seed` next to `BLOG_IMAGE`, passed as `_WORKSHOP_SEED=$WORKSHOP_SEED`. It only speeds up the first build; later builds use the project's own gem seed, and without it the first build just takes longer.
+- **Step 3**: the troubleshooting note on Gemfile changes links [`SEED_IMAGE.md`](./SEED_IMAGE.md): a Gemfile change installs only the added or changed gems.
+
 ## [2.5.2] - 2026-11-18 (Folder-independent `cd`; where to claim credits)
 
 - **Steps 3, 4 and 6**: `cd "$(git rev-parse --show-toplevel)/blog"` works from the repository root and from inside `blog/`.
