@@ -12,6 +12,7 @@ class CommentsController < ApplicationController
 
   private
     def set_post
-      @post = Post.find(params[:post_id])
+      @post = Post.find(params.expect(:post_id))
+      raise ActiveRecord::RecordNotFound unless @post.visible_to?(Current.user)
     end
 end

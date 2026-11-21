@@ -8,6 +8,19 @@ class Post < ApplicationRecord
   after_commit :generate_cover_image_if_missing, on: [ :create, :update ]
   after_commit :generate_podcast_audio, on: [ :create, :update ]
 
+  scope :visible_to, ->(current_user) {
+    base = where(public: true).or(where(user_id: nil))
+    current_user ? base.or(where(user: current_user)) : base
+  }
+
+  def visible_to?(current_user)
+    public? || user_id.nil? || (current_user.present? && user_id == current_user.id)
+  end
+
+  def modifiable_by?(current_user)
+    current_user.present? && (user_id.nil? || user_id == current_user.id)
+  end
+
   private
 
   def generate_cover_image_if_missing

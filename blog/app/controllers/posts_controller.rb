@@ -1,13 +1,13 @@
 class PostsController < ApplicationController
   allow_unauthenticated_access only: %i[ index show ]
   before_action :set_post, only: %i[ show edit update destroy purge_cover_image ]
+  before_action :authorize_post_visible!, only: %i[ show ]
+  before_action :authorize_post_owner!, only: %i[ edit update destroy purge_cover_image ]
 
   # GET /posts or /posts.json
   def index
     @posts = Post.with_attached_cover_image.includes(:comments, :user)
-                 .where(user: Current.user)
-                 .or(Post.where(public: true))
-                 .or(Post.where(user_id: nil))
+                 .visible_to(Current.user)
                  .order(created_at: :desc)
   end
 
@@ -78,6 +78,15 @@ class PostsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_post
       @post = Post.find(params.expect(:id))
+    end
+
+    def authorize_post_visible!
+      raise ActiveRecord::RecordNotFound unless @post.visible_to?(Current.user)
+    end
+
+    def authorize_post_owner!
+      raise ActiveRecord::RecordNotFound unless @post.visible_to?(Current.user)
+      head :forbidden unless @post.modifiable_by?(Current.user)
     end
 
     # Only allow a list of trusted parameters through.

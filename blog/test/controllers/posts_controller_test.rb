@@ -124,5 +124,122 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     @post.reload
     assert_not @post.cover_image.attached?
   end
+
+  # Post visibility and ownership regression tests
+  test "unauthenticated user cannot view another user's private post" do
+    private_post = Post.create!(title: "Secret Note", body: "Private content", user: users(:one), public: false)
+    sign_out
+
+    get post_url(private_post)
+    assert_response :not_found
+  end
+
+  test "other authenticated user cannot view another user's private post" do
+    private_post = Post.create!(title: "Secret Note", body: "Private content", user: users(:one), public: false)
+    sign_in_as(users(:two))
+
+    get post_url(private_post)
+    assert_response :not_found
+  end
+
+  test "owner can view own private post on show and index (session resumed on public actions)" do
+    private_post = Post.create!(title: "Owner Private Note", body: "Only for me", user: users(:one), public: false)
+
+    get post_url(private_post)
+    assert_response :success
+
+    get posts_url
+    assert_response :success
+    assert_includes response.body, "Owner Private Note"
+  end
+
+  test "other authenticated user gets 403 and cannot edit, update, destroy, or purge cover of user one's public post" do
+    owners_post = Post.create!(title: "Owner Public", body: "Original body", user: users(:one), public: true)
+    owners_post.cover_image.attach(
+      io: StringIO.new("\x89PNG\r\n\x1a\n"),
+      filename: "owner.png",
+      content_type: "image/png"
+    )
+    sign_in_as(users(:two))
+
+    get edit_post_url(owners_post)
+    assert_response :forbidden
+
+    patch post_url(owners_post), params: { post: { title: "Hacked Title", body: "Hacked body" } }
+    assert_response :forbidden
+    assert_equal "Owner Public", owners_post.reload.title
+
+    assert_no_difference("Post.count") do
+      delete post_url(owners_post)
+    end
+    assert_response :forbidden
+
+    assert_no_enqueued_jobs(only: GenerateCoverImageJob) do
+      delete purge_cover_image_post_url(owners_post)
+    end
+    assert_response :forbidden
+    assert owners_post.reload.cover_image.attached?
+
+    assert_no_enqueued_jobs(only: GenerateCoverImageJob) do
+      delete purge_cover_image_post_url(owners_post), as: :turbo_stream
+    end
+    assert_response :forbidden
+    assert owners_post.reload.cover_image.attached?
+  end
+
+  test "other authenticated user gets 404 when trying to edit, update, destroy, or purge private post" do
+    private_post = Post.create!(title: "Owner Private", body: "Hidden", user: users(:one), public: false)
+    sign_in_as(users(:two))
+
+    get edit_post_url(private_post)
+    assert_response :not_found
+
+    patch post_url(private_post), params: { post: { title: "Hacked" } }
+    assert_response :not_found
+    assert_equal "Owner Private", private_post.reload.title
+
+    assert_no_difference("Post.count") do
+      delete post_url(private_post)
+    end
+    assert_response :not_found
+
+    delete purge_cover_image_post_url(private_post)
+    assert_response :not_found
+  end
+
+  test "unauthenticated user can view user_id nil seeded posts and authenticated users can modify them" do
+    seeded_public = Post.create!(title: "Seeded Public", body: "Workshop", user: nil, public: true)
+    seeded_private = Post.create!(title: "Seeded Private", body: "Workshop", user: nil, public: false)
+    seeded_public.cover_image.attach(
+      io: StringIO.new("\x89PNG\r\n\x1a\n"),
+      filename: "seed.png",
+      content_type: "image/png"
+    )
+
+    sign_out
+    get post_url(seeded_public)
+    assert_response :success
+    get post_url(seeded_private)
+    assert_response :success
+
+    sign_in_as(users(:two))
+    get edit_post_url(seeded_public)
+    assert_response :success
+
+    patch post_url(seeded_public), params: { post: { title: "Updated Seeded" } }
+    assert_redirected_to post_url(seeded_public)
+    assert_equal "Updated Seeded", seeded_public.reload.title
+
+    assert_enqueued_with(job: GenerateCoverImageJob, args: [seeded_public.id]) do
+      delete purge_cover_image_post_url(seeded_public)
+    end
+    assert_redirected_to post_url(seeded_public)
+    assert_not seeded_public.reload.cover_image.attached?
+
+    assert_difference("Post.count", -1) do
+      delete post_url(seeded_public)
+    end
+    assert_redirected_to posts_url
+  end
 end
 
